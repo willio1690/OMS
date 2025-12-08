@@ -1,0 +1,48 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="#" id="catEditor" method="post" target="{update:'messagebox'}">
+  <div class="gridlist-action">
+    <{button label=$___ectools="同步淘宝类目"|t:'eccommon' app="desktop" onclick="new Dialog('index.php?app=tbo2o&ctl=admin_store_cat&act=syncTbStoreCat&p[0]=taobao',{height:260,title:'同步淘宝类目'})" icon="btn_add.gif" }>
+  </div>
+  <table cellspacing="0" cellpadding="0" class="gridlist">
+    <col class="Colauto"></col>
+    <thead>
+      <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;类目名称</th>
+    </thead>
+    <tbody>
+      <{foreach from=$cat item=item key=iLoop name="item"}>
+      <tr parentid="<{$item.cat_id}>" class="provice-bg">
+        <td style="text-align:left; width:320px;">
+          <div style="padding-left:<{$item.cat_grade*25}>px">
+            <{if $item.child_count>0}>
+            <span class="imgTree" onclick="clickTree(this);" id="<{$item.cat_id}>"> &nbsp;&nbsp; </span>
+            <{else}>
+            <span class="imgTree tree_open" id="<{$item.cat_id}>"> &nbsp;&nbsp; </span>
+            <{/if}>
+            <{$item.cat_name}></div>
+        </td>
+      </tr>
+      <{/foreach}>
+    </tbody>
+  </table>
+</form>
+
+<script>
+function clickTree(el){
+    var el=$(el), obj = el.getParent('[parentid]');
+    if(!el.hasClass("tree_open")){
+        if(!obj.getNext() || !obj.getNext().get('readstatus')){
+            var tr=new Element('tr[readstatus=1]').injectAfter(obj).setHTML('<td colspan="6" style="border:0;padding:0;"></td>');
+            W.page('index.php?app=tbo2o&ctl=admin_store_cat&act=getChildNode',{update:tr.firstChild,method:'post',data:'catId='+el.id});
+        }
+        obj.getNext().show();
+        el.addClass("tree_open");
+    }else{
+        obj.getNext().hide();
+        el.removeClass("tree_open");
+    }
+}
+</script>

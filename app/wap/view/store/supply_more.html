@@ -1,0 +1,30 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $active == 'unrelation'}>
+    <{foreach from=$dataList item=item}>
+    <li class="tr">
+        <div class="grid-1 td"><input type="checkbox" name="bm_id" id="bm_id" value="<{$item.bm_id}>" required></div>
+        <div class="grid-3 td item_bn"><{$item.material_bn}></div>
+        <div class="grid-7 td item_name"><div class="title" id="item_title_<{$item.bm_id}>" onclick="showTitle('<{$item.bm_id}>')"><{$item.material_name}></div></div>
+    </li>
+    <{/foreach}>
+<{elseif $active == 'relation'}>
+    <{foreach from=$dataList item=item}>
+    <li class="tr">
+        <div class="grid-3 td item_bn"><{$item.material_bn}></div>
+        <div class="grid-7 td item_name"><div class="title" id="item_title_<{$item.bm_id}>" onclick="showTitle('<{$item.bm_id}>')"><{$item.material_name}></div></div>
+        <div class="grid-1 td"><a href="<{$config_url}>?id=<{$item.id}>" class="btn small primary">配置</a></div>
+    </li>
+    <{/foreach}>
+<{else}>
+    <{foreach from=$dataList item=item}>
+    <li class="tr">
+        <div class="grid-3 td item_bn"><{$item.material_bn}></div>
+        <div class="grid-7 td item_name"><div class="title" id="item_title_<{$item.bm_id}>" onclick="showTitle('<{$item.bm_id}>')"><{$item.material_name}></div></div>
+        <div class="grid-1 td"><{if $item.is_relate}>已关联<{else}>未关联<{/if}></div>
+    </li>
+    <{/foreach}>
+<{/if}>

@@ -1,0 +1,61 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=finance&ctl=settlement&act=doUnMatchExport&finder_id=<{$env.get.finder_id}>" method="post" id="form1" isCloseDialog>
+     <div class="tableform">
+      <div class="division">
+ <table width="100%" border="0" cellpadding="0" cellspacing="0" class="girdlist">
+
+<tr><th>所选平台</th><td id="bill-shop">
+  <select name="platform_type" id="platform_type" vtype="required">
+  <{foreach from=$platform_list key=key item=item}>
+<option value="<{$key}>" ><{$item}></option>
+<{/foreach}>
+</select>
+</td></tr>
+
+
+ </table>
+
+<div class="table-action">
+      <{button label="确定" id="btn-submit" class="btn-primary" }> &nbsp; &nbsp;
+      <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+<input type='hidden' id='finder_id' name='finder_id' value='<{$finder_id}>'>
+  </div>  </div>
+</form>
+<script>
+
+
+
+
+
+
+$('btn-submit').addEvent('click',function(e){
+
+
+
+    var platform_type = $('platform_type').get('value');
+ 
+    this.getParent('.dialog').retrieve('instance').close();
+
+    window.open('index.php?app=finance&ctl=settlement&act=doUnMatchExport&p[0]='+platform_type);
+              
+  // finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+  //             _this.getParent('.dialog').retrieve('instance').close();
+
+
+  // var _this = this;_this.set('disabled',true);
+  // var _data = _this.form.toQueryString().replace(/\+/g,"%2B");
+  // new Request.JSON({
+  //           url:_this.form.get('action'),
+  //           data:_data,
+  //           onComplete:function(rs){
+  //             finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+  //             _this.getParent('.dialog').retrieve('instance').close();
+  //           }
+  //       }).send();
+});
+</script>

@@ -1,0 +1,137 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=logisticsmanager&ctl=admin_warehouse&act=doSave&finder_id=<{$finder_id}>" method="post" id="area_add_form"  class="tableform">
+<div class="division">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" >
+        <tbody>
+            <tr>
+                <th>区域仓名称:</th> 
+                <td>
+
+                   <input type="text" name="warehouse_name" value="<{$warehouse.warehouse_name}>" vtype="required">
+                </td>
+            </tr>
+             <tr>
+                <th>
+                   选择仓库:
+                </th> 
+                <td>
+                   <select name="branch_id" vtype="required">
+                       <option value="">请选择</option>
+                       <{foreach from=$branchList item=branch}>
+                       <option value="<{$branch.branch_id}>" <{if $branch.branch_id==$warehouse.branch_id}>selected<{/if}>><{$branch.name}></option>
+                       <{/foreach}>
+                   </select>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                   区域仓覆盖范围:
+                </th> 
+                <td>
+                <{input type="address" id='p_region_id' name="p_region_id" value='' }>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                   库存预警值:
+                </th> 
+                <td>
+                  <input type="text" name="warn_num" vtype="required&&number" value='5'>
+                </td>
+            </tr>
+            <tr><td><{button label="新增库存查询默认地址" id="btn_add_address" onclick="new Dialog('index.php?app=logisticsmanager&ctl=admin_warehouse&act=addNewAddress',{title:'新增库存查询默认地址',width:650,height:300})"}></td><td>
+             
+       <font color='red'>*</font>&nbsp;&nbsp;该地址用于云交易库存状态监控，请谨慎填写，提交后不支持修改</help>
+            </td></tr>
+            
+            <tr><td></td><td>
+              
+      
+         
+              <ul class="addrlist" id="addrlist"></ul>
+
+              <input type="hidden" name="consignee[area]"       id="consignee_area"      value="" />
+              <input type="hidden" name="consignee[addr]"       id="consignee_addr"      value="" />
+             
+              <input type="hidden" name="certId"                id="certId"              value="" />
+
+      
+
+            
+            </td></tr>
+            
+        </tbody>
+        </table>
+    </div>
+
+
+<div class="table-action">
+      <{button label="确定" class="btn-primary" type='submit' id='save_area'}> &nbsp; &nbsp;
+      <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+<input type='hidden' id='finder_id' name='finder_id' value='<{$finder_id}>'>
+<input type='hidden' name='id' value='<{$warehouse.id}>'>
+</form>
+<script>
+  var Order = {
+  addrlist:[],
+  addrTpl:'<li id="{addrid}" number="{number}" is_encrypt="{is_encrypt}" order_id="{order_id}"><input type="hidden" name="area[]" value="{area}" /><q><input type="hidden" name="addr[]" value="{addr}" />{areas}&nbsp;&nbsp;{addr}</q> <cid>{certId}</cid></li>',
+  
+ 
+  setAddr:function(data,cur){
+    var html = '';
+    if (typeOf(data) == 'array') {
+      this.addrlist = data;
+      for(var i=0;i<data.length;i++){
+        data[i]['number']=i;
+        data[i]['addrid']= 'addr'+i;
+        html+=this.addrTpl.substitute(data[i]);
+      }
+    }
+    $('addrlist').set('html',html);
+
+    if (!html) return ;
+
+    
+
+    
+  },
+  
+};
+
+  function regionSelect(el) {
+      new Dialog('index.php?app=logisticsmanager&ctl=admin_warehouse&act=showRegionList&region_id=' + $('p_region_id').value, {
+          width: 600, height: 600, title: '选择地区', onClose: function () {}
+      });
+  }
+$('save_area').addEvent('click',function(e){
+var form=this.getParent('form');
+var _this=this;
+if($('p_region_id').value==''){
+return MessageBox.error('<{t}>请选择区域<{/t}>');
+}
+form.store('target',{
+
+    onComplete:function(jsontext){
+
+  var json = Json.evaluate(jsontext);
+    if (typeof(json.error) != 'undefined'){
+        this.disabled=false;
+    }else{
+        finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+        $('area_add_form').getParent('.dialog').retrieve('instance').close();
+
+    }
+    
+    }
+  });
+
+form.fireEvent('submit',e);
+
+});
+
+</script>

@@ -1,0 +1,122 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title><{$env.conf.desktop.background.title}></title>
+    <link rel="shortcut icon" href="../favicon.gif" type="image/gif" />
+    <link href="<{$env.app.res_url}>/css/framework.css" rel="stylesheet" type="text/css"  />
+    <link href="<{$env.app.res_url}>/css/default/login.css" rel="stylesheet" type="text/css"  />
+    <script src="<{$env.app.res_url}>/js_mini/crypto-js.min.js" ></script>
+</head>
+<body>
+<{$top_shopex_cn_call}>
+<div class="signup-contant clearfix">
+    <div class="signup-middle">
+        <div class="signup-contant-main ">
+            <div class="login_title logo clearfix">
+                <h3><{if $env.conf.desktop.sale_id != 'shopex.erp'}>智能运营中台<{else}><{$env.conf.desktop.logo}><{/if}></h3>
+            </div>
+            <div class="signup">
+                <div class="signip-main">
+                    <div class="ifram">
+                        <div class="publicize" id="publicize">
+                            <img src="<{$env.app.res_url}>/logo.png" width="282" height="202" style="margin-left:30px;">
+                        </div>
+                    </div>
+                    <div class="window">
+                        <{$account_a}>
+                        <div class="window-tab">
+                            <ul>
+                                <{foreach from=$passports item=item}>
+                                <li class="window-tab-current" value="<{$item.value}>" >
+                                    <div class="window-tabcurrent-left"></div>
+                                    <div class="window-tabcurrent-mid"><{$item.name}></div>
+                                    <div class="window-tabcurrent-right"></div>
+                                </li>
+                                <{/foreach}>
+                            </ul>
+                        </div>
+                        <{foreach from=$passports item=item}>
+                        <div class="window-main" id = "<{$item.value}>_part">
+                            <div class="passport-bd"> <{$item.html}> </div>
+                            <{if $item.value == 'basic'}>
+                            <div class="passport-bd">
+                                <ul>
+                                    <{foreach from=$passports_sso item=sso}>
+                                    <li style="float: left;margin-right: 10px;"><{$sso.html}></li>
+                                    <{/foreach}>
+                                </ul>
+                            </div>
+                            <{/if}>
+                        </div>
+                        <{/foreach}>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="copyright">
+        <div class="copyright-main">
+            <div class="fav">
+                <div class="clearfix" style="text-align:right;">
+                    <div class="span-auto act addfav" id="addfav">
+                        <a href="javascript:void(addFavorite());"><{t}>加入收藏<{/t}></a>
+                    </div>
+                    <div class="span-auto act createshortcut" id="createshortcut"><a href="javascript:void(createShortcut());"><{t}>生成快捷方式<{/t}></a></div>
+                </div>
+            </div>
+
+            <!-- &copy; ShopEx Inc. -->
+
+        </div>
+    </div>
+
+</div>
+
+<{if $desktop_login_verify}><{$desktop_login_verify}><{/if}>
+
+<script>
+  void function(){
+
+    var sURL = location.href;
+    var sTitle = document.title;
+    addFavorite = function() {
+      try {
+        window.external.addFavorite(sURL, sTitle);
+      } catch (e) {
+        try {
+          window.sidebar.addPanel(sTitle, sURL, "");
+        } catch (e) {
+          var c = "ctrl";
+          if (navigator.platform.match(/mac/i)) {
+            c = "command"
+          }
+          alert("<{t}>请使用键盘上<{/t}>\n\n" + c
+            + "+D\n\n<{t}>进行收藏操作。<{/t}>");
+        }
+      }
+      return false;
+    }
+    createShortcut = function() {
+
+      var sname = document.title.replace(/\s/ig, '');
+      var surl = location.href;
+      document.createshortcuts.furl.value = surl;
+      document.createshortcuts.fname.value = sname;
+      document.createshortcuts.submit();
+    }
+
+  }();
+
+</script>
+<form action="index.php?app=desktop&ctl=createshortcuts" name="createshortcuts" target="_blank" method="post">
+    <input type="hidden" name="furl" value=""/>
+    <input type="hidden" name="fname" value=""/>
+</form>
+</body>
+</html>

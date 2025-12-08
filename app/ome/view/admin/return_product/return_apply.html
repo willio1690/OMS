@@ -1,0 +1,279 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout">
+    <div class="form-layout-block">
+        <form class="form-custom" enctype="multipart/form-data" action="index.php?ctl=admin_return&act=apply_add&app=ome&finder_id=<{$finder_id}>" method="post" id="return-apply" target="upload" isCloseDialog>
+            <div class="form-layout-block">
+                <h3>基本信息</h3>
+                <div class="form-layout-fields">
+                    <div class="form-field">
+                        <span class="form-field-label">服务标题<span style="color: red">*</span>：</span>
+                        <{input class="form-input" placeholder="请输入服务标题" type="text" name="title" value=$product.title size="30" vtype="required"}>
+                    </div>
+                    <div class="form-field" style="width:100%">
+                        <span class="form-field-label">售后仓库：</span>
+                        <span class="form-input">
+                            <select name="return_branch_id" class="x-input dailog-batch-ipt" style="width:24%">
+                            <option value=''>请选择</option>
+                            <{if $returnBranchList }>
+                            <{foreach from=$returnBranchList item=val}>
+                                <option value="<{$val['branch_id']}>" <{if $val['branch_id']==$returnBranchId}>selected="selected"<{/if}> ><{$val['branch_name']}></option>
+                            <{/foreach}>
+                            <{/if}>
+
+                            </select>
+                       </span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-layout-block">
+                <h3>货品信息<span style="color: #999">&nbsp;&nbsp;&nbsp;(选择申请售后的商品数量及仓库后方可选择收货人信息)</span></h3>
+                <div class="form-layout-fields">
+                    <div class="form-field" style="width: 100%">
+                        <table width="100%" border="0" class="gridlist">
+                            <thead>
+                            <tr>
+                                <th><{t}>选择<{/t}></th>
+                                <th><{t}>基础物料编码<{/t}></th>
+                                <th><{t}>基础物料名称<{/t}></th>
+                                <th><{t}>销售物料编码<{/t}></th>
+                                <{if $lucky_flag}><th><{t}>福袋编码<{/t}></th><{/if}>
+                                <th><{t}>规格<{/t}></th>
+                                <th><{t}>原价<{/t}></th>
+                                <th><{t}>销售价<{/t}></th>
+                                <th><{t}>实付金额<{/t}></th>
+                                <th><{t}>剩余数量<{/t}></th>
+                                <th><{t}>申请数量<{/t}></th>
+                                <{if $branch_mode!='single'}>
+                                <th><{t}>发货仓库<{/t}></th>
+                                <{/if}>
+                            </tr>
+                            </thead>
+                            <{foreach from=$items item=aGoods name="item" key=key}>
+                            <{if $aGoods.sendnum > '0'}>
+                            <input type="hidden" name="goods_name[<{$aGoods.order_item_id}>]" value="<{$aGoods.name}>">
+                            <input type="hidden" name="bn[<{$aGoods.order_item_id}>]" value="<{$aGoods.bn}>">
+                            <input type="hidden" name="item_id[<{$aGoods.order_item_id}>]" value="<{$aGoods.item_id}>">
+                            <input type="hidden" name="product_id[<{$aGoods.order_item_id}>]" value="<{$aGoods.product_id}>">
+                            <input type='hidden' id='effective<{$aGoods.order_item_id}>' name='effective[<{$aGoods.order_item_id}>]' value='<{$aGoods.effective}>'>
+                            <tbody>
+                            <tr id="s<{$aGoods.bn}>" data-bn="<{$aGoods.bn}>">
+                                <td><{if $aGoods.effective>0}>
+                                    <input type="checkbox" <{if $aGoods.disabled eq 'false'}>checked=checked<{/if}>  id="goods_bn" name="goods_bn[]" value='<{$aGoods.order_item_id}>' onclick='choose(this,"<{$aGoods.product_id}>");'><{/if}></td>
+                                <td><{$aGoods.bn}></td>
+                                <td>
+                                    <{if $aGoods.obj_type_name && $aGoods.obj_type_name != '商品'}>
+                                    <span style='width:18px;padding:2px;height:16px;background-color:blue;'><span style='color:#eeeeee;'><{$aGoods.obj_type_name}></span></span>
+                                    <{/if}>
+                                    <{$aGoods.name|visibility:$aGoods.product_id}>
+                                </td>
+                                <td><{$aGoods.sales_material_bn}></td>
+                                <{if $lucky_flag}><td><{$aGoods.combine_bn}></td><{/if}>
+                                <td><{$aGoods.spec_info}></td>
+                                <td><{$aGoods.price|cur}></td>
+                                <td><{$aGoods.sale_price/$aGoods.nums|cur}></td>
+                                <td><{if $aGoods.divide_order_fee}><{$aGoods.divide_order_fee/$aGoods.nums|cur}><{else}>-<{/if}></td>
+                                <td><{$aGoods.effective}></td>
+                                <td>
+                                    <{if $aGoods.effective>0}>
+                                    <{if $aGoods.num}>
+                                    <input type='text' id='num<{$aGoods.bn}>' name='num[<{$aGoods.order_item_id}>]' value='<{$aGoods.num}>' size='6'>
+                                    <{else}>
+                                    <input type='text' id='num<{$aGoods.bn}>' name='num[<{$aGoods.order_item_id}>]' value='<{$aGoods.effective}>' size='6'>
+                                    <{/if}>
+                                    <{/if}>
+                                </td>
+
+                                <{if $branch_mode=='single'}>
+                                <{if $key=='0'}>
+                                <script>
+                                    showAddress('<{$aGoods.branch.0.branch_id}>','<{$aGoods.bn}>');
+                                </script>
+                                <{/if}>
+                                <input type="hidden" value="<{$aGoods.branch.0.branch_id}>" />
+                                <input type="hidden" value="<{$aGoods.bn}>" />
+                                <input name="branch_id<{$aGoods.product_id}>" type="hidden" value="<{$aGoods.branch.0.branch_id}>"/>
+                                <span id="canpay<{$aGoods.bn}>"></span>
+                                <{else}>
+                                <td>
+                                    <{foreach from=$aGoods.branch item=branch key=keys}>
+                                    <{if $aGoods.effective>0}><input name="branch_id<{$aGoods.order_item_id}>"<{if $aGoods.disabled eq 'false'}>checked=checked<{/if}> type="radio" value="<{$branch.branch_id}>" class="x-pdt-chk-<{$branch.branch_id}>"
+                                    onclick="show_delivery('<{$branch.branch_id}>','<{$aGoods.bn}>');"/><{/if}><{$branch.branch_name}>
+                                    <{/foreach}>
+                                    <span id="canpay<{$aGoods.bn}>"></span>
+                                </td>
+                                <{/if}>
+                            </tr>
+                            </tbody>
+                            <{/if}>
+                            <{/foreach}>
+                        </table>
+                    </div>
+                </div>
+                <div class="form-layout-fields">
+                    <div class="form-field">
+                        <span class="form-field-label">上传文件：</span>
+                        <{input type="sfile" name="attachment" f_type="public" }>
+                        <{if $product.attachment!=''}>
+                        <{if $attachment_type!='remote'}>
+                        <a class="margin10" href="javascript:file_download()">请点击下载该附件</a>
+                        <{else}>
+                        <a class="margin10" href="<{$product.attachment}>" target="_blank">请点击下载该附件</a>
+                        <{/if}>
+                        <{/if}>
+                    </div>
+                </div>
+                <div class="form-layout-fields">
+                    <div class="form-field" style="width: 50%;">
+                        <span class="form-field-label">申请内容：</span>
+                        <textarea class="form-input" name="content" placeholder="请输入申请内容" style="height: 100px"><{$product.content}></textarea>
+                    </div>
+                    <div class="form-field" style="width: 50%;">
+                        <span class="form-field-label">售后答复：</span>
+                        <textarea class="form-input"  name="memo" placeholder="请输入售后答复" style="height: 100px"><{$product.memo}></textarea>
+                    </div>
+                </div>
+            </div>
+            <div ><{$plugin_html_show}></div>
+            <div class="form-layout-block">
+                <h3>选择收货人信息</h3>
+                <div class="form-layout-fields">
+                    <div class="form-field" style="width: 100%">
+                        <table width="100%" border="0" cellpadding="2" cellspacing="0" class="girdlist">
+                            <thead>
+                            <tr>
+                                <td><{t}>选择<{/t}></td>
+                                <td><{t}>发货单号<{/t}></td>
+                                <td><{t}>收货人姓名<{/t}></td>
+                                <td><{t}>收货人地区<{/t}></td>
+                                <td><{t}>收货人地址<{/t}></td>
+                            </tr>
+                            </thead>
+                            <tbody class='dly-body' id="dly-body">
+                            <{if $product.delivery_id}>
+                            <td><input type="radio" checked="checked" id="delivery_id" name="delivery_id" value="<{$product.delivery_id}>"></td>
+                            <td><{$product.delivery_bn}></td>
+                            <td><{$product.consignee.name}></td>
+                            <td><{$product.consignee.area}></td>
+                            <td><{$product.consignee.addr}></td>
+                            <{/if}>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="table-action">
+              <{button label="售后申请" class="btn-primary" type='submit'}>
+              <{button_permission label="返回"  class="btn-secondary" type="button" onclick="location.href=window.frameElement.src;"}>
+            </div>
+            <input type="hidden" name="url" value="index.php?app=ome&ctl=admin_return&act=index" />
+            <input type="hidden" name="order_id" value="<{$order_id}>" />
+            <input type="hidden" name="return_id" value="<{$product.return_id}>" />
+            <input type="hidden" name="return_bn" value="<{$product.return_bn}>" />
+            <input type="hidden" name="source" value="<{$source}>">
+        </form>
+    </div>
+</div>
+        <script>
+
+  function file_download(){
+    var ifm=new IFrame({src:'index.php?app=ome&ctl=admin_return&act=file_download2&p[0]=<{$product.return_id}>'});
+    ifm.injectAfter(document.body);
+  }
+
+  function show_delivery(branch_id,bn){
+    $ES('input[name^=goods_bn]').each(function(i,index){
+      if(i.value==bn){
+      }
+    });
+
+    showAddress(branch_id,bn);
+  }
+
+  function showAddress(branch_id,bn){
+    bn = bn.replace(/\+/g,"%2B");
+    new Request.JSON({
+      url:'index.php?app=ome&ctl=admin_return&act=check&source=<{$source}>',
+      data:{
+        'branch_id' : branch_id,
+        'bn' : bn,
+        'order_id' : "<{$order_id}>"
+      },
+      method:'get',
+      onSuccess:function(data){
+        var ifadd='yes';
+        $ES('input[name^=delivery_id]').each(function(item,index){
+          if(item.value==data.delivery_id){
+            ifadd='no';
+          }
+        });
+        if(data.ship_area.contains(':')){
+            data.ship_area = data.ship_area.split(':')[1].split('/').join('-');
+        }else{
+            data.ship_area = data.ship_area.split('/').join('-');
+        }
+        var info = "<td><input type=radio checked=checked id=delivery_id name=delivery_id value="+data.delivery_id+"></td><td>"+data.delivery_bn+"</td><td>"+data.ship_name+"</td><td>"+data.ship_area+"</td><td>"+data.ship_addr+"</td>";
+        var newtr=new Element('tr');
+        if(ifadd=="yes"){
+          $('dly-body').adopt(newtr);
+          newtr.set('html',info);
+          //$('num'+data.bn).value=data.refund;
+          //$('effective'+data.bn).value=data.refund;
+        }
+      }
+    }).send();
+  }
+
+  /*
+  *选择商品时选择对应仓库信息
+  *默认取的是第一条
+  */
+  function choose(bn,product_id){
+    var s = 'branch_id'+product_id,el;
+    el = $ES('input[name$='+s+']');
+    el.each(function(item,index){
+      if(bn.checked==true){
+        if(index==0){
+          if (el.length==1){
+            item.checked=true;
+          }
+
+          show_delivery(item.value,bn.getParent('tr').dataset.bn);
+        }
+        if (el.length>1)
+        item.set('vtype', 'requiredradio');
+        }else{
+        item.set('vtype', '');
+        item.checked=false;
+        $('dly-body').empty();
+      }
+    });
+  }
+
+  function visibility(e){
+    var visiTips = new Tips({
+            onShow:function(tip,el){
+                el.addClass('active');
+                tip.setStyle('display','block');
+            },
+            text: function(element){
+                if(element.get('visibility')=='false'){
+                    return '不可售商品';
+                }else{
+                    return '';
+                }
+            }
+        });
+        var e  = new Event(e), el = e.target;
+        if (el.get('visibility')=='false'){
+            visiTips.attach(el);
+            el.addEvent('mouseleave',function(){
+                el.removeClass('active');
+            });
+            el.fireEvent('mouseenter',e);
+        }
+}
+</script>

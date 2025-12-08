@@ -1,0 +1,68 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<{if $shopData.shop_type=='360buy'}>
+<form action="index.php?<{$env.server.QUERY_STRING}>" id="shop_dly_crop" method="post">
+<input type="hidden" name="shop_id" value="<{$shop_id}>"/>
+<div class="division">
+    <input type="radio" onchange="check(1)" name="config" value="0" <{if $dlycorpconf.config=='0' || $dlycorpconf.config==''}>checked<{/if}>>关闭
+    <input type="radio" onchange="check(1)" name="config" value="1" <{if $dlycorpconf.config=='1' || $dlycorpconf.config==''}>checked<{/if}>>开启
+</div>
+<div id="shop_crop" class="division">
+    <table width="40%" cellspacing="0" cellpadding="0" border="0" >
+    <tbody>
+       
+        <tr>
+            
+            <td><span style="font-weight:bold;">请选择该店铺对应物流公司:</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   
+            <select name="corp_id">
+            
+            <{foreach from=$dlycorps item=dlycorp}>
+            <option value="<{$dlycorp.corp_id}>" <{if $dlycorpconf.corp_id==$dlycorp.corp_id}>selected<{/if}>><{$dlycorp.name}></option>
+            <{/foreach}>
+            </select>
+            
+            </td>
+        </tr>
+        <tr>
+            
+            <td> <span style="font-weight:bold;">款到发货是否强制使用京东面单 :</span> <input type="radio"name="is_cod" value="0" <{if $dlycorpconf.is_cod=='0' || $dlycorpconf.is_cod==''}>checked<{/if}>>否
+    <input type="radio" name="is_cod" value="1" <{if $dlycorpconf.is_cod=='1'}>checked<{/if}>> 是
+            </td>
+        </tr> 
+       
+        
+    </tbody>
+    </table>
+<div class="division">
+  
+</div>
+
+</div>
+<{button type='submit' label='确认'}>
+</form>
+
+<{else}>
+<span class="red">本店铺类型不支持京东物流设定</span>
+<{/if}>
+</div>
+<script>
+function check(status){
+	if(status == 1){
+		if($$('input[name=config]:checked').get('value') == 1){
+			$('shop_crop').show();
+            $('shop_crop').getFormElements().set('disabled',false);
+		}else{
+			$('shop_crop').hide();
+            $('shop_crop').getFormElements().set('disabled',true);
+		}
+	}
+}
+check(1);
+
+</script>
+
+

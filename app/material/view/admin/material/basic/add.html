@@ -1,0 +1,677 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+
+<{/capture}>
+<style>
+    .notice-inline.error  {background-image:none;margin-left:25px}
+    #fm1 .division td label ,#fm1 .division div label {vertical-align:top;}
+</style>
+<div class="form-layout">
+    <form method="post" id="fm1" action="index.php?app=material&ctl=admin_material_basic&act=toAdd" enctype="multipart/form-data">
+        <div class="form-layout-block">
+            <h3>基本信息</h3>
+            <div class="form-layout-fields">
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">物料属性：</span>
+                    <div class="form-radios">
+                        <td>
+                            <{foreach from=$materialTypes key=typeKey item=typeVal}>
+                            <input id="<{$typeKey}>" name="type" type="radio" value="<{$typeKey}>" <{if $typeKey=='1'}>checked="checked"<{/if}>>
+                            <label for="<{$typeKey}>"><{$typeVal}></label>
+                            <{/foreach}>
+                        </td>
+                    </div>
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>物料名称：</span>
+                    <input class="form-input" placeholder="请输入物料名称" type="text" name="material_name" size="60" vtype="required" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>物料类型：</span>
+                    <select class="form-input" placeholder="请选择" name="goods_type">
+                        <option value="0">--请选择物料类型--</option>
+                        <{foreach from=$goods_types item=types}>
+                            <option value="<{$types.type_id}>"><{$types.name}></option>
+                        <{/foreach}>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>物料分类：</span>
+                    <{input vtype="required" type="category" value="" name="cat_id"}>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>物料品牌：</span>
+                    <select class="form-input" placeholder="请选择" id="brand" name="brand">
+                        <option value="0">--请选择品牌--</option>
+                        <{foreach from=$material_brand item=brand}>
+                        <option value="<{$brand.brand_id}>"><{$brand.brand_name}></option>
+                        <{/foreach}>
+                    </select>
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>物料编号：</span>
+                    <input class="form-input" placeholder="请输入物料编号" type="text" name="material_bn" vtype="required"  onkeyup="value=value.replace(/[^A-Za-z0-9_-\/]/ig,'')" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>物料条码：</span>
+                    <input class="form-input" placeholder="请输入物料条码" type="text" name="material_code" vtype="required"  onkeyup="value=value.replace(/[^A-Za-z0-9_-]/ig,'')" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">物料规格：</span>
+                    <input class="form-input" placeholder="请输入物料规格" type="text" name="material_specification" maxlength="20"  />
+                    <{help}><{t}>规格将在备货单和发货单中展示<{/t}><{/help}>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">物料款号：</span>
+                    <input class="form-input" placeholder="请输入物料款号" type="text" name="material_spu" onkeyup="value=value.replace(/[^A-Za-z0-9_-\s\/]/ig,'').replace(/\/+/g,'/')" />
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">特殊扫码配置：</span>
+                    <div class="form-radios">
+                        <input  name="special_setting" id="openconf" type="radio" value="3">
+                        <label for="openconf">配置</label>
+                        <input id="openconf2" name="special_setting" checked type="radio" value="4">
+                        <label for="openconf2" >关闭</label>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">是否启用唯一码：</span>
+                    <div class="form-radios">
+                        <input id="serial_number1" name="serial_number"  type="radio" value="true">
+                        <label for="serial_number1">是</label>
+                        <input id="serial_number2" name="serial_number" checked type="radio" value="false">
+                        <label for="serial_number2" >否</label>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">是否在售：</span>
+                    <div class="form-radios">
+                        <input id="visibled1" name="visibled" checked type="radio" value="1">
+                        <label for="visibled1">在售</label>
+                        <input id="visibled2" name="visibled" type="radio" value="2">
+                        <label for="visibled2" >停售</label>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">是否全渠道：</span>
+                    <div class="form-radios">
+                        <input id="omnichannel1" name="omnichannel" <{if !$exist_store}>disabled="disabled"<{/if}>  type="radio" value="1">
+                        <label for="omnichannel1">开启</label>
+                        <input id="omnichannel2" name="omnichannel" <{if !$exist_store}>disabled="disabled"<{/if}> checked type="radio" value="2">
+                        <label for="omnichannel2" >关闭</label>
+                    </div>
+                    <span style="color:red;">*支持门店配送/自提，需要开启此配置项。</span>
+                </div>
+                 <div class="form-field">
+                    <span class="form-field-label">门店销售：</span>
+                    <div class="form-radios">
+                        <input id="o2osales1" name="is_o2o_sales" <{if !$exist_store}>disabled="disabled"<{/if}>  type="radio" value="1">
+                        <label for="o2osales1">是</label>
+                        <input id="o2osales2" name="is_o2o_sales" <{if !$exist_store}>disabled="disabled"<{/if}> checked type="radio" value="0">
+                        <label for="o2osales2" >否</label>
+                    </div>
+                    <span style="color:red;">*支持门店销售，需要开启此配置项。</span>
+                </div>
+                <div class="form-layout-fields">
+                    <div id="description" style="border: 0px solid black;width: 500px;padding: 10px 50px;letter-spacing: 1px;display: none;background-color: #FDFDDB;">
+                        扫码中识别整个条码中第
+                        <input class="form-input" type="text" name="first_num" vtype="required" value="1"/><span style="color:red;">*</span>
+                        位到第
+                        <input class="form-input" type="text" name="last_num" vtype="required"  value=""/><span style="color:red;">*</span>
+                        <br />位为扫码出库的条码
+                        即扫码作业中根据配置的第X到Y位的条码与物料条码一致<br />
+                        则视作该商品进行出库。
+                    </div>
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">所属公司业务组织：</span>
+                    <select class="form-input" placeholder="请选择" name="bbu_info">
+                        <option value="0">--请选择公司业务组织--</option>
+                        <{foreach from=$bbu_list item=bbu}>
+                            <option value="<{$bbu.bbu_id}>|<{$bbu.cos_id}>"><{$bbu.bbu_name}>(<{$bbu.bbu_code}>)</option>
+                        <{/foreach}>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="form-layout-block" id="combination_items">
+            <h3>关联半成品/普通物料信息</h3>
+            <div class="gridlist" style="padding:10px;">
+
+                <{button label="半成品/普通频道" id="material-find-btn" }>
+
+                <table class="gridlist" id="material_table"  style="margin:4px 0;">
+                    <thead>
+                    <tr>
+                        <th>编码</th>
+                        <th style="width:240px;">名称</th>
+                        <th>数量</th>
+                        <th style="width:30px;">删除</th>
+                    </tr>
+                    </thead>
+                    <tbody id="dataNode">
+                    <tr>
+                        <td colspan="7" style="padding:0;"><div class="note" style="margin:0;"> 暂无物料信息 </div></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div align="right">
+                    <{button type="button" id="material-delall-btn" label="全部删除" }>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 图片管理区块 -->
+        <div class="form-layout-block">
+            <h3>图片管理</h3>
+            <div class="form-layout-fields">
+                <div class="form-field" style="width: 100%;">
+                    <span class="form-field-label">物料图片：</span>
+                    <{input type="image_magnifier" name="material_image" target_type="material" display_width="150" display_height="150" magnifier="true" border_style="2px dashed #ddd" border_radius="8px" cursor_style="pointer"}>
+                    <div class="form-remark">支持上传1张图片，支持放大镜预览</div>
+                </div>
+            </div>
+        </div>
+        
+         <div class="form-layout-block">
+            <h3>属性信息</h3>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">颜色：</span>
+                    <input class="form-input" placeholder="请输入颜色" type="text" name="color" value=""  />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">尺码：</span>
+                    <input class="form-input" placeholder="请输入尺码" type="text"  name="size" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">季节：</span>
+                    <input class="form-input"  type="text"  name="props[season]" />
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">材质：</span>
+                    <input class="form-input"  type="text" name="props[uppermatnm]" value=""  />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">适用对象：</span>
+                    <input class="form-input"  type="text"  name="props[gendernm]" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">鞋型：</span>
+                    <input class="form-input"  type="text"  name="props[widthnm]" />
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">风格款式：</span>
+                    <input class="form-input"  type="text" name="props[modelnm]" value=""  />
+                </div>
+                <div class="form-field">
+                   
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"></span>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="form-layout-block">
+            <h3>自定义列</h3>
+            <div class="form-layout-fields">
+
+                <{foreach from=$customcols  item=customcol}>
+                <div class="form-field">
+                    <span class="form-field-label"><{$customcol.col_name}>：</span>
+                    <input class="form-input"  type="text" name="props[<{$customcol.col_key}>]" value=""  />
+                </div>
+                <{/foreach}>
+                
+            </div>
+           
+           
+        </div>
+        <div class="form-layout-block">
+            <h3>扩展信息</h3>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">成本价：</span>
+                    <input class="form-input" placeholder="请输入成本价" type="text" name="cost" value="" onkeyup="value=value.replace(/[^\d\.]/ig,'')" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">长度：厘米(cm)</span>
+                    <input class="form-input" placeholder="请输入长度" type="text" vtype="number" name="length" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">包装单位：</span>
+                    <input class="form-input" placeholder="请输入包装单位" type="text" name="unit" />
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">零售价：</span>
+                    <input class="form-input" placeholder="请输入零售价" name="retail_price" value="" onkeyup="value=value.replace(/[^\d\.]/ig,'')" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">宽度：厘米(cm)</span>
+                    <input class="form-input" placeholder="请输入宽度" type="text" vtype="number" name="width" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">毛重:克(g)：</span>
+                    <input class="form-input" placeholder="请输入重量" type="text" name="weight" />
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">采购进价：</span>
+                    <input class="form-input" placeholder="请输入采购进价" name="purchasing_price" value="" onkeyup="value=value.replace(/[^\d\.]/ig,'')" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">高度：厘米(cm)</span>
+                    <input class="form-input" placeholder="请输入高度" type="text" name="high" vtype="number" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">体积:立方米（cm³）：</span>
+                    <input class="form-input" placeholder="请输入体积" type="text" name="volume" />
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">箱规：</span>
+                    <input class="form-input" placeholder="请输入箱规" type="text" name="box_spec" vtype="number" />
+                </div>
+                 <div class="form-field">
+                    <span class="form-field-label">净重:克(g)：</span>
+                    <input class="form-input" placeholder="请输入重量" type="text" name="net_weight" />
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-layout-block">
+            <h3>保质期管理</h3>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">保质期批次：</span>
+                    <div class="form-radios">
+                        <input  name="use_expire" id="use_expire" type="radio" value="1">
+                        <label for="use_expire">开启</label>
+                        <input id="use_expire2" name="use_expire" checked type="radio" value="2">
+                        <label for="use_expire2" >关闭</label>
+                    </div>
+                </div>
+                <div class="form-field use_expire_conf" style="display:none;">
+                    <span class="form-field-label">预警天数配置：</span>
+                    <input class="form-input" placeholder="请输入预警天数" type="text" name="warn_day" vtype="number&required" />
+                </div>
+                <div class="form-field use_expire_conf" style="display:none;">
+                    <span class="form-field-label">自动退出库存天数配置：</span>
+                    <input class="form-input" placeholder="请输入自动退出库存天数" type="text" name="quit_day" vtype="number&required" />
+                </div>
+                <div class="form-field use_expire_wms_conf" style="display:none;">
+                    <span class="form-field-label">保质期（小时）：</span>
+                    <input class="form-input" placeholder="请输入保质期" type="text" name="shelf_life" vtype="number&required" />
+                </div>
+                <div class="form-field use_expire_wms_conf" style="display:none;">
+                    <span class="form-field-label">禁收天数：</span>
+                    <input class="form-input" placeholder="请输入禁收天数" type="text" name="reject_life_cycle" vtype="number&required" />
+                </div>
+                <div class="form-field use_expire_wms_conf" style="display:none;">
+                    <span class="form-field-label">禁售天数：</span>
+                    <input class="form-input" placeholder="请输入禁售天数" type="text" name="lockup_life_cycle" vtype="number&required" />
+                </div>
+                <div class="form-field use_expire_wms_conf" style="display:none;">
+                    <span class="form-field-label">临期预警天数：</span>
+                    <input class="form-input" placeholder="请输入临期预警天数" type="text" name="advent_life_cycle" vtype="number&required" />
+                </div>
+            </div>
+        </div>
+        <div class="form-layout-block">
+            <h3>发票信息</h3>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">开票税率：</span>
+                    <input class="form-input" placeholder="请输入开票税率%" type="text" vtype='unsigned'  name='tax_rate' />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">开票名称：</span>
+                    <input class="form-input" placeholder="请输入开票名称" type="text" name="tax_name" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">发票分类编码：</span>
+                    <input class="form-input" placeholder="请输入发票分类编码" type="text" name="tax_code" />
+                    <span style = "color:red;">&nbsp;&nbsp;(建议设置，开电子发票时，必要参数)</span>
+                </div>
+            </div>
+        </div>
+        <div id="cc"  class="form-actions">
+            <button class="btn-primary" id="material-save-btn">保存</button>
+            <{button type="button" class="btn-secondary" id="return-btn" label="返 回" onclick="location.href=window.frameElement.src;"}>
+        </div>
+    </form>
+</div>
+<script>
+    (function() {
+        window.addEvent('domready', function() {
+            $ES('input[name=type]').each(function(item){
+                item.addEvent('click',function(e){
+                    if(this.value == '1' || this.value == '4'){
+                        $('combination_items').setStyle('display','block');
+                    }else{
+                        $('combination_items').setStyle('display','none');
+                    }
+                })
+            });
+
+            $ES('input[name=special_setting]').each(function(item){
+                item.addEvent('click', function(e){
+                    if(this.value == '3'){
+                        $('description').setStyle('display','block');
+                        $('warn_div').setStyle('display','none');
+                    }else{
+                        $('description').setStyle('display','none');
+                        $('warn_div').setStyle('display','block');
+                    }
+                })
+            });
+
+            $ES('input[name=use_expire]').each(function(item){
+                item.addEvent('click',function(e){
+                    if(this.value == '1'){
+                        $ES('.use_expire_conf').setStyle('display','table-row');
+                        $ES('.use_expire_wms_conf').setStyle('display','table-row');
+                        $ES('#openconf').set('disabled', true);
+                    }else{
+                        $ES('.use_expire_conf').setStyle('display','none');
+                        $ES('.use_expire_wms_conf').setStyle('display','none');
+                        $ES('#openconf').set('disabled', false);
+                    }
+                })
+            });
+
+            var callurl='index.php?app=material&ctl=admin_material_basic&act=getMaterial',store=[];
+
+            var tpl='<tr key="{bm_id}" id="bm_{bm_id}" title="点击选取/反选此条记录">'
+                    +'  <td>{material_bn}</td><td class="material-name">{material_name}</td>'
+                    +'  <td><input type="text" value="{material_num}" key="num" vtype="number&amp;&amp;required" tname="at[_PRIMARY_]" size="6"></td>'
+                    +'  <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>'
+                    +'</tr>';
+
+            $('material-find-btn').addEvent('click',function(e){
+                var material_type = $$('input[name=type]:checked').get('value');
+                var type = 2;
+                if (material_type == 4){
+                    type ='giftpackage';
+                }
+                var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=material&ctl=admin_material_basic&act=findMaterial&type='+type);
+                
+                // 使用Ex_Loader加载finderDialog
+                Ex_Loader('modedialog', function() {
+                new finderDialog(url,{params:{url:callurl,name:'bm_id[]'},width:1000,height:660,
+                    onCallback:function(rs){
+                        if(!rs)return;
+                        rs=JSON.decode(rs);
+                        init(rs);
+                    }
+                    });
+                });
+            });
+
+            var pag,rows;
+            function emptyData(){
+                var noData='<tr>'
+                        +'<td colspan="7" style="padding:0;"><div class="note" style="margin:0;"> 暂无半成品信息 </div></td>'
+                        +'</tr>';
+                $('dataNode').set('html',noData);
+            }
+
+            function createProduct(data){
+                // 使用Ex_Loader加载PageData组件
+                Ex_Loader('pager', function() {
+                pag=new PageData(tpl,data,{'updateMain':$('dataNode'),'pageNum':5,PRIMARY_ID:'bm_id',
+                    'onShow':function(){
+                        var _this=this;
+                        $$('#dataNode input[type]').addEvent('change',function(e){
+                            var pid=this.getParent('tr').get('key'),value=this.value;
+
+                            _this.editData(pid,[this.get('key'),value]);
+                        });
+
+                        rows=$ES('#dataNode tr');
+                        rows.each(function(item,i){
+                            item.addEvent('click',function(e){
+                                this.toggleClass('selected');
+                            });
+                            item.getElement('.btn-delete-item').addEvent('click',function(e){
+                                if(_this.selectData(item.get('key')) && confirm('确定要删除 '+ _this.selectData(item.get('key'))['material_name'] +' 吗？')) _this.delData(item.get('key'));
+                                if(!$E('#dataNode tr')) emptyData();
+                            });
+                            item.getElement('input[tname^=at]').addEvent('keypress',function(e){
+                                if(e.code==13) $E('#pfba input').focus();
+                            });
+                        });
+
+                        if(this.data.length) rows[0].getElement('input[key^=num]').focus();
+
+                        $ES('.material-name').removeEvent('mouseover').addEvent('mouseover',function(e){
+                            if (this.get('visibility')=='false')
+                            {
+                                var e  = new Event(e), el = e.target;
+                                visiTips.attach(el);
+                                el.addEvent('mouseleave',function(){
+                                    this.removeClass('active');
+                                });
+                                el.fireEvent('mouseenter',e);
+                            }
+                        });
+                    }
+                    });
+                });
+            }
+
+            function init(rs){
+                var tmparr=findProduct(rs,'bm_id');
+                store.unshift.apply(store,tmparr.reverse());
+                createProduct(store);
+            }
+
+            function findProduct(arr,PRIMARY){
+                if(!store.length)return arr;
+                store.each(function(a){
+                    arr.each(function(b){
+                        if(a[PRIMARY]==b[PRIMARY])arr.erase(b);
+                    });
+                });
+                return arr;
+            }
+
+            function delProduct(obj,arr){
+                arr.each(function(d){obj.delData(d);});
+            }
+
+            $('material-delall-btn').addEvent('click',function(e){
+                if(!pag||!pag.data)return;
+                var delarr=[];
+                pag.data.each(function(d){
+                    delarr.push(d['bm_id']);
+                });
+                if(confirm('确认删除全部物料吗？')){
+                    delProduct(pag,delarr);
+                    emptyData();
+                }
+            });
+
+            $('material-save-btn').addEvent('click',function(e){
+                var _this=this;
+                var form=this.getParent('form');
+
+                var use_expire  = $ES("input[name='use_expire']:checked").get('value');
+                if(use_expire == '1')
+                {
+                    var warn_day    = $ES("input[name='warn_day']").get('value');
+                    var quit_day    = $ES("input[name='quit_day']").get('value');
+
+                    warn_day    = parseInt(warn_day);
+                    quit_day    = parseInt(quit_day);
+
+                    if(isNaN(warn_day) || warn_day <=0 || isNaN(quit_day) || quit_day <=0)
+                    {
+                        alert('请填写保质期监控配置');
+                        return false;
+                    }
+
+                    if(warn_day <= quit_day)
+                    {
+                        alert('预警天数必须大于自动退出库存天数');
+                        return false;
+                    }
+                }
+
+                if(pag){
+                    // 在提交前，先从实际的input元素中读取最新的值并创建隐藏input字段
+                    // 这样在multipart/form-data提交时能正常工作
+                    var tableRows = $ES('#dataNode tr');
+                    if(tableRows && tableRows.length > 0){
+                        // 先删除之前可能存在的隐藏input（避免重复）
+                        var existingInputs = form.getElements('input[type="hidden"][name^="at["]');
+                        if(existingInputs && existingInputs.length > 0){
+                            existingInputs.each(function(input){
+                                if(input && input.destroy){
+                                    input.destroy();
+                                }
+                            });
+                        }
+                        
+                        // 从表格中读取数据并创建隐藏input字段
+                        tableRows.each(function(row){
+                            if(!row) return;
+                            var bm_id = row.get('key');
+                            // 跳过没有key的行（如"暂无物料信息"提示行）
+                            if(!bm_id) return;
+                            
+                            var numInput = row.getElement('input[tname^=at]');
+                            if(numInput){
+                                var numValue = numInput.get('value');
+                                // 如果数量不为空，创建隐藏input字段并添加到表单中
+                                if(numValue && numValue.toString().trim() !== ''){
+                                    var hiddenInput = new Element('input', {
+                                        type: 'hidden',
+                                        name: 'at[' + bm_id + ']',
+                                        value: numValue
+                                    });
+                                    form.appendChild(hiddenInput);
+                                }
+                            }
+                        });
+                    }
+                    
+                    // 同时保留原有的extraData方式（作为备用）
+                    var data = pag.toHideInput($('dataNode').getElement('tr'));
+                    form.store('target',{extraData:data,
+                        onRequest:function(){
+                            _this.disabled=true;
+                        },
+                        onComplete:function(jsontext){
+                            try{
+                                var json = JSON.decode(jsontext);
+                                if (typeof(json.error)!='undefined'){
+                                    _this.disabled=false;
+                                }else{
+                                    _this.disabled=true;
+                                    if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']).chain(function(){
+                                        window.close()
+                                    });
+                                }
+                            }catch(e){}
+                        }
+                    });
+                }else{
+                    form.store('target',{
+                        onRequest:function(){
+                            _this.disabled=true;
+                        },
+                        onComplete:function(jsontext){
+                            try{
+                                var json = JSON.decode(jsontext);
+                                if (typeof(json.error)!='undefined'){
+                                    _this.disabled=false;
+                                }else{
+                                    _this.disabled=true;
+                                    if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']).chain(function(){
+                                        window.close()
+                                    });
+                                }
+                            }catch(e){}
+                        }
+                    });
+                }
+                // 直接提交表单（验证组件已在页面初始化时加载）
+                form.fireEvent('submit',e);
+            });
+
+                        // =================== 图片上传功能 ===================
+            // 现在使用 input_image_magnifier 组件，无需额外的JavaScript处理
+            // 组件会自动处理图片上传、预览和放大镜功能
+
+
+        });
+    })();
+
+    function feature_group_object_callback(rs,handle){
+        var p_node = handle.getParent('div');
+        var html = '已选择了1个类目,'+"<a href='javascript:void(0);' onclick='feature_group_selected_show()'>查看选中的类目.</a>";
+        if ($defined($('hand-selected-product')))
+        {
+            $('hand-selected-product').setHTML(html);
+        } else {
+            var div = new Element('div',{'html':html,'id':'hand-selected-product'});
+            div.injectAfter(p_node);
+        }
+    }
+
+    function feature_group_selected_show(){
+        // 使用Ex_Loader加载Dialog组件
+        Ex_Loader('modedialog', function() {
+        new Dialog('index.php?app=material&ctl=admin_material_basic&act=showFeatureGrp',{
+            ajaxoptions:{data:$('hand-selected-product').getPrevious('div'),method:'post'}
+            });
+        });
+    }
+
+    // =================== 图片处理函数 ===================
+    // 现在使用 input_image_magnifier 组件，这些函数已不再需要
+    // 组件会自动处理图片上传、预览和放大镜功能
+
+</script>
+
+<style>
+    .content-container {
+        background: #EEF5F9;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        border-radius: 2px;
+        overflow: auto;
+        padding: 0;
+        box-shadow: none;
+    }
+
+    
+
+    
+
+</style>

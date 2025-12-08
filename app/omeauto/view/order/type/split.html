@@ -1,0 +1,87 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">  
+        <form action="" method="post" id="orderSplitFrm"> 
+            <table width="100%" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <th width="60">拆单规则名称： </th>
+                        <td ><{input type="text&&required" name="name" id='t_name' value=$info.name}>&nbsp;&nbsp;&nbsp;&nbsp;(请使用通俗易懂的名称，如 单个商品拆)</td>
+                    </tr>
+                    <tr>
+                        <th width="60">拆单简单说明： </th>
+                        <td><{input type="textarea" cols="100" rows="4" name="describe" id='t_describe' value=$info.describe}><br/>(对此订单类型的简单描述)</td>
+                    </tr>
+                    <tr>
+                        <th width="60"><{help}>按京东开普勒商品渠道ID拆：现仅用于【抖音平台】订单使用【京东云交易】仓储进行发货。<{/help}>&nbsp;拆单类型： </th>
+                        <td>
+                            <{input type="select" id='t_split_type' name="split_type" value=$info.split_type options=$split_type required="required"}>
+                            <div id="split_type_special" style="padding-top: 10px"></div>&nbsp;&nbsp;<span style="color:red;">*提示：如果设置了 "按虚拟商品拆单" 规则，系统会优先执行虚拟商品自动拆单并自动发货。</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center">
+                            <{button class="btn-primary" label="确定" type="button" id="msaveBtn"}>
+                            <{button class="btn-primary" label="取消" type="button" id="mcancelBtn"}>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div> 
+</div>
+<script> 
+    (function() {
+        //关闭按钮
+        $('mcancelBtn').addEvent('click', function(){
+            $('mcancelBtn').getParent('.dialog').retrieve('instance').close();
+        });
+        $('t_split_type').addEvent('change', function () {
+            var _this = this;
+            new Request.HTML({
+                url: 'index.php?app=omeauto&ctl=order_split&act=getSplitSpecial&sid=<{$info.sid}>',
+                update: $('split_type_special'),
+                data: {
+                    split_type: _this.value
+                }
+            }).send();
+        });
+        $('t_split_type').fireEvent('change');
+        //保存按钮
+        $('msaveBtn').addEvent('click', function(){
+            
+            var roles = '';
+            $$('#roleList li').each(function(item) {
+                if (roles == '') {
+                    roles = item.getElement('.edit').get('ref');
+                } else {
+                    roles = roles  + "|||" + item.getElement('.edit').get('ref') ;
+                }
+            });
+            new Request ({
+                url:'index.php?app=omeauto&ctl=order_split&act=save&sid=<{$info.sid}>',
+                method:'post',
+                data:$('orderSplitFrm').toQueryString(),
+                onRequest: function () {
+                    $('msaveBtn').set('disabled', 'true');
+                    $('mcancelBtn').set('disabled', 'true');
+                },
+                onSuccess: function(result) {
+                    if (result =='SUCC') {
+                        finderGroup["<{$env.get.finder_id}>"].refresh.delay(400,finderGroup["<{$env.get.finder_id}>"]);
+                        $('msaveBtn').getParent('.dialog').retrieve('instance').close();
+                    } else {
+                        $('msaveBtn').set('disabled', '');
+                        $('mcancelBtn').set('disabled', '');
+                        //提示信息
+                        alert(result);
+                    }
+                }
+            }).send();
+        }); 
+    })();
+</script>

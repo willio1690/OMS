@@ -1,0 +1,261 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division" id='support-shops'>
+    <span style="padding-bottom:8px;">
+        <font style="font-size:14px;font-weight:bold">线下门店优选规则设置</font><br><br>
+    </span>
+    <div style="padding-left:18px;"><h4>注意:必须先在<a href="index.php?app=ome&ctl=admin_setting&act=index">"系统设置"</a>内门店配置中设置优选模式，默认为按区域覆盖</h4></div>
+    <form method='post' action='index.php?app=o2o&ctl=admin_autostore&act=ruleList'>
+        <div class="tableform">
+            <h4><{t}>选择线下门店<{/t}></h4>
+            
+            <div class="division">
+                <table class="gridlist o2o_table_list">
+                    <tr>
+                        <td width="200" style="text-align:right;height:40px;"><b>区域：</b></td>
+                        <td style="text-align:left;"><div id="ajax_store_regions">&nbsp;</div></td>
+                    </tr>
+                    <tr>
+                        <td width="200" style="text-align:right;height:40px;"><b>门店名称：</b></td>
+                        <td>
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td width="230" nowrap="nowrap" style="text-align:left; border:none;"><input type="text" name="o2o_shop_name" id="o2o_shop_name" value="" style="width:180px;" onkeyup="this.value=this.value.replace(/['<>%;)(&+]/g,'')" /></td>
+                                    <td style="text-align:left; border:none;"><input type="button" name="but_search_shop" id="but_search_shop" value="按门店名称搜索" /><input id="is_select_o2o" type="hidden" name="is_select_o2o" value="false" /><input id="default_select_branch_id" name="default_select_branch_id" value="" type="hidden" /><input id="default_o2o_dly" name="default_o2o_dly" value="" type="hidden" /><span style="color:red;">&nbsp;&nbsp;&nbsp;*&nbsp;按关键字搜索的结果是全部门店，不限地区！</span></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="200" style="text-align:right;height:40px;"><b>线下门店：</b></td>
+                        <td style="text-align:left;">
+                            <div>
+                                <span id="o2o_shoplist"><select name="branch_id" id="branch_id"><option value="">请选择区域搜索线下门店</option></select></span>
+                                <span style="color:red;">&nbsp;&nbsp;*</span>
+                                <span id="get_shop_msg" style="color:red;">&nbsp;</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+        <div class="division">
+            <div class="table-action">
+                <{button label="确定" type="button" id='btn-primary'}>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    $('btn-primary').addEvent('click',function(e){
+        var _form = this.form;
+        var branch_id    = $("branch_id").value;
+        
+        if (branch_id == "")
+        {
+            MessageBox.error('请选择门店');return false;
+        }else{
+            _form.action = _form.action+'&branch_id='+branch_id;
+        }
+
+        _form.fireEvent('submit',e);
+    });
+
+    $$('.set_rule')
+    
+var store_html    = '<select name="branch_id" id="branch_id">';
+window.addEvent('domready', function()
+{
+    if($("ajax_store_regions"))
+    {
+        new Request(
+        {
+            url: "index.php?app=o2o&ctl=admin_autostore&act=ajax_store_regions",
+            async:false,
+            method:'post',
+            data:{area: "<{$order.consignee.area}>", name: "store_consignee_area"},
+            onComplete: function(region_html)
+            {
+                $("ajax_store_regions").set('html', region_html);
+            }
+        }).send();
+    }
+});
+
+function selectO2oArea(sel, path, depth)
+{
+    sel=$(sel);
+    if(!sel)return;
+    var sel_value=sel.value;
+    var sel_panel=sel.getParent();
+    var selNext=sel.getNext();
+    var areaPanel= sel.getParent('*[package]');
+    var hid=areaPanel.getElement('input[type=hidden]');
+    var curOption=$(sel.options[sel.selectedIndex]);
+
+    var setHidden=function(sel){
+        var rst=[];
+        var sel_break = true;        
+        
+        if (curOption && !curOption.get('has_c')){
+            /** 删除多余的三级地区 **/
+            var _currChliSpan = sel.getNext('.x-region-child');    
+            if (_currChliSpan){
+                _currChliSpan.destroy();
+            }
+            /** end **/
+        }
+        
+        var sels=$ES('select',areaPanel);
+        sels.each(function(s){
+          if(s.getValue()!= '_NULL_' && sel_break){
+              rst.push($(s.options[s.selectedIndex]).get('text'));
+          }else{
+            sel_break = false;
+          }
+        });
+        if(sel.value != '_NULL_'){
+            $E('input',areaPanel).value = areaPanel.get('package')+':'+rst.join('/')+':'+sel.value;
+        }else{
+            $E('input',areaPanel).value =function(sel){
+              var s=sels.indexOf(sel)-1;
+              if(s>=0){
+                 return areaPanel.get('package')+':'+rst.join('/')+':'+sels[s].value;
+              }
+              return '';
+            }(sel);
+        }
+
+    };
+    if(sel_value=='_NULL_'&&selNext&&(selNext.getTag()=='span' && selNext.hasClass('x-areaSelect'))){
+        sel.nextSibling.empty();
+        setHidden(sel);
+    }else{
+        /*nextDepth*/
+        if(curOption.get('has_c')){
+          new Request({
+                url:'index.php?app=o2o&ctl=admin_autostore&act=selO2oRegion&path='+path+'&depth='+depth,
+                onSuccess:function(response){
+                    var e;
+                    if(selNext && (selNext.getTag()=='span'&& selNext.hasClass('x-region-child'))){
+                        e = selNext;
+                    }else{
+                        e = new Element('span',{'class':'x-region-child'}).inject(sel_panel);
+                    }
+                    setHidden(sel);
+                    if(response){
+                        e.set('html',response);
+                        if(hid){
+                           hid.retrieve('sel'+depth,function(){})();
+                           hid.retrieve('onsuc',function(){})();
+                        }
+                    }else{
+                        sel.getAllNext().remove();
+                        setHidden(sel);
+                        hid.retrieve('lastsel',function(){})(sel);
+                    }
+                }
+            }).get();
+            if($('shipping')){
+                $('shipping').setText('');
+            }
+        }else{
+            sel.getAllNext().remove();
+            setHidden(sel);
+            if(!curOption.get('has_c')&&curOption.value!='_NULL_')
+            hid.retrieve('lastsel',function(){})(sel);
+        }
+    }
+
+    //未选择区域
+    if(path == '_NULL_')
+    {
+        consignee_area     = document.getElementsByName("store_consignee_area");
+        parent_region    = consignee_area[0].value;
+        if(parent_region)
+        {
+            temp_area    = parent_region.split(":");
+            path         = temp_area[2];
+            depth        = parseInt(depth) - 1;
+        }
+    }
+
+    $("o2o_shop_name").value    = "";
+    if(path != '_NULL_')
+    {
+        ajax_o2o_store_list(path, depth, '');
+    }
+    else
+    {
+        var html    = store_html;
+        html        += '<option value="">请选择门店区域</option></select>';
+        $("o2o_shoplist").set('html', html);
+    }
+}
+
+$('but_search_shop').addEvent('click',function(e)
+{
+    search_o2o_store();
+});
+
+function search_o2o_store()
+{
+    sel_shop_name = $("o2o_shop_name").value.replace(/["'<>%;)(&+]/g,"");
+    $("o2o_shop_name").value   = sel_shop_name;
+    
+    if(sel_shop_name=="")
+    {
+        alert("请输入门店名称关键字...");
+        return false;
+    }
+    
+    ajax_o2o_store_list('', '', sel_shop_name);
+}
+
+function ajax_o2o_store_list(region_id, depth, shop_name)
+{
+    var html            = store_html;
+    
+    new Request(
+    {
+        url: "index.php?app=o2o&ctl=admin_autostore&act=ajax_o2o_store_list",
+        async:false,
+        method:'post',
+        data:{region_id:region_id, depth:depth, shop_name:shop_name},
+        onComplete: function(json)
+        {
+            json = JSON.decode(json);
+            
+            if(json.res == 'empty')
+            {
+                html    += '<option value="">没有可选门店</option></select>';
+                $("o2o_shoplist").set('html', html);
+            }
+            else if(json.res == 'no_district')
+            {
+                $("get_shop_msg").set('html', '请选择所在区域...');
+            }
+            else if(json.res == 'succ')
+            {
+                store_data    = json.store_list;
+                store_data.each(function(rs, i)
+                {
+                    html    += '<option value="'+ rs.branch_id +'">'+ rs.store_name +'</option>';
+                });
+                html    += '</select>';
+                
+                $("get_shop_msg").set('html', '');
+                $("o2o_shoplist").set('html', html);
+            }
+            else
+            {
+                $("get_shop_msg").set('html', '获取错误...');
+            }
+        }
+    
+    }).send();
+}
+</script>

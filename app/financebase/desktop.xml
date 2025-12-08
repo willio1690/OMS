@@ -1,0 +1,46 @@
+<desktop>
+    <permissions>
+        <permission id="shop_settlement_rules">收支分类设置</permission>
+        <permission id="shop_settlement_feetype">费用项设置</permission>
+        <permission id="shop_settlement_verification">核销规则设置</permission>
+        <permission id="shop_settlement_base">店铺收支明细</permission>
+        <permission id="shop_settlement_expenses_show">费用对账拆分总览</permission>
+        <permission id="shop_settlement_import">实收退导入</permission>
+        <permission id="shop_settlement_cainiao">菜鸟账单导入</permission>
+        <permission id="shop_settlement_jxt">京准通账单导入</permission>
+        <permission id="shop_settlement_jdbill">京东钱包流水</permission>
+        <permission id="shop_settlement_cainiaoitems">支付宝实付明细</permission>
+        <permission id="shop_settlement_task">账单设置</permission>
+        <permission id="shop_settlement_expenses_rule">费用拆分规则</permission>
+        <permission id="shop_settlement_expenses_splittotal">拆分结果汇总</permission>
+        <permission id="shop_settlement_expenses_splititem">拆分结果明细</permission>
+        <permission id="shop_settlement_expenses_export">结果导出日志</permission>
+    </permissions>
+
+    <workground name="财务管理" id="finance_center"   order="400" icon="icon-caiwuguanli-01">
+        <menugroup name="账单设置" en="bill-basic-set">
+            <menu controller='admin_shop_settlement_rules' action='index' permission='shop_settlement_rules' display='true' order='2000100'>收支分类设置</menu>
+            <menu controller='admin_shop_settlement_fee_type' action='index' permission='shop_settlement_feetype' display='true' order='2000200'>费用项设置</menu>
+            <menu controller='admin_shop_settlement_verification' action='error' permission='shop_settlement_verification' display='true' order='2000300'>核销规则设置</menu>
+        </menugroup>
+        <menugroup name="账单导入" en="bill">
+            <menu controller='admin_shop_settlement_bill' action='base' permission='shop_settlement_base' display='true' order='2000105'>店铺收支明细</menu>
+            <menu controller='admin_shop_settlement_cainiaoitems' action='index' permission='shop_settlement_cainiaoitems' display='true' order='2000450'>支付宝实付明细</menu>
+            <menu controller='admin_shop_settlement_cainiao' action='index' permission='shop_settlement_cainiao' display='true' order='2000500'>菜鸟账单导入</menu>
+            <menu controller='admin_shop_settlement_cainiao' action='detailed' permission='shop_settlement_cainiao' display='false' order='2000700'>菜鸟账单详情</menu>
+            <menu controller='admin_shop_settlement_jingzhuntong' action='index' permission='shop_settlement_jxt' display='true' order='2000800'>京准通账单导入</menu>
+            <menu controller='admin_shop_settlement_jingzhuntong' action='detailed' permission='shop_settlement_jxt' display='false' order='2000810'>京准通单详情</menu>
+            <menu controller='admin_shop_settlement_jdbill' action='index' permission='shop_settlement_jdbill' display='true' order='2000900'>京东钱包流水</menu>
+            <menu controller='admin_shop_settlement_jdbill' action='detailed' permission='shop_settlement_jdbill' display='false' order='2000910'>京东钱包流水明细</menu>
+            <menu controller='admin_shop_settlement_bill' action='bill_import' permission='shop_settlement_import' display='true' order='2000400'>实收退导入</menu>
+            <menu controller='admin_shop_settlement_queue' action='index' permission='shop_settlement_task' display='true' order='2000401'>实收退任务队列</menu>
+        </menugroup>
+        <menugroup name="费用拆分" en="expense-splitting">
+            <menu controller='admin_expenses_show' action='index' permission='shop_settlement_expenses_show' display='true' order='2000115'>费用对账拆分总览</menu>
+            <menu controller='admin_expenses_rule' action='index' permission='shop_settlement_expenses_rule' display='true' order='2001100'>费用拆分规则</menu>
+            <menu controller='admin_expenses_splittotal' action='index' permission='shop_settlement_expenses_splittotal' display='true' order='2001150'>拆分结果汇总</menu>
+            <menu controller='admin_expenses_splititem' action='index' permission='shop_settlement_expenses_splititem' display='true' order='2001200'>拆分结果明细</menu>
+            <menu controller='admin_expenses_export' action='index' permission='shop_settlement_expenses_export' display='true' order='2001250'>结果导出日志</menu>
+        </menugroup>
+    </workground>
+</desktop>

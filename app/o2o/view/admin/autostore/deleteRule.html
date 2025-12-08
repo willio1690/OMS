@@ -1,0 +1,39 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form id='delete_rule_form' method="post" action='index.php?app=o2o&ctl=admin_autostore&act=doDeleteRule'>
+    <div class="division">
+        <div class="tableform">
+              <h4>是否确认删除当前选中的规则</h4>
+        </div>
+       <div class="table-action">
+            <{button label="是" type="button" id='cancel-rule'}><{button label="否" type="button" id='copy-rule' isCloseDialogBtn='true'}>
+        </div>
+    </div>
+    <input type="hidden" name="rule_id" value="<{$data}>">
+</form>
+
+<script>
+$('cancel-rule').addEvent('click',function(e){
+    var _this=this;
+    $('delete_rule_form').store('target',{
+          onRequest:function(){
+                _this.disabled=true;
+            },
+            onComplete:function(jsontext){
+            try{
+                    var json = Json.evaluate(jsontext);
+                    if (typeof(json.error) != 'undefined'){
+                        _this.disabled=false;
+                    }else{
+                        $('delete_rule_form').getParent('.dialog').retrieve('instance').close();
+                        opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,opener.finderGroup['<{$env.get.finder_id}>']);
+                    }
+                 }catch(e){}
+            }
+        });
+        $('delete_rule_form').fireEvent('submit',e);
+});
+</script>

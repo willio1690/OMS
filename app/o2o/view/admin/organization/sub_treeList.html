@@ -1,0 +1,31 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table cellspacing="0" cellpadding="0" style="width:100%">
+  <col class="Colauto"></col>
+  <col class="Coloption_1b"></col>
+  <tbody>
+    <{foreach from=$organization item=item key=iLoop name="item"}>
+      <tr parentid="<{$item.org_id}>" class="provice-bg">
+        <td style="text-align:left; width:320px;">
+          <div style="padding-left:<{$item.step*25}>px">
+            <{if $item.org_type == 1 || $item.org_type == 3}>
+                <{if $item.child_count>0}>
+                <span class="imgTree" onclick="clickTree(this);" id="<{$item.org_id}>"> &nbsp;&nbsp; </span>
+                <{else}>
+                <span class="imgTree tree_open"> &nbsp;&nbsp; </span>
+                <{/if}>
+            <{else}>
+                <span class=""> &nbsp;&nbsp; </span>
+            <{/if}>
+            <span style="font-weight:700; color:#000; text-decoration:none;padding-right:15px;" >【<{$item.org_no}>】<{$item.org_name}></span>
+          </div>
+        </td>
+        <td style="width:350px">
+           
+        </td>
+      </tr>
+      <{/foreach}>
+</table>

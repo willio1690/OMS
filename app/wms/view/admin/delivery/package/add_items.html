@@ -1,0 +1,176 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="post" id="package-form" action="index.php?app=wms&ctl=admin_receipts_print&act=addPrintShip&finder_id=<{$env.get.finder_id}>" target='_blank'>
+<input type="hidden" name="delivery_id" value="<{$delviery_id}>">
+<input type="hidden" name="num" value="<{$num}>">
+
+<div class="division">
+    <h5>发货单明细</h5>
+    <table class="gridlist" id="delivery-items"  style="margin:4px 0;">
+    <thead>
+    <tr>
+        <th>基础物料编码</th>
+        <th>基础物料名称</th>
+        <th>条形码</th>
+        <th>发货单数量</th>
+        <th>已打包数量</th>
+    </tr>
+    </thead>
+    <tbody>
+        <{foreach from=$deliveryItems item=item}>
+            <tr item-bn="<{$item.bn}>" item-barcode="<{$item.barcode}>">
+                <td data-bn="<{$item.bn}>"><{$item.bn}></td>
+                <td data-name="<{$item.product_name}>"><{$item.product_name}></td>
+                <td data-barcode="<{$item.barcode}>"><{$item.barcode}></td>
+                <td data-number="<{$item.number}>"><{$item.number}></td>
+                <td data-packagenum="<{$item.package_num}>"><span style="color: green;"><{$item.package_num}></span></td>
+            </tr>
+        <{/foreach}>
+    </tbody>
+    </table>
+</div>
+
+<div class="division">
+    <{foreach from=$packages item=item key=key}>
+        <div class="package-info" id="package-<{$key}>">
+            <h5><{$item.package_title}></h5>
+            <span>
+                <label>包裹号：</label>
+                <{input type="text" name="package_bn[]" value=$item.package_bn readonly="true"}>
+                <{input type="hidden" name="package_type[]" value=$item.package_type}>
+            </span> 
+            <span>
+                <label>基础物料编码：</label>
+                <{input type="text" class="bn-btn" name="bn" placeholder="输入”9999“下个包裹"}>
+            </span>
+            <span>
+                <label>条形码：</label>
+                <{input type="text" class="barcode-btn" name="barcode" placeholder="输入”9999“下个包裹"}>
+            </span>
+            <table class="gridlist package-table" id=""  style="margin:4px 0;">
+            <thead>
+            <tr>
+                <th>基础物料编码</th>
+                <th>基础物料名称</th>
+                <th>条形码</th>
+                <th>数量</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody class="package-items"></tbody>
+            </table>
+        </div>
+    <{/foreach}>
+</div>
+<div class="table-action">
+    <button type="button" id="package-btn" style="font-size:3.0em;font-weight: 700; height: 50px; width:200px;cursor: pointer; margin-left:50px;" >打印物流单
+    </button>
+</div>
+</form>
+<script type="text/javascript">
+(function(){
+    var tpl =   '<td>{bn}<input type="hidden" name="product_bn[{package_bn}][]" value={bn}><input type="hidden" name="product_num[{package_bn}][]" value={num}></td>\
+                 <td>{name}</td>\
+                 <td>{barcode}</td>\
+                 <td data-packagenum={num}>{num}</td>\
+                 <td><{img src="bundle/delete.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>';
+    function addItem(){
+        if (this.get('name') == 'bn'){
+            var itemTr = $E('#delivery-items tr[item-bn='+this.value+']');
+        }else{
+            var itemTr = $E('#delivery-items tr[item-barcode='+this.value+']');
+        }
+        
+        if (!$defined(itemTr)){
+            return MessageBox.error('货号['+this.value+']不存在！');
+        }
+        var bn          = itemTr.getElement('td[data-bn]').dataset.bn;
+        var name        = itemTr.getElement('td[data-name]').dataset.name;
+        var barcode     = itemTr.getElement('td[data-barcode]').dataset.barcode;
+        var number      = itemTr.getElement('td[data-number]').dataset.number;
+        var packagenum  = itemTr.getElement('td[data-packagenum]').dataset.packagenum;
+        var package_bn  = this.getParent('.package-info').getElement('input[name="package_bn[]"]').value;
+        if (packagenum.toInt() >= number.toInt()){
+            return MessageBox.success('货号['+this.value+']已全部打包！');
+        }
+
+        var packageBody = this.getParent('.package-info').getElement('.package-items');
+        var packageItemTr = packageBody.getElement('tr[item-bn='+bn+']');
+        if ($defined(packageItemTr)){
+            packageItemTr.getElement('td[data-packagenum]').dataset.packagenum++;
+            
+            var num = packageItemTr.getElement('td[data-packagenum]').dataset.packagenum;
+            packageItemTr.getElement('td[data-packagenum]').setText(num);
+            packageItemTr.getElement('input[name="product_num['+package_bn+'][]"]').value = num;
+        }else{
+            var num = 1;
+            var h = tpl.substitute({
+                bn:bn,
+                name:name,
+                barcode:barcode,
+                num:num,
+                package_bn:package_bn
+            });
+            var packageTr = new Element('tr',{"item-bn":bn, html:h});
+
+            $E('.btn-delete-item',packageTr).addEvent('click',function(e){
+                var num = this.getParent('tr').getElement('td[data-packagenum]').dataset.packagenum;
+                itemTr.getElement('td[data-packagenum]').dataset.packagenum -= num;
+                itemTr.getElement('td[data-packagenum]').setText(itemTr.getElement('td[data-packagenum]').dataset.packagenum);
+
+                this.getParent('tr').remove();
+            })
+        }
+
+        itemTr.getElement('td[data-packagenum]').dataset.packagenum++
+        itemTr.getElement('td[data-packagenum]').setText(itemTr.getElement('td[data-packagenum]').dataset.packagenum);
+
+        this.getParent('.package-info').getElement('.package-items').adopt(packageTr);
+    }
+
+    $E('input.barcode-btn').focus();
+    $$('input.bn-btn','input.barcode-btn').addEvent('keyup',function(e){
+        if(e.code==13){
+            if (this.value == '9999') {
+                this.value = '';
+                var nextInput = this.getParent('.package-info').getNext('div.package-info').getElement('input[name='+this.get('name')+']');
+                if ($defined(nextInput)){
+                    nextInput.select();
+                }
+                return ;
+            }
+
+            addItem.bind(this)(this.value);
+
+            this.select();
+        }
+    })
+    $('package-btn').addEvent('click',function(e){
+        // 判断是否都装箱
+        // var finish = true; var bn = '';
+        var items = $ES('#delivery-items tr[item-bn]');
+        for(var i=0;i<items.length;i++){
+            var number      = items[i].getElement('td[data-number]').dataset.number;
+            var packagenum  = items[i].getElement('td[data-packagenum]').dataset.packagenum;
+            if(number.toInt() != packagenum.toInt()){
+                return MessageBox.error('请将所有货品装箱');
+            }
+        }
+
+        var packages =  $ES('#package-form input[name="package_bn[]"]');
+        for (var i = 0; i < packages.length; i++) {
+            var packagesItems = packages[i].getParent('.package-info').getElement('.package-items tr[item-bn]');
+            if (!$defined(packagesItems)) {
+                return MessageBox.error('包裹【'+packages[i].value+'】未装货品');
+            }
+        }
+
+        $('package-form').submit();
+
+        $('package-btn').getParent('.dialog').retrieve('instance').close();
+    });
+})()
+</script>

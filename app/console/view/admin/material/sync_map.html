@@ -1,0 +1,81 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division" id="mapGoodsDataSync">
+    <table>
+        <tbody>
+            <tr>
+                <th width="5%">仓储:</th>
+                <td width="17%">
+                    <select class="mapGoodsData" name="wms_id">
+                        <option value="">请选择</option>
+                        <{foreach from=$wms_data item=item}>
+                            <option value="<{$item.channel_id}>"><{$item.channel_name}></option>
+                        <{/foreach}>
+                    </select>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <input type="hidden" class="mapGoodsData" name="id" value="-1" />
+    <input type="hidden" class="mapGoodsData" name="operate_type" value="<{$operate_type}>" />
+    <div>统计:<span id="curTotal" style="color: red;">0</span>/<span id="total">0</span></div>
+    <div id="processBarBg" style="border:1px solid #999999; width:98%; height:25px;line-height:25px;padding:1px; background:#EEEEEE;">
+        <div style=" background:#3366cc; width:0px; padding-bottom:1px;overflow:hidden;" id='processBar'>&nbsp;</div>
+    </div>
+    <div class="table-action">
+        <{button label="开始" id="sync_btn"  type="button"}>
+    </div>
+    <div id='sync-error'></div>
+</div>
+
+<script>
+    (function(){
+        var map_goods = JSON.decode('<{$map_goods|json_encode}>');
+        $('total').set('text', map_goods.length);
+        $('sync_btn').addEvent('click', function() {
+            var wms_id = $E('select[name=wms_id]').value;
+            if (!wms_id) return MessageBox.error('请选择仓储');
+            var _parent=this;
+            Ex_Loader('cmdrunner',function(){
+                new taskrunner(map_goods.map(function(){return 'index.php?app=console&ctl=admin_map&act=doMapUpdate'}), {
+                    container: $('mapGoodsDataSync'),
+                    dataClass: '.mapGoodsData',
+                    onLoad: function() {
+                        _parent.disabled = true;
+                        _parent.set('html', '<span><span>同步中...</span></span>');
+                    },
+                    onStart: function() {
+                        var rowData = map_goods[this.prestep];
+                        $E('#mapGoodsDataSync input[name=id]').set('value', rowData.id);
+                    },
+                    onComplete:function() {
+                        var num=this.step/this.num*100;
+                        $('processBar').setStyle('width',num+'%');
+                        $('curTotal').set('text', this.step);
+                    },
+                    onCheck:function(message) {
+                        if(message != '|ok.') {
+                            var strDiv = document.createElement('DIV');
+                            strDiv.set('text', message.slice(0, -4));
+                            $('sync-error').appendChild(strDiv);
+                        }
+                    },
+                    onError:function(text) {
+                        if (!text) {alert('未捕获到错误信息，可能执行超时');}
+                        _parent.set('html', '<span><span>同步失败</span></span>');
+                        _parent.disabled = false;
+                        if (this.iframe) this.iframe.destroy();
+                        if (this.form) this.form.destroy();
+                    },
+                    onSuccess:function() {
+                        if (this.iframe) this.iframe.destroy();
+                        _parent.set('html', '<span><span>处理已完成</span></span>');
+                    }
+                }).run();
+            });
+        });
+    }());
+</script>

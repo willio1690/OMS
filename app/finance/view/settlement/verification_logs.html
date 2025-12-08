@@ -1,0 +1,35 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+           <div class="division">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0">
+
+        <tbody>
+  
+      <tr>
+         <td > 操作时间 </td>
+         <td > IP </td>
+         <td > 操作人 </td>
+         <td > 操作类型 </td>
+         <td > 操作内容 </td>
+ 
+         
+       </tr>
+
+            <{foreach from=$list item=item}>
+       <tr>
+         <td><{$item.log_time|cdate}></td>
+         <td><{$item.ip}></td>
+         <td><{$item.op_name}></td>
+         <td><{$item.log_type}></td>
+         <td><{$item.content}></td>
+       </tr>
+        <{/foreach}>
+        </tbody>
+      </table>
+    
+
+  </div>  </div>

@@ -1,0 +1,33 @@
+<desktop>
+    <permissions>
+        <permission id="waybill_manager">电子面单号管理</permission>
+        <permission id="delivery_template_manager">发货面单模板管理</permission>
+        <permission id="warehouse">区域仓列表</permission>
+       <permission id="cloudprint">云打印机</permission>
+    </permissions>
+
+    <workground name="系统设置" id="setting_tools"  order="1100" icon="icon-xitongshezhi-01">
+        <menugroup name="物流管理" en="logistics-management">
+            <menu controller='admin_express_template' action='stock' permission='delivery_template_manager' display='true' order='3000440'>备货面单管理</menu>
+            <menu controller='admin_express_template' action='delivery' permission='delivery_template_manager' display='true' order='3000450'>发货面单管理</menu>
+            <menu controller='admin_express_template' action='index' permission='waybill_manager' display='true' order='3000500'>快递面单管理</menu>
+            <menu controller='admin_channel' action='index' permission='waybill_manager' display='true' order='3000600'>电子面单来源</menu>
+            <!--<menu controller='admin_waybill_log' action='index' permission='waybill_manager' display='true' order='3000700'>面单异常请求</menu>-->
+            <menu controller='admin_logistics_log' action='index' permission='waybill_manager' display='true' order='3000800'>物流回填日志</menu>
+        </menugroup>
+    </workground>
+    <workground name="基础档案" id="goods_manager"  order="600" icon="icon-jichudangan-01">
+        
+        <menugroup name="仓库物流管理" en="branch-logistics-management">
+            <menu controller='admin_warehouse' action='index' permission='warehouse' display='true' order='4000200'>区域仓管理</menu>
+        </menugroup>
+    </workground>
+    <workground name="系统集成" id="channel_center" order="1400" icon="icon-xitongjicheng-01">
+
+    <menugroup name="云打印" en="cloudprint_manager">
+      
+      
+        <menu controller='admin_cloudprint' action='index' permission='cloudprint' display='true' order='4000200'>云打印机</menu>
+    </menugroup>
+    </workground>
+</desktop>

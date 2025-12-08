@@ -1,0 +1,129 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <!-- <h3>财务设置</h3> -->
+    <div class="division">
+     <{if $isSaveInitTime == 'false'}>
+     <form method="post" action="index.php?app=finance&ctl=setting_init&act=save_init_time" id="setting-form">
+     <{/if}>
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tbody>
+              <tr>
+                <th style='width:200px;text-align:right;'><em class="c-red">*</em>账务起始年：</th>
+                <td><{input type="select" name="init_time[year]" options=$year value=$init_time.year vtype="required" }></td>
+              </tr>
+              <tr>
+                <th style='width:200px;text-align:right;'><em class="c-red">*</em>账务起始月：</th>
+                <td><{input type="select" name="init_time[month]" options=$month value=$init_time.month vtype="required" }></td>
+              </tr>
+              <tr>
+                <th style='width:200px;text-align:right;'><em class="c-red">*</em>账务起始日：</th>
+                <td><{input type="select" name="init_time[day]" options=$day value=$init_time.day vtype="required" }></td>
+              </tr>
+              <tr>
+                <th style='width:200px;text-align:right;'>账期时间：</th>
+                <td><{input type="select" name="init_time[cycle]" options=array("month"=>"按月","day"=>"按日") required="true" value=$init_time.cycle}></td>
+              </tr>
+              <tr>
+                <th style='width:200px;text-align:right;'>账期规则：</th>
+                <td><{input type="select" name="init_time[according]" options=array("ying_shou"=>"按应收单账单日期","shi_shou"=>"按实收单账单日期") required="true" value=$init_time.according}></td>
+              </tr>
+              <tr>
+                <th style='width:200px;text-align:right;'>应收金额：</th>
+                <td><{input type="select" name="init_time[ying_shou]" options=array("sale"=>"销售金额","settlement"=>"结算金额","actually"=>"客户实付") required="true" value=$init_time.ying_shou}></td>
+              </tr>
+              <tr>
+                <th style='width:200px;text-align:right;'>应退金额：</th>
+                <td><{input type="select" name="init_time[ying_tui]" options=array("apply"=>"退款申请金额","refund"=>"退款金额","settlement"=>"结算金额","real_refund_amount"=>"买家实退") required="true" value=$init_time.ying_tui}>
+                  <span style='color:red;'>注意：结算金额时，售后仅退款以退款金额为准！</span>
+                </td>
+              </tr>
+            </tbody>
+        </table>
+        <div class='notice'>
+            初始化设置完成后，有数据进入系统，则不能修改！必须清空所有数据才能再次修改！<br/><br/>
+            <span style='color:red;'>注意：必须费用项不能为空，不然流水无法转换到实收实退单！</span>
+        </div>
+
+        <div class="table-action">
+           <{if $isSaveInitTime == 'true' || $feeTypeCount}>
+                <{button label="保存" type="button" name="submit" id="btn-setting"  disabled="disabled" }>
+           <{else}>
+                <{button label="保存" type="submit" name="submit" id="btn-setting"  }>
+           <{/if}>
+            <{button type='button' label='关闭' isCloseDialogBtn="true"}>
+        </div>
+
+    <{if $isSaveInitTime == 'false'}>
+    </form>
+    <{/if}>
+    </div>
+
+    <div class="division" style="display:none;">
+    <h3>第二步：账期数据导入</h3>
+    <{if $isInit == 'false' }>
+    <form  method="post" action="index.php?app=finance&ctl=setting_init&act=save_init">
+    <input type="hidden" value="true" name="isInit">
+    <{/if}>
+
+    <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+      <tbody>
+        <tr>
+          <th style='width:200px;text-align:right;'>选择导入模版：</th>
+          <td>
+            <input type='button' value='下载模版' <{if $isInit == 'false' || $canImport == 'true' }>onclick="new Dialog('index.php?app=omecsv&ctl=admin_export&act=main&add=finance&ctler=finance_mdl_bill&filter[template]=1',{'title':'<{t}>下载模版<{/t}>','width':400,'height':170});"<{/if}> >
+          </td>
+        </tr>
+
+        <tr>
+        <th style='width:200px;text-align:right;'>导入模版：</th>
+        <td>
+          <input type='button' value='导入账单' <{if $isInit == 'false' || $canImport == 'true' }>onclick="new Dialog('index.php?app=omecsv&ctl=admin_import&act=main&add=finance&ctler=finance_mdl_bill&filter[checkTime]=before',{'title':'<{t}>导入账单<{/t}>','width':400,'height':180});"<{/if}> >
+        </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="table-action">
+      <{if $isInit == 'true'}>
+        <{button label="初始化完成" type="button" name="submit" id="btn-setting"  disabled="disabled" }>
+      <{else}>
+        <{button label="初始化完成" type="submit" name="submit" id="btn-setting"}>
+      <{/if}>
+    </div>
+
+    <{if $isInit == 'false' }>
+    </form>
+    <{/if}>
+
+    </div>
+</div>
+
+<script>
+$('btn-setting').addEvent('click',function(event){
+    if (!validate($('setting-form'))){
+        return ;
+    }
+
+    $('setting-form').fireEvent('submit', {stop:$empty});
+});
+
+$('setting-form').store('target',{
+    onRequest:function(){
+       $('btn-setting').set('disabled', 'true');
+    },
+    onComplete:function(resp){
+        resp = JSON.decode(resp)
+
+        $('btn-setting').set('disabled', '');
+        if (resp.error) return ;
+
+        $('setting-form').getParent('.dialog').retrieve('instance').close();
+
+        finderGroup['<{$env.get.finder_id}>'].refresh();
+    }
+});
+</script>

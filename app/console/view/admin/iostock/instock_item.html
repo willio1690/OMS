@@ -1,0 +1,90 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../app/wms/statics/wms.css" rel="stylesheet" type="text/css">       
+<{/capture}>
+
+
+
+<div class="tableform"> 
+
+<h4>入库单明细</h4>
+
+<div class="division">
+<table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+<col style="width:10%;"></col>
+<col style="width:22%;"></col>
+<col style="width:6%;"></col>
+<col style="width:10%;"></col>
+<col style="width:6%;"></col>
+<col style="width:6%;"></col>
+<col style="width:6%;"></col>
+<col style="width:6%;"></col>
+<{if $batch }>
+<col style="width:6%;"></col>
+<col style="width:4%;"></col>
+<col style="width:6%;"></col>
+<col style="width:6%;"></col>
+<{/if}>
+<thead>
+<tr>
+	<th>基础物料编码</th>
+    <th>基础物料名称</th>
+    <th>规格</th>
+	<th>条码</th>
+    <th>备件码</th>
+	<th>入库数量</th>
+ <th>良品</th>
+ <th>不良品</th>
+ <th>计量单位</th>
+ <{if $batch }>
+    <th>批次号</th>
+    <th>批次数量</th>
+    <th>生产日期</th>
+    <th>过期日期</th>
+    <th>箱号</th>
+ <{/if}>
+</tr>
+</thead>
+<{foreach from=$iso_items item=item}>
+<tbody>
+<tr>
+    <td rowspan="0"><{$item.bn}></td>
+    <td rowspan="0"><{$item.product_name}></td>
+    <td rowspan="0"><{$item.spec_info}></td>
+    <td rowspan="0"><{$item.barcode}></td>
+     <td rowspan="0"><{$item.partcode}></td>    
+    <td rowspan="0"><{$item.nums}></td>
+     <td rowspan="0"><{$item.normal_num}></td>
+      <td rowspan="0"><{$item.defective_num}></td>
+      <td rowspan="0"><{$item.unit}></td>
+</tr>
+<{if $batch }>
+<{foreach from=$item.detail item=iv}>
+<tr>
+    <td><{$iv.batch_code}></td>
+    <td><{$iv.nums}></td>
+    <td><{$iv.product_date}></td>
+    <td><{$iv.expire_date}></td>
+    <{if $iv.extendpro && $iv.extendpro.package_code}>
+    <td><{$iv.extendpro.package_code}></td>
+    <{else}>
+    <td><{$iv.box_no}></td>
+    <{/if}>
+</tr>
+<{/foreach}>
+<{/if}>
+</tbody>
+<{/foreach}>
+</table>
+</div>
+</div>
+
+<!--
+<div style="width:100%;text-align:right;line-height:25px;">
+<a href='index.php?app=console&ctl=admin_iostockorder&act=more_items&iso_id=<{$appr_id}>' target="_blank">查看更多</a>
+</div>
+-->

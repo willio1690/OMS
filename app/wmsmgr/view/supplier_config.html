@@ -1,0 +1,41 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<div class="division">
+<form method="post" action="index.php?<{$env.server.QUERY_STRING}>" id="terminal">
+<input type="hidden" name="wms_id" value="<{$wms_id}>">
+<table width="100%" cellspacing="0" cellpadding="0" border="0" >
+<tbody>
+  <{foreach from=$supplier_list item=supplier}>
+  <tr>
+      <th> <{$supplier.name}>：</th>
+      <td>
+        <{input type="text" size="32" name="wms[{$supplier.supplier_id}][supplier_bn]" value=$supplier.wms.wms_supplier_bn}><{help}><{t}>WMS供应商编号<{/t}><{/help}>
+      </td>
+  </tr>
+  <{/foreach}>
+</tbody>
+</table>
+<div class="table-action">
+<{if $supplier_list}>
+<{button class="btn-primary" type="submit" id="saveterminal" name="submit" label="保存"}>
+<{else}>
+请添加供应商
+<{/if}>
+</div>
+</form>
+</div>
+</div>
+
+<script>
+$('terminal').store('target',{
+    onRequest:function(){
+    },
+    onComplete:function(jsontext){
+      finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+    }
+});
+</script>

@@ -1,0 +1,67 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=ome&ctl=admin_dly_corp&act=synccrossbordercorp&finder_id=<{$finder_id}>" method="post" id="form1">
+<br/>
+<ul>
+	<li>
+		选择店铺:
+		<select  name='shop_id' id='shop_id'>
+			<{foreach from=$shoplist key=key item=shop}>
+			<option value='<{$key}>'><{$shop}></option>
+			<{/foreach}>
+		</select>	
+		&nbsp;&nbsp;进度:&nbsp;
+		<div style="border:1px solid #CCC;width:100px;overflow:hidden;margin-right:50px;float:right;background:#FFF;padding:1px;">
+			<div id="processBar_examin" style="background:#7493D1;width:0%;height:15px;">&nbsp;</div>
+	   </div>&nbsp;
+	</li>
+</ul>
+</p>
+<div id='rs'> 
+	
+</div>
+<div class="table-action">
+    
+      <{button  type="button"  id="crossbordercorp" label="同步" onclick="synccrossbordercorp();"}> &nbsp;
+     
+    </div>
+<input type='hidden' id='finder_id' name='finder_id' value='<{$finder_id}>'>
+</form>
+<script>
+setProcessBar("processBar_examin",'2%'); 
+$('rs').setHTML('');        
+function synccrossbordercorp(){
+	setProcessBar("processBar_examin",'2%'); 
+	$('rs').setHTML('同步中...');
+	$('crossbordercorp').set('readOnly',true); 
+	var shop_id = $('shop_id').getElement('option:selected').value;
+	if(!shop_id){
+		alert('请选择店铺!');
+	}
+    new Request({
+    	url:'index.php?app=ome&ctl=admin_dly_corp&act=ajax_synccrossbordercorp',
+   		method:'post',
+   		data:'shop_id='+shop_id,
+   		async:false,
+        onComplete:function(json){
+        	var rs = JSON.decode(json);
+        	 if(rs.rsp == 'succ'){
+        	 	setProcessBar("processBar_examin",'100%'); 
+        	    var sHtml = "<font color='green'>同步已完成，请设置跨境物流打印模板</font>";
+                $('rs').setHTML(sHtml);
+        	 }else{
+        	 	var sHtml = "<font color='red'>同步失败,"+rs.msg+"</font>";
+        	 	$('rs').setHTML(sHtml);
+        	 }
+        	 $('crossbordercorp').set('readOnly',false);
+        }
+       
+    }).send();
+} 
+function setProcessBar(id,w){
+    document.getElementById(id).style.width = w;
+}            
+</script>

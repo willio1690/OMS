@@ -1,0 +1,63 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+﻿<script>
+	function edit_status()
+	{
+		new Request({
+				url:'index.php?app=finance&ctl=monthend&act=edit_status',
+				method:'post',
+				data:'monthly_id='+'<{$monthly_id}>',
+				onSuccess:function(response){ 
+					var hash_res_obj = JSON.decode(response);
+						Dialogclose();
+						window.finderGroup['<{$env.get._finder.finder_id}>'].refresh();
+
+					}
+				}).send();
+	}
+	
+	var Dialogclose = function(){
+		var btn = $('doConf-form-submit');
+		var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+		_dialogIns.close();
+	}
+</script>
+
+
+
+<{if $asc_status_msg}>
+	<script>alert('<{$asc_status_msg}>'); Dialogclose();</script>
+<{elseif $book_status_msg}>
+	<script>alert('<{$book_status_msg}>'); Dialogclose();</script>
+<{elseif $auto_falg == 'true'}>
+<script>
+    if(window.confirm('<{$auto_falgmsg}>'))
+	{ 
+		edit_status();
+	}
+    else
+	{
+        Dialogclose();
+    }
+</script>
+<{else}>
+<script>
+    if(window.confirm("关账后，该账期将不能再进行任何处理！"))
+	{ 
+		edit_status();
+	}
+    else
+	{
+		Dialogclose();
+    }
+</script>
+<{/if}>
+
+<div class="table-action">
+	
+	 <input value="提交" type="submit" class='' name="submit" disabled="disabled" id="doConf-form-submit" />
+</div>
+

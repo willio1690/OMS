@@ -1,0 +1,97 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+   <h4><{t}>礼盒商品<{/t}></h4>
+      <table width="100%" class="gridlist" border="0" cellspacing="0" cellpadding="0">
+        <thead>
+        <tr>
+          <th><{t}>物料编码<{/t}></th>
+          <th><{t}>物料名称<{/t}></th>
+          <th><{t}>规格<{/t}></th>
+          <th><{t}>单位<{/t}></th>
+          <th><{t}>原价<{/t}></th>
+          <th><{t}>销售价<{/t}></th>
+          <th><{t}>优惠额<{/t}></th>
+            <th><{t}>实付金额<{/t}></th>
+            <th><{t}>优惠分摊<{/t}></th>
+          <th><{t}>购买量<{/t}></th>
+          <th><{t}>已发货量<{/t}></th>
+          <th><{t}>已退货量<{/t}></th>
+          <th><{t}>hold单时限<{/t}></th>
+          <th><{t}>是否预售<{/t}></th>
+          <th><{t}>预选仓<{/t}></th>
+          <th><{t}>子单号<{/t}></th>
+          <th><{t}>平台商品ID<{/t}></th>
+          <th><{t}>行号<{/t}></th>
+          <{if $is_host}>
+          <th><{t}>达人ID<{/t}></th>
+          <th><{t}>达人名称<{/t}></th>
+          <th><{t}>直播间ID<{/t}></th>
+          <{/if}>
+        </tr>
+      </thead>
+      <tbody>
+        <{foreach from=$objs item=obj}>
+        <tr>
+          <td><strong><{$obj.bn}></strong></td>
+          <td>
+            <{if $obj.s_type=='dx'}><span style="color:#66ccff">【代销】</span><{/if}>
+            <{if $obj.is_sh_ship=='true'}><span style="color:#800002">【禁发】</span><{/if}>
+            <strong><{$obj.name}></strong>
+          </td>
+          <td>礼盒商品&nbsp;</td>
+          <td>件&nbsp;</td>
+          <td><strong><{$obj.price}></strong></td>
+          <td><strong><{$obj.sale_price/$obj.quantity|cur}></strong></td>
+          <td><strong><{$obj.pmt_price/$obj.quantity|cur}></strong></td>
+          <td><strong><{$obj.divide_order_fee|cur}></strong></td>
+          <td><strong><{$obj.part_mjz_discount|cur}></strong></td>
+          <td><strong><{$obj.quantity}></strong></td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td><{if $obj.estimate_con_time < 1}>-<{elseif $obj.estimate_con_time == $maxHoldTime}>手工操作<{else}><{$obj.estimate_con_time|cdate}><{/if}></td>
+          <td><{if $obj.presale_status == 1}>是<{else}>否<{/if}></td>
+          <td><{$obj.store_code}></td>
+          <td><{$obj.oid}></td>
+          <td><{$obj.shop_goods_id}></td>
+          <td><{$obj.sku_uuid}></td>
+        <{if $is_host}>
+          <td></td>
+          <td></td>
+          <td></td>
+          <{/if}>
+        </tr>
+        <{foreach from=$obj.order_items item=item}>
+        <tr class="ColColorBlue" <{if $item.delete == 'true'}>style="background-color: rgb(216, 216, 216);"<{/if}> >
+          <td><{$item.bn}></td>
+          <td><{$item.name}></td>
+          <td><{$item.addon}></td>
+          <td><{$item.unit}></td>
+          <td><{$item.price}></td>
+        <td><{if $show_sale_price}><{$item.sale_price/$item.quantity|cur}><{else}>-<{/if}></td>
+        <td><{if $show_sale_price}><{$item.pmt_price/$item.quantity|cur}><{else}>-<{/if}></td>
+          <td><{$item.divide_order_fee|cur}></td>
+          <td><{$item.part_mjz_discount|cur}></td>
+          <td><{$item.quantity}></td>
+          <td><{$item.sendnum}></td>
+          <td><{$item.return_num}></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+
+          <{if $is_host}>
+          <td><{$obj.author_id}></td>
+          <td><{$obj.author_name}></td>
+          <td><{$obj.room_id}></td>
+          <{/if}>
+        </tr>
+        <{/foreach}>
+        <{/foreach}>
+      </tbody>
+     </table>
+</div>

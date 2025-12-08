@@ -1,0 +1,101 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+  <div class="division">
+    <table width="100%" cellspacing="0" cellpadding="0" border="0">
+      <tbody>
+        <tr>
+          <th width="15%">发货单号：</th>
+          <td width="35%"><{$data.delivery_bn}></td>
+          <th width="15%">物流编码：</th>
+          <td width="35%"><{$data.logi_code}></td>
+        </tr>
+        <tr>
+          <th>物流单号：</th>
+          <td><{$data.logi_no}></td>
+          <th>包裹状态：</th>
+          <td>
+            <{if $data.status == '0'}>未发货
+            <{elseif $data.status == '1'}>已发货
+            <{elseif $data.status == '2'}>已取消
+            <{elseif $data.status == '3'}>已接受
+            <{elseif $data.status == '4'}>已签收
+            <{elseif $data.status == '5'}>已支付
+            <{else}>未知
+            <{/if}>
+          </td>
+        </tr>
+        <tr>
+          <th>包裹重量：</th>
+          <td><{$data.weight}></td>
+          <th>预计物流费用：</th>
+          <td><{$data.delivery_cost_expect}></td>
+        </tr>
+        <tr>
+          <th>实际物流费用：</th>
+          <td><{$data.delivery_cost_actual}></td>
+          <th>订单号：</th>
+          <td><{$data.order_bn}></td>
+        </tr>
+        <tr>
+          <th>京东订单号：</th>
+          <td><{$data.package_bn}></td>
+          <th>创建时间：</th>
+          <td><{if $data.create_time}><{$data.create_time|date_format:'%Y-%m-%d %H:%M:%S'}><{else}>-<{/if}></td>
+        </tr>
+        <tr>
+          <th>发货时间：</th>
+          <td><{if $data.delivery_time}><{$data.delivery_time|date_format:'%Y-%m-%d %H:%M:%S'}><{else}>-<{/if}></td>
+          <th>最后更新时间：</th>
+          <td><{if $data.last_modified}><{$data.last_modified|date_format:'%Y-%m-%d %H:%M:%S'}><{else}>-<{/if}></td>
+        </tr>
+        <tr>
+          <th>同步状态：</th>
+          <td>
+            <{if $data.sync_status == 'none'}>未请求
+            <{elseif $data.sync_status == 'fail'}>失败
+            <{elseif $data.sync_status == 'succ'}>成功
+            <{else}>未知
+            <{/if}>
+          </td>
+          <th>推送云交易：</th>
+          <td>
+            <{if $data.push_kepler == 'none'}>未回写
+            <{elseif $data.push_kepler == 'fail'}>回写失败
+            <{elseif $data.push_kepler == 'succ'}>回写成功
+            <{elseif $data.push_kepler == 'retry'}>重试推送
+            <{else}>未知
+            <{/if}>
+          </td>
+        </tr>
+        <tr>
+          <th>异常状态：</th>
+          <td>
+            <{if $data.exception_status == 0}>
+              <span style="color: green;">无异常</span>
+            <{else}>
+              <span style="color: red;">有异常</span>
+            <{/if}>
+          </td>
+          <th>异常代码：</th>
+          <td><{$data.exception_code|default:'-'}> <{if $data.exception_code == 'GOT_EXCEPTION'}> - 揽收异常<{elseif $data.exception_code == 'GOT_UPDATE_EXCEPTION'}> - 揽收更新异常<{elseif $data.exception_code == 'TRANSPORT_EXCEPTION'}> - 运输派送异常<{elseif $data.exception_code == 'DELIVERY_UPDATE_EXCEPTION'}> - 派送更新异常<{/if}></td>
+        </tr>
+        <tr>
+          <th>子异常代码：</th>
+          <td><{$data.sub_exception_code|default:'-'}> <{if $data.sub_exception_code == 'WILL_GOT_TIMEOUT'}> - 揽收即将超时<{elseif $data.sub_exception_code == 'WILL_CONSIGN_FAKE_TIMEOUT'}> - 即将虚假发货<{elseif $data.sub_exception_code == 'CONSIGN_DELAY'}> - 延迟发货<{elseif $data.sub_exception_code == 'CONSIGN_CLICKED_FAKE'}> - 虚假点击发货<{elseif $data.sub_exception_code == 'OUT_STOCK'}> - 缺货<{elseif $data.sub_exception_code == 'WILL_GOT_UPDATE_TIMEOUT'}> - 揽收更新即将超时<{elseif $data.sub_exception_code == 'COLLECTED_STOP'}> - 揽收后停滞<{elseif $data.sub_exception_code == 'WILL_TRANSPORT_TIMEOUT'}> - 运输派送即将超时<{elseif $data.sub_exception_code == 'TRANSPORTING_STOP'}> - 运输停滞<{elseif $data.sub_exception_code == 'WILL_DELIVERY_UPDATE_TIMEOUT'}> - 派送更新即将超时<{elseif $data.sub_exception_code == 'DELIVERING_STOP'}> - 派送停滞<{/if}></td>
+          <th>异常类型：</th>
+          <td><{$data.exception_type|default:'-'}> <{if $data.exception_type == 'WARNING'}> - 预警异常<{elseif $data.exception_type == 'EXCEPTION'}> - 实际异常<{else}> - <{$data.exception_type}><{/if}></td>
+        </tr>
+        <tr>
+          <th>异常发生时间：</th>
+          <td><{if $data.exception_create_time}><{$data.exception_create_time|date_format:'%Y-%m-%d %H:%M:%S'}><{else}>-<{/if}></td>
+          <th>预警转实际异常时间：</th>
+          <td><{if $data.exception_over_time}><{$data.exception_over_time|date_format:'%Y-%m-%d %H:%M:%S'}><{else}>-<{/if}></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div> 

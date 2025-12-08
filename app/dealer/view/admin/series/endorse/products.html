@@ -1,0 +1,148 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .division table {
+        border: 1px solid #dbdbdb;
+    }
+
+    .division table tbody tr {
+        height: 24px;
+        line-height: 24px;
+    }
+
+    .division table tbody tr th {
+        text-align: right;
+        width: 25%
+    }
+
+    .division table tbody tr th, .division table tr td {
+        padding: 7px 5px;
+    }
+
+    .division table tbody td input {
+        height: 24px;
+        line-height: 24px;
+    }
+
+    h5 {
+        margin-bottom: 12px;
+        color: #305c89;
+    }
+</style>
+<div class="division" id="branch-content">
+    <div id="agent-branch-errorinfo" class="error" style="display:none;"></div>
+
+    <form method="post" action="index.php?app=dealer&ctl=admin_series_endorse_products&act=doBatchSetShopyjdfType&view=<{$view}>" id="agent-branch-form">
+        <input type='hidden' name='sep_id_list' value='<{$sep_id_list}>'>
+        <h5><{if $history}><em class='c-red'>《快照》</em><{/if}>经销商订单发货方式变更</h5>
+        <table width="100%" cellspacing="0" cellpadding="0" border="0">
+            <tbody>
+            <tr>
+                <th align="right">代发货：</th>
+                <td>
+                    <lable><input type="radio" name="is_shopyjdf_type" value="2" <{if $history}>disabled='disabled'<{/if}> checked/>是</lable>
+                    <lable><input type="radio" name="is_shopyjdf_type" <{if $history and $is_shopyjdf_type==1}>checked disabled='disabled'<{/if}> value="1"/>否</lable>
+                </td>
+            </tr>
+            <tr>
+                <th align="right">生效时间：</th>
+                <td>
+                <{if $history}>
+                  <{input type="date" name="from_date" value=$from_date disabled='disabled'}>
+                <{else}>
+                  <{input type="date" name="from_date" value=$from_date}>
+                <{/if}>
+                  <select id='from_time_h' name='from_time_h' style='width: 53px; height: 24px; padding-top: 1px;' >
+                    <{foreach from=$from_time_list.h item=item }>
+                      <option value="<{$item}>" <{if $from_time_h==$item}>selected<{/if}>><{$item}></option>
+                    <{/foreach}>
+                  </select>
+                  :
+                  <select id='from_time_i' name='from_time_i' style='width: 53px; height: 24px; padding-top: 1px;' >
+                    <{foreach from=$from_time_list.i item=item }>
+                      <option value="<{$item}>" <{if $from_time_i==$item}>selected<{/if}>><{$item}></option>
+                    <{/foreach}>
+                  </select>
+                </td>
+            </tr>
+            <tr>
+                <th align="right">结束时间：</th>
+                <td>
+                <{if $history}>
+                  <{input type="date" name="end_date" value=$end_date disabled='disabled'}>
+                <{else}>
+                  <{input type="date" name="end_date" value=$end_date}>
+                <{/if}>
+                  <select id='end_time_h' name='end_time_h' style='width: 53px; height: 24px; padding-top: 1px;' >
+                    <{foreach from=$end_time_list.h item=item }>
+                      <option value="<{$item}>" <{if $end_time_h==$item}>selected<{/if}>><{$item}></option>
+                    <{/foreach}>
+                  </select>
+                  :
+                  <select id='end_time_i' name='end_time_i' style='width: 53px; height: 24px; padding-top: 1px;' >
+                    <{foreach from=$end_time_list.i item=item }>
+                      <option value="<{$item}>" <{if $end_time_i==$item}>selected<{/if}>><{$item}></option>
+                    <{/foreach}>
+                  </select>
+                </td>
+            </tr>
+            <tr>
+                <th align="right">备注说明：</th>
+                <td >自发货改成代发货需要设置时间范围，代发货变更自发货设置生效时间</td>
+            </tr>
+            </tbody>
+        </table>
+        <br/>
+    </form>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <{if !$history}>
+    <{button label="确定" class="btn-primary" id="agent-branch-submit" }>
+    <{button label="取消" class="btn-secondary" isCloseDialogBtn="true" }>
+    <{/if}>
+</div>
+<{/area}>
+<script type="text/javascript">
+    (function () {
+        // validatorMap.set('branch_name_en', ['请输入英文字母或数字', function (element, v) {
+        //     return v == null || v == '' || !/[^A-Z a-z 0-9]/g.test(v);
+        // }]);
+
+        // validatorMap.set('telephone', ['请输入数字及-', function (element, v) {
+        //     return v == null || v == '' || !/[^\d\-]/.test(v);
+        // }]);
+
+        $('agent-branch-submit').addEvent('click', function (e) {
+            $('agent-branch-form').fireEvent('submit', {
+                stop: function () {
+                }
+            });
+        });
+
+        $('agent-branch-form').store('target', {
+            onRequest: function () {
+                $E('#agent-branch-submit').disabled = true
+
+                $E('#agent-branch-submit span span').setText('提交中...')
+
+                $('agent-branch-errorinfo').hide()
+            },
+            onComplete: function (resp) {
+                $E('#agent-branch-submit').disabled = false
+                $E('#agent-branch-submit span span').setText('确定')
+
+                resp = JSON.decode(resp);
+                if (resp.error) {
+                    return $('agent-branch-errorinfo').setText(resp.error).show();
+                }
+
+                $('agent-branch-form').getParent('.dialog').retrieve('instance').close();
+            }
+        })
+    })();
+
+</script>

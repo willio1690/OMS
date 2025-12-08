@@ -1,0 +1,75 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+    <{if $ar_list}>
+        <h4>应收应退单</h4>
+        <table class="gridlist" border="0" cellspacing="0" cellpadding="0" >
+            <thead>
+                <tr>
+                    <th>单据编号</th>
+                    <th>业务订单号</th>
+                    <th>关联订单号</th>
+                    <th>客户/会员</th>
+                    <th>核销状态</th>
+                    <th>业务类型</th>
+                    <th>账单日期</th>
+                    <th>应收/应退金额</th>
+                    <th>备注</th>
+                </tr>
+            </thead>
+            <tbody>
+                <{foreach from=$ar_list item=item}>
+                <tr>
+                    <td><{$item.ar_bn}></td>
+                    <td><{$item.order_bn}></td>
+                    <td><{$item.relate_order_bn}></td>
+                    <td><{$item.member}></td>
+                    <td><{if $item.status=="2"}>已核销<{else}>未核销<{/if}></td>
+                    <td><{$item.type}></td>
+                    <td><{$item.trade_time|cdate}></td>
+                    <td><{$item.money}></td>
+                    <td><{$item.memo}></td>
+                </tr>
+                <{/foreach}>
+            </tbody>
+        </table>
+    <{/if}>
+</div>
+<div class="division">
+    <{if $bill_list}>
+        <h4>实收实退单</h4>
+        <table class="gridlist" border="0" cellspacing="0" cellpadding="0" >
+            <thead>
+                <tr>
+                    <th>单据编号</th>
+                    <th>业务订单号</th>
+                    <th>客户/会员</th>
+                    <th>核销状态</th>
+                    <th>单据类型</th>
+                    <th>费用项</th>
+                    <th>账单日期</th>
+                    <th>实收/实退金额</th>
+                    <th>备注</th>
+                </tr>
+            </thead>
+            <tbody>
+                <{foreach from=$bill_list item=item}>
+                <tr>
+                    <td><{$item.bill_bn}></td>
+                    <td><{$item.order_bn}></td>
+                    <td><{$item.member}></td>
+                    <td><{if $item.status=="2"}>已核销<{else}>未核销<{/if}></td>
+                    <td><{if $item.bill_type=="1"}>支出<{else}>收入<{/if}></td>
+                    <td><{$item.fee_type}></td>
+                    <td><{$item.trade_time|cdate}></td>
+                    <td><{$item.money}></td>
+                    <td><{$item.memo}></td>
+                </tr>
+                <{/foreach}>
+            </tbody>
+        </table>
+    <{/if}>
+</div>

@@ -1,0 +1,91 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division" id="order_items">
+   <h4><{t}><{if $obj_type=='pkg'}>组合<{elseif $obj_type=='gift'}>赠品<{else}>普通<{/if}>商品明细<{/t}></h4>
+      <table class="nosplit gridlist clear" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 1px solid #d5dfe3; border-collapse: separate;">
+        <thead>
+        <tr>
+          <th><{t}>物料编码<{/t}></th>
+          <!--<th><{t}>物料名称<{/t}></th>-->
+          <th><{t}>商品类型<{/t}></th>
+          <th><{t}>购买量<{/t}></th>
+          <th><{t}>已发货量<{/t}></th>
+          <th><{t}>已退货量<{/t}></th>
+          <th><{t}>转换状态<{/t}></th>
+          <th><{t}>发货方式<{/t}></th>
+          <th><{t}>处理状态<{/t}></th>
+          <th><{t}>所属贸易公司<{/t}></th>
+          <th><{t}>分销订单号<{/t}></th>
+          <th><{t}>支付状态<{/t}></th>
+          <th><{t}>子单状态<{/t}></th>
+          <th><{t}>子单号<{/t}></th>
+          <th style="white-space: nowrap;width: 130px;"><{t}>最后更新时间<{/t}></th>
+        </tr>
+      </thead>
+      <tbody>
+        <{foreach from=$objs item=obj}>
+        <tr <{if $obj.delete == 'true'}>style="background-color:#AAAAAA;"<{/if}> >
+          <td><strong><{$obj.bn}></strong></td>
+          <!--<td><strong><{$obj.name}></strong></td>-->
+          <td><strong><{if $obj.obj_type=='pkg'}>组合<{elseif $obj.obj_type=='gift'}>赠品<{else}>普通<{/if}></strong></td>
+          <td><{$obj.quantity}></td>
+          <td> - </td>
+          <td> - </td>
+          <td><{if $obj.is_shopyjdf_step=='1'}>待转换<{elseif $obj.is_shopyjdf_step=='2'}>已转换<{elseif $obj.is_shopyjdf_step=='3'}>转换失败<{else}>未转换<{/if}></td>
+          <td><strong><{if $obj.is_shopyjdf_type=='1'}>自发货<{elseif $obj.is_shopyjdf_type=='2'}>代发货<{elseif $obj.is_shopyjdf_type=='3'}>部分代发货<{else}>待转换<{/if}></strong></td>
+          <td>
+            <{if $obj.is_shopyjdf_type=='1'}>
+            <strong> - </strong>
+            <{elseif $obj.process_status=='confirmed'}>
+            <strong style="color: green;">已处理</strong>
+            <{else}>
+            <strong>未处理</strong>
+            <{/if}>
+          </td>
+          <td> - </td>
+          <td> - </td>
+          <td><span <{if $obj.pay_status == '5'}>style="color: #ffcccc;"<{elseif $obj.pay_status == '6'}>style="color: #ffee99;"<{/if}> ><{$obj.pay_name}></span></td>
+          <td><{$obj.ship_name}></td>
+          <td><{$obj.plat_oid}></td>
+          <td><{$obj.last_modified|cdate}></td>
+      </tr>
+        <{foreach from=$obj.order_items item=item}>
+        <tr class="ColColorBlue" <{if $item.delete == 'true'}>style="background-color:#DDDDDD;"<{elseif $obj.pay_status == '5'}>style="background-color: #ffe3e7;"<{elseif $obj.pay_status == '6'}>style="background-color: #ffffbb;"<{/if}> >
+          <td><{$item.bn}></td>
+          <!--<td><{$item.name}></td>-->
+          <td><{$item.item_type}></td>
+          <td><{$item.nums}></td>
+          <td><{$item.sendnum}></td>
+          <td><{$item.return_num}></td>
+          <td> - </td>
+          <td><{if $item.is_shopyjdf_type=='1'}>自发货<{elseif $item.is_shopyjdf_type=='2'}>代发货<{elseif $item.is_shopyjdf_type=='3'}>部分代发货<{else}>待转换<{/if}></td>
+          <td>
+            <{if $item.process_status=='confirmed'}>
+            <strong style="color: green;">已处理</strong>
+            <{else}>
+            <strong>未处理</strong>
+            <{/if}>
+          </td>
+          <td><{$item.betc_name}></td>
+          <td><{$item.erp_order_bn}></td>
+          <td> - </td>
+          <td><{$item.ship_name}></td>
+          <td> - </td>
+          <td><{$item.last_modified|cdate}></td>
+      </tr>
+      <{/foreach}>
+    <{/foreach}>
+  </tbody>
+ </table>
+</div>
+<style>
+#order_items th {
+background: url("../app/desktop/statics/css/default/images/tile_bg.png") 0 -296px;
+height: 22px;
+line-height: 22px;
+border-right: 1px solid #c8d6dc;
+}
+</style>

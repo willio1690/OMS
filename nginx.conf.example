@@ -1,0 +1,122 @@
+# Nginx 配置文件示例
+# 
+# 说明：
+# 1. 此配置适用于 OpenResty/Nginx
+# 2. 根据实际部署路径调整 root、fastcgi_pass 等配置
+# 3. 将此配置添加到 server 块中，或作为独立的 server 配置文件
+
+server {
+    listen 80;
+    server_name your-domain.com;
+    root /var/www/oms;
+    
+    index index.php index.html;
+    
+    # 字符集设置
+    charset UTF-8;
+    
+    # 日志配置
+    access_log /var/log/nginx/oms_access.log;
+    error_log /var/log/nginx/oms_error.log;
+    
+    # 禁止访问敏感目录
+    location ~ ^/(\.git|script|data|config|vendor|cgi-bin|tools|docs|docker|tests|upgrade)/ {
+        deny all;
+        return 403;
+    }
+    
+    # 禁止访问 PHP 配置文件
+    location ~ ^/.*/(config|secrets|defined_ext)\.php$ {
+        deny all;
+        return 403;
+    }
+    
+    # 禁止访问隐藏文件（以 . 开头）
+    location ~ /\. {
+        deny all;
+        return 403;
+    }
+    
+    # 特殊路由规则
+    # 将以 'm-' 开头的请求重写到 index.html
+    location ^~ /m- {
+        rewrite ^ /index.html break;
+    }
+    
+    # 将 '/home' 的请求重写到 index.html
+    location = /home {
+        rewrite ^ /index.html break;
+    }
+    
+    # PHP 文件处理
+    location ~ \.php$ {
+        # 禁止直接访问敏感配置文件
+        if ($request_uri ~* "/(config|secrets|defined_ext)\.php$") {
+            return 403;
+        }
+        
+        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
+        # 或使用 TCP 连接：
+        # fastcgi_pass 127.0.0.1:9000;
+        
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+        
+        # FastCGI 超时设置
+        fastcgi_read_timeout 300;
+        fastcgi_send_timeout 300;
+    }
+    
+    # 静态文件处理
+    location ~* \.(jpg|jpeg|png|gif|ico|css|js|svg|woff|woff2|ttf|eot)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+    
+    # 主路由处理
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+    
+    # 安全头设置
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    # 如果已配置 SSL，取消下面的注释
+    # add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    
+    # 禁止访问敏感文件扩展名
+    location ~ \.(sql|log|bak|backup|old|tmp)$ {
+        deny all;
+        return 403;
+    }
+    
+    # 404 错误页面
+    error_page 404 /404.html;
+    
+    # 50x 错误页面
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+    }
+}
+
+# HTTPS 配置示例（如果已配置 SSL 证书）
+# server {
+#     listen 443 ssl http2;
+#     server_name your-domain.com;
+#     root /var/www/oms;
+#     
+#     # SSL 证书配置
+#     ssl_certificate /path/to/certificate.crt;
+#     ssl_certificate_key /path/to/private.key;
+#     ssl_protocols TLSv1.2 TLSv1.3;
+#     ssl_ciphers HIGH:!aNULL:!MD5;
+#     ssl_prefer_server_ciphers on;
+#     
+#     # 其他配置与 HTTP 配置相同
+#     # ...
+# }
+

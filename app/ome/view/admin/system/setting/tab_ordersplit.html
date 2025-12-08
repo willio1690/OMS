@@ -1,0 +1,129 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="notice">
+    <span style="font-weight:bold;padding-left:15px;">常见问题：</span><br />
+    <span style="padding-left:15px;">1、易开店、Ec-store支持回传所有快递号 </span><br />
+    <span style="padding-left:15px;">2、淘宝、天猫、分销王、可按照货号回传快递单号！</span><br />
+    <span style="padding-left:15px;">3、京东等其他平台只能回传一张快递单号。</span><br />
+</div>
+<div class="form-layout-block">
+    <h3>拆单设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">是否启动拆单：</span>
+            <div class="form-radios">
+                <input id="ome_order_split_off" type="radio" value="1" class="delivery-cfg-delie" name="set[ome.order.split]" <{if $setData.ome_order_split == '1'}>checked="checked"<{/if}> >
+                <label for="ome_order_split_off" >开启拆单</label>
+                <input id="ome_order_split_on" type="radio" value="0" class="delivery-cfg-delie" name="set[ome.order.split]" <{if $setData.ome_order_split != '1'}>checked="checked"<{/if}> >
+                <label for="ome_order_split_on">关闭拆单</label>
+            </div>
+            <span class="form-remark" style="color:#ff0000; font-weight:normal;">如需修改"拆单方式"，请先处理完下面"拆掉发货订单列表"中的订单 <a target="_blank" href="index.php?app=ome&ctl=admin_operation_log&act=split_logs" style="color:#0066cc; text-decoration:none;" title="详细查看配置历史日志">(详细配置日志)</a></span>
+
+        </div>
+        <div class="form-field show_split_setting" id="show_split_setting">
+            <span class="form-field-label">回写方式：</span>
+            <div class="form-radios">
+                <input id="ome_order_split_type_off" type="radio" name="set[ome.order.split_type]" class="delivery-cfg-delie" value="1" <{if $setData.ome_order_split_type == '1' || $setData.ome_delivery_split_type==''}>checked="checked"<{/if}> >
+                <label for="ome_order_split_type_off" >回写第一张</label>
+                <input id="ome_order_split_type_on" type="radio" name="set[ome.order.split_type]" class="delivery-cfg-delie" value="2" <{if $setData.ome_order_split_type == '2'}>checked="checked"<{/if}> >
+                <label for="ome_order_split_type_on">回写最后一张</label>
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">赠品是否单独拆分：</span>
+                <div class="form-radios">
+                    <input id="ome_order_split_gift_off" type="radio" value="0" class="delivery-cfg-delie" name="set[ome.order.split.gift]" <{if $setData.ome_order_split_gift != '1'}>checked="checked"<{/if}> >
+                    <label for="ome_order_split_gift_off" >不区分赠品，符合拆分条件，就自动拆单</label>
+                    <input id="ome_order_split_gift_on" type="radio" value="1" class="delivery-cfg-delie" name="set[ome.order.split.gift]" <{if $setData.ome_order_split_gift == '1'}>checked="checked"<{/if}> >
+                    <label for="ome_order_split_gift_on">符合拆分条件时，仅赠品不拆单</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<{if $order_num}>
+<div class="form-layout-block">
+    <h3>拆单未发货订单列表</h3>
+    <div class='tableform'>
+        <div class="division">
+            <table width="100%" cellspacing="0" cellpadding="0" border="0" class='delivery-cfg-table'>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div id="split_rule">
+                                <table class="gridlist" cellpadding="0,cellspacing=0,border=0">
+                                    <thead>
+                                        <tr>
+                                            <th>编号</th>
+                                            <th>订单号</th>
+                                            <th>所属店铺</th>
+                                            <th>确认状态</th>
+                                            <th>发货状态</th>
+                                            <th>订单总额</th>
+                                            <th>最后更新</th>
+                                            <th>拆单数量</th>
+                                            <th>已发货数量</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <{foreach from=$order_list item=val key=key}>
+                                        <tr>
+                                            <td><{$val.order_id}></td>
+                                            <td><{$val.order_bn}></td>
+                                            <td><{$val.shop_name}></td>
+                                            <td><{$val.process_status}></td>
+                                            <td><{$val.ship_status}></td>
+                                            <td style="text-align:left;"><{$val.total_amount|cur}></td>
+                                            <td><{$val.last_modified|cdate}></td>
+                                            <td><{$val.dly_count}></td>
+                                            <td><strong style="color:#ff0000;"><{$val.dly_succ}></strong></td>
+                                        </tr>
+                                    <{/foreach}>
+                                        <tr>
+                                            <td colspan="9" style="text-align:right;">共<b style="color:#ff0000;"><{$order_num}></b>条记录，查看更多请到订单列表栏目……&nbsp;&nbsp;</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<{/if}>
+<!--拆单配置-->
+<script>
+    $$('input[name=set[ome.order.split]]').addEvent('click',function(e)
+    {
+        var value = this.value;
+        var order_num	= parseInt('<{$order_num}>');
+
+        if(order_num > 0)
+        {
+            alert("还有 "+ order_num +" 条部分拆分的订单，请先处理完毕再关闭拆单功能，\n\n否则发货回写 与 生成销售单会出现问题！");
+            return false;
+        }
+
+        if(value == '1')
+        {
+            document.getElementById('show_split_setting').style.display	= '';
+        }
+        else
+        {
+            document.getElementById('show_split_setting').style.display	= 'none';
+        }
+    });
+
+    var order_split = $$('input[name=set[ome.order.split]]:checked').get('value');
+
+    if(order_split == '1'){
+        $('show_split_setting').setStyle('display','');
+    }else{
+        $('show_split_setting').setStyle('display','none');
+    }
+
+</script>

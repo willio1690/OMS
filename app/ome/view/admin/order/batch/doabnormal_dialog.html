@@ -1,0 +1,35 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css src="ome.css" app="ome"}>
+<{/capture}>
+
+  <h4>订单异常备注</h4>
+  <div class="division">
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" >
+   <tr>
+   <th ><{t}>异常类型：<{/t}></th>
+   <td >
+   <{foreach from=$abnormal_type item=abt name=ab_type}>
+      <label><input type='radio' name='abnormal[abnormal_type_id]' value='<{$abt.type_id}>' id='<{$abt.type_id}>' <{if $smarty.foreach.ab_type.first}>checked<{/if}>><{$abt.type_name}></label>
+   <{/foreach}>
+   </td>
+   </tr>
+        <tr>
+            <th><{t}>处理情况：<{/t}></th>
+            <td>
+                <label><input type='radio' name='abnormal[is_done]' value='false' checked/>未处理</label>
+                <label><input type='radio' name='abnormal[is_done]' value='true'/>已处理</label>
+            </td>
+        </tr>
+
+        <tr>
+          <th><{t}>异常备注追加：<{/t}></th>
+          <td><textarea name="abnormal[abnormal_memo]" vtype="required" rows="6" style="width:80%"></textarea>
+          </td>
+        </tr>
+    </table>
+  </div>

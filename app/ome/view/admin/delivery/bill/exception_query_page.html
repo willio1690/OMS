@@ -1,0 +1,112 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform" id="download-body">
+    <div class="error" style="display: none;"></div>
+    <form action="" method="post" id="download-form">
+        <input type="hidden" name="baseApiUrl" value="index.php?app=ome&ctl=admin_delivery_bill&act=doExceptionQuery">
+        <table cellspacing="0" cellpadding="0" border="0">
+            <tr>
+                <th>选择店铺：</th>
+                <td>
+                    <select name="shop_id" class="x-input-select inputstyle" style="width:250px;" required data-search="true">
+                        <option value="">请选择店铺</option>
+                        <{foreach from=$shops item=shop}>
+                        <option value="<{$shop.shop_id}>"><{$shop.name}> (<{$shop.shop_bn}>)</option>
+                        <{/foreach}>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>异常发生时间范围：</th>
+                <td>
+                    <{input type="date" vtype="date" name="start_modified" value=$time_from style="width:120px; font-family:arial;"}> 
+                    <span style="margin:0 10px;">至</span>
+                    <{input type="date" vtype="date" name="end_modified" value=$time_to style="width:120px; font-family:arial;"}>
+                </td>
+            </tr>
+            <tr>
+                <th>一级异常类型：</th>
+                <td>
+                    <select name="exception_code" class="x-input-select inputstyle" style="width:250px;" required>
+                        <option value="">请选择异常类型</option>
+                        <option value="GOT_EXCEPTION">揽收异常</option>
+                        <option value="GOT_UPDATE_EXCEPTION">揽收更新异常</option>
+                        <option value="TRANSPORT_EXCEPTION">运输派送异常</option>
+                        <option value="DELIVERY_UPDATE_EXCEPTION">派送更新异常</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>二级异常类型：</th>
+                <td>
+                    <select name="sub_exception_code" class="x-input-select inputstyle" style="width:250px;">
+                        <option value="">请选择二级异常类型（可选）</option>
+                        <option value="WILL_GOT_TIMEOUT">揽收即将超时</option>
+                        <option value="WILL_CONSIGN_FAKE_TIMEOUT">即将虚假发货</option>
+                        <option value="CONSIGN_DELAY">延迟发货</option>
+                        <option value="CONSIGN_CLICKED_FAKE">虚假点击发货</option>
+                        <option value="OUT_STOCK">缺货</option>
+                        <option value="WILL_GOT_UPDATE_TIMEOUT">揽收更新即将超时</option>
+                        <option value="COLLECTED_STOP">揽收后停滞</option>
+                        <option value="WILL_TRANSPORT_TIMEOUT">运输派送即将超时</option>
+                        <option value="TRANSPORTING_STOP">运输停滞</option>
+                        <option value="WILL_DELIVERY_UPDATE_TIMEOUT">派送更新即将超时</option>
+                        <option value="DELIVERING_STOP">派送停滞</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+
+<div class="table-action">
+    <{button label="下一步" class="btn btn-primary" id="download-search-btn"}>
+    <{button label="关闭" class="btn btn-secondary" isCloseDialogBtn='true'}>
+</div>
+
+<script>
+    (function () {
+        $('download-search-btn').addEvent('click', function () {
+            if (!validate($('download-form'))) return;
+
+            W.page('index.php?app=ome&ctl=admin_delivery_bill&act=exceptionQueryPromise', {
+                data: $('download-form').toQueryString(),
+                method: 'post',
+                update: $('download-body'),
+                onComplete: function (resp) {
+                    try {
+                        resp = JSON.decode(resp);
+                        if (resp.error) {
+                            $E('#download-body .error').show().setText(resp.error);
+                        }
+
+                        $('download-search-btn').set('disabled', false);
+                    } catch (e) {
+                    }
+                },
+                onRequest: function () {
+                    $E('#download-body .error').hide().empty();
+                    $('download-search-btn').set('disabled', true);
+                }
+            });
+        });
+    })();
+
+    // 初始化店铺选择框的搜索功能
+    Ex_Loader("tail.select", function(){
+        tail.select('select[name="shop_id"]', {
+            search: true,
+            width: 250,
+            height: 200,
+            searchMinLength: 0,
+            searchPlaceholder: '输入店铺名称搜索',
+            searchFocus: true,
+            searchMark: true,
+            searchMarkPlaceholder: '未找到匹配项'
+        });
+    });
+</script> 

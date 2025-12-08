@@ -1,0 +1,135 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.tginput{
+    margin-top:10px;
+    margin-bottom:10px;
+    padding-left:19px;
+    background:none repeat scroll 0 0 #FAFAFA;
+    border:1px solid #cccccc;
+    color:#069CBC;
+    font-size:20px;
+    line-height:30px;
+    height:35px;
+    width: 400px;
+}
+.tgbutton{
+    margin-top: -10px;
+    margin-left: 25px;
+    font-size:1.5em;
+
+    height: 39px; 
+    width:100px;
+    cursor:pointer;
+    display:-moz-inline-stack;
+    line-height: 35px;
+    overflow: visible;
+    text-decoration: none;
+    vertical-align: middle;
+}
+.tableLeft{
+    text-align:right;
+}
+</style>
+
+<div class="location">
+    <div class="tabs-wrap">
+    <ul>
+        <li class="tab current " onclick="" id="1">
+            <span>发货追回导入</span>
+        </li>
+    </ul>
+</div>
+
+<form method="post" enctype="multipart/form-data" id="import_form" action="index.php?app=ome&ctl=admin_delivery_back&act=doImport" class="tableform">
+<input type="hidden" name="app" value="ome" />
+<input type="hidden" name="model" value="delivery_back" />
+    
+    <div id="information" class="division" style="display:none;">
+        <div style="color:#ff0000;"><b>错误信息如下：</b></div>
+        <div id="errorInfo" style="width:500px;height:150px;padding:5px;overflow-y:auto;line-height:150%;border:1px solid #999;"></div>
+    </div>
+    
+    <div class="division">
+    <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td nowrap="nowrap" style="height:50px; width:150px; word-break:keep-all; vertical-align:middle; font-weight:bold;">第一步，设置导入模式：</td>
+            <td style="vertical-align:middle;">
+                <input name="import_mode" value="delivery_no" type="radio" checked="checked">按发货单号
+                &nbsp;&nbsp;&nbsp;<input name="import_mode" value="logi_no" type="radio">按退回物流单号 <span style="margin-left:5px; color:red;">*默认使用 "按发货单号" 方式。</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="height:50px; word-break:keep-all; vertical-align:middle; font-weight:bold;">第二步：导出模板</td>
+            <td style="vertical-align:middle;"><{button class="btn-primary" id='download_template' label="下载" type="button"}></td>
+        </tr>
+    </table>
+    </div>
+    
+    <h4><{t}>第三步：上传您要导入的文件<{/t}></h4>
+    <div class="division">
+    <table cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <th><{t}>上传文件：<{/t}></th>
+            <td><input type="file" name="import_file" /></td>
+        </tr>
+        <tr>
+            <th>&nbsp;</th>
+            <td style="padding-top:15px;"><{button class="btn-primary" id='btn-submit' label="上传" type="button"}> <span style="margin-left:5px; color:red;">&nbsp;&nbsp;&nbsp;*注：处理方式是根据导入文件中的标题（退回物流单号、发货单号）进行相应的追回处理。</span></td>
+        </tr>
+    </table>
+    </div>
+</form>
+
+<script>
+(function(){
+    $("download_template").addEvent('click', function(){
+        var url = 'index.php?app=ome&ctl=admin_delivery_back&act=exportTemplate';
+        var mode = '';
+        
+        $ES("input[name='import_mode']").each(function(item){
+            if(item.checked){
+                mode = item.value;
+            }
+        });
+        
+        url = url + "&mode="+ mode;
+        
+        window.open(url);    
+    });
+    
+    $('import_form').store('target',{
+        onComplete:function(jsontext){
+            var json = JSON.decode(jsontext);
+            if (json.result == 'succ'){
+                $('btn-submit').set('html', '<span><span>上传</span></span>');
+                $('btn-submit').set('disabled', '');
+                
+                MessageBox.success('导入成功！');
+            }else{
+                MessageBox.error('导入失败！');
+                
+                $('information').style.display ='';
+                
+                var errorInfo = '';
+                for(var key=0; key<json['msg'].length;key++){
+                    errorInfo = errorInfo + json['msg'][key] + '<br />';
+                }
+                
+                $('errorInfo').set('html', errorInfo);
+                $('btn-submit').set('html', '<span><span>上传</span></span>');
+                $('btn-submit').set('disabled', '');
+            }
+        }
+    });
+    
+    $('btn-submit').addEvent('click',function(){
+        $('information').style.display ='none';
+        $('errorInfo').set('html', '');
+        $('import_form').fireEvent('submit',{stop:$empty});
+    });
+})();
+</script>

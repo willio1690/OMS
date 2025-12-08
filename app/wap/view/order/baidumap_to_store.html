@@ -1,0 +1,60 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta name="author" content="tyler chao">
+  <meta name="keywords" content="keywords">
+  <meta name="description" content="description">
+  <title>门店地图</title>
+  <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=<{$baidu_map_key}>"></script>
+</head>
+
+<body style="margin:0px;width:100%;height:100%; background:#FFF;">
+    <div style="width:100%;height:100%; background:#FFF;" id="container"></div>
+</body>
+
+<script type="text/javascript">
+//通过浏览器获取当前位置并且表示出线路到达终点
+var geolocation = new BMap.Geolocation();
+geolocation.getCurrentPosition(function(r){
+    if(this.getStatus() == BMAP_STATUS_SUCCESS){
+        //当前经纬度
+        var start_lng = r.point.lng;
+        var start_lat = r.point.lat;
+        var map = new BMap.Map("container");
+        map.enableScrollWheelZoom(); //启用滚轮放大缩小，也适用手机触摸，默认禁用。
+        var localSearch = new BMap.LocalSearch(map);
+        var keyword = "<{$ship_addr}>";
+        
+        localSearch.setSearchCompleteCallback(function (searchResult) {
+            var poi = searchResult.getPoi(0);
+            //通过地址获取终点经纬度
+            var end_lng = poi.point.lng;
+            var end_lat = poi.point.lat;
+            //标识出驾车路线
+            var p1 = new BMap.Point(start_lng,start_lat);
+            var p2 = new BMap.Point(end_lng,end_lat);
+            var driving = new BMap.DrivingRoute(map, {renderOptions:{map: map, autoViewport: true}});
+            driving.search(p1, p2);
+            
+        });
+        localSearch.search(keyword);
+    }else {
+        alert('failed'+this.getStatus());
+    }        
+},{enableHighAccuracy: true})
+
+if(window.innerHeight)
+{
+    document.getElementById("container").style.height = window.innerHeight + 'px';
+}
+</script>
+</html>

@@ -1,0 +1,354 @@
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+/* 自定义Select组件样式 - 兼容微信小程序端 */
+/* 通用版本，适用于整个项目 */
+
+/* 自定义select容器 */
+.custom-select {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  font-family: PingFangSC-Regular, Roboto, Helvetica Neue, Helvetica, Tahoma, Arial;
+}
+
+/* 适配.image-text_2容器 */
+.image-text_2 .custom-select {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 在.image-text_2容器中的触发器样式 */
+.image-text_2 .custom-select-trigger {
+  position: relative;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background: transparent;
+  padding: 0 1.25rem 0 0;
+}
+
+/* 在.image-text_2容器中不显示自定义箭头 */
+.image-text_2 .custom-select-arrow {
+  display: none;
+}
+
+/* 选择框主体 */
+.custom-select-trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 1.25rem 0 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: rgba(18, 18, 18, 1);
+  letter-spacing: 0.31111112236976624px;
+  font-family: PingFangSC-Regular;
+  font-weight: normal;
+  text-align: right;
+  white-space: nowrap;
+  line-height: 1.25rem;
+  min-height: 1.25rem;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* 选中的文本 */
+.custom-select-text {
+  flex: 1;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 下拉箭头 */
+.custom-select-arrow {
+  position: absolute;
+  top: 0.125rem;
+  right: 0.125rem;
+  z-index: 0;
+  width: 0.5rem;
+  height: 0.313rem;
+  margin: 0.407rem 0 0.532rem 0.47rem;
+  transition: transform 0.3s ease;
+  pointer-events: none;
+}
+
+/* 展开状态的箭头 */
+.custom-select.open .custom-select-arrow {
+  transform: rotate(180deg);
+}
+
+/* 下拉选项容器 */
+.custom-select-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  max-height: 12.5rem;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+  margin-top: 0.25rem;
+}
+
+/* 展开状态显示选项 */
+.custom-select.open .custom-select-options {
+  display: block;
+}
+
+/* 选项项 */
+.custom-select-option {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: rgba(18, 18, 18, 1);
+  background: #fff;
+  border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* 最后一个选项不显示底边框 */
+.custom-select-option:last-child {
+  border-bottom: none;
+}
+
+/* 选项悬停状态 */
+.custom-select-option:hover {
+  background-color: #f8f8f8;
+}
+
+/* 选项激活状态 - 优化触摸反馈 */
+.custom-select-option:active {
+  background-color: #f0f0f0;
+  transform: scale(0.98);
+  transition: background-color 0.1s ease, transform 0.1s ease;
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  .custom-select-option:hover {
+    background-color: transparent;
+  }
+  
+  .custom-select-option:active {
+    background-color: #f0f0f0;
+  }
+}
+
+/* 选中的选项 */
+.custom-select-option.selected {
+  background-color: #F5EDC9;
+  color: #C69A1B;
+  font-weight: 500;
+}
+
+/* 禁用状态 */
+.custom-select.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.custom-select.disabled .custom-select-trigger {
+  cursor: not-allowed;
+}
+
+/* 遮罩层 */
+.custom-select-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  z-index: 999;
+  display: none;
+}
+
+/* 展开状态显示遮罩 */
+.custom-select.open .custom-select-mask {
+  display: block;
+}
+
+/* 适配原有样式 - 与delivery.css中的.text-group_2保持一致 */
+.custom-select-trigger.text-group_2 {
+  word-break: break-all;
+  color: rgba(18, 18, 18, 1);
+  font-size: 0.875rem;
+  letter-spacing: 0.31111112236976624px;
+  font-family: PingFangSC-Regular;
+  font-weight: normal;
+  text-align: right;
+  white-space: nowrap;
+  line-height: 1.25rem;
+  outline: none;
+  border: none;
+  position: relative;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background: transparent;
+  padding: 0 1.25rem 0 0;
+}
+
+/* 适配搜索输入框样式 */
+.custom-select-trigger.search-input,
+.custom-select-trigger.channel-select,
+.custom-select-trigger.store-select {
+  font-size: 0.875rem;
+  color: #333;
+  text-align: right;
+  padding: 0.5rem 1rem 0.5rem 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+  .custom-select-options {
+    max-height: 10rem;
+  }
+  
+  .custom-select-option {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+}
+
+/* 动画效果 - 优化性能 */
+.custom-select-options {
+  opacity: 0;
+  transform: translateY(-0.5rem);
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.custom-select.open .custom-select-options {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 硬件加速 */
+.custom-select-trigger,
+.custom-select-options,
+.custom-select-arrow {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* 滚动条样式 */
+.custom-select-options::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+.custom-select-options::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 0.125rem;
+}
+
+.custom-select-options::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 0.125rem;
+}
+
+.custom-select-options::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 加载状态 */
+.custom-select.loading .custom-select-text {
+  color: #999;
+}
+
+.custom-select.loading .custom-select-arrow {
+  animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 错误状态 */
+.custom-select.error .custom-select-trigger {
+  border-color: #ff4d4f;
+  color: #ff4d4f;
+}
+
+/* 聚焦状态 */
+.custom-select.focus .custom-select-trigger {
+  outline: 2px solid rgba(24, 144, 255, 0.2);
+  outline-offset: 1px;
+}
+
+/* 空状态提示 */
+.custom-select-empty {
+  padding: 1rem;
+  text-align: center;
+  color: #999;
+  font-size: 0.8125rem;
+}
+
+/* Modal弹出框中的自定义select适配 */
+.modal-form-item .custom-select {
+  position: relative;
+  width: auto;
+  min-width: 8rem;
+}
+
+.modal-form-item .custom-select-trigger {
+  border: none;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  text-align: right;
+  color: #121212;
+  background-color: #fff;
+  padding: 0.5rem 1.25rem 0.5rem 0.5rem;
+  min-height: auto;
+  line-height: 1.2;
+}
+
+.modal-form-item .custom-select-trigger:focus {
+  border-color: #666;
+  outline: none;
+  background-color: #fff;
+}
+
+.modal-form-item .custom-select-options {
+  right: 0;
+  left: auto;
+  min-width: 10rem;
+  max-width: 15rem;
+}
+
+.modal-form-item .custom-select-arrow {
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+}
+
+/* Modal中展开状态的箭头 */
+.modal-form-item .custom-select.open .custom-select-arrow {
+  transform: translateY(-50%) rotate(180deg);
+}

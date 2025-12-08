@@ -1,0 +1,183 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<form id="o2o_confirm_form" method='post' action='index.php?app=o2o&ctl=admin_inventory&act=doConfirm'>
+<input type='hidden' name='inventory_id' value="<{$inventory_id}>" /> 
+<input type='hidden' name='branch_id' value="<{$branch_id}>" /> 
+<div class="tableform">
+<div class="division" >
+<h4>基本信息</h4>
+    <table width='100%' cellspacing="0" cellpadding="0" >
+      <tr>
+          <td colspan="2">盘点单编号：<{$inv_info.inventory_bn}></td>
+          <td colspan="2">盘点类型：<{$inv_info.inventory_type_text}></td>
+      </tr>
+       <tr>
+          <td colspan="2">门店：<{$inv_info.store_name}></td>
+         
+        <td colspan="2">申请人：<{$inv_info.apply_name}></td>
+      </tr>
+      <tr>
+           <td colspan="2">盘点确认人：<{$inv_info.confirm_op_name}></td>
+          <td colspan="2">申请时间: <{$inv_info.createtime_format}></td>
+      </tr>
+      <tr>
+            <td colspan="2">盘点确认时间：<{$inv_info.confirm_time_format}>
+                </td>
+                <td><{input type="checkbox" value=1 id="frm_check" checked="checked"}>
+                <span style="font-weight: bold;font-size: 16px;">仅显示有差异明细</span></td>
+      </tr>
+       <tr>
+          <td>帐面总数：<font style="font-weight: bold;font-size: 16px;color: red"><{$inventorys.total_pos_accounts_num}></font></td>
+          <td>实际总数：<font style="font-weight: bold;font-size: 16px;color: red"><{$inventorys.total_actual_num}></font></td>
+          <td>盘盈总数：<font style="font-weight: bold;font-size: 16px;color: red"><{$inventorys.total_over}></font></td>
+          <td>盘亏总数：<font style="font-weight: bold;font-size: 16px;color: red"><{$inventorys.total_short}></font></td>
+      </tr>
+       <tr>
+          <td>盈亏总金额：<font style="font-weight: bold;font-size: 16px;color: red"><{$inventorys.total_amount}></font></td>
+          <td></td>
+          <td></td>
+          <td></td>
+      </tr>
+    </table>
+    
+<h4>盘点明细</h4>
+    <table width='100%' cellspacing="0" cellpadding="0" class="gridlist delivery-cfg-table">
+        <thead>
+        <tr>
+            <th>物料名称</th>
+            <th>物料编码</th>
+          
+            <th>POS帐面数量</th> 
+          
+            <th>线上实际数量</th>
+         
+            <th>线上盈(+)亏(-)</th>
+            <th>销售价</th>
+            <th>小计</th>
+          </tr>
+        </thead>
+        <tbody id="dataNode">
+            <tr>
+                <td colspan="7" style="padding:0;"><div class="note" style="margin:0;"> 暂无货品信息 </div></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+  
+<div class="table-action">
+    <{button type="button" class="btn" id="confirm-btn" label="确 认"}>
+    <{button type="button" class="btn" id="return-btn" label="关 闭"}>
+</div>
+
+</div>
+</form>
+
+<script>
+(function(){
+    var finder = opener.finderGroup['<{$env.get.finder_id}>'];
+    var store=[];
+    $('return-btn').addEvent('click', function(){
+       
+        if(finder) setTimeout(finder.refresh(),30000);
+        setTimeout('window.close()',200);
+    });
+
+    $('confirm-btn').addEvent('click',function(e){
+        var _form = $("o2o_confirm_form");
+        var url = _form.action;
+        new Request({url:url,method:'post',data:_form,
+            onComplete:function(result){
+                if(!result) return;
+                ret = JSON.decode(result);
+                if(ret.error){
+                    MessageBox.error(ret.error);
+                    return false;
+                }
+                alert("盘点确认成功");
+                if(finder) setTimeout(finder.refresh(),30000);
+                setTimeout('window.close()',200);
+            },
+        }).send();
+        
+        
+    });
+    showInvetoryItems();
+    function showInvetoryItems() {
+        var frm_check = $('frm_check').checked ? 1 : 0;
+        var inventory_id = '<{$inv_info.inventory_id}>';
+        if(pag && pag.data) {
+            pag.data.splice(0,pag.data.length);
+        }
+        emptyData();
+       
+        new Request({url:'index.php?app=o2o&ctl=admin_inventory&act=getItems', 
+        method:'post',
+        data:{'inventory_id':inventory_id, 'diff_nums':frm_check},
+        onSuccess:function(json){
+            if(!json) return;
+            rs=JSON.decode(json);
+            if(rs){
+                init(rs);
+            }
+            
+        }
+        }).send();
+    }
+
+    function init(rs){
+            var tmparr=findProduct(rs,'bm_id');
+             store.unshift.apply(store,tmparr.reverse());
+             createProduct(store);
+        }
+    function findProduct(arr,PRIMARY){
+        if(!store.length)return arr;
+        store.each(function(a){
+            arr.each(function(b){
+                if(a[PRIMARY]==b[PRIMARY])
+                {
+                    
+                    a.num=b.num;
+                    arr.erase(b);
+                }
+            });
+        });
+        return arr;
+    }
+
+     var tpl='<tr key="{item_id}" id="product_{item_id}">'+
+            '<td>{material_name}</td><td>{material_bn}</td><td>{pos_accounts_num}</td><td>{actual_num}</td>'+
+            '<td>{short_over}</td><td>{price}</td><td>{amount}</td>'+
+            '</tr>';
+
+        var pag;
+        function emptyData(){
+            var noData='<tr>'+
+                '<td colspan="7" style="padding:0;"><div class="note" style="margin:0;"> 暂无差异,如需查看,可以点击  仅显示有差异明细 查看</div></td>'+
+                '</tr>';
+            $('dataNode').set('html',noData);
+        }
+        function createProduct(data){
+            pag = new PageData(tpl,data,{'updateMain':$('dataNode'),'pageNum':100});
+        }
+
+        if($('frm_check')) {
+            $('frm_check').addEvent('click', function() {
+                showInvetoryItems();
+            });
+            
+        }
+
+})();
+
+</script>
+

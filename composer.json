@@ -1,0 +1,29 @@
+{
+    "description": "ONEX OMS 订单管理系统 - 由商派 ShopeX 开发并开源的企业级订单管理系统",
+    "version": "8.0.0",
+    "require": {
+        "php": ">=8.0",
+        "aliyuncs/oss-sdk-php": "^2.6",
+        "sentry/sentry": "^4.4",
+        "monolog/monolog": "^3.5"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.10",
+        "squizlabs/php_codesniffer": "^3.7",
+        "phpunit/phpunit": "*",
+        "guzzlehttp/guzzle": "*"
+    },
+    "scripts": {
+        "phpstan":"@php phpstan analyse app --memory-limit=1G",
+        "phpcs": "@php phpcs app"
+    },
+    "config": {
+        "process-timeout": 0
+    },
+    "autoload": {
+        "files": ["app/base/autoload.php"],
+        "psr-4": {
+            "Shopex\\OMS\\": "app/"
+        }
+    }
+}

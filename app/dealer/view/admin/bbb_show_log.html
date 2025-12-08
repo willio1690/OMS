@@ -1,0 +1,30 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+    <h4>操作日志</h4>
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+        <thead>
+        <tr>
+            <th>操作时间</th>
+            <th>操作人</th>
+            <!-- <th>IP</th> -->
+            <th>行为</th>
+            <th>操作内容</th>
+        </tr>
+        </thead>
+        <tbody>
+        <{foreach from=$logs item=log}>
+        <tr>
+            <td><{$log.operate_time}></td>
+            <td><{$log.op_name}></td>
+            <!-- <td><{$log.ip}></td> -->
+            <td><{$log.operation}></td>
+            <td><{$log.memo}></td>
+        </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,14 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $data}>
+    <div>
+        <{input type='dealer_object' object='shop@ome' multiple=true breakpoint='0' name='shop_id' textcol='name' value=$data.bind_shop_ids callback='shop_object_callback' replacehtml=$replacehtml emptytext='选取经销店铺' style='float:left;width:500px;' filter=$data.filter }>
+    </div>
+<{else}>
+    <div>
+        <{input type='dealer_object' object='shop@ome' multiple=true breakpoint='0' name='shop_id' textcol='name' value=$data.bind_shop_ids callback='shop_object_callback' replacehtml=$replacehtml emptytext='选取经销店铺' style='float:left;width:500px;' filter="delivery_mode=shopyjdf" }>
+    </div>
+<{/if}>

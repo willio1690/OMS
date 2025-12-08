@@ -1,0 +1,62 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <table width="100%" cellspacing="0" cellpadding="0">
+            <tbody>
+                <tr>
+                    <td width="50%"><font style="font-weight: bold;font-size: 14px;"><em class="c-red"> * </em>不限仓库</font></td>
+                    <td><{input type="select" vtype="required" name="nobranch_corp" rows=$corps value=$common_corp labelColumn="name" valueColumn="corp_id" }></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<{foreach from=$branches item=item}>`
+    <div class="tableform">
+        <div class="division">
+            <table width="100%" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <td width="50%"><font style="font-weight: bold;font-size: 14px;"><{$item.name}></font></td>
+                        <td><{input type="select" branch_id=$item.branch_id name="branch_corp[{$item.branch_id}]" options=$item.corps value=$branch_corp[$item.branch_id] }></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+<{/foreach}>
+
+<div class="table-action">
+    <{button class="btn-primary" label="保存" type="button" id="saveCurrentCorp"}>
+    <{button class="btn-secondary" isCloseDialogBtn="true" label="关闭"}>
+</div>
+
+<script type="text/javascript">
+    (function(){
+        $('saveCurrentCorp').addEvent('click',function(){
+            if (!$E('select[name=nobranch_corp]').value) {
+                return MessageBox.error('不限仓库必须选择物流');
+            }
+
+            $E('input[name=config[corp_id]]').value = $E('select[name=nobranch_corp]').value;
+            $E('#special_corp .label').setText($E('select option:selected').getText());
+
+            var data = {};
+            $ES('select[name^=branch_corp]').each(function(item){
+                data[item.get('branch_id')] = item.value;
+            });
+
+            $E('textarea[name=config[special_corp]]').value = JSON.encode(data)
+
+
+            this.getParent('.dialog').retrieve('instance').close();
+        });
+    })();
+</script>
+
+

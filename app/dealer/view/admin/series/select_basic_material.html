@@ -1,0 +1,14 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $data}>
+    <div>
+        <{input type='dealer_object' object='basic_material@material' multiple=true breakpoint='0' name='bm_id' textcol='material_name' value=$data.bind_bm_ids callback='product_object_callback' replacehtml=$replacehtml emptytext='选取基础物料' style='float:left;width:500px;' filter=$data.filter }>
+    </div>
+<{else}>
+    <div>
+        <{input type='dealer_object' object='basic_material@material' multiple=true breakpoint='0' name='bm_id' textcol='material_name' value=$data.bind_bm_ids callback='product_object_callback' replacehtml=$replacehtml emptytext='选取基础物料' style='float:left;width:500px;' filter="" }>
+    </div>
+<{/if}>

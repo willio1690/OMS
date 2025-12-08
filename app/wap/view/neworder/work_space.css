@@ -1,0 +1,299 @@
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+html {
+    font-size: 100%;
+  }
+  body {
+    margin: 0;
+  }
+
+  .page {
+    background-color: rgba(243, 243, 243, 1);
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    height: 100vh;
+    overflow: auto;
+    padding-bottom: 120px;
+  }
+
+  .main {
+    margin-top: 3.34rem;
+  }
+
+  .section_4 {
+    /* position: absolute;
+    left: 0.75rem;
+    top: 9.375rem; */
+    width: 21.938rem;
+    /* width: 100%; */
+    /* height: 30.094rem; */
+
+    align-self: center;
+    margin: 0 auto;
+  }
+
+  .list-item {
+    margin-bottom: 0.75rem;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 1rem;
+    padding: 0.813rem 0.688rem 1.125rem 0.188rem;
+  }
+
+  .text-wrapper_5 {
+    margin: 0 0.219rem 0.375rem 0.907rem;
+  }
+
+  .section_6 {
+    margin: 0.75rem 0.563rem 0 0.438rem;
+  }
+
+  .image_2 {
+    width: 5rem;
+    height: 5rem;
+    margin: 0.094rem 0 0.25rem 0;
+  }
+
+  .text-group_1 {
+    margin: 0 0 0.313rem 0.844rem;
+    flex-shrink: 1;
+  }
+
+  .text_11 {
+    word-break: break-all;
+    color: rgba(159, 159, 159, 1);
+    font-size: 0.75rem;
+    letter-spacing: 0.2666666805744171px;
+    font-family: PingFangSC-Medium;
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+    line-height: 1.032rem;
+    margin-top: 0.188rem;
+    width: 4.3125rem;
+  }
+
+  .text_12 {
+    word-break: break-all;
+    color: rgba(18, 18, 18, 1);
+    font-size: 0.75rem;
+    letter-spacing: 0.2666666805744171px;
+    font-family: PingFangSC-Medium;
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+    line-height: 1.032rem;
+    margin: 0.125rem 0 0 0;
+    flex: 1;
+  }
+
+  .text_28 {
+    /* height: 2.5rem; */
+    word-break: break-all;
+    color: rgba(24, 24, 24, 1);
+    font-size: 0.875rem;
+    letter-spacing: 0.31111112236976624px;
+    font-family: PingFangSC-Medium;
+    font-weight: 500;
+    text-align: left;
+    line-height: 1.25rem;
+  }
+
+  .text_29 {
+    word-break: break-all;
+    color: rgba(151, 151, 153, 1);
+    font-size: 0.75rem;
+    font-family: PingFangSC-Medium;
+    font-weight: 500;
+    text-align: left;
+    line-height: 1.032rem;
+    margin: 0.157rem 0 0 0;
+  }
+
+  .text_30 {
+    word-break: break-all;
+    color: rgba(151, 151, 153, 1);
+    font-size: 0.75rem;
+    font-family: PingFangSC-Medium;
+    font-weight: 500;
+    text-align: left;
+    line-height: 1.032rem;
+    margin: 0.313rem 0 0 0;
+  }
+
+  .text_31 {
+    word-break: break-all;
+    color: rgba(29, 29, 29, 1);
+    font-size: 0.75rem;
+    font-family: PingFangSC-Medium;
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+    line-height: 1.032rem;
+    margin: 0 0 0 10.6875rem
+  }
+
+  .status-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .status-returned,.status-order {
+    font-size: 0.75rem;
+    color: #161515;
+    line-height: 1.03rem;
+    text-align: right;
+    font-style: normal;
+    background: #F5EDC9;
+    border-radius: 0.13rem;
+    padding: 0.28rem 0.5rem;
+    white-space: nowrap;
+  }
+  .status-order {
+    color: #C69A1B;
+  }
+  .status-order-box {
+    flex: 1;
+    text-align: right;
+  }
+
+  /* 页面部分 */
+  .group_2 {
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 1rem;
+    align-self: center;
+    margin: 0.782rem auto 0.75rem;
+    width: 21.938rem;
+    position: relative;
+    padding: 0.3rem 0 0.4rem;
+  }
+
+  .group_3 {
+    width: 20.282rem;
+  }
+
+  .text_2 {
+    word-break: break-all;
+    color: rgba(18, 18, 18, 1);
+    font-size: 0.875rem;
+    letter-spacing: 0.31111112236976624px;
+    font-family: PingFangSC-Regular;
+    font-weight: normal;
+    text-align: left;
+    white-space: nowrap;
+    line-height: 1.25rem;
+  }
+
+
+  .group_4 {
+    /* width: 20.282rem; */
+    width: 100%;
+    padding: 0 0.75rem 0 0.907rem;
+    margin-top: 1.09rem;
+    padding-bottom: 0.87rem;
+  }
+
+  .group_4:not(:last-child) {
+    border-bottom: 1px solid #D7D7D7;
+  }
+
+  .text_3 {
+    word-break: break-all;
+    color: rgba(18, 18, 18, 1);
+    font-size: 0.875rem;
+    letter-spacing: 0.31111112236976624px;
+    font-family: PingFangSC-Regular;
+    font-weight: normal;
+    text-align: left;
+    white-space: nowrap;
+    line-height: 1.25rem;
+  }
+
+  .image-text_2 {
+    position: relative;
+    top: 0;
+    left: 0;
+
+  }
+
+  .text-group_2 {
+    word-break: break-all;
+    color: rgba(18, 18, 18, 1);
+    font-size: 0.875rem;
+    letter-spacing: 0.31111112236976624px;
+    font-family: PingFangSC-Regular;
+    font-weight: normal;
+    text-align: right;
+    white-space: nowrap;
+    line-height: 1.25rem;
+    outline: none;
+    border: none;
+    appearance:none;
+    -moz-appearance:none;
+    -webkit-appearance:none;
+    position: relative;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    background: transparent;
+    padding: 0 1.25rem;
+  }
+
+  .thumbnail_2 {
+    position: absolute;
+    top: .125rem;
+    right: .125rem;
+    z-index: 0;
+    width: 0.5rem;
+    height: 0.313rem;
+    margin: 0.407rem 0 0.532rem 0.47rem;
+  }
+
+
+  .wspace-footer {
+    padding: 0.9375rem;
+    text-align: center;
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+  }
+
+  .wspace-info{
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .text_36 {
+    height: 0.938rem;
+    word-break: break-all;
+    color: rgba(125, 125, 125, 1);
+    font-size: 0.75rem;
+    font-family: PingFangSC-Medium;
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+    line-height: 1.032rem;
+    margin-top: 0.219rem;
+  }
+
+  .text_37 {
+    height: 1.313rem;
+    word-break: break-all;
+    color: rgba(26, 26, 26, 1);
+    font-size: 1rem;
+    font-family: PingFangSC-Medium;
+    font-weight: 500;
+    text-align: left;
+    white-space: nowrap;
+    line-height: 1.407rem;
+    margin-left: -0.156rem;
+  }

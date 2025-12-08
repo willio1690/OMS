@@ -1,0 +1,104 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="POST" action="index.php?app=crm&ctl=admin_gift_rule_logs&act=save&finder_id=<{$env.get.finder_id}>" class="tableform" id="gift_form">
+<input type="hidden" name="sid" value="<{$data.sid}>">
+<div class="division1">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+    <tr>
+        <th><{t}>赠品规则编码：<{/t}></th>
+        <td><{$data.rule_bn}></td>
+    </tr>
+    <tr>
+        <th><{t}>赠品规则名称：<{/t}></th>
+        <td><{$data.rule_title}></td>
+    </tr>
+    <tr>
+        <th><{t}>赠品货号：<{/t}></th>
+        <td><{$data.gift_bn}></td>
+    </tr>
+    <tr>
+        <th><{t}>赠品名称：<{/t}></th>
+        <td><{$data.gift_name}></td>
+    </tr>
+    <tr class='giftyj'>
+        <th><{t}>预警：<{/t}></th>
+        <td><{input type="bool" id="gift_yj" name="is_warning" value=$data.is_warning}></td>
+    </tr>
+    <tr class='giftyjhtml'>
+        <th><{t}>预警数量：<{/t}></th>
+        <td><{input type="number" id="warning_num" name="warning_num" value=$data.warning_num}>&nbsp;&nbsp;<span style="color:red;">*当“已赠送数量”达到“预警数量”时,会触发短信提醒。</span></td>
+    </tr>
+    <tr class='giftyjhtml'>
+        <th><{t}>预警手机号：<{/t}></th>
+        <td>
+            <div>多个手机号使用#分割</div>
+            <textarea name="warning_mobile"><{$data.warning_mobile}></textarea>
+        </td>
+    </tr>
+    <tr>
+        <th><{t}>已赠送数量：<{/t}></th>
+        <td><{$data.send_num}></td>
+    </tr>
+</table>
+</div>
+</form>
+
+<{area inject='.mainFoot'}>
+<div class="table-action">
+    <{button type="button" label="保存" id="save_btn"}>
+</div>
+<{/area}>
+
+<script>
+    (function(){
+        $('save_btn').addEvent('click', function(){
+            if(!$('warning_num').value){
+                alert("请输入数字");
+                $('warning_num').focus();
+                return false;
+            }
+            
+            $('gift_form').fireEvent('submit',{stop:$empty});
+        });
+
+        var _form = $('gift_form');
+        var btn =$('save_btn');
+
+        _form.store('target',{
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+
+                if (hash_res_obj.success != undefined && hash_res_obj.success != "")
+                {
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+
+                    if(_dialogIns)
+                    {
+                        _dialogIns.close();
+                    }
+                }
+            }
+        });
+        
+        $$('input[name=is_warning]').addEvent('click',function(e){
+            showgiftyj(this.value)
+        });
+        
+        function showgiftyj(value) {
+            if(value == 'true') {
+                $$('.giftyjhtml').setStyle('display','');
+            } else {
+                $$('.giftyjhtml').setStyle('display','none');
+            }
+        }
+        
+        var is_warning_value = $$('input[name=is_warning]:checked').get('value');
+        showgiftyj(is_warning_value);
+
+    })();
+</script>

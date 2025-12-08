@@ -1,0 +1,29 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+    <table border="0" class="gridlist" cellspacing="0" cellpadding="0" >
+        <thead>
+            <th>物料编码</th>
+            <th>物料名称</th>
+            <th>实付小计</th>
+            <th>开票金额小计</th>
+            <th>购买数量</th>
+            <th>退货数量</th>
+        </thead>
+        <tbody>
+            <{foreach from=$items item=val}>
+            <tr <{if $val.is_delete == 'true'}>style="background-color: #DBDBDB;" g-del="b"<{else}>g-del="a"<{/if}>>
+                <td><{$val.bn}></td>
+                <td><{$val.name}></td>
+                <td><{$val.divide}></td>
+                <td><{$val.amount}></td>
+                <td><{$val.quantity}></td>
+                <td><{$val.reship_num}></td>
+            </tr>
+            <{/foreach}>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,144 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css src="ome.css" app="ome"}>
+<{script src="coms/dropmenu.js"  app='desktop'}>
+<{script src="coms/datapicker.js"  app='desktop'}>
+<{script src="coms/colorpicker.js"  app='desktop'}>
+<{/capture}>
+
+<div class="tableform">
+    新建订单标签：
+    <div class="division">
+    <form id='add_label_form' method="post" action="index.php?app=omeauto&ctl=order_labelrule&act=saveLabel">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tbody>
+                <tr>
+                    <th>标签代码：</th>
+                    <td><input name="label_code" id="label_code" type="text" value="<{$data.label_code}>" maxlength="20" vtype="required" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')" />
+                    &nbsp;&nbsp;<span style="color:red;">*</span>必填项,支持英文字母、数字</td>
+                </tr>
+                <tr>
+                    <th>标签名称：</th>
+                    <td><input name="label_name" id="label_name" type="text" value="<{$data.label_name}>" maxlength="15" vtype="required" />&nbsp;&nbsp;<span style="color:red;">*</span>必填项</td>
+                </tr>
+                <tr>
+                <th>标签颜色：</th>
+                <td><input type="text" name="label_color" id="label_color" readonly="readonly" value="<{$data.label_color}>" vtype="required" style="cursor:pointer; width:56px; color:red;" />&nbsp;&nbsp;<span style="color:red;">*</span>必填项</td>
+                </tr>  
+            </tbody>
+        </table>
+        <{if $data.label_id}>
+        <input type="hidden" name="label_id" value="<{$data.label_id}>">
+        <{/if}>
+    </form>
+    </div>
+</div>
+
+<{area inject=".mainFoot"}>
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td>
+        <button class="btn btn-primary" id="submit_btn" ><span><span><{t}>提交<{/t}></span></span></button>&nbsp;&nbsp;
+        <{button class="btn-primary"  label="取消" type="button" id="cancel_buttonn"}>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<{/area}>
+<script>
+Ex_Loader("picker",function(){
+    new GoogColorPicker("label_color",{
+        onSelect:function(hex,rgb,el){
+            $("label_color").set("value", hex);
+            el.setStyle("background-color",hex);
+        }
+    })
+});
+
+(function(){
+    var _form = $('form'); //表单ID 
+    var btn   = $('submit_btn'); //提交按钮ID
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    
+    //保存按钮
+    $('submit_btn').addEvent('click', function(){
+        var label_code = $("label_code").value;
+        var label_name = $("label_name").value;
+        var label_color = $("label_color").value;
+        
+        if(label_code==""){
+            alert("请填写标签代码");
+            return false;    
+        }
+        
+        if(label_name==""){
+            alert("请填写标签名称");
+            return false;    
+        }
+        
+        if(label_color==""){
+            alert("请填写标签颜色");
+            return false;    
+        }
+        
+        $('add_label_form').fireEvent('submit', {
+            stop: function() {
+            }
+        });
+    });
+    
+    //关闭按钮
+    $('cancel_buttonn').addEvent('click', function(){
+        $('cancel_buttonn').getParent('.dialog').retrieve('instance').close();
+    });
+    
+    $('add_label_form').removeEvents('submit').addEvent('submit', function(e)
+    {
+        e.stop();
+        
+        new Request.JSON ({
+            url:this.action,
+            onRequest: function () {
+                $('submit_btn').set('disabled', 'true');
+                $('cancel_buttonn').set('disabled', 'true');
+            },
+            onSuccess: function(result)
+            {
+                //json = JSON.decode(result); //json会报错：Uncaught TypeError: json is null
+                json = result;
+                
+                if (json.res == 'succ') {
+                    //成功
+                    addLabel(json.labelInfo);
+                    
+                    $('submit_btn').getParent('.dialog').retrieve('instance').close();
+                } else {
+                    $('submit_btn').set('disabled', '');
+                    $('cancel_buttonn').set('disabled', '');
+                    
+                    //提示信息
+                    alert(json.error_msg);
+                }
+            }
+        })[this.method](this);
+    });
+    
+    function addLabel(labelInfo)
+    {
+        var label_id = labelInfo.label_id;
+        
+        var htmlStr = '<span><input name="label_id" type="radio" value="'+ label_id +'" checked="checked">&nbsp;'+ labelInfo.label_name +'&nbsp;';
+        htmlStr += '<span style="background-color:'+ labelInfo.label_color +';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+        htmlStr += '</span>';
+        
+        var addItem = new Element('li', {html:htmlStr}).inject('label_list_ul');
+    }
+})();
+</script>

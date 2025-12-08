@@ -1,0 +1,152 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<script>
+	var item_i = 1;
+ </script>
+ <div class="tableform">
+	<h3>发货单状态回传</h3>
+    <div class="division">
+ <form action="index.php?app=omevirtualwms&ctl=admin_wms&act=doSubmit" method="post" id="form-delivery">
+  <input type="hidden" name='flag' value='delivery' />
+  <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tbody>
+              <tr>
+				<th>发货单编号</th>
+				<td><input type="text" name="delivery_bn"  value="<{$data.delivery_bn}>"></td>
+			  </tr>
+			  <tr>
+				<th>仓库</th>
+				<td>
+					<input type='hidden' name="warehouse" value='<{$data.branch.branch_bn}>'><{$data.branch.name}>
+				</td>
+			  </tr>
+			  <tr>
+				<th>第三方仓储</th>
+				<td>
+                <input type="hidden" name="node_id" value='<{$data.node_id}>' />
+					<!--
+					<select name="node_id">
+						<{foreach from=$wms item=wms}>
+						<option value="<{$wms.node_id}>"><{$wms.wms_name}></option>
+						<{/foreach}>
+					</select> !-->
+					<{$data.wms_name}>
+				</td>
+			</tr>
+			<tr>
+				<th>状态</th>
+				<td>	
+					<select name="status">
+						<option value="FAILED">接单失败</option>
+						<option value="ACCEPT">已接单</option>
+						<option value="PRINT">已打印</option>
+						<option value="PICK">已拣配</option>
+						<option value="CHECK">已校验</option>
+						<option value="PACKAGE">已打包</option>
+						<option value="DELIVERY" selected>已发货</option>
+					</select>
+				</td>
+			  </tr>
+			  <tr>
+				<th>物流公司</th>
+				<td>
+					<select name="logistics">
+						<{foreach from=$data.wuliu item=log name=logistics}>
+						<option value="<{$log.wms_code}>"><{$log.name}></option>
+						<{/foreach}>
+					</select>
+				</td>
+			  </tr>
+			    <tr>
+				<th>运单号</th>
+				<td><input type="text" name="logi_no" value="<{$data.logi}>"></td>
+			  </tr>
+			   <tr>
+				<th>体积</th>
+				<td><input type="text" name="volume"></td>
+			  </tr>
+			  <tr>
+				<th>重量</th>
+				<td><input type="text" name="weight" value="0"><{help}><{t}>注意！请不要置为空值<{/t}><{/help}></td>
+			  </tr>
+			  <tr>
+				<th>备注</th>
+				<td><input type="text" name="remark" value="<{$data.demo}>"></td>
+			  </tr>
+			  <tr>
+				<th>操作时间</th>
+				<td><input type="text" name="operate_time" value="<{$data.time}>"></td>
+			  </tr>
+			  <tr>
+				<th>task</th>
+				<td><input type="text" name="task" value="<{$data.task}>"></td>
+			  </tr>
+            </tbody>
+        </table>
+		<div class="tableform">
+			<div><span style="font-weight:bold;">发货商品明细:</span><!--<span class="sysiconBtn addorder"  style="float:right;margin-right:150px;height:1.5em;" onclick="addDelivery();">添加商品</span>--></div>
+
+			<div id="listArea" class="division">
+            <{if $data.items_count >= 3000}>
+        <font style="color:red">*由于数据量过大,列表暂不展示,如要执行大数据量回传操作,请使用导入功能!</font>
+        <{else}>
+				<{foreach from=$data.product item=data name=product}>
+					<div id="delivery_<{$smarty.foreach.product.iteration}>" style="margin-bottom:3px;border:1px solid #ccc;">
+						<table width="100%" cellspacing="0" cellpadding="0" border="0">
+							<tr>
+								<th>基础物料名称</th>
+								<td><{$data.product_name}></td>
+								<th>基础物料编码</th>
+								<td><{$data.bn}><input type="hidden" name="product[<{$smarty.foreach.product.iteration}>][]" value="<{$data.bn}>"></td>
+							</tr>
+							<tr>
+								<th style="width:70px;">发货数量</th>
+								<td><{$data.number}><input type="hidden" name="product[<{$smarty.foreach.product.iteration}>][]" value="<{$data.number}>" ></td> 
+								<th style="width:70px;"></th>
+								<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="display:none" onclick="delDelivery('delivery_<{$smarty.foreach.product.iteration}>');" style="cursor:pointer;color:red;">X</span></td>
+							</tr>
+							<tr>
+								<th style="width:70px;">唯一码</th>
+								<td><input type="text" name="product[<{$smarty.foreach.product.iteration}>][]" value="" >*多个用 , 间隔</td> 
+								<th style="width:70px;"></th>
+								<td></td>
+							</tr>
+						</table> 
+					</div>
+				<{/foreach}>
+                <{/if}>
+			</div>
+			</div>
+			<div class="table-action">
+            <{if $data.items_count < 3000}>
+				<{button label="提交" type="submit" name="submit" id="btn-dataelivery"}>
+                <{/if}>
+		</div>
+	</form>
+  </div>
+</div>
+<script>
+function addDelivery(){
+	var i = item_i++;
+	var content='\
+		<div id="delivery_'+i+'" style="margin-bottom:3px;border:1px solid #ccc;">\
+		<table width="100%" cellspacing="0" cellpadding="0" border="0">\
+		<tr><th>货品编号'+i+'</th>\
+		<td><input type="text" name="product['+i+'][]"></td>\
+		<th style="width:70px;">发货数量'+i+'</th> \
+		<td><input type="text" name="product['+i+'][]"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onclick="delDelivery(\'delivery_'+i+'\');" style="cursor:pointer;color:red;">X</span></td> \
+		</tr>\
+		<table>\
+		</div>\
+	';
+	$E('#listArea').adopt(new Element('div').set('html',content).getFirst());
+	
+}
+delDelivery=function(o){
+  $(o).remove();
+}
+</script>  
+ 

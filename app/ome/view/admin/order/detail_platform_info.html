@@ -1,0 +1,171 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css src="ome.css" app="ome"}>
+<{/capture}>
+
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+        <td>
+            <div class="division">
+                <h4>订单明细信息</h4>
+                <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>商品编号</th>
+                        <th>购买量</th>
+                        <th>oid</th>
+                        <th>建议仓类型</th>
+                        <th>预选仓库编码</th>
+                        <th>择配建议类型</th>
+                        <th>承诺/最晚揽收时间</th>
+                        <th>承诺/最晚出库时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <{foreach from=$orderObjList item=itemVal}>
+                    <tr>
+                        <td><{$itemVal.bn}></td>
+                        <td><{$itemVal.quantity}></td>
+                        <td><{$itemVal.oid}></td>
+                        <td><{$itemVal.biz_sd_type}></td>
+                        <td><{$itemVal.store_code}></td>
+                        <td><{$itemVal.biz_delivery_type}></td>
+                        <td><{if $itemVal.promised_collect_time}><{$itemVal.promised_collect_time|date:"Y-m-d H:i:s"}><{else}> - <{/if}></td>
+                        <td><{if $itemVal.promise_outbound_time}><{$itemVal.promise_outbound_time|date:"Y-m-d H:i:s"}><{else}> - <{/if}></td>
+                    </tr>
+                    <{/foreach}>
+                    </tbody>
+                </table>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+      <td>
+        <div class="division">
+            <h4>翱象建议信息</h4>
+            <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+               <thead>
+                   <tr>
+                        <th>建议仓类型</th>
+                        <th>建议仓编码</th>
+                       <th>择配建议类型</th>
+                       <th>建议快递名单</th>
+                       <th>承诺/最晚揽收时间</th>
+                       <th>承诺/最晚发货时间</th>
+                       <th>承诺/计划送达时间</th>
+                       <th>承诺/最晚送达时间</th>
+                       <th>推单时间</th>
+                 </tr>
+              </thead>
+                <tbody>
+                    <tr>
+                        <td><{$extend_fields.biz_sd_type}></td>
+                        <td><{$extend_fields.biz_store_code}></td>
+                        <td><{$extend_fields.biz_delivery_type}></td>
+                        <td><{$extendInfo.biz_delivery_code}></td>
+                        <td><{if $extendInfo.promised_collect_time}><{$extendInfo.promised_collect_time|date:"Y-m-d H:i:s"}><{else}> - <{/if}></td>
+                        <td><{if $extendInfo.latest_delivery_time}><{$extendInfo.latest_delivery_time|date:"Y-m-d H:i:s"}><{else}> - <{/if}></td>
+                        <td><{if $extendInfo.plan_sign_time}><{$extendInfo.plan_sign_time|date:"Y-m-d H:i:s"}><{else}> - <{/if}></td>
+                        <td><{if $extendInfo.promised_sign_time}><{$extendInfo.promised_sign_time|date:"Y-m-d H:i:s"}><{else}> - <{/if}></td>
+                        <td><{if $extendInfo.push_time}><{$extendInfo.push_time|date:"Y-m-d H:i:s"}><{else}> - <{/if}></td>
+                   </tr>
+               </tbody>
+            </table>
+        </div>
+      </td>
+  </tr>
+</table>
+
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+      <td valign="top">
+          <div class="division">
+            <h4>发货快递白名单</h4>
+            <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+              <thead>
+                <tr>
+                  <th>物流公司编码</th>
+                  <th>物流公司名称</th>
+                </tr>
+              </thead>
+              <tbody>
+              <{if $extend_fields.white_logis}>
+              <{foreach from=$extend_fields.white_logis item=itemVal}>
+              <tr>
+                  <td><{$itemVal.code}></td>
+                  <td><{$itemVal.name}></td>
+              </tr>
+              <{/foreach}>
+              <{/if}>
+              </tbody>
+            </table>
+        </div>
+      </td>
+      <td valign="top">
+          <div class="division">
+            <h4>发货快递黑名单</h4>
+            <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+              <thead>
+                <tr>
+                  <th>物流公司编码</th>
+                  <th>物流公司名称</th>
+                </tr>
+              </thead>
+              <tbody>
+              <{if $extend_fields.black_logis}>
+              <{foreach from=$extend_fields.black_logis item=itemVal}>
+              <tr>
+                  <td><{$itemVal.code}></td>
+                  <td><{$itemVal.name}></td>
+              </tr>
+              <{/foreach}>
+              <{/if}>
+              </tbody>
+            </table>
+        </div>
+      </td>
+  </tr>
+</table>
+
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+        <td>
+            <div class="division">
+                <h4>扩展信息</h4>
+                <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>扩展名称</th>
+                        <th>建议值</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>物流服务标签</td>
+                        <td><{$extendInfo.promise_service}></td>
+                    </tr>
+                    <tr>
+                        <td>物流升级服务</td>
+                        <td><{if $extendInfo.cpup_service}><{$extendInfo.cpup_service}><{/if}></td>
+                    </tr>
+                    <tr>
+                        <td>预估发货地址</td>
+                        <td><{$extend_fields.send_country}> <{$extend_fields.send_state}> <{$extend_fields.send_city}> <{$extend_fields.send_district}> <{$extend_fields.send_town}></td>
+                    </tr>
+                    <tr>
+                        <td>预估发货地编码</td>
+                        <td><{$extend_fields.send_division_code}></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </td>
+    </tr>
+</table>

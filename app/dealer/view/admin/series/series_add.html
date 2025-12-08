@@ -1,0 +1,173 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<div class="form-layout">
+<form method="post" id="series_form" action="index.php?app=dealer&ctl=admin_series&act=toAdd">
+    <div class="form-layout-block">
+        <h3>创建产品线</h3>
+        <div class="form-layout-fields form-layout-fields-column">
+            <div class="form-field">
+                <span class="form-field-label"><span style="color:red;">*</span>产品线编码：</span>
+                <input class="form-input" placeholder="请输入产品线编码" type="text" name="series_code" vtype="alphaint&&required" />
+            </div>
+            <div class="form-field">
+                <span class="form-field-label"><span style="color:red;">*</span>产品线名称：</span>
+                <input class="form-input" placeholder="请输入产品线名称" type="text" name="series_name" vtype="required" />
+            </div>
+            <div class="form-field">
+                <span class="form-field-label"><span style="color:red;">*</span>产品线描述：</span>
+                <input class="form-input" placeholder="请输入产品线描述" type="text" name="description" vtype="required" />
+            </div>
+            <div class="form-field">
+                <span class="form-field-label"><span style="color:red;">*</span>产品线分类：</span>
+                <input class="form-input" placeholder="请输入产品线分类" type="text" name="cat_name" vtype="required" />
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">产品线备注：</span>
+                <input class="form-input" placeholder="请输入产品线备注" type="text" name="remark" />
+            </div>
+            <div class="form-field">
+                <span class="form-field-label"><span style="color:red;">*</span>所属贸易公司：</span>
+                <select class="form-input"  id="betc_id" name="betc_id">
+                    <option value="" >--请选择--</option>
+                    <{foreach from=$betcs item=betc}>
+                    <option value="<{$betc.betc_id}>"><{$betc.betc_name}></option>
+                    <{/foreach}>
+                </select>
+            </div>
+            <!-- 
+            <div class="form-field" id="bind_basic_material">
+                <span class="form-field-label"><span style="color:red;">*</span>基础物料：</span>
+                <div id="ajax_get_div_contents"></div>
+            </div>
+            <div class="form-field">
+                <span class="form-field-label"><span style="color:red;">*</span>经销店铺：</span>
+                <div id="ajax_get_div_contents_shop"></div>
+            </div>
+             -->
+        </div>
+    </div>
+    <div class="form-layout-block">
+        <div id="cc" class="noprint table-action">
+            <{button type="button" id="series_btn" label="创 建"}>
+            <{button class="btn-secondary" label="取 消" id="cancel-btn"}>
+        </div>
+    </div>
+</form>
+</div>
+<script>
+void function(){
+   	ajax_onload_html();
+
+    /*
+    // 监听所属贸易公司下拉框的变化
+    $('betc_id').addEvent('change', function (e) {
+        var selectedBetcId = this.value; // 获取选中的贸易公司ID
+        updateMaterialOptions(selectedBetcId); // 更新基础物料选项
+        updateShopOptions(selectedBetcId); // 更新经销店铺选项
+    });
+    */
+
+   	//点击提交表单
+   	$('series_btn').addEvent('click',function(e){
+        var _this = this;
+        var form = this.getParent('form');
+        form.fireEvent('submit',e);
+    });
+
+    $('cancel-btn').addEvent('click',function(){
+        W.page('index.php?app=dealer&ctl=admin_series&act=index&finder_vid=<{$finder_vid}>');
+    });
+}();
+
+//基础物料和经销店铺选择按钮展示
+function ajax_onload_html(){
+ //    //基础物料
+	// new Request.HTML({
+ //        url:'index.php?app=dealer&ctl=admin_series&act=ajax_basic_material_html',
+ //        method:'post',
+ //        update:$('ajax_get_div_contents'),
+ //        data:{'apiName':'request_html'},
+ //        onSuccess:function(){
+ //        }
+ //    }).send();
+
+    // 经销店铺请求逻辑，这里不再直接发送请求，而是通过updateShopOptions函数根据betc_id动态发送
+    // updateShopOptions($('betc_id').value); // 初始化时可以考虑是否需要立即根据默认选择的贸易公司加载
+}
+
+// 根据贸易公司ID更新基础物料选项
+function updateMaterialOptions(betcId) {
+    new Request.HTML({
+        url:'index.php?app=dealer&ctl=admin_series&act=ajax_basic_material_html',
+        method: 'post',
+        update: $('ajax_get_div_contents'),
+        data: {'betc_id': betcId}, // 动态传入betc_id
+        onSuccess: function () {
+            // 请求成功后的处理（如果需要）
+        }
+    }).send();
+}
+
+// 根据贸易公司ID更新经销店铺选项
+function updateShopOptions(betcId) {
+    new Request.HTML({
+        url: 'index.php?app=dealer&ctl=admin_series&act=ajax_shopyjdf_html',
+        method: 'post',
+        update: $('ajax_get_div_contents_shop'),
+        data: {'betc_id': betcId}, // 动态传入betc_id
+        onSuccess: function () {
+            // 请求成功后的处理（如果需要）
+        }
+    }).send();
+}
+
+//基础物料选择后展示模块
+function product_object_callback(rs,handle){
+    var length = handle.getElements('.row').length;
+    var html = '已选择了'+length+'个基础物料,'+"<a href='javascript:void(0);' onclick='product_selected_show()'>查看选中的基础物料.</a>";
+    if ($defined($('hand-selected-product'))){
+        $('hand-selected-product').setHTML(html);
+    }else{
+        var div = new Element('div',{'html':html,'id':'hand-selected-product'});
+        div.injectBefore(handle); 
+        $('hand-selected-product').style.cssText = 'float:left;margin:10px 10px 10px 5px';
+    }
+}
+
+//基础物料明细展示
+function product_selected_show(){
+    new Dialog('index.php?app=dealer&ctl=admin_series&act=showProducts',{
+        ajaxoptions:{data:$('hand-selected-product').getNext('div'),method:'post'}
+    });
+}
+
+//经销店铺选择后展示模块
+function shop_object_callback(rs,handle){
+    var length = handle.getElements('.row').length;
+    var html = '已选择了'+length+'个经销店铺,'+"<a href='javascript:void(0);' onclick='shop_selected_show()'>查看选中的经销店铺.</a>";
+    if ($defined($('hand-selected-shop'))){
+        $('hand-selected-shop').setHTML(html);
+    }else{
+        var div = new Element('div',{'html':html,'id':'hand-selected-shop'});
+        div.injectBefore(handle); 
+        $('hand-selected-shop').style.cssText = 'float:left;margin:10px 10px 10px 5px';
+    }
+}
+
+//经销店明细展示
+function shop_selected_show(){
+    new Dialog('index.php?app=dealer&ctl=admin_series&act=showShops',{
+        ajaxoptions:{data:$('hand-selected-shop').getNext('div'),method:'post'}
+    });
+}
+</script>

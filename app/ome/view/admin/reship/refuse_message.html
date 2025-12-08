@@ -1,0 +1,81 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class='division'>
+<form id='refuse' method='post' action='index.php?app=ome&ctl=admin_reship&act=refuse_message' enctype="multipart/form-data" target="upload" isCloseDialog>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="girdlist">
+
+        <tr>
+            <th><t>上传凭证</t></th>
+            <td>
+                <{input type="sfile" name="refuse_proof" f_type="public" }>
+            </td>
+        </tr>
+
+        <tr>
+            <th><t>换货原因</t></th>
+            <td>
+                <select name="seller_refuse_reason_id">
+                    <{foreach from=$refuse_reason item=reason}>
+                    <option value="<{$reason.reason_id}>"><{$reason.reason_text}></option>
+                    <{/foreach}>
+                </select>
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <th><t>备注</t></th>
+            <td><textarea name='refuse_message' vtype="required"></textarea></td>
+        </tr>
+    </table>
+    <div class="table-action">
+      <{button label="确定" class="btn-primary" type='submit'}>
+    </div>
+    <input type="hidden" name='return_id' value='<{$return_id}>'>
+    <input type="hidden" name='reship_id' value='<{$reship_id}>'>
+    <input type="hidden" id='finder_id' name='finder_id' value='<{$finder_id}>'>
+</form>
+</div>
+<script>
+var finder_id = $('finder_id').value;
+$('refuse').store('target',{
+    onComplete:function(resp){
+    rs = JSON.decode(resp);
+    if (rs.error){
+        var str = rs.error;
+        if(str == '请上传凭证图片!' || str == '上传文件不能超过500K!' || /您只能上传以下类型文件/.test(str)){
+            MessageBox.error(rs.error);
+            return false;
+        }
+
+        if (confirm("线上拒绝失败,是否本地强制拒绝？! 强制拒绝后,换货订单将会关闭不会再生成!"))
+        {
+            new Request({
+                url:'index.php?app=ome&ctl=admin_reship&act=force_refuse&p[0]=<{$reship_id}>',
+                method:'post',
+                onSuccess:function(response){
+                    alert('操作成功');
+
+                }
+              }).send();
+
+
+        }
+         $('refuse').getParent('.dialog').retrieve('instance').close();
+         finderGroup[finder_id].refresh.delay(400,finderGroup[finder_id]);
+    }else{
+
+        $('refuse').getParent('.dialog').retrieve('instance').close();
+        finderGroup[finder_id].refresh.delay(400,finderGroup[finder_id]);
+    }
+
+    }
+});
+
+
+</script>
+

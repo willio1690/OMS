@@ -1,0 +1,38 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<h4>地址库</h4>
+<div class="division">
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0">
+     <thead>
+        <tr>
+          <th>收件人</th>
+          <th>地区</th>
+          <th>详细地址</th>
+          <th>固定电话</th>
+          <th>手机</th>
+          <th>Email</th>
+          <th>邮编</th>
+          <th>是否默认</th>
+        </tr>
+        </thead>
+        <{foreach from=$address_detail item=detail}>
+       <tr id='<{$detail.address_id}>'>
+          <td><{$detail.ship_name|default:'-'}></td>
+          <td><{$detail.ship_area|default:'-'}></td>
+          <td><{$detail.ship_addr|default:'-'}></td>
+          <td><{$detail.ship_tel|default:'-'}></td>
+          <td><{$detail.ship_mobile|default:'-'}></td>
+           <td><{$detail.ship_email|default:'-'}></td>
+          <td><{$detail.ship_zip|default:'-'}></td>
+        <td><{if $detail.is_default=='1'}>是<{else}>否<{/if}></td>
+        </tr>
+       <{/foreach}>
+    
+    </table>
+  </div>  
+
+</div>

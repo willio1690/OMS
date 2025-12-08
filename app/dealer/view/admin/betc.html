@@ -1,0 +1,176 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+  <h5><{if $history}><em class='c-red'>《快照》</em>贸易公司编辑<{/if}></h5>
+  <div class="division">
+    <form method="post" action="index.php?app=dealer&ctl=admin_betc&act=save" id="frm">
+      <table border="0" cellspacing="0" cellpadding="0" >
+        <input type="hidden" name="betc_id" value="<{$betc_info.betc_id}>">
+        <tbody>
+          <{if !$history}>
+          <tr>
+            <th>所属公司业务组织：</th>
+            <td>
+              <select name="bbu_id" id="bbu_id" >
+                <option value="">-选择公司业务组织-</option>
+                <{foreach from=$bbu_list item=item }>
+                  <{if $item.bbu_id eq $betc_info.bbu_id }>
+                    <option value="<{$item.bbu_id}>" title="<{$item.bbu_name}>" selected><{$item.bbu_name}></option>
+                  <{else}>
+                    <option value="<{$item.bbu_id}>" title="<{$item.bbu_name}>" ><{$item.bbu_name}></option>
+                  <{/if}>
+                <{/foreach}>
+              </select>
+            </td>
+          </tr>
+
+          <tr>
+            <th><em class='c-red'>*</em>贸易公司编码：</th>
+            <td>
+              <{if $betc_info}>
+                <{input type="text" name="betc_code" value=$betc_info.betc_code title=$betc_info.betc_code readonly='readonly' }><em class='c-red'> *添加后不可编辑</em>
+              <{else}>
+                <{input type="text" name="betc_code" value=$betc_info.betc_code title=$betc_info.betc_code vtype="alphaint&&required" placeholder="英文字母或数字"}><em class='c-red'> *添加后不可编辑</em>
+              <{/if}>
+            </td>
+          </tr>
+
+          <tr>
+            <th><em class='c-red'>*</em>贸易公司名称：</th>
+            <td>
+              <{input type="text" name="betc_name" value=$betc_info.betc_name title=$betc_info.betc_name required='required'}>
+            </td>
+          </tr>
+
+          <tr>
+            <th>联系人姓名：</th>
+            <td>
+              <{input type="text" name="contact_name" value=$betc_info.contact_name title=$betc_info.contact_name required='required'}>
+            </td>
+          </tr>
+
+          <tr>
+            <th>联系人电话：</th>
+            <td>
+              <{input type="text" name="contact_mobile" value=$betc_info.contact_mobile title=$betc_info.contact_mobile required='required'}>
+            </td>
+          </tr>
+
+          <tr>
+            <th>联系人地址：</th>
+            <td>
+              <{input type="text" name="contact_address" value=$betc_info.contact_address title=$betc_info.contact_address required='required'}>
+            </td>
+          </tr>
+
+          <{else}> <!-- 快照展示 -->
+
+            <tr>
+              <th>所属公司业务组织：</th>
+              <td>
+                  <{foreach from=$bbu_list item=item }>
+                    <{if $item.bbu_id eq $betc_info.bbu_id }>
+                      <{input type="text" name="bbu_name" value=$item.bbu_name title=$item.bbu_name required='required' readonly='readonly'}>
+                    <{/if}>
+                  <{/foreach}>
+              </td>
+            </tr>
+            <tr>
+              <th><em class='c-red'>*</em>贸易公司编码：</th>
+              <td>
+                  <{input type="text" name="betc_code" value=$betc_info.betc_code title=$betc_info.betc_code readonly='readonly' }><em class='c-red'> *添加后不可编辑</em>
+              </td>
+            </tr>
+            <tr>
+              <th><em class='c-red'>*</em>贸易公司名称：</th>
+              <td>
+                <{input type="text" name="betc_name" value=$betc_info.betc_name title=$betc_info.betc_name required='required' readonly='readonly'}>
+              </td>
+            </tr>
+            <tr>
+              <th>联系人姓名：</th>
+              <td>
+                <{input type="text" name="contact_name" value=$betc_info.contact_name title=$betc_info.contact_name required='required' readonly='readonly'}>
+              </td>
+            </tr>
+            <tr>
+              <th>联系人电话：</th>
+              <td>
+                <{input type="text" name="contact_mobile" value=$betc_info.contact_mobile title=$betc_info.contact_mobile required='required' readonly='readonly'}>
+              </td>
+            </tr>
+            <tr>
+              <th>联系人地址：</th>
+              <td>
+                <{input type="text" name="contact_address" value=$betc_info.contact_address title=$betc_info.contact_address required='required' readonly='readonly'}>
+              </td>
+            </tr>
+          <{/if}>
+        </tbody>
+      </table>
+    </form>
+  </div>
+</div>
+<{area inject=".mainFoot"}>
+
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td>
+          <{if !$history}>
+          <{button class="btn-primary" type="button" id='submit_btn' label='确定' }>
+          <{button class="btn-secondary" type="button" id='close_btn' label='关闭' }>
+          <{/if}>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<{/area}>
+<script type="text/javascript">
+  (function(){
+    var _form = $('frm');//表单ID 
+    var btn   = $('submit_btn');//按钮ID
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    $('close_btn').addEvent('click', function(){
+      try{
+        var _dialogIns = this.getParent('.dialog').retrieve('instance');
+      }catch(e){}
+
+      if(_dialogIns){
+        // setTimeout(finder.refresh(),30000);
+        _dialogIns.close();
+      }
+    });
+    _form.store('target',{
+      onRequest:function(){
+        btn.setAttribute('disabled', 'disabled');
+      },
+      onComplete:function(){
+        btn.removeAttribute('disabled');
+      },
+      onSuccess:function(response){
+        var hash_res_obj = JSON.decode(response);
+        if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+          try{
+            var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+          }catch(e){}
+
+          if(_dialogIns){
+            setTimeout(finder.refresh(),30000);
+            _dialogIns.close();
+          }
+        }
+      }
+    });
+
+    btn.addEvent('click',function(){
+      _form.fireEvent('submit',{stop:$empty});
+    });
+
+  })();
+</script>

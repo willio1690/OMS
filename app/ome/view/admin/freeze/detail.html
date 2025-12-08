@@ -1,0 +1,166 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{/capture}>
+<div class="tableform">
+    <h3>冻结明细查询</h3>
+    <br />
+    <div class="division">
+        <div class="gray_form">
+            <form id="add_form" method='post' action="">
+                <div id="error_msg" style="float:right;background-color:#FBC2C4;width:14%;margin-right:3%;"></div><br />
+                <div style="float:right"><span id="trigger_word" style="user-select:text">基础</span>物料编码:<input type="text" id='bm_bn' /><{button id="add_btn" label="查询"}></div>
+                <br />
+                <table class="gridlist">
+                    <thead>
+                        <tr>
+                            <th>基础物料ID</th>
+                            <th>基础物料编码</th>
+                            <th>基础物料名称</th>
+                            <th>最后更新时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataNodeBm"></tbody>
+
+                    <thead>
+                        <tr>
+                            <th>商品表总库存</th>
+                            <th>商品Redis总库存</th>
+                            <th>商品表总冻结</th>
+                            <th>商品Redis总冻结</th>
+                            <th>商品流水表总冻结</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataNodeBmStoreFreeze"></tbody>
+
+                    <thead>
+                        <tr>
+                            <th>仓库ID</th>
+                            <th>仓库编码</th>
+                            <th>仓库名称</th>
+                            <th>仓库表库存</th>
+                            <th>仓库Redis库存</th>
+                            <th>仓库表冻结</th>
+                            <th>仓库Redis冻结</th>
+                            <th>仓库流水表冻结</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataNodeBranchStoreFreeze"></tbody>
+
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.onkeydown=function(event) 
+{
+    e = event ? event :(window.event ? window.event : null); 
+    if(e.keyCode==13){
+        find_product();
+        return false;
+    } 
+}
+
+$('add_btn').addEvent('click',function(e){
+    // 清空表格内容
+    var dataNodeBm = $('dataNodeBm');
+    var dataNodeBmStoreFreeze = $('dataNodeBmStoreFreeze');
+    var dataNodeBranchStoreFreeze = $('dataNodeBranchStoreFreeze');
+
+    if (dataNodeBm) dataNodeBm.innerHTML = '';
+    if (dataNodeBmStoreFreeze) dataNodeBmStoreFreeze.innerHTML = '';
+    if (dataNodeBranchStoreFreeze) dataNodeBranchStoreFreeze.innerHTML = '';
+
+    find_product();
+});
+
+function find_product(){
+    new Request({
+        url:'index.php?app=ome&ctl=admin_freeze_detail&act=get_data',
+        method: 'post',
+        data:'bm_bn='+$('bm_bn').value,
+        onSuccess:function(rs){
+            res = JSON.decode(rs);
+            if(res.res == 'false'){
+                $('error_msg').set('text',res.msg);
+                return ;
+            }else{
+                $('error_msg').set('text','');
+            }
+            console.log(res);
+
+            // 检查 product_info 是否存在
+            if (res.product_info && Object.keys(res.product_info).length > 0) {
+                var html_bm = "<tr class='product'>" +
+                    "<td>" + (res.product_info.bm_id || '') + "</td>" +
+                    "<td>" + (res.product_info.bm_bn || '') + "</td>" +
+                    "<td>" + (res.product_info.material_name || '') + "</td>" +
+                    "<td>" + (res.material_stock.last_modified || '') + "</td>" +
+                "</tr>";
+                if (dataNodeBm) {
+                    dataNodeBm.innerHTML = html_bm; // 直接替换内容
+                }
+            }
+
+            // 检查相关字段是否存在
+            if (res.material_stock && Object.keys(res.material_stock).length > 0 && 
+                res.redis_product && Object.keys(res.redis_product).length > 0 && 
+                res.stock_freeze_all && Object.keys(res.stock_freeze_all).length > 0) {
+                var html_bm_store_freeze = "<tr class='product'>" +
+                    "<td>" + (res.material_stock.store || '') + "</td>" +
+                    "<td>" + (res.redis_product.store || '') + "</td>" +
+                    "<td>" + (res.material_stock.store_freeze || '') + "</td>" +
+                    "<td>" + (res.redis_product.store_freeze || '') + "</td>"+
+                    "<td>" + (res.stock_freeze_all.store_freeze || '') + "</td>"+
+                "</tr>";
+                if (dataNodeBmStoreFreeze) {
+                    dataNodeBmStoreFreeze.innerHTML = html_bm_store_freeze; // 直接替换内容
+                }
+            }
+
+            // 检查 branch_info 是否存在
+            if (res.branch_info && Object.keys(res.branch_info).length > 0) {
+                var html_bm_branch_store_freeze = "";
+                for (var branch_id in res.branch_info) {
+                    if (res.branch_info.hasOwnProperty(branch_id)) {
+                        var branch = res.branch_info[branch_id];
+                        var branch_product = (res.branch_product && res.branch_product[branch_id]) ? res.branch_product[branch_id] : {};
+                        var redis_branch = (res.redis_branch && res.redis_branch[branch_id]) ? res.redis_branch[branch_id] : {};
+                        var stock_freeze = (res.stock_freeze && res.stock_freeze[branch_id]) ? res.stock_freeze[branch_id] : {};
+
+                        // 检查 branch_product、redis_branch 和 stock_freeze 是否为空对象
+                        var isEmptyBranchProduct = Object.keys(branch_product).length === 0;
+                        var isEmptyRedisBranch = Object.keys(redis_branch).length === 0;
+                        var isEmptyStockFreeze = Object.keys(stock_freeze).length === 0;
+
+                        if (isEmptyBranchProduct && isEmptyRedisBranch && isEmptyStockFreeze) {
+                            continue; // 跳过当前循环，继续下一次循环
+                        }
+
+                        html_bm_branch_store_freeze += "<tr class='product'>" +
+                            "<td>" + (branch.branch_id || '') + "</td>" +
+                            "<td>" + (branch.branch_bn || '') + "</td>" +
+                            "<td>" + (branch.name || '') + "</td>" +
+                            "<td>" + (branch_product.store || '') + "</td>" +
+                            "<td>" + (redis_branch.store || '') + "</td>" +
+                            "<td>" + (branch_product.store_freeze || '') + "</td>" +
+                            "<td>" + (redis_branch.store_freeze || '') + "</td>" +
+                            "<td>" + (stock_freeze.num || '') + "</td>" +
+                            "</tr>";
+                    }
+                }
+                if (dataNodeBranchStoreFreeze) {
+                    dataNodeBranchStoreFreeze.innerHTML = html_bm_branch_store_freeze; // 直接替换内容
+                }
+            }
+
+        },
+    }).send();
+}
+</script>

@@ -1,0 +1,66 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=ome&ctl=admin_setting&act=doSyncShopResaon&finder_id=<{$finder_id}>" method="post" id="form">
+<input type='hidden' id='finder_id' name='finder_id' value='<{$finder_id}>'>
+<div class="tableform">
+    <div class="division">
+    <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+            <tr>
+            <th><h4>选择店铺:</h4></th>
+            <td>
+            <select name="shop_id" id="shop_id">
+            <{foreach from=$shopList item=itemVal key=itemKey}>
+            <option value="<{$itemVal.shop_id}>"><{$itemVal.name}></option>
+            <{/foreach}>
+            </select>
+            </td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+</div>
+</form>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td><button class="btn btn-primary" id="submit_btn" ><span><span><{t}>提交<{/t}></span></span></button> &nbsp; &nbsp;
+          <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<{/area}>
+<script>
+(function(){
+    var _form = $('form');//表单ID 
+    var btn   = $('submit_btn');//按钮ID
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    _form.store('target',{
+        onComplete:function(){
+        },
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+
+                if(_dialogIns){
+                    finder.refresh();
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+
+    btn.addEvent('click',function(){
+        _form.fireEvent('submit',{stop:$empty});
+    });
+})();
+</script>

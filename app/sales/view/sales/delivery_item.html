@@ -1,0 +1,65 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../app/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<div class="tableform" id="saleinfo">
+
+<h4>销售明细：</h4>
+
+<div class="goods-spec-cell" id='goods-spec-product'>
+    <table cellspacing="0" cellpadding="0" border="0" class="gridlist">
+     <thead>
+     <tr>
+       <th ><{t}>销售物料编码<{/t}></th>
+       <th><{t}>订单号<{/t}></th>
+        <th><{t}>物料类型<{/t}></th>
+				<th><{t}>物料编码<{/t}></th>
+        <th><{t}>物料名称<{/t}></th>
+        <th><{t}>吊牌价<{/t}></th>
+        <th><{t}>数量<{/t}></th>
+        <th><{t}>货品优惠<{/t}></th>
+        <th><{t}>销售总价<{/t}></th>
+        <th><{t}>平摊优惠<{/t}></th>
+				<th><{t}>销售金额<{/t}></th>
+				<th><{t}>平台承担<{/t}></th>
+				<th><{t}>结算金额<{/t}></th>
+        <{foreach from=$propsTitle item=item}>
+        <th><{$item.col_name}></th>
+        <{/foreach}>
+	 </tr></thead><tbody>
+ <{foreach from=$itemList item=dataitem}>
+	<tr>
+      <td><{$dataitem.sales_material_bn}></td>
+      <td><{$dataitem.order_bn}></td>
+      <td><{$dataitem.type_name}></td>
+	     <td><{$dataitem.bn}></td>
+      <td><{$dataitem.name}></td>
+   
+  	  <td><{$dataitem.price|cur}></td>
+        <td><{$dataitem.nums}></td>
+        <td><{$dataitem.pmt_price|cur}></td>
+        <td><{$dataitem.sale_price|cur}></td>
+        <td><{$dataitem.apportion_pmt|cur}></td>
+  	  <td><{$dataitem.sales_amount|cur}></td>
+  	  <td><{$dataitem.platform_amount|cur}></td>
+  	  <td><{$dataitem.settlement_amount|cur}></td>
+      <{foreach from=$propsTitle item=item}>
+      <th><{$dataitem.props[$item.col_key]}></th>
+      <{/foreach}>
+	</tr>
+    
+<{/foreach}>
+
+</tbody>
+</table>
+</div>
+
+
+
+</div>
+</div>

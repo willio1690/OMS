@@ -1,0 +1,359 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class='division'>
+<h3><{$title}></h3>
+<form method='post' action='index.php?app=inventorydepth&ctl=regulation_apply&act=save' id='regulation-apply-form'>
+    <input type='hidden' name='init_bn' value="<{$data.bn|default:$init_bn}>">
+    <input type='hidden' name='id' value="<{$data.id|default:''}>">
+    <div class='tableform'>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+                <tr>
+                    <th><span class="red">*</span> 应用编号:</th>
+                    <td><input type='text' name='bn' value="<{$data.bn|default:''}>" vtype='required' class='x-input' <{if $data.bn}>readonly='readonly'<{/if}> ></td>
+                </tr>
+                <tr>
+                    <th><span class="red">*</span> 应用名称:</th>
+                    <td><{input type='text' name='heading' value=$data.heading vtype='required'}></td>
+                </tr>
+                <tr id='condition-tr'>
+                    <th><span class="red">*</span> 规则类型:</th>
+                    <td>
+                        更新销售库存
+                        <input type='hidden' name='condition' value="<{$data.condition}>">
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="red">*</span> 触发类型:</th>
+                    <td><{input type="select" required=true name="style" options=$options.style value=$data.style}></td>
+                </tr>
+                <tr id='apply-range'>
+                    <th><span class="red">*</span> 应用范围:</th>
+                    <td>
+                    <input type='checkbox' name='shop_id[]' value='_ALL_' <{if $data.shop_id.0 == '_ALL_'}>checked<{/if}> onclick='allShop(this);'>所有店铺
+
+                    <ul id='shops' <{if $data.shop_id.0 == '_ALL_'}>style="display:none;"<{/if}>>
+                        <{foreach from=$data.shops item=shop}>
+                            <li class='span-auto' style='min-width: 118px;margin-bottom:5px;'><input type='checkbox' name='shop_id[]' value='<{$shop.shop_id}>' <{if is_array($data.shop_id) && in_array($shop.shop_id,$data.shop_id)}>checked<{/if}> onchange="javascript:if(this.checked){this.getNext('span').setStyle('color','red');}else{this.getNext('span').setStyle('color','');}"><span <{if is_array($data.shop_id) && in_array($shop.shop_id,$data.shop_id)}>style='font-size:14px;font-weight:bold;color:red;' <{else}>style='font-size:14px;font-weight:bold;'  <{/if}> ><{$shop.name}></span></li>
+                        <{/foreach}>
+                    </ul>
+                    <{*
+                    <{input type='object' object='shop@ome' multiple=true breakpoint='0'  name='shop_id' value=$data.shop_id}>
+                    *}>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="red">*</span> 应用对象:</th>
+                    <td>
+                        <div style="margin-bottom: 10px;">
+                            <label><input type="radio" name="apply_object_type" value="1" <{if $data.apply_object_type == 1 || !$data.apply_object_type}>checked<{/if}> onchange="window.toggleApplyObjectCalledByUser=true;toggleApplyObject()" /> 全部商品</label>&nbsp;&nbsp;
+                            <label><input type="radio" name="apply_object_type" value="2" <{if $data.apply_object_type == 2}>checked<{/if}> onchange="window.toggleApplyObjectCalledByUser=true;toggleApplyObject()" /> 指定商品</label>&nbsp;&nbsp;
+                            <label><input type="radio" name="apply_object_type" value="3" <{if $data.apply_object_type == 3}>checked<{/if}> onchange="window.toggleApplyObjectCalledByUser=true;toggleApplyObject()" /> 客户分类商品</label>
+                        </div>
+                        
+                        <div id="apply-object-content">
+                            <div id="all-products-content" style="display: none;">
+                                <div style="color: #666; font-size: 12px;">所有商品都将应用此规则</div>
+                            </div>
+                            
+                            <div id="specific-products-content" style="display: none;">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tbody>
+                                <tr class='choose' id='choose_stock' >
+                                    <td>
+                                        <div id="ajax_get_div_contents"></div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                            </div>
+                            
+                            <div id="customer-classify-content" style="display: none;">
+                                <label>客户分类:</label>
+                                <select id="customer-classify-sel" name="apply_object_filter[]" multiple>
+                                    <{foreach from=$customerClassifyOptions key=id item=name}>
+                                        <option value="<{$id}>" <{if isset($data.selected_customer_classify) && is_array($data.selected_customer_classify) && in_array($id, $data.selected_customer_classify)}>selected<{/if}>><{$name}></option>
+                                    <{/foreach}>
+                                </select>
+                                <div style="margin-top: 8px; color: #666; font-size: 12px;">
+                                    选择需要应用专用供货仓的客户分类（可多选）
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>平台SKU ID:</th>
+                    <td><textarea rows="6" cols="50" name="shop_sku_id" placeholder="如果一个OMS商品对应平台多个SKU ID，且无需回写所有SKU ID，请以逗号隔开所需回写SKU ID"><{$data.shop_sku_id}></textarea></td>
+                </tr>
+                <tr>
+                    <th><span class="red">*</span> 应用规则:</th>
+                    <td>
+                        <select id="regulation-sel" name="regulation_id">
+                            <option value="">请选择应用规则</option>
+                            <{foreach from=$regulationOptions key=id item=name}>
+                                <option value="<{$id}>" <{if $data.regulation_id == $id}>selected<{/if}>><{$name}></option>
+                            <{/foreach}>
+                        </select>
+                        <div style="margin-top: 8px; color: #666; font-size: 12px;">
+                            (需先在【库存规则】中设置库存回写规则)
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                   <th><span class="red">*</span> 回写方式:</th>
+                    <td>
+                    <label><input type="checkbox" value="1" name="sync_mode_total" checked onclick="return false;" style="cursor: not-allowed;" /> 按仓库总和回写</label>&nbsp;&nbsp;
+                    <label><input type="checkbox" value="1" name="is_sync_subwarehouse" <{if $data.is_sync_subwarehouse == '1'}>checked<{/if}> /> 回写区域仓</label>&nbsp;&nbsp;
+                    <label><input type="checkbox" value="1" name="is_sync_store" <{if $data.is_sync_store == '1'}>checked<{/if}> /> 回写门店</label>&nbsp;&nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <th>专用供货仓:</th>
+                    <td>
+                        <select id="supply-branch-sel" name="supply_branch_id[]" multiple>
+                            <{foreach from=$branchOptions key=bn item=name}>
+                                <option value="<{$bn}>" <{if is_array($data.supply_branch_id) && in_array($bn, $data.supply_branch_id)}>selected<{/if}>><{$name}></option>
+                            <{/foreach}>
+                        </select>
+                        <div style="margin-top: 8px; color: #666; font-size: 12px;">
+                            优先级：专用供货仓 > 店铺默认供货仓 > 系统默认供货仓（留空则使用店铺默认供货仓）
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="red">*</span> 开始时间:</th>
+                    <td><{input type='time' name='start_time' value=$data.start_time vtype='required'}></td>
+                </tr>
+                <tr>
+                    <th><span class="red">*</span> 结束时间:</th>
+                    <td><{input type='time' name='end_time' value=$data.end_time vtype='required'}></td>
+                </tr>
+                <tr>
+                    <th>规则应用等级</th>
+                    <td><{input type='text' vtype='unsignedint' name='priority' value=$data.priority|default:99 size=8}>
+                        <{help}>数值越大越先执行<{/help}>
+                    </td>
+                </tr>
+                <tr>
+                    <th><span class="red">*</span> 应用启用状态 :</th>
+                    <td><{if $data.using=='true'}>启用<{else}>停用<{/if}></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</form>
+</div>
+
+<{capture name='footbar'}>
+    <div class='table-action'>
+        <{button type='button' label='确认' id='regulation-apply-submit'}>
+        <{button type='button' label='取消' onclick='javascript:window.close();'}>
+    </div>
+<{/capture}>
+<script>
+function allShop(el){
+    if (el.checked)
+    {
+        $('shops').hide();
+        $('shops').getElements('input').set('disabled',true);
+    }else{
+        $('shops').show();
+        $('shops').getElements('input').set('disabled',false);
+    }
+}
+
+function isAll(el){
+    if (el.checked) {
+        el.getParent('div').getNext('div').setStyle('visibility','hidden');
+    }else{
+        el.getParent('div').getNext('div').setStyle('visibility','visible');
+    }
+}
+
+function toggleApplyObject() {
+    var applyObjectType = document.querySelector('input[name="apply_object_type"]:checked');
+    if (!applyObjectType) {
+        return;
+    }
+    var applyObjectTypeValue = applyObjectType.value;
+    var allProductsContent = document.getElementById('all-products-content');
+    var specificProductsContent = document.getElementById('specific-products-content');
+    var customerClassifyContent = document.getElementById('customer-classify-content');
+    
+    // 隐藏所有内容
+    allProductsContent.style.display = 'none';
+    specificProductsContent.style.display = 'none';
+    customerClassifyContent.style.display = 'none';
+    
+    if (applyObjectTypeValue == '1') {
+        allProductsContent.style.display = 'block';
+    } else if (applyObjectTypeValue == '2') {
+        specificProductsContent.style.display = 'block';
+        // 确保ajax_get_div_contents容器可见
+        var ajaxContainer = document.getElementById('ajax_get_div_contents');
+        if (ajaxContainer) {
+            ajaxContainer.style.display = 'block';
+            // 确保容器内的所有div元素都可见
+            var childDivs = ajaxContainer.getElementsByTagName('div');
+            for (var i = 0; i < childDivs.length; i++) {
+                childDivs[i].style.visibility = 'visible';
+            }
+        }
+        // 只在用户手动切换时重新加载，避免初始化时重复请求
+        if (window.toggleApplyObjectCalledByUser) {
+            var apply_id = '<{$data.id}>';
+            var isEdit = apply_id && apply_id != '';
+            if (!isEdit || !ajaxContainer.innerHTML.trim()) {
+                ajax_onload_html(apply_id);
+            }
+        }
+    } else if (applyObjectTypeValue == '3') {
+        customerClassifyContent.style.display = 'block';
+    }
+}
+void function(){
+
+    $('regulation-apply-submit').addEvent('click',function(){
+        var form = $('regulation-apply-form');
+
+        W.page(form.action,{
+            data:form,
+            onComplete:function(resp){
+                resp = JSON.decode(resp);
+                if (resp.error)
+                {
+                    MessageBox.error(resp.error);
+                    return ;
+                }
+
+                opener.finderGroup["<{$env.get._finder.finder_id}>"].refresh.delay(400,opener.finderGroup["<{$env.get._finder.finder_id}>"]);
+                setTimeout("window.close()",200);
+            }
+        });
+    });
+
+    $ES('#regulation-apply-form #apply-range input[name="rangetype"]').addEvent('click',function(){
+            if (this.value=='all')
+            {
+                $E('#regulation-apply-form #apply-range #shops').hide();
+            }else{
+                $E('#regulation-apply-form #apply-range #shops').show();
+            }
+    });
+	
+	var apply_id	= '<{$data.id}>';
+	$ES('#regulation-apply-form #apply-range input[name="shop_id[]"]').addEvent('click',function()
+	{
+		var apply_id	= '';
+		// ajax_onload_html(apply_id);
+    });
+	
+	// 初始化应用对象显示状态（不触发重复请求）
+	window.toggleApplyObjectCalledByUser = false;
+	toggleApplyObject();
+	
+	// 如果当前选中的是"指定商品"，则加载内容
+	var currentApplyObjectType = document.querySelector('input[name="apply_object_type"]:checked');
+	if (currentApplyObjectType && currentApplyObjectType.value == '2') {
+		ajax_onload_html(apply_id);
+	}
+}();
+
+function ajax_onload_html(apply_id)
+{
+	var shop_ids	= '';
+	$$('input[name="shop_id[]"').each(function(item){
+		if(item.checked==true && item.get('value'))
+		{
+			shop_ids += ',' + item.get('value');
+		} 
+	})
+	if(shop_ids.indexOf("_ALL_") > 0 )
+	{
+		shop_ids	= '_ALL_';
+	}
+	shop_ids    = shop_ids.substr(1);
+	
+	new Request.HTML({
+		url:'index.php?app=inventorydepth&ctl=regulation_apply&act=ajax_sales_material_html&p[0]='+ apply_id +'&p[1]='+shop_ids,
+		method:'post',
+		update:$('ajax_get_div_contents'),
+		data:{'apiName':'request_html'},
+		onSuccess:function(){
+			// 确保加载的内容可见
+			var ajaxContainer = $('ajax_get_div_contents');
+			if (ajaxContainer) {
+				ajaxContainer.style.display = 'block';
+				// 确保容器内的所有div元素都可见
+				var childDivs = ajaxContainer.getElementsByTagName('div');
+				for (var i = 0; i < childDivs.length; i++) {
+					childDivs[i].style.visibility = 'visible';
+				}
+			}
+		}
+	}).send();
+}
+
+// 初始化专用供货仓tail组件
+var supplyBranchSel = tail.select("#supply-branch-sel", {
+    multiContainer: true,
+    height: 660,
+    searchMinLength: 0,
+    openAbove: true,
+    multiSelectAll: true,
+    placeholder:'请选择专用供货仓',
+    search:true
+});
+
+// 初始化应用规则tail组件
+var regulationSel = tail.select("#regulation-sel", {
+    height: 660,
+    searchMinLength: 0,
+    openAbove: true,
+    placeholder:'请选择应用规则',
+    search:true
+});
+
+// 初始化客户分类tail组件
+var customerClassifySel;
+setTimeout(function() {
+    customerClassifySel = tail.select("#customer-classify-sel", {
+        multiContainer: true,
+        height: 660,
+        searchMinLength: 0,
+        openAbove: true,
+        multiSelectAll: true,
+        placeholder:'请选择客户分类',
+        search:true
+    });
+}, 100);
+
+// 保护"按仓库总和回写"复选框不被修改
+document.addEventListener('DOMContentLoaded', function() {
+    var syncModeTotalCheckbox = document.querySelector('input[name="sync_mode_total"]');
+    if (syncModeTotalCheckbox) {
+        // 确保复选框始终为选中状态
+        syncModeTotalCheckbox.checked = true;
+        
+        // 添加事件监听器防止取消选中
+        syncModeTotalCheckbox.addEventListener('change', function(e) {
+            if (!this.checked) {
+                this.checked = true;
+            }
+        });
+        
+        // 添加事件监听器防止点击
+        syncModeTotalCheckbox.addEventListener('click', function(e) {
+            e.preventDefault();
+            return false;
+        });
+    }
+});
+
+
+</script>

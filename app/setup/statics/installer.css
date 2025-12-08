@@ -1,0 +1,1072 @@
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+body {
+	margin:0px;
+	padding:0;
+	font-size:12px;
+	text-align:center;
+	font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	background:#f5f7fa;
+}
+textarea, input {
+	font-family:Arial, Helvetica, sans-serif, "宋体";
+}
+.banner {
+	text-align:center;
+	padding:0;
+	color:rgba(255, 255, 255, 0.95);
+	font-size:20px;
+	font-weight:600;
+	text-shadow:0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.banner h1{
+	color:rgba(255, 255, 255, 0.95);
+	font-size:20px;
+	font-weight:600;
+	height:auto;
+	padding:0;
+	text-shadow:0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.ins-step-tips {
+	line-height:22px;
+}
+.ins-steps .span-auto, .ins-step-tips .span-auto {
+	width:50%;
+	margin-right: 0;
+	background: #e9e9e9;
+}
+.ins-items {
+	width:70%;
+}
+.ins-step-tips {
+	width:20%;
+}
+.ins-items, .ins-step-tips {
+	/* 样式定义在其他地方 */
+}
+.step-item {
+	padding: 8px;
+	border: 2px solid #efefef;
+}
+.ins-step-tips {
+	background:#e9e9e9;
+	position:relative;
+}
+.ins-step-tips ul, .ins-step-tips li {
+	list-style-type:none;
+	margin:0;
+}
+.ins-step-tips ul {
+	margin-top:30px;
+}
+.ins-step-tips sup {
+	font-size: 14px;
+	font-weight: bold;
+}
+.step-item {
+	zoom:1;
+	cursor:pointer;
+}
+.step-item sub {
+	font-size: 12px;
+	color:#ff3300;
+	visibility: hidden;
+}
+.step-item-cur {
+	border-color:#fff;
+	background:#fff;
+}
+.step-item-cur sub {
+	visibility: visible;
+}
+.ins-step-tip-ready sub {
+	color:green;
+}
+.ins-items .ins-item {
+	display:none;
+	padding-bottom:10px;
+}
+.ins-items h3 {
+	/* 样式定义在其他地方 */
+}
+.ins-items .span-auto {
+	margin: 0;
+	width: 50%;
+}
+.ins-items .item {
+	margin: 10px 0 0 10px;
+}
+.ins-items label {
+	display: block;
+	text-align: right;
+	line-height: 30px;
+}
+.package {
+	padding:20px 5px 5px 20px;
+	margin:0;
+	background:none;
+	border-bottom:1px solid #BDCAE6;
+	display:flex;
+	align-items:flex-start;
+	gap:20px;
+}
+.package .name {
+	flex:0 0 200px;
+	min-width:200px;
+	text-align:right;
+}
+.package .name strong {
+	text-align:right;
+}
+.package .version {
+	flex:0 0 100px;
+	min-width:100px;
+	text-align:left;
+	display:block !important;
+	visibility:visible !important;
+	opacity:1 !important;
+	width:100px;
+	height:auto;
+}
+.package .version sup {
+	color:#ff6600 !important;
+	font-size:14px !important;
+	font-weight:500 !important;
+	vertical-align:baseline;
+	display:inline !important;
+	line-height:1.5 !important;
+	position:relative;
+}
+.package .desc {
+	flex:1;
+	min-width:0;
+	text-align:left;
+}
+.loading {
+	background:#E2F3FC url(loading.gif) no-repeat 656px center !important;
+}
+.complete {
+	color: #264409;
+	background: #ffffff;
+}
+.error2 {
+	background-color: #FBE3E4;
+	color: #8a1f11;
+}
+.console {
+	border:1px #e9e9e9 solid;
+	display:none;
+}
+.console input {
+	width:100%;
+	padding:3px 0 3px 0;
+	border:none;
+	border-top:1px #fff solid;
+	background:#333;
+	color:#fff;
+}
+.console-panel {
+	height:250px;
+	background:#333;
+	color:#fff;
+	font-family:Verdana;
+	margin:0;
+	line-height:22px;
+}
+.license {
+	font-size:14px;
+	height:350px;
+	width:100%;
+	margin:0 auto;
+	border:1px solid #e0e0e0;
+	border-radius:8px;
+	padding:20px;
+	background:#ffffff;
+	color:#333;
+	line-height:1.8;
+	font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	resize:vertical;
+	box-shadow:0 1px 3px rgba(0, 0, 0, 0.05);
+	transition:all 0.3s ease;
+	display:block;
+	box-sizing:border-box;
+}
+.license:focus {
+	border-color:#157FE3;
+	outline:none;
+	box-shadow:0 0 0 3px rgba(21, 127, 227, 0.1), 0 2px 8px rgba(0, 0, 0, 0.08);
+	background:#fff;
+}
+#console_info_handle a {
+	text-decoration: none;
+	cursor: pointer;
+}
+#console_info_handle a span {
+	display:block;
+	visibility:hidden;
+	color:#fff;
+	font-size:10px;
+}
+#console_info_handle a:hover span {
+	visibility:visible;
+}
+/*---------setup--------*/
+* {
+	margin:0 auto;
+	padding:0;
+}
+ul, p, dd, dl, dt, h1, img, li {
+	margin:0;
+	padding:0;
+	border:0;
+}
+h4 {
+	margin:0 0 10px 0;
+	padding:8px 0 4px 0;
+	border-bottom:1px dashed #D8D8D8;
+	color:#333;
+	text-align:left;
+}
+.span-2 {
+	text-align:right;
+	padding-right:2px;
+	padding-left:60px;
+}
+li {
+	list-style:none;
+	text-align:left;
+}
+.container {
+	margin:0 auto;
+	display:flex;
+	flex-direction:column;
+	min-height:100vh;
+	width:100%;
+	padding:15px 20px;
+	box-sizing:border-box;
+}
+.container-all {
+	width:100%;
+	max-width:960px;
+	margin:0 auto;
+	flex:1;
+	display:flex;
+	flex-direction:column;
+}
+.logo {
+	height:auto;
+	padding:20px 0 12px 0;
+	width:100%;
+	margin:0 auto;
+	text-align:center;
+	flex-shrink:0;
+}
+.installer-main {
+	width:100%;
+	max-width:960px;
+	border:none;
+	border-radius:12px;
+	padding:0;
+	margin:0 auto;
+	background:#ffffff;
+	box-shadow:0 4px 20px rgba(0, 0, 0, 0.1);
+	overflow:hidden;
+}
+.installer-steps {
+	width:100%;
+	height:auto;
+	padding:30px 40px;
+	background:linear-gradient(135deg, #157FE3 0%, #0d6bb8 100%);
+	box-shadow:0 2px 8px rgba(21, 127, 227, 0.2);
+}
+.installer-steps-main {
+	width:100%;
+	height:auto;
+	border-bottom:none;
+	padding:0;
+}
+.installer-steps-main ul {
+	width:100%;
+	height:auto;
+	border:none;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	gap:0;
+	list-style:none;
+	margin:0;
+	padding:0;
+	position:relative;
+}
+.installer-steps-main li {
+	float:none;
+	display:flex;
+	align-items:center;
+	gap:12px;
+	color:rgba(255, 255, 255, 0.9);
+	font-size:16px;
+	font-weight:500;
+	position:relative;
+	flex:1 1 auto;
+	justify-content:center;
+	max-width:none;
+	min-width:0;
+	overflow:visible;
+}
+.installer-steps-main li::after {
+	content:'';
+	position:absolute;
+	left:calc(50% + 18px);
+	top:18px;
+	right:calc(-50% + 18px);
+	height:2px;
+	background:rgba(255, 255, 255, 0.25);
+	z-index:0;
+	transform:translateY(-50%);
+	pointer-events:none;
+}
+.installer-steps-main li:last-child::after {
+	display:none;
+}
+.step-installing1 {
+	width:auto;
+	height:auto;
+	padding:0;
+	background:none;
+}
+.step-installing1 em {
+	width:36px;
+	height:36px;
+	min-width:36px;
+	min-height:36px;
+	text-align:center;
+	line-height:36px;
+	color:#157FE3;
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	font-weight:600;
+	font-size:18px;
+	background:#fff;
+	border:2px solid #157FE3;
+	border-radius:50%;
+	flex-shrink:0;
+	position:relative;
+	z-index:1;
+	box-shadow:0 0 0 4px rgba(255, 255, 255, 0.3);
+	box-sizing:border-box;
+}
+.step-installing1 span {
+	color:#fff;
+	font-size:16px;
+	font-weight:600;
+	padding-left:0;
+	text-shadow:0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.step-installing1::after {
+	background:#fff;
+}
+.step-installed1 {
+	width:auto;
+	height:auto;
+	padding:0;
+	background:none;
+}
+.step-installed2 {
+	width:auto;
+	height:auto;
+	padding:0;
+	background:none;
+}
+.step-installed {
+	background:none;
+}
+.step-installed1 em {
+	color:#fff;
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	font-weight:600;
+	font-size:18px;
+	background:#52c41a;
+	border-radius:50%;
+	width:36px;
+	height:36px;
+	min-width:36px;
+	min-height:36px;
+	line-height:36px;
+	position:relative;
+	z-index:1;
+	flex-shrink:0;
+	box-sizing:border-box;
+}
+.step-installed1 span {
+	color:#52c41a;
+	font-size:16px;
+	font-weight:600;
+	padding-left:0;
+}
+.step-installed1::after {
+	background:#52c41a;
+}
+.installer-step2 {
+	width:auto;
+	height:auto;
+	padding:0;
+	background:none;
+	color:rgba(255, 255, 255, 0.6);
+	font-weight:500;
+	font-size:16px;
+}
+.installer-step2 em {
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	font-size:18px;
+	padding-right:0;
+	width:36px;
+	height:36px;
+	line-height:36px;
+	background:rgba(255, 255, 255, 0.15);
+	border-radius:50%;
+	margin-right:12px;
+	position:relative;
+	z-index:1;
+}
+.installer-step2::after {
+	background:rgba(255, 255, 255, 0.15);
+}
+.step-installed2 {
+	width:auto;
+	height:auto;
+	padding:0;
+	background:none;
+	color:rgba(255, 255, 255, 0.8);
+	font-weight:500;
+	font-size:16px;
+}
+.step-installed2 em {
+	color:#fff;
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	font-size:18px;
+	padding-right:0;
+	width:36px;
+	height:36px;
+	line-height:36px;
+	background:#52c41a;
+	border-radius:50%;
+	margin-right:12px;
+	position:relative;
+	z-index:1;
+	flex-shrink:0;
+	box-sizing:border-box;
+}
+.step-installed2 span {
+	color:#52c41a;
+	font-weight:600;
+}
+.step-installed2::after {
+	background:#52c41a;
+}
+.step-installing2 {
+	width:auto;
+	height:auto;
+	padding:0;
+	background:none;
+}
+.step-installing2 em {
+	width:36px;
+	height:36px;
+	text-align:center;
+	line-height:36px;
+	color:#157FE3;
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	font-weight:600;
+	font-size:18px;
+	background:#fff;
+	border:2px solid #157FE3;
+	border-radius:50%;
+	flex-shrink:0;
+	position:relative;
+	z-index:1;
+	box-shadow:0 0 0 4px rgba(255, 255, 255, 0.3);
+}
+.step-installing2 span {
+	color:#fff;
+	font-size:16px;
+	font-weight:600;
+	padding-left:0;
+	text-shadow:0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.step-installing2::after {
+	background:#fff;
+}
+.installer-step3 {
+	width:auto;
+	height:auto;
+	padding:0;
+	color:rgba(255, 255, 255, 0.6);
+	font-weight:500;
+	font-size:16px;
+}
+.installer-step3 em {
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	font-size:18px;
+	padding-right:0;
+	width:36px;
+	height:36px;
+	line-height:36px;
+	background:rgba(255, 255, 255, 0.15);
+	border-radius:50%;
+	margin-right:12px;
+	position:relative;
+	z-index:1;
+}
+.installer-step3::after {
+	background:rgba(255, 255, 255, 0.15);
+}
+.step-installing3 {
+	width:auto;
+	height:auto;
+	padding:0;
+}
+.step-installing3 em {
+	width:36px;
+	height:36px;
+	text-align:center;
+	line-height:36px;
+	color:#157FE3;
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	font-weight:600;
+	font-size:18px;
+	background:#fff;
+	border:2px solid #157FE3;
+	border-radius:50%;
+	flex-shrink:0;
+	position:relative;
+	z-index:1;
+	box-shadow:0 0 0 4px rgba(255, 255, 255, 0.3);
+}
+.step-installing3 span {
+	color:#fff;
+	font-size:16px;
+	font-weight:600;
+	padding-left:0;
+	text-shadow:0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.step-installing3::after {
+	background:#fff;
+}
+.step-installed3 {
+	width:auto;
+	height:auto;
+	padding:0;
+	background:none;
+}
+.step-installed3 em {
+	width:36px;
+	height:36px;
+	min-width:36px;
+	min-height:36px;
+	text-align:center;
+	line-height:36px;
+	color:#fff;
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	font-weight:600;
+	font-size:18px;
+	background:#52c41a;
+	border-radius:50%;
+	flex-shrink:0;
+	position:relative;
+	z-index:1;
+	box-sizing:border-box;
+}
+.step-installed3 span {
+	color:#52c41a;
+	font-size:16px;
+	font-weight:600;
+	padding-left:0;
+}
+.step-installed3::after {
+	background:#52c41a;
+}
+.installer-info {
+	width:100%;
+	padding:12px 18px 18px 18px;
+	background:#ffffff;
+	background-image:none;
+}
+.right-mainx {
+	height:auto;
+	padding:0;
+	background:#fff;
+	display:flex;
+	flex-direction:column;
+}
+.right-main-info {
+	padding:20px 24px;
+	background:#ffffff;
+	flex:1;
+}
+.info-license {
+	margin-bottom:0;
+}
+.info-license .license {
+	margin-bottom:0;
+}
+.right-main-btn {
+	padding:16px 20px;
+	height:auto;
+	border-top:1px solid #e8e8e8;
+	background:#ffffff;
+	display:flex;
+	justify-content:space-between;
+	align-items:center;
+	gap:12px;
+}
+.login-footer {
+	position:relative;
+	text-align:center;
+	padding:30px 0;
+	background:transparent;
+	margin-top:40px;
+}
+.login-footer-text {
+	color:#999;
+	font-size:12px;
+	font-family:Arial, Helvetica, sans-serif;
+	display:inline-flex;
+	align-items:center;
+	gap:8px;
+}
+.login-footer-text img {
+	height:16px;
+	vertical-align:middle;
+}
+.login-footer-text a {
+	color:#999;
+	text-decoration:none;
+}
+.login-footer-text a:hover {
+	opacity:0.8;
+}
+.taskstepbutton {
+	cursor: pointer;
+	width:180px;
+	height:42px;
+	font-size:14px;
+	padding:0;
+	margin:0;
+	border:none;
+	text-indent:0;
+	background:linear-gradient(135deg, #157FE3 0%, #0d6bb8 100%);
+	color:#fff;
+	border-radius:6px;
+	font-weight:500;
+	transition:all 0.3s ease;
+	box-shadow:0 2px 8px rgba(21, 127, 227, 0.3);
+}
+.taskstepbutton:hover {
+	transform:translateY(-1px);
+	box-shadow:0 4px 12px rgba(21, 127, 227, 0.4);
+	background:linear-gradient(135deg, #1a8ff0 0%, #0f7ac9 100%);
+}
+.taskstepbutton_out {
+	background:linear-gradient(135deg, #157FE3 0%, #0d6bb8 100%);
+}
+.taskstepbutton_move {
+	background:linear-gradient(135deg, #157FE3 0%, #0d6bb8 100%);
+}
+.step-back {
+	display:inline-block;
+	padding:10px 20px;
+	color:#666;
+	font-size:14px;
+	text-decoration:none;
+	border:1px solid #d9d9d9;
+	border-radius:4px;
+	background:#ffffff;
+	transition:all 0.3s ease;
+	cursor:pointer;
+	vertical-align:middle;
+}
+.step-back:hover {
+	color:#157FE3;
+	border-color:#157FE3;
+	background:#f0f7ff;
+	text-decoration:none;
+}
+.step-back:active {
+	background:#e6f2ff;
+}
+.taskstepbutton-start {
+	float:none;
+	cursor: pointer;
+	width:180px;
+	height:42px;
+	font-size:14px;
+	padding:0;
+	margin:0;
+	border:none;
+	text-indent:0;
+	background:linear-gradient(135deg, #157FE3 0%, #0d6bb8 100%);
+	color:#fff;
+	border-radius:6px;
+	font-weight:500;
+	transition:all 0.3s ease;
+	box-shadow:0 2px 8px rgba(21, 127, 227, 0.3);
+	display:inline-block;
+}
+.taskstepbutton-start:hover {
+	transform:translateY(-1px);
+	box-shadow:0 4px 12px rgba(21, 127, 227, 0.4);
+	background:linear-gradient(135deg, #1a8ff0 0%, #0f7ac9 100%);
+}
+.taskstepbutton-startin {
+	position:absolute;
+	right:600px;
+}
+.taskstepbutton-detection {
+	width:180px;
+	height:38px;
+	background:linear-gradient(135deg, #157FE3 0%, #0d6bb8 100%);
+	color:#fff;
+	border-radius:6px;
+	font-weight:500;
+	margin:0 auto;
+	display:block;
+	text-indent:0;
+	transition:all 0.3s ease;
+	box-shadow:0 2px 8px rgba(21, 127, 227, 0.3);
+	font-size:14px;
+}
+.taskstepbutton-detection:hover {
+	transform:translateY(-1px);
+	box-shadow:0 4px 12px rgba(21, 127, 227, 0.4);
+	background:linear-gradient(135deg, #1a8ff0 0%, #0f7ac9 100%);
+}
+.info-license tr {
+	height:auto;
+	border-bottom:1px solid #f0f0f0;
+}
+.info-license tr:last-child {
+	border-bottom:none;
+}
+.info-license th {
+	text-align:right;
+	width:150px;
+	padding:16px 20px 16px 0;
+	color:#666;
+	font-weight:500;
+	font-size:14px;
+	vertical-align:top;
+}
+.info-license td {
+	text-align:left;
+	padding:16px 0;
+	color:#333;
+	font-size:14px;
+}
+.info-license input[type="text"],
+.info-license input[type="password"],
+.info-license select {
+	border:1px solid #d9d9d9;
+	border-radius:4px;
+	padding:8px 12px;
+	font-size:14px;
+	transition:all 0.3s ease;
+	width:400px;
+	max-width:400px;
+	box-sizing:border-box;
+}
+.info-license textarea {
+	border:1px solid #d9d9d9;
+	border-radius:4px;
+	padding:8px 12px;
+	font-size:14px;
+	transition:all 0.3s ease;
+	width:100%;
+	min-width:400px;
+	box-sizing:border-box;
+	resize:vertical;
+}
+.info-license input[type="text"]:focus,
+.info-license input[type="password"]:focus,
+.info-license select:focus {
+	border-color:#157FE3;
+	outline:none;
+	box-shadow:0 0 0 2px rgba(21, 127, 227, 0.1);
+}
+.info-license textarea:focus {
+	border-color:#157FE3;
+	outline:none;
+	box-shadow:0 0 0 2px rgba(21, 127, 227, 0.1);
+} 
+.notice-inline { background-color:#fff; border:none; color:#FF0000;}
+.console_handle { text-align:right; padding:60px 4px 4px 0;height:18px;}
+/*.right,.right-main{   
+    -webkit-border-radius-topright: 5px; 
+    -webkit-border-radius-bottomright: 5px;   
+    -moz-border-radius-topright: 5px; 
+    -moz-border-radius-bottomright: 5px;
+}*/
+
+/*----开始安装----*/
+.installer-proimg{ 
+	width:180px; 
+	height:180px; 
+	float:none; 
+	background:none; 
+	padding:0;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+}
+.installer-proimg img,
+.installer-proimg {
+	background-size:contain;
+	background-position:center center;
+	background-repeat:no-repeat;
+}
+.installer-proinfo{ 
+	width:auto; 
+	height:auto; 
+	float:none; 
+	background:none; 
+	padding-left:0; 
+	text-align:left;
+	flex:1;
+}
+.installer-proinfow{ width:330px; padding-left:40px;}
+.installer-proinfo-title { 
+	width:100%; 
+	font-size:28px; 
+	color:#1a1a1a; 
+	font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+	line-height:1.4;
+	font-weight:700;
+	margin-bottom:20px;
+}
+.installer-proinfo-title p{ 
+	font-size:15px; 
+	line-height:1.75;
+	color:#666;
+	margin-bottom:14px;
+}
+.installer-success-title { width:100%; font-size:32px; color:#333; font-family: "微软雅黑",Arial, Helvetica, sans-serif; line-height:140%; text-align:center; padding-top:30px;}
+.installer-success-title p{ font-size:14px; line-height:240%; text-align:left}
+.installer-success-txt {font-family: "微软雅黑",Arial, Helvetica, sans-serif; font-size:22px; padding-bottom:20px;}
+
+.loadpart{width:95%;border:1px solid #BECAE6;height:17px; background:url(loadpart.gif) repeat-x left center; position:relative;margin:20px 0 20px 10px; padding:0 1px 0 1px;}
+.loader{height:100%; float:left; width:0px; text-align:center; background:url(loader.gif) repeat-x left center;}
+.btnbox{
+	height:24px;
+	line-height:24px;
+	padding:0 20px 60px 0;
+	display:flex;
+	justify-content:space-between;
+	align-items:center;
+}
+.appNum{color:#669900;line-height:28px; font-size:28px; position:absolute; left:50%; top:-50px; font-family:Georgia, "Times New Roman", Times, serif; font-weight:normal;}
+.right-main .hide{display:none;}
+
+/*----重新检测----*/
+.installer-detection {
+	width:100%;
+	padding:0;
+	background:transparent;
+	margin-bottom:30px;
+}
+.installer-detection:last-child {
+	margin-bottom:0;
+}
+.installer-detection-title {
+	width:100%;
+	height:auto;
+	margin-bottom:20px;
+}
+.installer-detection-title h4{
+	color:#1a1a1a;
+	border-bottom:2px solid #157FE3;
+	padding:0 0 12px 0;
+	margin:0 0 20px 0;
+	font-size:18px;
+	font-weight:600;
+}
+.installer-detection .tableform {
+	width:100%;
+	border-collapse:separate;
+	border-spacing:0;
+}
+.installer-detection .tableform tr {
+	border-bottom:1px solid #f0f0f0;
+	transition:background-color 0.2s ease;
+}
+.installer-detection .tableform tr:hover {
+	background-color:#fafafa;
+}
+.installer-detection .tableform tr:last-child {
+	border-bottom:none;
+}
+.installer-detection th{
+	text-align:left;
+	padding:10px 12px;
+	line-height:1.5;
+	color:#666;
+	font-weight:500;
+	font-size:14px;
+	width:180px;
+	vertical-align:middle;
+	background-color:#fafafa;
+}
+.installer-detection td{
+	text-align:left;
+	padding:10px 12px;
+	line-height:1.5;
+	color:#333;
+	font-size:14px;
+	vertical-align:middle;
+}
+.installer-detection-success{
+	color:#52c41a;
+	background:none;
+	padding:0;
+	display:inline-flex;
+	align-items:center;
+	gap:8px;
+	font-weight:500;
+}
+.installer-detection-success::before {
+	content:"✓";
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	width:20px;
+	height:20px;
+	background:#52c41a;
+	color:#fff;
+	border-radius:50%;
+	font-size:12px;
+	font-weight:bold;
+	flex-shrink:0;
+}
+.installer-detection-failure{
+	background:none;
+	color:#ff4d4f;
+	padding:0;
+	display:inline-flex;
+	align-items:center;
+	gap:8px;
+	font-weight:500;
+}
+.installer-detection-failure::before {
+	content:"✗";
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	width:20px;
+	height:20px;
+	background:#ff4d4f;
+	color:#fff;
+	border-radius:50%;
+	font-size:12px;
+	font-weight:bold;
+	flex-shrink:0;
+}
+.installer-detection .tableform input[type="text"],
+.installer-detection .tableform input[type="password"],
+.installer-detection .tableform input[type="number"],
+.installer-detection .tableform textarea,
+.installer-detection .tableform select {
+	width:100%;
+	max-width:400px;
+	padding:8px 12px;
+	border:1px solid #d9d9d9;
+	border-radius:4px;
+	font-size:14px;
+	color:#333;
+	background-color:#fff;
+	transition:all 0.3s ease;
+	box-sizing:border-box;
+}
+.installer-detection .tableform input[type="text"]:focus,
+.installer-detection .tableform input[type="password"]:focus,
+.installer-detection .tableform input[type="number"]:focus,
+.installer-detection .tableform textarea:focus,
+.installer-detection .tableform select:focus {
+	border-color:#157FE3;
+	outline:none;
+	box-shadow:0 0 0 2px rgba(21, 127, 227, 0.1);
+}
+.installer-detection .tableform input[type="text"]:hover,
+.installer-detection .tableform input[type="password"]:hover,
+.installer-detection .tableform input[type="number"]:hover,
+.installer-detection .tableform textarea:hover,
+.installer-detection .tableform select:hover {
+	border-color:#40a9ff;
+}
+
+/* 开始页面特殊样式 */
+.installer-info-start {
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	padding:40px 40px;
+	gap:40px;
+	min-height:auto;
+}
+
+.installer-info-start .installer-proimg {
+	width:200px;
+	height:200px;
+	min-width:200px;
+	max-width:200px;
+	float:none;
+	padding:0;
+	background-size:contain;
+	background-position:center center;
+	background-repeat:no-repeat;
+	flex-shrink:0;
+}
+
+.installer-info-start .installer-proinfo {
+	width:auto;
+	height:auto;
+	float:none;
+	padding-left:0;
+	flex:1;
+	max-width:550px;
+	min-width:300px;
+}
+
+.installer-info-start .installer-proinfo-title {
+	font-size:32px;
+	margin-bottom:20px;
+}
+
+.installer-info-start .installer-proinfo-title p {
+	font-size:16px;
+	line-height:1.8;
+	margin-bottom:16px;
+}
+
+.install_title{
+	font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	font-size:20px;
+	font-weight:600;
+	color:rgba(255, 255, 255, 0.95);
+	text-shadow:0 2px 4px rgba(0, 0, 0, 0.3);
+}

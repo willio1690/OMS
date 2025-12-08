@@ -1,0 +1,20 @@
+<services>
+    <service id="desktop_finder.brush_mdl_orders">
+        <class>brush_finder_orders</class>
+    </service>
+    <service id="desktop_finder.brush_mdl_farm">
+        <class>brush_finder_farm</class>
+    </service>
+    <service id="desktop_finder.brush_mdl_delivery">
+        <class>brush_finder_delivery</class>
+    </service>
+    <service id="brush.order">
+        <class>brush_order</class>
+    </service>
+    <service id="operation_log">
+        <class>brush_operation_log</class>
+    </service>
+    <service id="data_clear">
+        <class>brush_data_clear</class>
+    </service>
+</services>

@@ -1,0 +1,114 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout" style="padding-bottom: 0px;">
+    <form method="post" id="order_form" action="index.php?app=monitor&ctl=admin_alarm_group&act=save" name="order_form">
+        <div class="form-layout-block">
+            <h3>基本信息</h3>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>邮件组名称：</span>
+                    <input class="form-input" placeholder="请输入模板名称" type="text" name="group_name" size="60" value="<{$data.group_name}>" vtype="required" />
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field" style="width: 100%">
+                    <span class="form-field-label">选择触发事件：</span>
+                    <div class="form-checkbox">
+                        <{foreach from=$eventType key=type item=name}>
+                            <label><input  name="event_type[]" <{if is_array($data.event_type) && in_array($type,$data.event_type)}>checked="checked"<{/if}> type="checkbox" value="<{$type}>"><{$name}></label>
+                        <{/foreach}>
+                    </div>
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field" style="width:25%" >
+                    <span class="form-field-label">接收用户：</span>
+                    <select data-search="fuzzy_search" name='receiver_id[]' multiple >
+                        <option value=''>请选择</option>
+                        <{foreach from=$receiver_list item=item key=key}>
+                        <option value="<{$item.id}>" <{if is_array($data.receiver_id) && in_array($item.id,$data.receiver_id)}>selected="selected"<{/if}>  ><{$item.receiver}></option>
+                        <{/foreach}>
+                    </select>
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field" style="width:25%" >
+                    <span class="form-field-label">运营组织：</span>
+                    <select data-search="fuzzy_search" name='org_id[]' multiple >
+                        <option value=''>请选择</option>
+                        <{foreach from=$org_list item=item key=key}>
+                        <option value="<{$item.org_id}>" <{if is_array($data.org_id) && in_array($item.org_id,$data.org_id)}>selected="selected"<{/if}>  ><{$item.name}></option>
+                        <{/foreach}>
+                    </select>
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">启用状态：</span>
+                    <div class="form-radios">
+                        <label><input name="disabled" type="radio" <{if $data.disabled=='false'}>checked<{/if}> value="false">启用</label>
+                        <label><input name="disabled" type="radio" <{if $data.disabled=='true'}>checked<{elseif !$data}>checked<{/if}> value="true">禁用</label>
+                    </div>
+                </div>
+            </div>
+            <div id="cc" class="form-layout-fields" >
+                <input type="hidden" name="group_id" value="<{$data.group_id}>">
+                <button class="btn-primary" id="material-save-btn">保存</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    (function () {
+        if ($('cpAdd')) {
+            $('cpAdd').addEvent('click', function (e) {
+                var sHtml = '<div class="form-field">\n' +
+                    '                    <span class="form-field-label">接收信息地址：</span>\n' +
+                    '                    <input class="form-input" placeholder="请输入接收信息地址" type="text" name="receiver[]" size="60" value="<{$data.template_name}>"  />\n' +
+                    '                </div>';
+                document.getElementById("receiver").insertAdjacentHTML('beforeend', sHtml);
+            });
+        }
+    })();
+
+    (function(){
+        var _form = $('order_form');
+        var btn = $('material-save-btn');
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+
+        _form.store('target',{
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+                    if(_dialogIns){
+                        _dialogIns.close();
+                        finder.refresh();
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+            var flag = submit_frm();
+            if(flag){
+                _form.fireEvent('submit',{stop:$empty});
+            }
+        });
+
+    })();
+
+    tail.select('select[data-search="fuzzy_search"]', {
+        search: true,
+        multiple: true,
+        height: 200,
+        hideDisabled: true,
+        multiContainer: true,
+        hideSelected: true,
+    });
+</script>

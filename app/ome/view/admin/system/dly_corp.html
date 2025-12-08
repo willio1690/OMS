@@ -1,0 +1,755 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform" id="dltype-info-<{$dt_id}>">
+    <h4 class="head-title">添加/编辑物流公司</h4>
+
+    <form action="index.php?app=ome&ctl=admin_dly_corp&act=saveDlType"  method="post" class="tableform" id="form-dly_corp">
+        <div class="division">
+            <input type="hidden" name="branch_mode" value="<{$branch_mode}>">
+            <{if $dt_info.corp_id}>
+            <input type="hidden" name="corp_id" value="<{$dt_info.corp_id}>">
+            <{/if}>
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <{if $logisticsmanager=='true'}>
+                <tr>
+                    <th><{t}>面单类型：<{/t}></th>
+                    <td>
+                        <input type="radio" name="tmpl_type" onchange="tmplTypeChange()" value="normal" <{if $dt_info.tmpl_type!='electron'}>checked<{/if}>>普通面单
+                        <input type="radio" name="tmpl_type" onchange="tmplTypeChange()" value="electron" <{if $dt_info.tmpl_type=='electron'}>checked<{/if}>>电子面单
+                    </td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr id="normalChannel">
+                    <th><{t}>单号来源：<{/t}></th>
+                    <td>线下获取</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr id="electronChannel">
+                    <th><{t}>单号来源：<{/t}></th>
+                    <td>
+                        <{input type="select" name='electron_channel_id' id='electron_channel_id' rows=$electronchannel valueColumn="channel_id" labelColumn="name" value=$dt_info.channel_id vtype="required" style="width:100px;"}>
+                    </td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <th><{t}>适用店铺：<{/t}></th>
+                    <td id="normalShop">全部</td>
+                    <td id="electronShop"><{$dt_info.shop_name}></td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+                <{/if}>
+                
+                <tr>
+                  <th>快递模式：</th>
+                  <td>
+                        <input type="radio" name="corp_model" value="normal" <{if $dt_info.corp_model != 'instatnt' && $dt_info.corp_model != 'seller'}>checked<{/if}> >普通快递&nbsp;&nbsp;
+                        <input type="radio" name="corp_model" value="instatnt" <{if $dt_info.corp_model == 'instatnt'}>checked<{/if}> >同城配送&nbsp;&nbsp;
+                        <input type="radio" name="corp_model" value="seller" <{if $dt_info.corp_model == 'seller'}>checked<{/if}> >商家配送&nbsp;&nbsp;
+                  </td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <th><{t}>物流公司：<{/t}></th>
+                    <{if $dt_info.d_type == '2'}>
+                    <td><{$dt_info.name}></td>
+                    <{else}>
+                    <td><div style="position:relative;"><input type="text" id="dly_name" name="name" value="<{$dt_info.name}>" vtype="required" > <{img id="btn-search" class="btn-zoom pointer" app="desktop" src="bundle/zoom_btn.gif"}><em><font color='red'>*</font></em></div></td>
+                    <{/if}>
+                    <th>&nbsp;</th>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <th><{t}>物流编号：<{/t}></th>
+                    <{if $dt_info.d_type == '2'}>
+                    <td><{$dt_info.type}><input type="hidden" id="dly_type"><!-- 避免js报错 --></td>
+                    <{else}>
+                    <td><input type="text" name="type" id="dly_type" value="<{$dt_info.type}>" vtype='required' <{if $dt_info.dlytype_readonly}>readonly='true'<{/if}> ><em><font color='red'>*</font></em></td>
+                    <{/if}>
+                    <th>&nbsp;</th>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <th><{t}>网址：<{/t}></th>
+                    <td><input name="website" type="text" id="dly_website" value="<{$dt_info.website}>"></td>
+                    <th></th>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th><{t}>询件网址：<{/t}></th>
+                    <td><input name="request_url" type="text" id="dly_request_url" value="<{$dt_info.request_url}>"></td>
+                    <th></th>
+                    <td>    </td>
+                </tr>
+                <!--  <tr>-->
+                <!--    <th><{t}>类型：<{/t}></th>-->
+                <!--    <td><label><input type="radio" name="is_cod" value="false" <{if $dt_info.is_cod=='false' || $dt_info.is_cod==''}>checked<{/if}>>先收款后发货</label> &nbsp; <label><input type="radio" name="is_cod" value="true" <{if $dt_info.is_cod=='true'}>checked<{/if}>>货到付款</label><span class="notice-inline"><{t}>选择货到付款后顾客无需再选择支付方式<{/t}></span></td>-->
+                <!--  </tr>-->
+                <!--<tr>
+                    <th><{t}>重量设置(单位g)：<{/t}></th>
+                    <td><{t}>首重重量&nbsp;<{/t}><input style="width:30px;" vtype="required&&unsignedint" type="text" name="firstunit" value="<{if $dt_info.firstunit}><{$dt_info.firstunit}><{else}><{/if}>" ><{t}>g&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;续重重量&nbsp;<{/t}><input style="width:30px;" vtype="required&&unsignedint" type="text" name="continueunit" value="<{if $dt_info.continueunit}><{$dt_info.continueunit}><{else}><{/if}>">g</td>
+                    <th>&nbsp;</th><td>&nbsp;</td>
+                </tr>-->
+                <tr>
+                    <th>&nbsp;</th>
+                    <td><input type="checkbox" name="protect" value="true" <{if $dt_info.protect=='true'}>checked<{/if}>>支持物流保价
+                        <script>
+                            $E('#dltype-info-<{$dt_id}> input[name=protect]').addEvent('click',function(){
+                                if(this.checked){
+                                    $('protect_rate').show().getFormElements().set('disabled',false);
+                                }else{
+                                    $('protect_rate').hide().getFormElements().set('disabled',true);
+                                }
+                            });
+                            $E('#dltype-info-<{$dt_id}> input[name=protect]')
+                            .fireEvent('click',$E('#dltype-info-<{$dt_id}> input[name=protect]'));
+
+                        </script>    </td>
+                    <th>&nbsp;</th><td>&nbsp;</td>
+                </tr>
+                <tr id="protect_rate">
+                    <th><{t}>保价设置：<{/t}></th>
+                    <td>
+                        费率&nbsp;<input type="text" name="protect_rate" value="<{$dt_info.protect_rate}>" style="width:25px;" class='_x_ipt' vtype='number' caution="该项必填且只允许填写数字金额"><{t}>%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;最低保价费&nbsp;<{/t}><input type="text" name="minprice" value="<{$dt_info.minprice}>" style="width:25px;" class='_x_ipt' vtype='required&&number' caution="该项必填且只允许填写数字金额">    </td>
+                    <th>&nbsp;</th><td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <th><{t}>地区费用类型：<{/t}></th>
+                    <td>
+                        <div id='deliveryAreaToggle'>
+                            <label><input type="radio" name="setting" value='1' <{if $dt_info.setting=="1"||$dt_info.setting==""}>checked<{/if}>><{t}>统一设置<{/t}></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="setting" value='0' <{if $dt_info.setting=="0"}>checked<{/if}>><{t}>指定地区费用<{/t}></label>
+                        </div>
+                        <script>
+
+                            function deliveryAreaToggle(radio){
+                                var tradio=radio;
+                                var tradioValue=tradio.get('value');
+                                var tmap={
+                                    '1':$('def_dexp'),
+                                    '0':$('deliveryAreabox')
+                                };
+                                if(tradio.checked){
+                                    tmap[tradioValue].show();
+                                    tmap[tradioValue].getFormElements().set('disabled',false);
+                                }else{
+                                    tmap[tradioValue].hide();
+
+                                    tmap[tradioValue].getFormElements().set('disabled',true);
+                                }
+                            }
+
+                        </script>    </td>
+                    <th>&nbsp;</th><td>&nbsp;</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="division" id='def_dexp'>
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th><{t}>重量设置(单位g)：<{/t}></th>
+                    <td>
+                        <{t}>首重重量&nbsp;<{/t}><input style="width:30px;" vtype="required&&unsignedint" type="text" name="firstunit" value="<{if $dt_info.firstunit}><{$dt_info.firstunit}><{else}><{/if}>" ><{t}>&nbsp;g&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;续重重量&nbsp;<{/t}><input style="width:30px;" vtype="required&&unsignedint" type="text" name="continueunit" value="<{if $dt_info.continueunit}><{$dt_info.continueunit}><{else}><{/if}>">&nbsp;g
+                    </td>
+                </tr>
+                <tr>
+                    <th><{t}>配送费用：<{/t}></th>
+                    <td>
+                        <div style="line-height:30px;" class='deliveryexpbox'>
+                            <div class='deliveryexp' style="<{if $dt_info.dt_useexp==1}>display:none<{/if}>">
+                                首重费用 <input style="width:30px;" type='text' name='firstprice' value="<{$dt_info.firstprice}>" class="_x_ipt" vtype="required&&number" caution="该项必填且只允许填写数字金额"/>&nbsp;元&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                续重费用 <input style="width:30px;" type='text' name='continueprice' value="<{$dt_info.continueprice}>" class="_x_ipt" vtype="required&&number" caution="该项必填且只允许填写数字金额"/>
+                                &nbsp;元&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='lnk chgexp' onclick='chaexps(this)'><{t}>使用公式<{/t}></span>
+
+                            </div>
+                            <div class='deliveryexp' style='<{if $dt_info.dt_useexp==0}>display:none<{/if}>'>
+                                配送公式 <input style="width:300px;" type='text' name='dt_expressions' value="<{if $dt_info.dt_useexp}><{$dt_info.dt_expressions}><{/if}>"  class="_x_ipt" vtype="required&&checkExp1&&checkExp2" /><{button label="验证" class="checkexp" onclick="checkExp(this);"}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='lnk chgexp' onclick='chaexps(this)'><{t}>取消公式<{/t}></span>
+                                <input type="hidden" name="dt_useexp" value="<{$dt_info.dt_useexp}>">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="division" id='deliveryAreabox'>
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th><{t}>费用设置：<{/t}></th>
+                    <td>
+                        <div  id="deliveryArea-<{$dt_info.dt_id}>" class='deliveryArea'>
+                            <ol style='list-style-type:decimal;list-style:decimal'>
+
+                                <input type='hidden' name='delidgroup'/>
+                                <script>
+                                    function deleteDelivery(d){
+                                        if (!confirm('删除后无法恢复，确定要删除吗？')){
+                                            return;
+                                        }
+                                        var areaid_group=d.getElement('input[name^=area_fee_conf[areaGroupId][]]');
+                                        var delidgroupHidden=$E('#deliveryArea-<{$dt_info.dt_id}> input[name=delidgroup]');
+                                        var _id;
+                                        areaid_group.get('name').replace(/\[(\d+)?\]/,function($0,$1){
+                                            _id=$1;
+                                        });
+                                        if(_id){
+                                            delidgroupHidden.value+=(delidgroupHidden.value!=''?",":'')+_id;
+                                        }
+                                        d.remove();
+                                    }
+                                </script>
+
+                                <{if $dt_info.area_fee_conf}>
+
+                                <{foreach from=$dt_info.area_fee_conf item=area key=key}>
+                                <li class='division' style="line-height:30px;">
+                                    <div class='deliverycity'>
+                                        地区 <input style="width:300px;" type='text' name='area_fee_conf[areaGroupName][]' readonly=true required="true" value='<{$area.areaGroupName}>' class="_x_ipt" vtype="required" caution="地区不能为空" onclick="regionSelect(this);">
+                                        <input type='hidden' name='area_fee_conf[areaGroupId][]' value="<{$area.areaGroupId}>"/><{img class='regionSelect' src='images/bundle/editcate.gif' style='cursor:pointer;display:none;' onclick='regionSelect(this)' alt='编辑地区' title="编辑地区"}>
+                                        <a onclick='deleteDelivery($(this).getParent("li"))' >删除</a>
+                                    </div>
+                                    <div class='deliveryexpbox'>
+                                    <div class='deliveryweight'>
+                                    <{t}>首重重量&nbsp;<{/t}><input style="width:30px;" vtype="required&&unsignedint" type="text" name="area_fee_conf[firstunit][]" value="<{if $area.firstunit}><{$area.firstunit}><{else}><{/if}>" ><{t}>&nbsp;g&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;续重重量&nbsp;<{/t}><input style="width:30px;" vtype="required&&unsignedint" type="text" name="area_fee_conf[continueunit][]" value="<{if $area.continueunit}><{$area.continueunit}><{else}><{/if}>">&nbsp;g
+                                    
+                                    </div>
+                                        <div class='deliveryexp' style="<{if $area.dt_useexp==1}>display:none<{/if}>">
+                                            首重费用 <input style="width:30px;" type='text' name='area_fee_conf[firstprice][]' value="<{$area.firstprice}>" <{if $area.dt_useexp=="0"}>class="_x_ipt"<{/if}> vtype="required&&number" caution="该项必填且只允许填写数字金额"/>
+                                                        &nbsp;元&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;续重费用 <input style="width:30px;" type='text' name='area_fee_conf[continueprice][]' value="<{$area.continueprice}>" <{if $area.dt_useexp=="0"}>class="_x_ipt"<{/if}> vtype="required&&number" caution="该项必填且只允许填写数字金额"/>
+
+                                                        &nbsp;元&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='lnk chgexp' onclick='chaexps(this)'><{t}>使用公式<{/t}></span>
+                                        </div>
+                                        <div class='deliveryexp' style='<{if $area.dt_useexp==0}>display:none<{/if}>'>
+                                            公式 <input style="width:300px;" type='text' name='area_fee_conf[dt_expressions][]' value="<{if $area.dt_useexp}><{$area.dt_expressions}><{/if}>" <{if $area.dt_useexp=="1"}>class="_x_ipt"<{/if}> vtype="required&&checkExp1&&checkExp2" /><{button label="验证" class="checkexp" onclick="checkExp(this);"}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='lnk chgexp' onclick='chaexps(this)'><{t}>取消公式<{/t}></span>
+                                            <input type='hidden' name='area_fee_conf[dt_useexp][]' value='<{$area.dt_useexp}>'/>
+                                        </div>
+                                    </div>
+
+                                </li>
+
+                                <{/foreach}>
+
+                                <{else}>
+                                <li class='division' style="line-height:30px;">
+                                <div></div><div></div>
+                                </li>
+                                <li class='division' style="line-height:30px;">
+                                    <div class='deliverycity'>
+                                        地区 <input style="width:300px;" type='text' name='area_fee_conf[areaGroupName][]' readonly=true required="true" value='' onclick="regionSelect(this);">
+                                        <input type='hidden' name='area_fee_conf[areaGroupId][]' value="" class="_x_ipt" caution="配送地区不能为空"/>
+                                        <{img class='regionSelect' src='images/bundle/editcate.gif' style='cursor:pointer;display:none;' onclick='regionSelect(this)' alt='编辑地区' title="编辑地区"}>
+                                        <a onclick='deleteDelivery($(this).getParent("li"))' >删除</a>
+                                    </div>
+                                    
+                                    <div class='deliveryexpbox'>
+                                    <div class='deliveryweight'>
+                                    <{t}>首重重量&nbsp;<{/t}><input style="width:30px;" vtype="required&&unsignedint" type="text" name="area_fee_conf[firstunit][]" value="<{if $dt_info.firstunit}><{$dt_info.firstunit}><{else}><{/if}>" ><{t}>g&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;续重重量&nbsp;<{/t}><input style="width:30px;" vtype="required&&unsignedint" type="text" name="area_fee_conf[continueunit][]" value="<{if $dt_info.continueunit}><{$dt_info.continueunit}><{else}><{/if}>">g
+                                    
+                                    </div>
+                                        <div class='deliveryexp'>
+                                            首重费用 <input style="width:30px;" type='text' name='area_fee_conf[firstprice][]' value="" class="_x_ipt" vtype="required&&number" caution="该项必填且只允许填写数字金额"/>&nbsp;元&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            续重费用 <input style="width:30px;" type='text' name='area_fee_conf[continueprice][]' value="" class="_x_ipt" vtype="required&&number" caution="该项必填且只允许填写数字金额"/>元
+                                            <span class='lnk chgexp' onclick='chaexps(this)'><{t}>使用公式<{/t}></span>
+                                        </div>
+                                        <div class='deliveryexp' style='display:none'>
+                                            配送公式 <input style="width:300px;" type='text' name='area_fee_conf[dt_expressions][]' value=""  class="_x_ipt" vtype="required&&checkExp1&&checkExp2" /><{button label="验证" class="checkexp" onclick="checkExp(this);"}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='lnk chgexp' onclick='chaexps(this)'><{t}>取消公式<{/t}></span>
+                                            <input type='hidden' name='area_fee_conf[dt_useexp][]' value='0'/>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <{/if}>
+
+                            </ol>
+                            <{button label="添加地区费用" class="add-dlyarea" }>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="division">
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th><{t}>状态：<{/t}></th>
+                    <td><input name="disabled" type="radio" value="true" <{if $dt_info.disabled=='true'}>checked="checked"<{/if}> ><{t}>关闭<{/t}>
+                               <input type="radio" name="disabled" value="false" <{if $dt_info.disabled=='false' || $dt_info.disabled==''}>checked="checked"<{/if}>><{t}>启用<{/t}><{help}>关闭后在选择物流公司的列表中不可见<{/help}></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="division">
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <{if $logisticsmanager=='true'}>
+                <tr id="normalTmpl">
+                    <th><{t}>选择普通面单模板：<{/t}></th>
+                    <td><{input type="select" name='normal_tmpl_id' rows=$normalTmpl valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                </tr>
+                <tr id="electronTmplType">
+                    <th><{t}>选择控件类型：<{/t}></th>
+                    <td>
+                        <input id='electron_type_electron' type="radio" value="electron" name="electron_type" onchange="electronTypeChange()" <{if is_array($canniaoId) && !in_array($dt_info.prt_tmpl_id , $canniaoId,true)}>checked<{/if}>><{t}>shopex控件<{/t}>
+                        <input id='electron_type_cainiao'  type="radio" value="cainiao" name="electron_type" onchange="electronTypeChange()" <{if is_array($canniaoId) && in_array($dt_info.prt_tmpl_id , $canniaoId,true)}>checked<{/if}>><{t}>菜鸟控件<{/t}>
+                        <input id='electron_type_pdd'  type="radio" value="pdd" name="electron_type" onchange="electronTypeChange()" <{if $electronType!='electron'}>checked<{/if}>/><{t}>拼多多控件<{/t}>
+                        <input id='electron_type_jd'  type="radio" value="jd" name="electron_type" onchange="electronTypeChange()" <{if $electronType!='electron'}>checked<{/if}>/><{t}>京东控件<{/t}>
+                        <input id='electron_type_douyin'  type="radio" value="douyin" name="electron_type" onchange="electronTypeChange()" <{if $electronType!='electron'}>checked<{/if}>/><{t}>抖音控件<{/t}>
+                        <input id='electron_type_kuaishou'  type="radio" value="kuaishou" name="electron_type" onchange="electronTypeChange()" <{if $electronType!='electron'}>checked<{/if}>/><{t}>快手控件<{/t}>
+                        <input id='electron_type_wphvip'  type="radio" value="wphvip" name="electron_type" onchange="electronTypeChange()" <{if $electronType!='electron'}>checked<{/if}>/><{t}>唯品会vip控件<{/t}>
+                        <input id='electron_type_sf'  type="radio" value="sf" name="electron_type" onchange="electronTypeChange()" <{if $electronType!='electron'}>checked<{/if}>/><{t}>顺丰控件<{/t}>
+                        <input id='electron_type_xhs'  type="radio" value="xhs" name="electron_type" onchange="electronTypeChange()" <{if $electronType!='electron'}>checked<{/if}>/><{t}>小红书控件<{/t}>
+                        <input id='electron_type_wxshipin'  type="radio" value="wxshipin" name="electron_type" onchange="electronTypeChange()" <{if $electronType!='electron'}>checked<{/if}>/><{t}>微信视频号控件<{/t}>
+                        <input id='electron_type_youzan'  type="radio" value="youzan" name="electron_type" onchange="electronTypeChange()" <{if $electronType!='electron'}>checked<{/if}>/><{t}>有赞控件（菜鸟）<{/t}>
+                        <input id='electron_type_dewu'  type="radio" value="dewu" name="electron_type" onchange="electronTypeChange()" <{if $electronType!='electron'}>checked<{/if}>/><{t}>得物品牌直发控件<{/t}>
+                        <input id='electron_type_meituan4bulkpurchasing'  type="radio" value="meituan4bulkpurchasing" name="electron_type" onchange="electronTypeChange()" <{if $electronType!='electron'}>checked<{/if}>/><{t}>美团电商控件<{/t}>
+                    </td>
+                </tr>
+                <tr id="electronTmplName">
+                    <th><{t}>面单模板类型：<{/t}></th>
+                    <td id='electronTmpl'><{input type="select" name='electron_tmpl_id' rows=$electronTmpl  valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                    <td id='cainiaoTmpl'><{input type="select" name='cainiao_tmpl_id' rows=$cainiaoTmpl  valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                    <td id='pddTmpl'><{input type="select" name='pdd_tmpl_id' rows=$pddTmpl  valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                    <td id='jdTmpl'><{input type="select" name='jd_tmpl_id' rows=$jdTmpl  valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                    <td id='douyinTmpl'><{input type="select" name='douyin_tmpl_id' rows=$douyinTmpl  valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                    <td id='kuaishouTmpl'><{input type="select" name='kuaishou_tmpl_id' rows=$kuaishouTmpl  valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                    <td id='wphvipTmpl'><{input type="select" name='wphvip_tmpl_id' rows=$wphvipTmpl  valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                    <td id='sfTmpl'><{input type="select" name='sf_tmpl_id' rows=$sfTmpl  valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                    <td id='xhsTmpl'><{input type="select" name='xhs_tmpl_id' rows=$xhsTmpl  valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                    <td id='wxshipinTmpl'><{input type="select" name='wxshipin_tmpl_id' rows=$wxshipinTmpl  valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                    <td id='youzanTmpl'><{input type="select" name='youzan_tmpl_id' rows=$youzanTmpl  valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                    <td id='dewuTmpl'><{input type="select" name='dewu_tmpl_id' rows=$dewuTmpl  valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                    <td id='meituan4bulkpurchasingTmpl'><{input type="select" name='meituan4bulkpurchasing_tmpl_id' rows=$meituan4bulkpurchasingTmpl  valueColumn="template_id" labelColumn="template_name" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                </tr>
+                <{else}>
+                <{if $prttpl}>
+                <tr>
+                    <th><{t}>选择快递单模板：<{/t}></th>
+                    <td><{input type="select" name='prt_tmpl_id' rows=$prttpl valueColumn="prt_tmpl_id" labelColumn="prt_tmpl_title" value=$dt_info.prt_tmpl_id vtype="required" style="width:100px;"}> <em><font color='red'>*</font></em></td>
+                </tr>
+                <{/if}>
+                <{/if}>
+            </table>
+            <div class="division">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th><{t}>权重：<{/t}></th>
+                        <td><{input type="number" value=$dt_info.weight|default:0 name="weight" size=2}><span>&nbsp;&nbsp;&nbsp;&nbsp;(数值越大表示优先级越高。如不填写,默认为0)</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="table-action">
+                <{button type="submit" label="保存" id="btn-dly_corp" }>
+            </div>
+    </form>
+</div>
+
+
+<script>
+    function tmplTypeChange(){
+        var logisticsmanager="<{$logisticsmanager}>";
+
+
+           if($$('input[name=tmpl_type]:checked').get('value') == 'normal'){
+                $('dly_type').set('value', '');
+                <{if !$dt_info.corp_id}>
+                $('dly_type').removeProperty('readonly');
+                <{else}>
+                $('dly_type').set('value', '<{$dt_info.type}>');
+                <{/if}>
+                $('normalTmpl').show();
+                $('electronTmplType').hide();
+                $('electronTmplName').hide();
+                $('normalChannel').show();
+                $('electronChannel').hide();
+                $('normalShop').show();
+                $('electronShop').hide();
+                $("btn-search").show();
+            }else if($$('input[name=tmpl_type]:checked').get('value') == 'electron'){
+                $('electronTmplType').show();
+                $('electronTmplName').show();
+                $('normalTmpl').hide();
+                $('electronTmpl').hide();
+                $('cainiaoTmpl').hide();
+                $('electronChannel').show();
+                $('normalChannel').hide();
+                $('electronShop').show();
+                $('normalShop').hide();
+                $('dly_type').removeProperty('readonly');
+                $("btn-search").hide();
+            }
+
+    }
+
+    tmplTypeChange();
+    electronTypeChange();
+    function electronTypeChange(){
+        var channelShop = JSON.decode('<{$channelShop}>');
+        var jsonelectronchannel = JSON.decode('<{$jsonelectronchannel}>');
+        var channel_id = $('electron_channel_id').value;
+
+        if(channelShop[channel_id]){
+            $('electronTmpl').hide();
+            $('cainiaoTmpl').hide();
+            $('pddTmpl').hide();
+            $('jdTmpl').hide();
+            $('douyinTmpl').hide();
+            $('kuaishouTmpl').hide();
+            $('wphvipTmpl').hide();
+            $('sfTmpl').hide();
+            $('xhsTmpl').hide();
+            $('wxshipinTmpl').hide();
+            $('youzanTmpl').hide();
+            $('dewuTmpl').hide();
+            $('meituan4bulkpurchasingTmpl').hide();
+            if(jsonelectronchannel[channel_id]['channel_type']=='taobao'){
+                if($$('input[name=electron_type]:checked').get('value') == 'electron'){
+                    $('electronTmpl').show();
+                    $('cainiaoTmpl').hide();
+                }else{
+                    $('electron_type_cainiao').set('checked','checked');
+                    $('electronTmpl').hide();
+                    $('cainiaoTmpl').show();
+                }
+            }else if(jsonelectronchannel[channel_id]['channel_type']=='pdd'){
+                if($$('input[name=electron_type]:checked').get('value') == 'electron'){
+                    $('electronTmpl').show();
+                    $('pddTmpl').hide();
+                }else {
+                    $('electron_type_pdd').set('checked','checked');
+                    $('electronTmpl').hide();
+                    $('pddTmpl').show();
+                }
+            }else if(jsonelectronchannel[channel_id]['channel_type']=='douyin'){
+                if($$('input[name=electron_type]:checked').get('value') == 'electron'){
+                    $('electronTmpl').show();
+                    $('douyinTmpl').hide();
+                }else {
+                    $('electron_type_douyin').set('checked','checked');
+                    $('electronTmpl').hide();
+                    $('douyinTmpl').show();
+                }
+            }else if(jsonelectronchannel[channel_id]['channel_type']=='kuaishou'){
+                if($$('input[name=electron_type]:checked').get('value') == 'electron'){
+                    $('electronTmpl').show();
+                    $('kuaishouTmpl').hide();
+                }else {
+                    $('electron_type_kuaishou').set('checked','checked');
+                    $('electronTmpl').hide();
+                    $('kuaishouTmpl').show();
+                }
+            }else if(jsonelectronchannel[channel_id]['channel_type']=='wphvip'){
+                if($$('input[name=electron_type]:checked').get('value') == 'electron'){
+                    $('electronTmpl').show();
+                    $('wphvipTmpl').hide();
+                }else {
+                    $('electron_type_wphvip').set('checked','checked');
+                    $('electronTmpl').hide();
+                    $('wphvipTmpl').show();
+                }
+            }else if(jsonelectronchannel[channel_id]['channel_type']=='sf'){
+                if($$('input[name=electron_type]:checked').get('value') == 'electron'){
+                    $('electronTmpl').show();
+                    $('sfTmpl').hide();
+                }else {
+                    $('electron_type_sf').set('checked','checked');
+                    $('electronTmpl').hide();
+                    $('sfTmpl').show();
+                }
+            }else if(jsonelectronchannel[channel_id]['channel_type']=='xhs'){
+                if($$('input[name=electron_type]:checked').get('value') == 'electron'){
+                    $('electronTmpl').show();
+                    $('xhsTmpl').hide();
+                }else {
+                    $('electron_type_xhs').set('checked','checked');
+                    $('electronTmpl').hide();
+                    $('xhsTmpl').show();
+                }
+            }else if(jsonelectronchannel[channel_id]['channel_type']=='wxshipin'){
+                if($$('input[name=electron_type]:checked').get('value') == 'electron'){
+                    $('electronTmpl').show();
+                    $('wxshipinTmpl').hide();
+                }else {
+                    $('electron_type_wxshipin').set('checked','checked');
+                    $('electronTmpl').hide();
+                    $('wxshipinTmpl').show();
+                }
+            }else if(jsonelectronchannel[channel_id]['channel_type']=='meituan4bulkpurchasing'){
+                if($$('input[name=electron_type]:checked').get('value') == 'electron'){
+                    $('electronTmpl').show();
+                    $('meituan4bulkpurchasingTmpl').hide();
+                }else {
+                    $('electron_type_meituan4bulkpurchasing').set('checked','checked');
+                    $('electronTmpl').hide();
+                    $('meituan4bulkpurchasingTmpl').show();
+                }
+            }else if(jsonelectronchannel[channel_id]['channel_type']=='360buy' || jsonelectronchannel[channel_id]['channel_type']=='jdalpha' || jsonelectronchannel[channel_id]['channel_type']=='jdgxd'){
+                if($$('input[name=electron_type]:checked').get('value') == 'electron'){
+                    $('electronTmpl').show();
+                    $('jdTmpl').hide();
+                }else{
+                    $('electron_type_jd').set('checked','checked');
+                    $('electronTmpl').hide();
+                    $('jdTmpl').show();
+                }
+            }else if(jsonelectronchannel[channel_id]['channel_type']=='dewu'){
+                if($$('input[name=electron_type]:checked').get('value') == 'electron'){
+                    $('electronTmpl').show();
+                    $('dewuTmpl').hide();
+                }else {
+                    $('electron_type_dewu').set('checked','checked');
+                    $('electronTmpl').hide();
+                    $('dewuTmpl').show();
+                }
+            }else if(jsonelectronchannel[channel_id]['channel_type']=='youzan'){
+                if($$('input[name=electron_type]:checked').get('value') == 'electron'){
+                    $('electronTmpl').show();
+                    $('youzanTmpl').hide();
+                }else {
+                    $('electron_type_youzan').set('checked','checked');
+                    $('electronTmpl').hide();
+                    $('youzanTmpl').show();
+                }
+            } else {
+                $('electron_type_electron').set('checked','checked');
+                $('electronTmpl').show();
+            }
+        }else{
+            $('electronTmpl').hide();
+            $('cainiaoTmpl').hide();
+            $('pddTmpl').hide();
+            $('jdTmpl').hide();
+            $('wphvipTmpl').hide();
+            $('sfTmpl').hide();
+            $('douyinTmpl').hide();
+            $('kuaishouTmpl').hide();
+            $('xhsTmpl').hide();
+            $('wxshipinTmpl').hide();
+            $('dewuTmpl').hide();
+            $('meituan4bulkpurchasingTmpl').hide();
+            $('youzanTmpl').hide();
+        }
+    }
+
+
+    var m_electron_dly = {
+        'EMS':'EMS普通B',
+        'EYB':'EMS经济A',
+        'SF':'顺丰模板_标准',
+        'ZJS':'菜鸟宅急送',
+        'ZTO':'菜鸟中通',
+        'HTKY':'菜鸟百世汇通',
+        'UC':'菜鸟优速',
+        'YTO':'菜鸟圆通',
+        'STO':'菜鸟申通',
+        'TTKDEX':'菜鸟天天快递',
+        'QFKD':'菜鸟全峰',
+        'FAST':'菜鸟快捷',
+        'POSTB':'菜鸟邮政小包',
+        'GTO':'菜鸟国通',
+        'YUNDA':'韵达标准',
+        'JDCOD':'京东电子面单A'
+      };
+
+    $('electron_channel_id').addEvent('change',function(){
+        var jsonelectronchannel = JSON.decode('<{$jsonelectronchannel}>');
+        var channelType = JSON.decode('<{$channelType}>');
+
+        var channel_id = $('electron_channel_id').value;
+        if(channelType[channel_id]){
+            if(channelType[channel_id]=='JDCOD'){
+                $('electronShop').set('text', '京东SOP');
+                $('dly_type').set('value',channelType[channel_id].toUpperCase());
+                electronTypeChange();
+            } else {
+                $('electronShop').set('text', '全部');
+                $('dly_type').set('value', channelType[channel_id].toUpperCase());
+                electronTypeChange();
+            }
+            /*带出模板*/
+            var tname = m_electron_dly[channelType[channel_id].toUpperCase()];
+            if($defined(tname)){
+              var options = $$('#form-dly_corp #electronTmplName select option');
+              options.each(function(option){
+                
+                if (tname == option.getText()) {
+                  option.selected = true;
+                };
+              });
+            }
+        }else{
+            $('electronTmpl').hide();
+            $('cainiaoTmpl').hide();
+            $('electronShop').set('text', '');
+            $('dly_type').set('value', '');
+            $('dly_type').removeProperty('readonly');
+        }
+    });
+    
+    $('form-dly_corp').store('target',{
+        onRequest:function(){
+            $('btn-dly_corp').set('disabled', 'true');
+        },
+        onComplete:function(jsontext){
+            var json = Json.evaluate(jsontext);
+            if (typeof(json.error) != 'undefined'){
+                $('btn-dly_corp').set('disabled', '');
+            }else{
+                $('btn-dly_corp').set('disabled', 'true');
+                var fg = opener.finderGroup;
+                for(fid in fg){
+                    if(fid){
+                        fg[fid].refresh();
+                    }
+                }
+                window.close();
+            }
+        }
+    });
+    
+    $("btn-search").addEvent('click',function(e)
+    {
+        var url='index.php?app=ome&ctl=admin_dly_corp&act=corp_recommend';
+        
+        if($$('input[name=corp_model]:checked').get('value') == 'instatnt'){
+            url += "&corp_model=instatnt";
+        }else if($$('input[name=corp_model]:checked').get('value') == 'seller'){
+            url += "&corp_model=seller";
+        }
+        
+        new Dialog(url,{width:400,height:420,title:'物流公司选择'});
+    });
+
+    /*var DialogExp ;
+$ES(".checkexp","area-tbody-dom").each(function(item, index, itobj){
+  item.addEvent('click',function(e){
+    e=new Event(e);
+    var ipt=e.target;
+    var id = 'check_'+ipt.getAttribute('areaid');
+    DialogExp = new Dialog('index.php?app=ome&ctl=admin_dly_corp&act=checkExp&area_id='+ipt.getAttribute('areaid')+'&expvalue='+encodeURIComponent($(id).value),{modal:true,title:'验算配送公式'});
+  });
+});*/
+
+    $$("#deliveryAreaToggle input[name=setting]").addEvent('click',function(){
+
+        $$("#deliveryAreaToggle input[name=setting]").each(deliveryAreaToggle);
+    }).each(deliveryAreaToggle);
+
+
+    function getval(expval){
+        if (eval(expval) > 0.000001){
+            return 1;
+        }else if (eval(expval) >-0.000001&&eval(expval)< 0.000001){
+            return 1/2;
+        }else{
+            return 0;
+        }
+    }
+    function getceil(expval){
+        if (eval(expval) > 0){
+            return Math.ceil(eval(expval)-0.000001);
+        }else{
+            return 0;
+        }
+    }
+
+
+    function chaexps(el){
+        var  dexps=$ES('.deliveryexp',$(el).getParent('.deliveryexpbox'));
+        dexps.toggleDisplay();
+        dexps.each(function(i){
+            if(i.getElement('input[name^=useexp]')){
+                if(!i.isDisplay()){
+                    i.getElement('input[name^=useexp]').set('value',0);
+                }else{
+                    i.getElement('input[name^=useexp]').set('value',1);
+                }
+            }
+            else if (i.getElement('input[name^=dt_useexp]'))
+            {
+                if(!i.isDisplay()){
+                    i.getElement('input[name^=dt_useexp]').set('value',0);
+                }else{
+                    i.getElement('input[name^=dt_useexp]').set('value',1);
+                }
+            }else if(i.getElement('input[name^=area_fee_conf[dt_useexp]]')){
+                if(!i.isDisplay()){
+                    i.getElement('input[name^=area_fee_conf[dt_useexp]]').set('value',0);
+                }else{
+                    i.getElement('input[name^=area_fee_conf[dt_useexp]]').set('value',1);
+                }
+            }
+        });
+    }
+
+    void function(){
+
+        var btn_add=$E('#deliveryArea-<{$dt_info.dt_id}> .add-dlyarea');
+        var getItemTemplete=function(){
+            var pre_firstunit='';
+            var pre_continueunit='';
+            if($$('.deliveryweight').getLast()){
+                pre_firstunit = $$('.deliveryweight').getLast().getElement('input[name^=area_fee_conf[firstunit]').value;
+                pre_continueunit = $$('.deliveryweight').getLast().getElement('input[name^=area_fee_conf[continueunit]').value;
+            }
+            var btn = '<{button label="验证" class="checkexp" onclick="checkExp(this);"}>';
+            var itemTemplete = "<div class='deliverycity'>";
+            itemTemplete+="地区";
+            itemTemplete+="<input style='width:300px;' type='text' name='area_fee_conf[areaGroupName][]' readonly=true  value='' class='_x_ipt' vtype='required' caution='地区不能为空' onclick=\"regionSelect(this);\">";
+            itemTemplete+="<input type='hidden' name='area_fee_conf[areaGroupId][]' value=''/>";
+            //itemTemplete+="<img class='regionSelect' src='images/bundle/editcate.gif' style='cursor:pointer;' onclick='regionSelect(this)' alt='编辑地区' title='编辑地区'>";
+            //itemTemplete+='<{img class="regionSelect" src="images/bundle/editcate.gif" style="cursor:pointer;" onclick="regionSelect(this)" alt="编辑地区" title="编辑地区"}>';
+            itemTemplete+="<a onclick='deleteDelivery($(this).getParent(\"li\"))' >删除</a>";
+            //itemTemplete+="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label><input type='checkbox' name='hasCod[]' value='1'/><{t}>支持货到付款<{/t}></label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            itemTemplete+="</div>";
+            itemTemplete+="<div class='deliveryexpbox'><div class='deliveryweight'><{t}>首重重量&nbsp;<{/t}><input style='width:30px;' vtype='required&&unsignedint' type='text' name='area_fee_conf[firstunit][]' value='"+pre_firstunit+"' ><{t}>&nbsp;g&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;续重重量&nbsp;<{/t}><input style='width:30px;' vtype='required&&unsignedint' type='text' name='area_fee_conf[continueunit][]' value='"+pre_continueunit+"'>&nbsp;g</div><div class='deliveryexp'>";
+            itemTemplete+="首重费用 <input style='width:30px;' type='text' name='area_fee_conf[firstprice][]' class='_x_ipt' vtype='required&&number' caution='该项必填且只允许填写数字金额' value=''>&nbsp;元";
+            itemTemplete+="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;续重费用 <input style='width:30px;' type='text' name='area_fee_conf[continueprice][]' class='_x_ipt' vtype='required&&number' caution='该项必填且只允许填写数字金额' value='' >&nbsp;元";
+            itemTemplete+="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='lnk chgexp' onclick='chaexps(this)'><{t}>使用公式<{/t}></span>";
+            itemTemplete+="</div>";
+            itemTemplete+="<div class='deliveryexp' style='display:none'>";
+            itemTemplete+="配送公式 <input style='width:300px;' type='text' name='area_fee_conf[dt_expressions][]' value='' vtype='required&&checkExp1&&checkExp2' />";
+            itemTemplete+= btn +"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='lnk chgexp' onclick='chaexps(this)'><{t}>取消公式<{/t}></span>";
+            itemTemplete+="<input type='hidden' name='area_fee_conf[dt_useexp][]' value='0'/>";
+            itemTemplete+="</div></div>";
+
+            return  itemTemplete;
+        };
+        var list=$E('#deliveryArea-<{$dt_info.dt_id}> ol');
+        btn_add.addEvent('click',function(){
+        
+
+            var newitem=new Element('li',{'class':'division','style':'line-height:30px;'}).set('html',getItemTemplete()).inject(list);
+            regionSelect(newitem.getElement('.regionSelect'));
+        });
+
+        $$('#dltype-info-<{$dt_id}> .chgexp').each(chaexps);
+
+    }();
+    function regionSelect(el){
+        var el=$(el).getParent('.deliverycity');
+        var iptText=el.getElement('input[type=text]');
+        var iptHidden=el.getElement('input[type=hidden]');
+        Ex_Loader('modedialog',function(){
+            new ModeDialog('index.php?app=eccommon&ctl=regions&act=showRegionTreeList&p[0]='+el.uid+'&p[1]=multi',{
+                width:270,height:340,params:{iptText:iptText,iptHidden:iptHidden}
+            });
+        });
+    }
+    var checkExp=function(btn){
+        btn=$(btn);
+        var ipt=btn.getPrevious('input');
+        var expValue=ipt.getValue();
+        new Dialog('index.php?app=ome&ctl=admin_dly_corp&act=checkExp&expvalue='+encodeURIComponent(expValue),
+        { modal:true,
+            title:'验算配送公式'
+        }
+    );
+    }
+</script>

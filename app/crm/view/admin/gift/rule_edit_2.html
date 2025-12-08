@@ -1,0 +1,243 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform" style="background:#FFF;">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" >
+        <tr>
+            <th><{t}>订单类型：<{/t}></th>
+            <td>
+                <{foreach from=$order_types item=item key=key}>
+                <label for="m_<{$key}>"><span><input type="checkbox" value="<{$key}>" id="m_<{$key}>" name="filter_arr[order_types][]" <{if is_array($rule.filter_arr.order_types) && $key|in_array:$rule.filter_arr.order_types}>checked<{/if}>/> <{$item.text}></span></label>
+                <{/foreach}>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:red">*全部未勾选，表示所有订单</span>
+            </td>
+        </tr>
+        <tr>
+            <th><{t}>支付状态：<{/t}></th>
+            <td>
+                <select name="filter_arr[pay_status]" class="x-input">
+                    <option value="">无限制</option>
+                    <option value="3" <{if $rule.filter_arr.pay_status == '3'}> selected="selected" <{/if}>>部分付款</option>
+                    <option value="1" <{if $rule.filter_arr.pay_status == '1'}> selected="selected" <{/if}>>已支付</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+          <th><{t}>订单金额：<{/t}></th>
+          <td>
+            <select id="order_amount_type" name="filter_arr[order_amount][type]" class="x-input">
+                <option value="0">无限制</option>
+                <option value="1">付款金额</option>
+                <option value="2">订单总额</option>
+            </select>
+            
+            <span style="<{if($rule.filter_arr.order_amount.type==0)}>display:none;<{/if}>">
+                <select id="order_amount_sign" name="filter_arr[order_amount][sign]" class="x-input">
+                    <option value="between">介于</option>
+                    <option value="bthan">大于等于</option>
+                </select>
+                
+                <span style="<{if($rule.filter_arr.order_amount.sign=='bthan')}>display:none;<{/if}>"><{input id="order_amount_min_num" type="text" name="filter_arr[order_amount][min_num]" value=$rule.filter_arr.order_amount.min_num size="4" }>元
+                ~</span>
+                <{input id="order_amount_max_num" type="text" name="filter_arr[order_amount][max_num]" value=$rule.filter_arr.order_amount.max_num size="4" }>元       
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <th><{t}>购买商品：<{/t}></th>
+          <td>
+            <select id="filter_arr[buy_goods][type]" name="filter_arr[buy_goods][type]" class="x-input">
+                <option value="0">任意商品</option>
+                <option value="1">指定销售物料</option>
+                <option value="2">指定基础物料</option>
+            </select>
+            
+            <div style="<{if($rule.filter_arr.buy_goods.type==0)}>display:none;<{/if}>padding:10px 0 0 0;line-height:28px;">
+            
+                购买范围：
+                <select id="filter_arr[buy_goods][buy_type]" name="filter_arr[buy_goods][buy_type]" class="x-input">
+                    <option value="any">购买了任意一个指定商品</option>
+                    <option value="all">购买了全部指定商品</option>
+                    <option value="none">排除购买的指定商品</option>
+                </select>
+                <br/>
+                <div id='add_sku_postion'>
+ <{input type='inventorydepth_object' object='basic_material@material' multiple=true breakpoint='0'  name='bm_id' textcol='material_name' value=$bm_id   callback='product_object_callback' replacehtml=$bcreplacehtml emptytext='从基础物料里选' }>
+ <{input type='inventorydepth_object' object='sales_material@material' multiple=true breakpoint='0'  name='sm_id' textcol='sales_material_name' value=$sm_id callback='sm_object_callback' replacehtml=$smreplacehtml emptytext='从销售物料中选' filter=array('sales_material_type'=>array("1","2","6"))}>
+                </div>
+                计算方式：
+                <select id="filter_arr[buy_goods][calculate_type]" name="filter_arr[buy_goods][calculate_type]" class="x-input">
+                    <option value="appoint">购买的指定商品之和</option>
+                    <option value="all">购买的全部商品之和</option>
+                    <option value="least">购买的指定商品最小值</option>
+                </select>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th><{t}>赠送数量：<{/t}></th>
+          <td>
+            <ul id="num_rules">
+                    <li>
+                        <input name="filter_arr[buy_goods][num_rule]" type="radio" value="fixed" />
+                        
+                        购买
+                        <select id="num_rules_sign" name="filter_arr[buy_goods][rules_sign]" class="x-input">
+                            <option value="nequal">等于</option>
+                            <option value="between">介于</option>
+                            <option value="bthan">大于等于</option>
+                        </select>
+                        <{input type="text" id="buy_goods_min_num" name="filter_arr[buy_goods][min_num]" value=$rule.filter_arr.buy_goods.min_num size="4" }>
+                        
+                        <span style="<{if($rule.filter_arr.buy_goods.rules_sign!='between')}>display:none;<{/if}>">
+                        ~ <{input id="buy_goods_max_num" type="text" name="filter_arr[buy_goods][max_num]" value=$rule.filter_arr.buy_goods.max_num size="4" }>
+                        </span>
+                        
+                        <select id="count_type" name="filter_arr[buy_goods][count_type]" class="x-input">
+                            <option value="num">件</option>
+                            <option value="paid">元</option>
+                            <option value="sku">种</option>
+                        </select>
+                        时送一组赠品，不累加
+                        <{help}><{t}>金额是指订单的实际付款金额，如无实付金额则使用销售价。种数是指不重复的货号数量。<{/t}><{/help}>
+                    </li>
+                    <li>
+                        <input id="num_rules_auto" name="filter_arr[buy_goods][num_rule]" type="radio" value="auto" />
+                        每购买
+                        <{input type="text" id="per_num" name="filter_arr[buy_goods][per_num]" value=$rule.filter_arr.buy_goods.per_num size="4" }>
+                        <select id="count_type2" name="filter_arr[buy_goods][count_type2]" class="x-input">
+                            <option value="num">件</option>
+                            <option value="paid">元</option>
+                            <option value="sku">种</option>
+                        </select>
+                        ，
+                        
+                        赠送<{input type="text" id="send_suite" name="filter_arr[buy_goods][send_suite]" value=$rule.filter_arr.buy_goods.send_suite size="4" }>组赠品，
+                        
+                        每订单最多送<{input type="text" id="max_send_suite" name="filter_arr[buy_goods][max_send_suite]" value=$rule.filter_arr.buy_goods.max_send_suite size="4" }>组
+                        
+                        <{help}><{t}>系统自动累加赠送 如：买2送1，4送2、6送3。1组赠品可以包含多个商品和多个数量。例如买2送1组，最多送5组， 当1组赠品包含2个A商品和1个B商品，将送2个A和1个B。买4时送4个A和2个B，依次累加。最多送10个A和5个B。计算倍数时无条件舍去小数位。<{/t}><{/help}>
+                    </li>
+                </ul>
+          </td>
+        </tr>
+        <tr>
+          <th><{t}>限量赠送：<{/t}></th>
+          <td>
+            <select id="filter_arr[buy_goods][limit_type]" name="filter_arr[buy_goods][limit_type]" class="x-input">
+                <option value="0">不限量</option>
+                <option value="1">限量</option>
+            </select>
+            
+            <span style="<{if($rule.filter_arr.buy_goods.limit_type==0)}>display:none;<{/if}>">
+                符合条件的前
+                <{input type="text" id="buy_goods_limit_orders" name="filter_arr[buy_goods][limit_orders]" value=$rule.filter_arr.buy_goods.limit_orders size="4" }>笔订单赠送
+             </span>           
+            <span id='limit_time_type'  <{if !$rule.filter_arr.buy_goods.limit_type  || $rule.filter_arr.buy_goods.limit_type =='0' }> style='display:none;' <{/if}> >&nbsp;&nbsp;&nbsp;
+            每日<input type='checkbox' id='limit_time_day' name='filter_arr[buy_goods][limit_time_day]' value='day'    <{if $rule.filter_arr.buy_goods.limit_time_day eq 'day'}>checked<{/if}>
+            </span>
+            <font color="#5779BD">&nbsp;&nbsp;&nbsp;不勾选，默认为已赠送总订单数量</font>
+          </td>
+        </tr>
+        
+       <tr>
+          <th><{t}>每ID第一次购买赠送：<{/t}></th>
+           <td> <input type="checkbox"  value="1" name="filter_arr[buyer_nick]"    <{if $rule.filter_arr.buyer_nick eq '1'}>checked<{/if}>></td>
+       </tr>
+        <tr>
+            <th><{t}>达人订单：<{/t}></th>
+            <td style="padding:7px 0px;">
+
+                <div id="select_host_type" >
+                    <input type="radio" name="filter_arr[is_host][type]" value='infinite' onclick="change_order_host_type(this.value);" checked/>无限制
+
+                    <input type="radio" name="filter_arr[is_host][type]" value='all' onclick="change_order_host_type(this.value);" <{if $rule.filter_arr.is_host.type == 'all'}>checked<{/if}>/>所有达人订单
+
+                    <input type="radio" name="filter_arr[is_host][type]" value='assign' onclick="change_order_host_type(this.value);" <{if $rule.filter_arr.is_host.type == 'assign'}>checked<{/if}>/>指定达人订单
+                </div>
+
+                <div id="select_host_detail" <{if $rule.filter_arr.is_host.type != 'assign' }>style="display:none;"<{/if}>>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <{t}><span style="color:red">* </span>达人ID：&nbsp;<{/t}>
+                    <{input id="title" type="textarea" name="filter_arr[is_host][author]" placeholder="支持多个, 以逗号符分隔" value=$rule.filter_arr.is_host.author size="25"}>
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <{t}>直播间ID：<{/t}>
+                    <{input id="title" type="textarea" name="filter_arr[is_host][room]" placeholder="支持多个, 以逗号符分隔" value=$rule.filter_arr.is_host.room size="25"}>
+                    &nbsp;<{help}><{t}>设置了达人ID同时也设置直播间ID，<br>两个条件间是“并且”的关系，<br>如果条件间互斥，则规则选出的订单为空<{/t}><{/help}>
+                </div>
+
+                <input type="hidden" value="<{$rule.filter_arr.is_host.status}>" id="order_host_type_status">
+                <input type="hidden" value="<{$rule.filter_arr.is_host.type}>" id="order_host_type_type">
+            </td>
+        </tr> 
+        <tr>
+            <th><{t}>指定会员：<{/t}></th>
+            <td><{input id="title" type="textarea" name="filter_arr[member_uname]" placeholder="支持多个, 以逗号符分隔" value=$rule.filter_arr.member_uname size="25"}></td>
+        </tr>
+        
+        <tr>
+            <th><{t}>指定商家备注：<{/t}></th>
+            <td><{input id="title" type="textarea" name="filter_arr[order_remark]" placeholder="支持多个| 以英文竖线符分隔" value=$rule.filter_arr.order_remark size="50"}></td>
+        </tr>
+        <tr>
+            <th><{t}>指定客户备注：<{/t}></th>
+            <td><{input id="title" type="textarea" name="filter_arr[member_remark]" placeholder="支持多个| 以英文竖线符分隔" value=$rule.filter_arr.member_remark size="50"}></td>
+        </tr>
+    </table>
+</div>
+<script>
+
+function product_object_callback(rs,handle){
+    var length = handle.getElements('.row').length;
+    var html = '已选择了'+length+'个基础物料,'+"<a href='javascript:void(0);' onclick='product_selected_show();'>查看选中基础物料.</a>";
+    if ($defined($('hand-selected-product')))
+    {
+        $('hand-selected-product').setHTML(html);
+    } else {
+        var div = new Element('div',{'html':html,'id':'hand-selected-product'});
+        div.injectBefore(handle); 
+    }
+}
+function product_selected_show(){
+    new Dialog('index.php?app=crm&ctl=admin_gift_rulebase&act=showProducts',{
+        ajaxoptions:{data:$('hand-selected-product').getNext('div'),method:'post'}
+    });
+}
+function sm_object_callback(rs,handle){
+    var length = handle.getElements('.row').length;
+    var html = '已选择了'+length+'个销售物料 '+"<a href='javascript:void(0);' onclick='sm_selected_show();'>查看选中销售物料.</a>";
+    if ($defined($('hand-selected-sm')))
+    {
+        $('hand-selected-sm').setHTML(html);
+    } else {
+        var div = new Element('div',{'html':html,'id':'hand-selected-sm'});
+        div.injectBefore(handle); 
+    }
+}
+function sm_selected_show(){
+    new Dialog('index.php?app=crm&ctl=admin_gift_rulebase&act=showPkg',{
+        ajaxoptions:{data:$('hand-selected-sm').getNext('div'),method:'post'}
+    });
+}
+//点击限量赠送时
+$('filter_arr[buy_goods][limit_type]').addEvent('change',function(){
+    var val =  $("filter_arr[buy_goods][limit_type]").value;
+    if(val == 1){
+        $("limit_time_type").setStyle('display','');//显示每日
+    }else{
+        $("limit_time_type").setStyle('display','none');//隐藏每日
+    }
+});
+
+function change_order_host_type(type_value){
+    $("select_host_detail").hide();
+    if(type_value == 'assign'){
+        $("select_host_detail").show();
+    }
+    $('order_host_type_type').value = type_value;
+}
+
+</script>

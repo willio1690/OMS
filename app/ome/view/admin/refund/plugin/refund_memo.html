@@ -1,0 +1,61 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class='division'>
+    <form enctype="multipart/form-data" id='upload_refuse_message' method='post' action='index.php?app=ome&ctl=admin_refund_apply&act=refuse_message' target="upload" isCloseDialog>
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" class="gridlist">
+            <tr>
+                <th style="padding-top: 15px;padding-left:15px;"><i style="color: red;">*</i><{t}>上传文件：<{/t}></th>
+                <td style="padding-top: 15px;padding-left:15px;">
+                    <{input type="sfile" name="attachment" f_type="public" }>
+                </td>
+            </tr>
+            <{if $refuse_reason}>
+            <tr>
+
+                <th style="padding-top: 15px;padding-left:15px;"><i style="color: red;">*</i><t>拒绝原因</t></th>
+
+                <td style="padding-top: 15px;padding-left:15px;">
+                    <select name="seller_refuse_reason_id">
+                        <{foreach from=$refuse_reason item=reason}>
+                        <option value="<{$reason.reason_id}>"><{$reason.reason_text}></option>
+                        <{/foreach}>
+                    </select>
+                </td>
+            </tr>
+            <{/if}>
+            <tr>
+                <th style="padding-top: 15px;padding-left:15px;"><i style="color: red;">*</i><{t}>备注：<{/t}></th>
+                <td style="padding-top: 15px;padding-left:15px;">
+                    <textarea name='memo' vtype="required"></textarea>
+                </td>
+            </tr>
+
+
+        </table>
+        <input type='hidden' name='apply_id' value='<{$apply_id}>'>
+        <input type="hidden" name='shop_type' value='<{$shop_type}>'>
+        <div class="table-action">
+            <{button label="确定" class="btn-primary" type='submit'}>
+        </div>
+        <input type='hidden' id='finder_id' name='finder_id' value='<{$finder_id}>'>
+    </form>
+</div>
+<script>
+$('upload_refuse_message').store('target',{
+    onComplete:function(resp){
+        rs = JSON.decode(resp);
+        
+        if(rs.error){
+          new MessageBox(rs.error,{type:'error',autohide:true});
+        }else{
+
+          finderGroup["<{$finder_id}>"].refresh.delay(400,finderGroup["<{$finder_id}>"]);
+          $('upload_refuse_message').getParent('.dialog').retrieve('instance').close();
+        }
+    }
+});
+
+</script>

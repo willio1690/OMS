@@ -1,0 +1,15 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table id="conf_table" width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+        <{foreach from=$conf_list item=conf}>
+            <tr>
+                <{include app="flowctrl" file="{$conf.html}"}>
+            </tr>
+        <{/foreach}>
+    </tbody>
+</table>
+

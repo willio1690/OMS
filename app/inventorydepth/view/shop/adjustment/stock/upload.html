@@ -1,0 +1,58 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.info{font-weight:bold;font-size:30px;}
+</style>
+<{if $error}>
+<div class='division info' style='color:red;'>
+<{$error}>
+</div>
+<{area inject='.mainFoot'}>
+  <div class='table-action'>
+    <{button label='取消' type='button' isCloseDialogBtn='true'}>
+  </div>
+<{/area}>
+
+<{else}>
+<div class="division" id="custom_html">
+    <table cellpadding="0" cellspacing="0" border="0" class="tableform">
+        <tr>
+            <th>回写销售：</th>
+            <td>
+                <input type="radio" name="skutype" value="1"> 全部销售物料
+
+                <input type="radio" name="skutype" value="2"> 仅店铺销售物料
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class='division info'>
+批量更新<span style='color:red;'><{$shop.shop_bn}></span>店铺所有货品库存会先进队列，<br/>稍后执行，确认吗？
+</div>
+<{area inject='.mainFoot'}>
+  <div class='table-action'>
+    <{button label='确定' type='button' id='submitbtn'}>
+    <{button label='取消' type='button' isCloseDialogBtn='true'}>
+  </div>
+<{/area}>
+<script type="text/javascript">
+$('submitbtn').addEvent('click',function(){
+  new Request.JSON({
+    url:"index.php?app=inventorydepth&ctl=shop_adjustment&act=batchUpload&p[0]=<{$shop.shop_id}>",
+    data:{skutype:$E('#custom_html input[name=skutype]:checked').get('value')},
+    onComplete:function(resp){
+      if (resp.error) {
+        $E('.info').setHTML('<div style="color:red;font-size:30px;">'+resp.error+'</div>');
+        return;
+      }
+      MessageBox.success('成功插入队列！');
+      $E('.info').getParent('.dialog').retrieve('instance').close();
+    }
+  }).send();
+});
+</script>
+<{/if}>

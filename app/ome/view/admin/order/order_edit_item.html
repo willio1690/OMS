@@ -1,0 +1,16 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="present">
+  <div class="gridlist" >
+    <input type="hidden" name="item_list" value="<{$item_list_log}>">
+    <div id="datalist">
+    <{foreach from=$conf_list key=type item=conf}>
+        <{include app="{$conf.app}" file="{$conf.html}"}>
+    <{/foreach}>
+    </div>
+    <div style="text-align: right; line-height:30px;"><b>商品总金额:<span id="total"></span>元</b>&nbsp;&nbsp;<b>商品销售总金额:<span id="total_sale_amount"></span>元</b></div>
+  </div>
+</div>

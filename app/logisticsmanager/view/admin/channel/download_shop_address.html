@@ -1,0 +1,91 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form id="form1" action="index.php?app=logisticsmanager&ctl=admin_channel&act=save_shop_address" name="form1" method="post" class="tableform">
+  <input type="hidden" name="account_list_json" value='<{$account_list_json}>' >
+  <input type="hidden" name="channel_id" value='<{$channel_id}>' >
+  <input type="hidden" name="channel_type" value='<{$channel_type}>' >
+  <div class="division">
+    <h5>快递公司ID : <{$logistics_code}></h5>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="gridlist" id='download_memo'>
+      <thead>
+      <tr>
+          <th>选择</th>
+          <!-- <th>快递公司id</th> -->
+          <th>店铺id</th>
+          <th>电子面单账号id</th>
+          <th>网点名字</th>
+          <th>网点编码</th>
+          <th>省份名</th>
+          <th>城市名</th>
+          <th>区县名</th>
+          <th>街道名</th>
+          <th>详细地址</th>
+          <th>联系人</th>
+          <th>移动电话</th>
+          <th>电话</th>
+      </tr>
+      </thead>
+      <tbody>
+      <{foreach from=$account_list item=account}>
+        <tr>
+          <td><input type="radio" name="acct_id" value="<{$account.acct_id}>"></td>
+          <!-- <td><{$account.delivery_id}></td> -->
+          <td><{$account.shop_id}></td>
+          <td><{$account.acct_id}></td>
+          <td><{$account.site_name}></td>
+          <td><{$account.site_code}></td>
+          <td><{$account.province_name}></td>
+          <td><{$account.city_name}></td>
+          <td><{$account.district_name}></td>
+          <td><{$account.street_name}></td>
+          <td><{$account.detail_address}></td>
+          <td><{$account.name}></td>
+          <td><{$account.mobile}></td>
+          <td><{$account.phone}></td>
+        </tr>
+      <{/foreach}>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-action">
+    <{button label="确定" class="btn-primary" type="button" id="saveaccount"}> &nbsp;&nbsp;
+    <{button label="关闭" type='button' id="cancelaccount"}> 
+  </div>
+</form>
+
+<script>
+
+$('saveaccount').addEvent('click',function(e){
+    var form=this.getParent('form');
+    var _this=this;
+  
+    form.store('target',{
+        onRequest:function(){
+            _this.disabled=true;
+        },
+        onComplete:function(jsontext){
+          try{
+              var json = Json.evaluate(jsontext);
+              if (typeof(json.error) != 'undefined'){
+                _this.disabled=false;
+              }else{
+                _this.getParent('.dialog').retrieve('instance').close();
+                window.finderGroup['<{$env.get.finder_id}>'].refresh(true);
+              }
+          }catch(e){}
+        }
+    });
+
+    form.fireEvent('submit',e);
+});
+
+$('cancelaccount').addEvent('click',function(e){
+    var _this=this;
+    _this.getParent('.dialog').retrieve('instance').close();
+});
+
+</script>

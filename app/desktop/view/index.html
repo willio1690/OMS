@@ -1,0 +1,984 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title><{$title}> - <{$title_desc}></title>
+  
+    <link rel="shortcut icon" href="../favicon.gif" type="image/gif" />
+    <{if defined('DEBUG_CSS') && DEBUG_CSS}>
+    <link rel="stylesheet" href="<{$env.app.res_url}>/css/framework.css" type="text/css" media="screen, projection"/>
+    <link rel="stylesheet" href="<{$env.app.res_url}>/css/default/style.css" type="text/css" media="screen, projection"/>
+    <{else}>
+    <link rel="stylesheet" href="<{$env.app.res_url}>/css/default/style_min.css" type="text/css" media="screen, projection"/>
+    <link href="<{$env.app.res_url}>/perfect/main.css" rel="stylesheet">
+    <{/if}>
+
+    <{foreach from=$theme_css item="desktop_theme_css_file"}>
+    <link rel="stylesheet" href="<{$desktop_theme_css_file}>" type="text/css" media="screen, projection"/>
+    <{/foreach}>
+    <{lang_css src="lang.css" app="desktop"}>
+    <{desktop_header}>
+    <{assign var='desktop_sideleft' value="desktop_{$uname}_sideleft"}>
+    <link rel="stylesheet" href="<{$env.app.res_url}>/css/default/tail.select-light.min.css" type="text/css" media="screen, projection"/>
+
+    <script>
+      startTime = (new Date).getTime();
+
+      currentWorkground = null;
+
+      /*商店事件、状态 推送包*/
+      shopeEvents = {};
+      SESS_ID=null;
+      SHOPBASE='<{$shop_base}>';
+      SHOPADMINDIR='<{$shopadmin_dir|escape:"html"}>';
+      DESKTOPRESURL='<{$env.app.res_url}>';
+      DESKTOPRESFULLURL='<{$env.app.res_full_url}>';
+      CURRENTUSER =  '<{$uname}>';
+      BREADCRUMBS ='0:0';
+      window.loadedPart = [1,0,(new Date).getTime()];
+    </script>
+    <style>
+        .side-content .side-bx .side-bx-title h3 {
+            cursor: pointer !important;
+            position: relative;
+            padding-left: 10px !important;
+            font-size: 14px !important;
+        }
+        .side-content .side-bx .side-bx-title h3::after {
+            position: absolute;
+            top: 16px;
+            left: -7px;
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-bottom: 5px solid #909399;
+            border-top-width: 0;
+            display: inline-block;
+            content: '';
+            margin-left: 5px;
+        }
+        .side-content .side-bx.active .side-bx-title h3::after {
+            position: absolute;
+            left: -7px;
+            top: 17px;
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 5px solid #909399;
+            border-bottom-width: 0;
+            display: inline-block;
+            content: '';
+            margin-left: 5px;
+        }
+        .side-content .side-bx .side-bx-bd {
+            height: auto;
+            overflow-y: hidden;
+        }
+        .side-content .side-bx.collapse .side-bx-bd {
+            height: 0;
+        }
+        .side-content .side-bx .side-bx-bd ul li a {
+            padding-left: 30px !important;
+        }
+        .wrapper #side .head-nav, .wrapper #side .side-inner {
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+<body>
+<noscript>
+    <div class='noscript error'>
+        <{t}>您好，要正常运行，浏览器必须支持Javascript<{/t}>
+    </div>
+</noscript>
+
+<{if strtolower($env.CONST.WITH_HTTPS_SUPPORT) == 'on' }>
+    <script type="text/javascript" src="https://g.alicdn.com/sj/securesdk/0.0.3/securesdk_v2.js?spm=a1z6x.7629140.0.0.5bb754beYk0IDd&file=securesdk_v2.js" id="J_secure_sdk_v2" data-appkey="<{$env.const.TOP_APP_KEY}>"></script>
+<{else}>
+<script type="text/javascript" src="http://g.tbcdn.cn/sj/securesdk/0.0.3/securesdk_v2.js" id="J_secure_sdk_v2" data-appkey="<{$env.const.TOP_APP_KEY}>"></script>
+<{/if}>
+
+<div style="display:none;height:0;overflow:hidden;">
+    <iframe src='<{$env.app.res_url}>/tpl.html' id='tplframe' class='hide'></iframe>
+    <iframe src='<{$env.app.res_url}>/about.html' name='download' id='downloadframe' class='hide'></iframe>
+    <iframe src='<{$env.app.res_url}>/about.html' name='upload' id='uploadframe' class='hide'></iframe>
+</div>
+
+<!-- 快捷操作侧边栏弹窗 -->
+<div id="quick-drawer" class="quick-drawer">
+    <div class="quick-drawer-header">
+        <h3>快捷菜单</h3>
+        <a style="text-decoration: none;" onClick="new Dialog('index.php?app=desktop&ctl=default&act=allmenu',{'title':'<{t}>快捷菜单配置<{/t}>'});" href="javascript:void(0)">
+            <i class="iconfont icon-xitongshezhi-01"></i>
+        </a>
+    </div>
+    <div class="quick-menu-list">
+        <{foreach from=$shortcuts_menus item=item key=key}>
+            <a href="index.php?<{$item}>"><{$key}></a>
+        <{/foreach}>
+    </div>
+</div>
+
+<!-- TODO 系统logo -->
+<div id="logo" class="logo">
+    <a href="index.php?ctl=dashboard&act=index">
+        <img height='17' width='87' src="<{$env.app.res_full_url}>/logo.png" alt="<{$env.conf.desktop.banner}>" >
+    </a>
+    <span style="font-family:Microsoft Yahei;font-size:18px;color:#4f638f;font-weight: bold;"><{$env.conf.desktop.logo}></span>
+</div>
+<div class="wrapper" id='body' style='visibility:hidden'>
+    <div class="msgbox" id="messagebox"></div>
+    <div class="header" id="header">
+        <div class="header-left">
+            <div id="header-crumbs" class="header-crumbs">
+            </div>
+        </div>
+        <div class="header-right">
+            <div id="quick-menu-btn" class="quick-menu right-icon-menu">
+                <i class="iconfont icon-kuaijiecaozuo-01" style="margin-right: 4px"></i>
+                快捷菜单
+            </div>
+            <!--菜单风格切换-->
+            <div class="right-icon-menu" title="菜单风格切换" onclick="switchSideMenuType()">
+                <a href="index.php?ctl=rpcnotify&act=index"><i class="iconfont icon-caidan"></i></a>
+            </div>
+
+            <div class="right-icon-menu" title="京麦评价(appId：<{$appId}>，Token：<{$depToken}>)">
+                <a href="javascript:void(0)" onclick="showEvaluate()"><i class="iconfont icon-dingdanguanli-01"></i></a>
+            </div>
+
+            <!--消息通知-->
+            <div class="right-icon-menu" title="消息通知">
+                <span class="icon-tips"><{$rpc_notify_count}></span>
+                <a href="index.php?ctl=rpcnotify&act=index"><i class="iconfont icon-xitongtongzhi-01"></i></a>
+            </div>
+            <!--短信-->
+            <div class="right-icon-menu" title="短信">
+                <span class="icon-tips"><{$msg_count}></span>
+                <a href="index.php?app=taoexlib&ctl=admin_account&act=index"><i class="iconfont icon-duanxin-01"></i></a>
+            </div>
+            <!--回收站-->
+            <div class="right-icon-menu" title="回收站">
+                <a href="index.php?app=desktop&ctl=default&act=alertpages&goto=index.php%3Fapp%3Ddesktop%26ctl%3Drecycle%26act%3Dindex%26nobuttion%3D1"><i class="iconfont icon-shanchu-01"></i></a>
+            </div>
+            <!--应用中心-->
+            <div class="right-icon-menu" title="应用中心">
+                <a href="index.php?app=desktop&ctl=appmgr&act=index"><i class="iconfont icon-yingyongzhongxin-01"></i></a>
+            </div>
+            <!-- 已授权显示 -->
+            <a class="right-icon-menu auth">
+                <img src="<{$env.app.res_full_url}>/perfect/icons/auth.png" height="16" alt>
+                <span>商业授权</span>
+                <span class="right-arrow-icon"></span>
+            </a>
+
+            <!-- 未授权显示 -->
+<!--            <a class="right-icon-menu unauth">-->
+<!--                <img src="<{$env.app.res_full_url}>/perfect/icons/unauth.png" height="16" alt>-->
+<!--                <span>未授权</span>-->
+<!--                <span class="right-arrow-icon"></span>-->
+<!--            </a>-->
+
+            <div class="right-icon-menu user-nickname">
+                <!-- 取昵称的第一个字 作为头像显示 -->
+                <span class="icon-avatar"><{$first_uname}></span>
+                <span><{$uname}></span>
+                <div id="user-account-drop" class="user-account-drop">
+                    <a href="index.php/index.php?ctl=passport&act=logout">退出登录</a>
+                    <a href="index.php?ctl=dashboard&act=chkpassword" target="dialog::{width:463,height:280,title:'<{t}>设置<{/t}>'}" >修改密码</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container clearfix" id="container">
+    <div class="side <{if $env.cookie[$desktop_sideleft] == 'OFF-SHOW'}>hide<{/if}>" id="side">
+        <div id="side-expand" class="side-expand"></div>
+        <div id="side-menu" class="head-nav clearfix"></div>
+        <div class="side-inner">
+            <div class="side-content"></div>
+        </div>
+    </div>
+
+    <div class='workground' id='workground'>
+        <div class="header-tabs">
+            <div id="header-tab-list" class="header-tab-list"></div>
+            <div class="tabs-ctl-left">
+                <i class="iconfont icon-chevron-left"></i>
+            </div>
+            <div class="tabs-ctl-right">
+                <i class="iconfont icon-chevron-right"></i>
+            </div>
+        </div>
+        <div id="__CONTEXT_MENU_BOX__" class="context-menu">
+          <div class="context-menu-item context-menu-item-left" onclick="contextMenuClick('left')">关闭左侧标签</div>
+          <div class="context-menu-item context-menu-item-right" onclick="contextMenuClick('right')">关闭右侧标签</div>
+          <div class="context-menu-item context-menu-item-other" onclick="contextMenuClick('other')">关闭其他标签</div>
+          <div class="context-menu-divider"></div>
+          <div class="context-menu-item" onclick="contextMenuClick('now')">关闭</div>
+        </div>
+        <div id="content-container" class="content-container">
+            <div class="toggler-left" id='leftToggler'>
+                <a href="javascript:void(0)" class="toggler-left-inner" title="<{t}>点击收起或展开左侧<{/t}>">&nbsp;</a>
+            </div>
+            <div class='content-head' style="font-size:0;height:0;"></div>
+            <div class='content-main' id='main'></div>
+            <div class='content-foot' style="font-size:0;height:0;"></div>
+        </div>
+    </div>
+
+    <div class="side-r hide" id="side-r">
+        <div class="side-r-modal"></div>
+        <div class="side-r-contanier">
+            <div class="side-r-resize" id="side-r-resize">&nbsp;</div>
+            <div class="side-r-top clearfix">
+                <b class="side-r-title flt f-14"></b>
+                <span class="frt side-r-close pointer">
+						<!-- <{img src="bundle/finder_drop_arrow_close.gif"}> -->
+					</span>
+            </div>
+            <div class="side-r-head" style="border-bottom:1px #999 solid;padding:2px 0 2px 0;font-size:0;height:0;">&nbsp;
+            </div>
+            <div id="side-r-content" class="side-r-content" conatainer="true" style="overflow:auto">
+            </div>
+            <div class="side-r-foot" style="font-size:0;height:0;"></div>
+            <!-- <div class="side-r-main">
+                <div class="side-r-head" style="border-bottom:1px #999 solid;padding:2px 0 2px 0;font-size:0;height:0;">&nbsp;
+                </div>
+                <div id="side-r-content" class="side-r-content" conatainer="true" style="overflow:auto">
+                </div>
+                <div class="side-r-foot" style="font-size:0;height:0;"></div>
+            </div> -->
+        </div>
+    </div>
+</div>
+
+<main id="app"></main>
+</div>
+<{lang_script src="lang.js"}>
+<{script src="loader.js" }>
+
+<{if defined('DEBUG_JS') && DEBUG_JS}>
+<{script src="moo.js" }>
+<{script src="moomore.js" }>
+<{script src="mooadapter.js" }>
+<{script src="jstools.js" }>
+<{script src="coms/wpage.js" }>
+<{script src="coms/messagebox.js" }>
+<{script src="coms/dialog.js" }>
+<{script src="coms/validate.js" }>
+<{script src="coms/dropmenu.js" }>
+<{script src="coms/finder.js" }>
+<{script src="tail.select-full.js" }>
+<{script src="image-magnifier.js" }>
+<{else}>
+<script src="<{$env.app.res_url}>/js_mini/moo_min.js" ></script>
+<script src="<{$env.app.res_url}>/js_mini/tools_min.js"></script>
+<script src="<{$env.app.res_url}>/js_mini/coms/finder.js" async="true"></script>
+
+<script src="<{$env.app.res_url}>/js_mini/tail.select-full.min.js" async="true"></script>
+<script src="<{$env.app.res_url}>/js_mini/image-magnifier.js"></script>
+<{/if}>
+
+<script src="<{$env.app.res_url}>/js_mini/es6-promise.auto.min.js" async="true"></script>
+
+<script src="https://assets.alicdn.com/s/kissy/1.2.0/kissy-min.js"></script>
+<script src="https://market.m.taobao.com/app/aliww/bc-ww/webww"></script>
+<script src="<{$env.app.res_url}>/perfect/common.js"></script>
+<script src="<{$env.app.res_url}>/perfect/side-menu.js"></script>
+<script src="<{$env.app.res_url}>/perfect/header-tabs.js"></script>
+<script src="<{$env.app.res_url}>/perfect/context-menu.js"></script>
+
+
+<script>
+  var menu = '<{$fav_menus|json_encode}>';
+  var menu_group = '<{$menus|json_encode}>';
+  var json = JSON.parse(menu_group.replace(/\s|\n/g, ''))
+  tabsController.init()
+  function switchSideMenuType() {
+    var type = localStorage.getItem('menuType') || 'expand'
+    if (type === 'expand') {
+      type = 'group'
+    } else {
+      type = 'expand'
+    }
+    localStorage.setItem('menuType', type)
+    initMenus(json, type)
+  }
+  initMenus(json, localStorage.getItem('menuType') || 'expand')
+</script>
+
+<script>
+
+  (function(){
+    <{if defined('DEBUG_JS') && DEBUG_JS}>
+  var js_path='js';
+  <{else}>
+  var js_path='js_mini';
+  <{/if}>
+
+	var	hs = {
+		'cmdrunner':{path:'<{$env.app.res_url}>/'+js_path+'/coms/cmdrunner.js?v=20211125',type:'js'},
+		'historyMan':{path:'<{$env.app.res_url}>/'+js_path+'/coms/hst.js',type:'js'},
+		'autocompleter':{path:'<{$env.app.res_url}>/'+js_path+'/coms/autocompleter.js',type:'js'},
+		'uploader':{path:'<{$env.app.res_url}>/'+js_path+'/coms/uploader.js',type:'js'},
+		'modedialog':{path:'<{$env.app.res_url}>/'+js_path+'/coms/modedialog.js',type:'js'},
+		'pager':{path:'<{$env.app.res_url}>/'+js_path+'/coms/pager.js',type:'js'},
+		<{if defined('DEBUG_JS') && DEBUG_JS}>
+		'colorpicker':{path:'<{$env.app.res_url}>/'+js_path+'/coms/colorpicker.js',type:'js'},
+		'editor_style_1':{path:'<{$env.app.res_url}>/'+js_path+'/coms/editor_style_1.js',type:'js',requires:['picker']},
+		<{/if}>
+		'picker':{path:'<{$env.app.res_url}>/'+js_path+'/coms/datapicker.js',type:'js',requires:['colorpicker']},
+		'editor':{path:'<{$env.app.res_url}>/'+js_path+'/coms/editor.js',type:'js',requires:['editor_style_1']},
+        'FX_Slide':{path:'<{$env.app.res_url}>/js/coms/Fx.Slide.js',type:'js'},
+        'security':{path:'<{$env.app.res_url}>/js/coms/security.js?v=20220826',type:'js'},
+        'layui':{path:'<{$env.app.res_url}>/'+js_path+'/layui.js',type:'js'},
+        'address':{path:'<{$env.app.res_url}>/'+js_path+'/cascader.js',type:'js'},
+        'image-magnifier':{path:'<{$env.app.res_url}>/'+js_path+'/image-magnifier.js',type:'js'}
+	};
+
+  Object.each(hs,function(v,k){Ex_Loader.add(k,v);});
+
+  if(window.ie6)Ex_Loader('<{$env.app.res_url}>/js/fixie6.js');
+
+  })();
+
+</script>
+
+<script>
+  (function(){
+    var currRoute = window.location.href.split('#')[1]
+    setTimeout(function () {
+      var cur = '<{$workground.menu_title}>';
+      $$('.head-nav dl').each(function(item){
+        var wg = item.getElement('dt a')
+        if (wg.hasClass('current'))	 {
+          var secMenu = item.getElements('.sec-menu')
+          if (secMenu) {
+            secMenu.each(function(menu) {
+              var url = menu.href.split('?')[1]
+              if (url == currRoute) {
+                menu.addClass('active')
+              } else {
+                menu.removeClass('active')
+              }
+            })
+          }
+          item.addClass('active')
+        }
+      });
+      initSideBox()
+    }, 1000)
+  })();
+  window.addEventListener('popstate', function() {
+    initSideBox()
+  });
+  function initSideBox () {
+    let sideBox = document.getElementsByClassName('side-bx')
+    for(let i=0; i<sideBox.length; i++) {
+      let titleList = sideBox[i].getElementsByClassName('side-bx-title')
+      if (titleList.length > 0) {
+        titleList[0].removeEventListener('click', initTitle)
+        titleList[0].addEventListener('click', initTitle)
+      }
+    }
+  }
+  function initTitle () {
+    if (this.getParent().hasClass('collapse')) {
+      this.getParent().removeClass('collapse')
+    } else {
+      this.getParent().addClass('collapse')
+    }
+  }
+
+  var LAYOUT = {
+    head: $('header'),
+    container: $('container'),
+    side: $('side'),
+    workground: $('workground'),
+    content_main: $('main'),
+    content_head: $E('#workground .content-head'),
+    content_foot: $E('#workground .content-foot'),
+    side_r: $('side-r'),
+    side_r_content:$('side-r-content'),
+    leftToggler:$('leftToggler')
+  };
+
+  /*init  script
+
+  this Function will run at 'loadedPart[1]==loadedPart[0]'
+  */
+  var initDesktop = function() {
+      window.resizeLayout = fixLayout = function() {
+        var _NUM = function(num){
+          num =  isNaN(num)?0:num;
+          if(num<0)num=0;
+          return num;
+        };
+        var mw=0,mh=0;
+        var winSize = window.getSize();
+
+        var containerHeight = winSize.y - LAYOUT.head.getSize().y;
+
+        LAYOUT.container.setStyle('height',_NUM(containerHeight-LAYOUT.container.getPatch().y));
+        LAYOUT.container.setStyle('width',_NUM(winSize.x.limit(960, 4000)));
+
+        // if(!LAYOUT.side.hasClass('hide')){
+        // 	LAYOUT.side.setStyle('width',_NUM( (winSize.x * 0.12).limit(0,winSize.x)));
+        // }
+        LAYOUT.workground.setStyle('width',_NUM(
+          (winSize.x - LAYOUT.workground.getPatch().x)-
+          LAYOUT.side.getSize().x)
+        ).setStyle('left',LAYOUT.side.offsetWidth);
+
+        setTimeout(function () {
+          if (!LAYOUT.side_r.hasClass('new')) {
+            LAYOUT.workground.setStyle('width',_NUM(
+              (winSize.x - LAYOUT.workground.getPatch().x)-
+              LAYOUT.side.getSize().x-
+              LAYOUT.side_r.getSize().x)
+            ).setStyle('left',LAYOUT.side.offsetWidth);
+          }
+        }, 10)
+
+        LAYOUT.content_main.setStyles({'height':
+            (mh=_NUM(containerHeight -
+              LAYOUT.content_head.getSize().y  -
+              LAYOUT.content_foot.getSize().y  -
+              LAYOUT.workground.getPatch().y)),
+          'width':(mw=_NUM(LAYOUT.workground.getSize().x-LAYOUT.workground.getPatch().x))
+        }).fireEvent('resizelayout',[{x:mw,y:mh}]);
+
+
+        if(!LAYOUT.side_r.hasClass('hide')){
+          // if(!LAYOUT.side_r.get('widthset'))
+          // LAYOUT.side_r.setStyle('width',_NUM((winSize.x*0.15).limit(0,winSize.x)));
+          // LAYOUT.side_r_content.setStyle('height',
+          //     _NUM(containerHeight-
+          // 	LAYOUT.side_r.getElement('.side-r-top').getSize().y-
+          //     LAYOUT.side_r.getElement('.side-r-head').getSize().y-
+          // 	LAYOUT.side_r.getElement('.side-r-foot').getSize().y-
+          //     LAYOUT.side_r_content.getPatch().y-
+          // 	LAYOUT.side_r.getPatch().y)
+          // );
+          // LAYOUT.side_r.setStyle('left',winSize.x - LAYOUT.side_r.offsetWidth);
+        }
+      };
+
+      resizeLayout();
+
+      Side_R = new Class({
+        Implements: [Options, Events],
+        options: {
+          onShow: $empty,
+          onHide: $empty,
+          onReady: $empty,
+          isClear:true,
+          width:false
+        },
+        initialize: function(url, opts) {
+          this.setOptions(opts);
+          this.panel = $('side-r');
+          this.container = $('side-r-content');
+          var trigger = this.options.trigger;
+          this.panel.removeClass('new')
+          if(trigger&&!trigger.retrieve('events',{})['dispose']) {
+
+            trigger.addEvent('dispose',function(){
+              $('side-r').addClass('hide');
+              $('side-r-content').empty();
+              $('side-r').removeProperty('widthset').store('url','');
+            });
+          }
+
+
+          if(this.panel.retrieve('url','') == url)return;
+
+          if (url) {
+            this.showSide(url);
+          } else {
+            throw Exception('NO TARGET URL');
+            return;
+          }
+
+          var btn_close = this.panel.getElement('.side-r-close');
+          var btn_modal = this.panel.getElement('.side-r-modal');
+          var _title = this.panel.getElement('.side-r-title');
+
+          _title.set('html',this.options.title||"");
+
+          if(btn_close){
+            btn_close.removeEvents('click').addEvent('click', this.hideSide.bind(this));
+          }
+          if(btn_modal){
+            btn_modal.removeEvents('click').addEvent('click', this.hideSide.bind(this));
+          }
+
+        },
+        showSide: function(url) {
+          this.cleanContainer();
+
+          var _this = this;
+          if(_this.options.width&&!_this.panel.get('widthset')){
+            _this.panel.set({'widthset':_this.options.width,styles:{width:_this.options.width}});
+          }
+          _this.panel.removeClass('hide');
+          _this.fireEvent('show');
+          window.resizeLayout();
+          if(this.cache)return;
+          W.page(url,{
+            update:_this.container,
+            render:false,
+            onRequest: function() {
+              _this.panel.addClass('loading');
+            },
+            onComplete: function() {
+              _this.panel.removeClass('loading');
+              _this.fireEvent('ready', $splat(arguments));
+              _this.panel.store('url',url);
+              _this.container.style.height = (_this.container.style.height.toInt()-_this.container.getPrevious().getSize().y-_this.container.getNext().getSize().y)+'px';
+
+            }
+          });
+        },
+        hideSide: function() {
+          var side_r_contanier = this.panel.getElement('.side-r-contanier')
+          if (side_r_contanier.hasClass('active')) {
+            side_r_contanier.removeClass('active')
+            var _this = this
+            setTimeout(function() {
+              _this.panel.addClass('hide');
+              window.resizeLayout();
+              _this.cleanContainer();
+              _this.fireEvent('hide');
+            }, 500)
+          } else {
+            this.panel.addClass('hide');
+            window.resizeLayout();
+            this.cleanContainer();
+            this.fireEvent('hide');
+          }
+        },
+        cleanContainer: function() {
+          this.panel.store('url','');
+          if(this.options.isClear)this.container.empty();
+        }
+      });
+
+
+      new Drag($('side-r-resize'), {
+        modifiers: {
+          'x': 'left',
+          'y':false
+        },
+        onBefore:function(el){
+          el.addClass('side-r-resize-ing');
+        },
+        onDrag: function(el) {
+
+          el.addClass('side-r-resize-ing');
+
+        },
+        onComplete: function(el) {
+          el.removeClass('side-r-resize-ing');
+
+          var left = el.getStyle('left');
+          left = left.toInt();
+
+          if (LAYOUT.side_r.hasClass('new')) {
+            let con_wid = LAYOUT.side_r.getElement('.side-r-contanier')
+            var _w = con_wid.getSize().x-(left-(-5));
+            con_wid.style.width = _w+'px';
+            con_wid.style.right = '-'+_w+'px';
+            con_wid.set('widthset',_w);
+            // LAYOUT.side_r.getElement('.side-r-foot').style.width = _w+'px';
+            // LAYOUT.side_r.getElement('.side-r-foot').style.right = '-'+_w+'px';
+          } else {
+            var _w =  LAYOUT.side_r.style.width.toInt()-(left-(-5));
+            LAYOUT.side_r.style.width = _w+'px';
+            LAYOUT.side_r.set('widthset',_w);
+          }
+
+          el.style.left = '-5px';
+          resizeLayout();
+        }
+      });
+
+
+      /*MODAL PANEL*/
+      MODALPANEL = {
+        createModalPanel:function(){
+          var mp = new Element('div',{'id':'MODALPANEL'});
+          var mpStyles = {
+            'position': 'absolute',
+            'background': '#000',
+            'width': '100%',
+            'display':'none',
+            'height': window.getScrollSize().y,
+            'top': 0,
+            'left': 0,
+            'zIndex': 65500,
+            'opacity': .4
+          };
+          this.element = mp.setStyles(mpStyles).inject(document.body);
+          return this.element;
+        },
+        show:function(){
+          var panel = this.element = this.element||this.createModalPanel();
+          panel.setStyles({
+            'width': '100%',
+            'height': window.getScrollSize().y
+          }).show();
+        },hide:function(){
+          if(this.element)this.element.hide();
+        }
+      };
+
+
+      var windowResizeTimer = 0;
+      window.addEvent('resize',function() {
+        $clear(windowResizeTimer);
+        windowResizeTimer = window.resizeLayout.delay(200);
+
+        if(MODALPANEL.element&&MODALPANEL.element.style.display!='none'){
+          MODALPANEL.element.setStyles({
+            'height':window.getScrollSize().y
+          });
+        }
+
+      });
+
+
+      $('leftToggler').addEvent('click',function(e) {
+        if(this.hasClass('fixed'))return;
+
+        LAYOUT.side.toggleClass('hide');
+
+        var fcokk =  'desktop_'+CURRENTUSER+'_sideleft';
+        if(!LAYOUT.side.hasClass('hide')){
+          Cookie.dispose(fcokk);
+        }else{
+          Cookie.write(fcokk,'OFF-SHOW',{duration:365});
+        }
+        fixSideToggler();
+        window.resizeLayout();
+      });
+
+      var fixSideToggler = (function(){
+        $('leftToggler').getElement('.toggler-left-inner')[ LAYOUT.side.hasClass('hide')? 'addClass' : 'removeClass' ]('hide');
+        return arguments.callee;
+      })();
+
+      fixSideLeft = function(act){
+        $('leftToggler')[act+'Class']('fixed');
+        if(Cookie.read('desktop_'+CURRENTUSER+'_sideleft'))act='add';
+        LAYOUT.side[act+'Class']('hide-submeu');
+        window.resizeLayout();
+      };
+      /*发货失败处理*/
+
+    // TODO 注释
+    //   $('syncwarn').addEvents({
+    //     'mouseenter':function(){
+    //       this.addClass('favor-active');
+    //       var drop_menu=this.getElement('.x-drop-menu'),
+    //         handle_h=this.getElement('.syncwarn-handle').offsetHeight,
+    //         drop_menu_h= window.getSize().y-handle_h;
+    //       drop_menu.setStyles({
+    //         top:handle_h-1,
+    //         left:0,
+    //         visibility:'visible'
+    //       });
+    //
+    //       if(drop_menu_h <= drop_menu.offsetHeight){
+    //         var edit_menu=this.getElement('.x-edit-menu'),
+    //           menu_h=drop_menu_h-drop_menu.getPatch().y;
+    //
+    //         drop_menu.setStyle('height',menu_h);
+    //       }
+    //     },
+    //     'mouseleave':function(){
+    //       this.removeClass('favor-active');
+    //       this.getElement('.x-drop-menu').setStyles({
+    //         visibility:'hidden',
+    //         height:'auto'
+    //       });
+    //     }
+    //   });
+
+      // TODO 注释
+      /*快捷菜单处理*/
+      // $('favor').addEvents({
+      //   'mouseenter':function(){
+      //     this.addClass('favor-active');
+      //     var drop_menu=this.getElement('.x-drop-menu'),
+      //       handle_h=this.getElement('.favor-handle').offsetHeight,
+      //       drop_menu_h= window.getSize().y-handle_h;
+      //     drop_menu.setStyles({
+      //       top:handle_h-1,
+      //       left:0,
+      //       visibility:'visible'
+      //     });
+      //
+      //     if(drop_menu_h <= drop_menu.offsetHeight){
+      //       var edit_menu=this.getElement('.x-edit-menu'),
+      //         menu_h=drop_menu_h-drop_menu.getPatch().y;
+      //
+      //       drop_menu.setStyle('height',menu_h).getElement('ul')
+      //         .setStyles({'overflow-y':'auto','height':menu_h-edit_menu.offsetHeight});
+      //     }
+      //   },
+      //   'mouseleave':function(){
+      //     this.removeClass('favor-active');
+      //     this.getElement('.x-drop-menu').setStyles({
+      //       visibility:'hidden',
+      //       height:'auto'
+      //     }).getElement('ul').setStyle('height','auto');
+      //   }
+      // });
+
+
+    // TODO 注释
+    //   void function(){
+    //     var winSize = window.getSize();
+    //     var dmenu = $('favor').getElement('.x-drop-menu');
+    //     dmenu.setStyle('width',winSize.x-$('favor').getPosition().x-dmenu.getPatch().x + 143);
+    //     var dinfo = $('syncwarn').getElement('.x-drop-menu');
+    //     dinfo.setStyle('width',winSize.x-$('syncwarn').getPosition().x-dinfo.getPatch().x + 143);
+    //
+    //     var favs = $$('#favor li');
+    //     favs.pop();
+    //     new Equalizer(favs).equalize('width');
+    //   }();
+
+
+      <{if count($fav_menus)>0}>
+    /*顶部菜单处理*/
+    void function(){
+      var _timer = 0;
+      var _mouse = true;
+      var _absoluteFix =  function(f,t){
+        var pos =  {};
+
+        var fcis = f.getCoordinates();
+        var tsize = t.getSize();
+        var wsize = window.getSize();
+        if((wsize.x-fcis.right)<tsize.x){
+          $extend(pos,{left:Math.abs(fcis.right-tsize.x),top:fcis.bottom});
+        }else{
+          $extend(pos,{left:fcis.left,top:fcis.bottom});
+        }
+
+        return pos;
+      }
+      var getCurWgMenu = function(){return LAYOUT.head.getElement('a[mid='+BREADCRUMBS.split(":")[0]+']');}
+      var workMenus = $$('.head-nav dl');
+      workMenus.each(function(item){
+        var aEl = item.getElement('dt a')
+        if (aEl.hasClass('current')) {
+          item.addClass('active')
+        }
+        let route = aEl.href.split('?')[1]
+        aEl.addEvent('click',function(){
+          workMenus.each(function(el, idx) {
+            let index = workMenus.indexOf(item)
+            if (index == idx) {
+              var secMenu = item.getElements('.sec-menu')
+              if (secMenu) {
+                secMenu.each(function(menu) {
+                  var url = menu.href.split('?')[1]
+                  if (url == route) {
+                    menu.addClass('active')
+                  } else {
+                    menu.removeClass('active')
+                  }
+                })
+              }
+              el.addClass('active');
+            } else {
+              el.removeClass('active');
+            }
+          })
+        });
+
+        var secMenu = item.getElements('.sec-menu')
+        if (secMenu) {
+          secMenu.each(function (secItem) {
+            secItem.addEvent('click',function(){
+              secMenu.each(function (item1, index1) {
+                if (index1 == secMenu.indexOf(secItem)) {
+                  item1.addClass('active')
+                } else {
+                  item1.removeClass('active')
+                }
+              })
+            });
+          })
+        }
+      });
+
+    }();
+
+  <{/if}>
+
+
+  /*每 30秒 同步一下后台 的事项*/
+  TaskRemote = {
+    url: "index.php?ctl=default&act=status",
+    timer: 30000,
+    delay: 0,
+    stop:function(){
+      $clear(this.delay);
+    },
+    start:function(){
+      this.delay = this.doit.delay(this.timer, this);
+    },
+    init: function() {
+      var _this = this;
+      this.request = (new Request.HTML({
+        url:this.url,
+        onSuccess: function(nodes, elements, responsetext, javascript) {
+          $clear(_this.delay);
+          _this.delay = _this.doit.delay(_this.timer, _this);
+        },
+        onCancel: function() {
+          _this.delay = _this.doit.delay(_this.timer, _this);
+        },
+        onFailure: function() {
+          _this.delay = _this.doit.delay(_this.timer * 2, _this);
+        }
+      }));
+      return this;
+    },
+    doit: function(_chain) {
+
+      _chain =$type(_chain)=='function'?_chain : $empty;
+
+      return this.request.post({
+        events: shopeEvents
+      }).chain(_chain);
+    }
+  };
+  TaskRemote.init().start();
+
+
+  EventsRemote = new Request({url:'index.php?ctl=default&act=desktop_events'});
+
+  var keyObj = <{$keyboard_setting_json}>;
+  $(window.gecko?document.documentElement:document.body).addEvent('keydown',function(e){
+    if(e.target==this){
+      if(e.code==32)e.stop();
+      Hotkey.init(e,keyObj);
+    }
+  });
+
+
+  Xtip = new Tips();
+
+  /*default Action
+      ctl=dashboard&act=index
+  */
+  W = new Wpage({},'ctl=dashboard&act=index').chain(function(){
+    $('body').setStyles({visibility:'visible'});
+  });
+
+
+  W.render(document.body);
+
+  (function(){
+    if(!Browser.Platform.ios)return;
+    var start = {x:0,y:0};
+    var fx = new Fx.Scroll('main',{link:'cancel'});
+    $('main').addEvents({
+      touchstart:function(e){
+        start = e.page;
+      },
+      touchmove:function(e){
+        e.stop();
+        fx.start(this.scrollLeft-(e.page.x-start.x),this.scrollTop-(e.page.y-start.y));
+      }
+    });
+  })();
+  };//function end;
+
+  window.addEvent('domready',initDesktop);
+
+  function _get_rpcnotify_num(obj) {
+    W.page('index.php?app=desktop&ctl=rpcnotify&act=read',{method:'POST',onComplete:function(){
+        var notify=$E('#topbar .notify_num');
+        if(notify){
+          var msg=notify.get('text'),n;
+          n=msg.substring(1,msg.length-1);
+          n=n-1>0?'('+(n-1)+')':'';
+          notify.set('text',n);
+        }
+      },data:{id:$(obj).getParent('tr').getElement('input').get('value')}
+    });
+  }
+
+  <{if $cloud_url}>
+  function redirect_cloud(){
+    _request =
+      new Request({
+        url:'index.php?app=desktop&ctl=default&act=clear_session',
+        method:'post',
+        onComplete:function(res){
+          top.location = '<{$cloud_url}>';
+        }
+      }).send();
+  }
+  <{/if}>
+
+  //NPS京东评价弹框
+  function showEvaluate()
+  {
+      var token = "<{$depToken}>";
+      var appId = "<{$appId}>";
+
+      //check
+      if(token == '' || appId == ''){
+          alert("appId或者Token为空");
+          return false;
+      }
+
+      var script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = '//jm-static.jd.com/shop-common-components/shop-common-components.iife.js?appId='+appId;
+      script.async = true;
+      document.body.appendChild(script);
+      script.onload = function () {
+          var customParams={
+              nps:{
+                  npsNodeIdLv1:'CJ_LISTEN_JM_ISV', // 传入一级场景id
+                  npsNodeIdLv2:'CJ_LISTEN_JM_ISV_SPERP', // 传入自己应用的二级场景id====CJ_LISTEN_JM_ISV_SPERP、CJ_LISTEN_JM_ISV_SPOMS
+                  npsStatus:true,
+                  token: token
+              }
+          }
+
+          // 把组件插入dom中
+          // 第一种插入办法
+          //$(document.body).append('<shop-common-components type="NPS" custom-params=\''+JSON.stringify(customParams)+'\'></shop-common-components>');
+
+          // 第二种插入办法，如果第一种不行可以使用第二种，或直接使用第二种
+          var customComponentHTML = '<shop-common-components type="NPS" custom-params=\'' + JSON.stringify(customParams) + '\'></shop-common-components>';
+          document.body.insertAdjacentHTML('beforeend', customComponentHTML);
+
+          window.shopCommonComponents.registerCommonComponents();
+      }
+  }
+</script>
+<{foreach from=$theme_scripts item="desktop_theme_js"}>
+<script type="text/javascript" src="<{$desktop_theme_js}>"></script>
+<{/foreach}>
+<{desktop_footer}>
+</body>
+</html>

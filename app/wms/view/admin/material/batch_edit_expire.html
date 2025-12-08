@@ -1,0 +1,257 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $total > 0}>
+<style>
+    .processBarBg {border:1px solid #999999; width:98%; margin:5px; height:25px;line-height:25px;padding:1px; background:#EEEEEE;}
+    .processBar {background:#3366cc; width:0px; padding-bottom:1px;overflow:hidden;}
+</style>
+<div id="processBarBg" class="processBarBg"><div id="processBar" class="processBar">&nbsp;</div></div>
+
+<div class="division" style="display:none;" id="information">
+<span id="iSucc" style="color:green">0</span> 个成功，
+<span id="iFail" style="color:red">0</span> 个失败
+</div>
+
+<div class="tableform">
+    <form id="order-batch-dialog" method='post' action='index.php?app=wms&ctl=admin_material_storagelife&act=batch_save'>
+        <input type="hidden" name="filter" value="<{$filter}>">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td width="200" align="right" nowrap="nowrap" class="memo"><strong>物料生产日期：</strong></td>
+                <td><{input type="date" vtype="date" id="production_date" name="production_date" value=$item.production_date style="width:100px; font-family:arial;"}></td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td align="right" class="memo"><strong>保质期时长：</strong></td>
+                <td>
+                    <select name="date_type" id="date_type">
+                        <option value="day" <{if $item.date_type == 1}>selected="selected"<{/if}> >按天</option>
+                        <option value="month" <{if $item.date_type == 2}>selected="selected"<{/if}> >按月</option>
+                        <option value="year" <{if $item.date_type == 3}>selected="selected"<{/if}> >按年</option>
+                        <option value="date" <{if $item.date_type == 4}>selected="selected"<{/if}> >按过期日期</option>
+                    </select>&nbsp;&nbsp;<input name="guarantee_period" type="text" id="guarantee_period" size="15" maxlength="5" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" value="<{$item.guarantee_period}>" />
+                </td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td width="200" align="right" nowrap="nowrap" class="memo"><strong>过期日期：</strong></td>
+                <td id="show_cal" style="display:none;"><{input type="date" vtype="date" id="expiring_date" name="expiring_date" style="width:100px; font-family:arial;"}></td>
+                <td id="show_input" ><input type="text" id="expiring_date" name="expiring_date" value="<{$item.expiring_date}>" readonly="readonly"></td>
+                <td>&nbsp;</td>
+              </tr>
+        </table>
+    </form>
+</div>
+<div class="table-action">
+<{button label="开始" type="botton" name="Start" id="btn-run"}>
+<{button label="关闭" type="botton" isCloseDialogBtn="true" }>
+</div>
+<script type="text/javascript">
+(function(){
+    function process(page_no){
+        var _form = $("order-batch-dialog");
+        var _input = document.getElementsByTagName('input');
+        var _textarea = document.getElementsByTagName('textarea');
+        var url = _form.action+'&page_no='+page_no+'&total=<{$total}>';
+        if(! validate(_form)) return;
+        new Request({url:url,method:'post',data:_form,
+            onComplete:function(result){
+                if(!result) return;
+                ret = JSON.decode(result);
+
+                var succ_num = $('iSucc').getText().toInt() + ret.data.succ_num;
+                var fail_num = $('iFail').getText().toInt() + ret.data.fail_num;
+                $('iSucc').set('html', succ_num);
+                $('iFail').set('html', fail_num);
+                
+                $('processBar').setStyle('width', ret.data.rate + '%');
+                if (ret.status == 'running') {
+                    page_no++;
+                    return process(page_no);
+                };
+
+                $('btn-run').set('html', '<span><span>处理已完成，本窗口将在3秒后自动关闭！</span></span>');
+                setTimeout("$('btn-run').getParent('.dialog').retrieve('instance').close();finderGroup['<{$env.get.finder_id}>'].refresh();",2000);
+            },
+            onRequest:function(){
+                $('information').style.display ='';
+                $('btn-run').disabled = true;
+                if(_input){
+                    for(var key in _input){
+                       SetReadOnly(_input[key]);
+                    }
+                }
+                if(_textarea){
+                    for(var key in _textarea){
+                       _textarea[key].readOnly=true;
+                    }
+                }
+                $('btn-run').set('html', '<span><span>数据处理中，请稍候！</span></span>');
+            }
+        }).send();
+    }
+
+    $("btn-run").addEvent('click',function(){
+        var flag		= submit_frm();
+        if(flag)
+        {
+            clearInterval(intervalName);
+        }
+        process(1);
+    });
+
+})();
+
+function SetReadOnly(obj) {
+    if (obj.type == 'radio') {
+        // 单选框时，设置所有具有相同name的radio为只读  
+        if (obj.name) {
+            var arr = document.getElementsByName(obj.name);
+            var len = arr.length;
+            var tmp = null;
+            for (var i = 0; i < len; i++)
+                if (arr[i].checked) {
+                tmp = arr[i];
+                break;
+            }  
+            var func;  
+            if (tmp)  
+                func = function() { tmp.checked = true; };
+            else  
+                func = function() { return false; };
+            for (var i = 0; i < len; i++)
+                arr[i].onclick = func;
+        } else
+            obj.onclick = function() { return false; };
+    }
+}
+
+function find_date_change()
+{
+	var production_date = $('production_date').value;
+	var expiring_date = $('expiring_date').value;
+	var date_type = $('date_type').value;
+	var guarantee_period = $('guarantee_period').value;
+	
+	if(production_date && expiring_date){
+		var dates = production_date.split('-');
+		var cur_year = dates[0].toInt();
+		var cur_month = dates[1].toInt()-1;
+		var cur_day = dates[2].toInt();
+		var date = new Date(cur_year,cur_month,cur_day);
+
+		dates = expiring_date.split('-');
+		cur_year = dates[0].toInt();
+		cur_month = dates[1].toInt()-1;
+		cur_day = dates[2].toInt();
+		var date2 = new Date(cur_year,cur_month,cur_day);
+
+		switch(date_type){
+			case 'date':
+				$('guarantee_period').value = (date2-date)/86400000;
+				return;
+				break;
+		}
+	}
+
+	if(production_date && guarantee_period){
+		var dates = production_date.split('-');
+		var cur_year = dates[0].toInt();
+		var cur_month = dates[1].toInt()-1;
+		var cur_day = dates[2].toInt();
+
+		var date = new Date(cur_year,cur_month,cur_day);
+		switch(date_type){
+			case 'day':
+				$('show_input').getElement("input[name=expiring_date]").value = new Date(cur_year,cur_month,cur_day+guarantee_period.toInt()).toLocaleDateString().replace(/[\/]+/g,'-');
+				return;
+				break;
+			case 'month':
+				$('show_input').getElement("input[name=expiring_date]").value = new Date(cur_year,cur_month+guarantee_period.toInt(),cur_day).toLocaleDateString().replace(/[\/]+/g,'-');
+				return;
+				break;
+			case 'year':
+				$('show_input').getElement("input[name=expiring_date]").value = new Date(cur_year+guarantee_period.toInt(),cur_month,cur_day).toLocaleDateString().replace(/[\/]+/g,'-');
+				return;
+				break;
+		}
+	}
+}
+
+var intervalName ='';
+clearInterval(intervalName);
+intervalName = setInterval("find_date_change();", 800);
+
+$('date_type').addEvent('change', function(e) {
+	if(this.value == 'date'){
+		$('show_input').setStyle('display','none');
+		$('show_cal').setStyle('display','block');
+		$('guarantee_period').value ='';
+		$('guarantee_period').set('readonly',true);
+		$('show_input').getElement("input[name=expiring_date]").value ='';
+		$('show_cal').getElement("input[name=expiring_date]").value ='';
+	}else{
+		$('show_input').setStyle('display','block');
+		$('show_cal').setStyle('display','none');
+		$('guarantee_period').value ='';
+		$('guarantee_period').set('readonly',false);
+		$('show_input').getElement("input[name=expiring_date]").value ='';
+		$('show_cal').getElement("input[name=expiring_date]").value ='';
+	}
+});
+
+function submit_frm()
+{
+	var date_type	= $('date_type').value;
+	var production_date	= $('production_date').value;
+	var guarantee_period	= $('guarantee_period').value;
+	var expiring_date	    = $('expiring_date').value;
+	
+	guarantee_period	= (guarantee_period ? parseInt(guarantee_period) : 0);
+	
+	if(production_date == '')
+	{
+		alert('请选择生产日期!');
+		$('time_from').focus();
+		return false;
+	}
+	
+	if(guarantee_period == '' || guarantee_period <= 0)
+	{
+		alert('请输入保质期!');
+		$('guarantee_period').focus();
+		return false;
+	}
+	
+	if(production_date && expiring_date)
+	{
+		var start = production_date.split('-');
+	
+		var cur_year = start[0].toInt();
+		var cur_month = start[1].toInt()-1;
+		var cur_day = start[2].toInt();
+		var date = new Date(cur_year,cur_month,cur_day);
+	
+		var end = expiring_date.split('-');
+		cur_year = end[0].toInt();
+		cur_month = end[1].toInt()-1;
+		cur_day = end[2].toInt();
+		var date2 = new Date(cur_year,cur_month,cur_day);
+		
+		if(date2 <= date){
+			alert('过期日期不能早于生产日期!');
+			$('expiring_date').focus();
+			return false;
+		}
+	}
+	
+    return true;
+}
+</script>
+
+<{else}>
+<h2 style="color:red;">暂无符合条件的保质期</h2>
+<{/if}>

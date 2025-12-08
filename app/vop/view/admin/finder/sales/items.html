@@ -1,0 +1,72 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<h3>明细信息</h3>
+<div class="division">
+    <table>
+        <tbody>
+            <tr>
+                <th>SO单号：</th>
+                <td><{$sales.sale_bn}></td>
+                <th>业务单号：</th>
+                <td><{$sales.bill_bn}></td>
+                <th>业务类型：</th>
+                <td><{$sales.bill_type}></td>
+                <th>原始单据号：</th>
+                <td><{$sales.original_bn}></td>
+            </tr>
+            <tr>
+                <th>仓库编码：</th>
+                <td><{$sales.branch_bn}></td>
+                <th>仓库名称：</th>
+                <td><{$sales.branch_name}></td>
+                <th>承运商：</th>
+                <td><{$sales.logi_code}></td>
+                <th>运单号：</th>
+                <td><{$sales.logi_no}></td>
+            </tr>
+            <tr>
+                <th>采购单号：</th>
+                <td><{$sales.po_bn}></td>
+                <th>销售时间：</th>
+                <td><{$sales.sale_time|cdate:'FDATE_FTIME'}></td>
+                <th>店铺编码：</th>
+                <td><{$sales.shop_bn}></td>
+                <th>店铺名称：</th>
+                <td><{$sales.shop_name}></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="division">
+<table class="gridlist">
+    <thead>
+        <tr>
+            <td>基础物料编码</td>
+            <td>基础物料条码</td>
+            <td>基础物料名称</td>
+            <td>发货数量</td>
+            <td>销售单价</td>
+            <td>销售小计</td>
+            <td>结算小计</td>
+        </tr>
+    </thead>
+    <tbody>
+        <{foreach from=$items item=item}>
+        <tr>
+            <td><{$item.material_bn}></td>
+            <td><{$item.barcode}></td>
+            <td><{$item.material_name}></td>
+            <td><{$item.nums}></td>
+            <td><{$item.price}></td>
+            <td><{$item.amount}></td>
+            <td><{$item.settlement_amount}></td>
+        </tr>
+        <{/foreach}>
+    </tbody>
+</table>
+</div>
+</div>

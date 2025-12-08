@@ -1,0 +1,64 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+#widgets_consultinfo, #widgets_patchinfo{width:100%;}
+#widgets_consultinfo tr, #widgets_patchinfo tr{ height:30px;line-height:30px;color:#333}
+#widgets_consultinfo tr th, #widgets_patchinfo tr th{text-align:left;width:70%;}
+#widgets_consultinfo tr td, #widgets_patchinfo tr td{text-align:right;font-weight:normal;padding-right:10px;}
+#ome_desktop_widgets_consultinfo .no_infos, #ome_desktop_widgets_patchinfo .no_infos{padding:10px 0 5px 0;}
+</style>
+
+<div class="item flt" id="ome_desktop_widgets_consultinfo">
+    <div class="dashbd-action"></div>
+    <div class="dashbd-bd">
+        <div class="dashbd-head">
+            <div class="dashbd-headl">产品动态</div>
+        </div>
+
+        <div class="dashbd-list">
+            <div class="clearfix dashbd-row">
+                <{if $info.news}>
+                <table id="widgets_consultinfo" cellpadding="0" cellspacing="0">
+                    <{foreach from=$info.news item=item}>
+                        <tr>
+                            <th><{$item.url}></th>
+                            <td><{$item.publish_date}></td>
+                        </tr>
+                    <{/foreach}>
+                </table>
+                <{else}>
+                    <div class="no_infos">暂无任何产品动态......</div>
+                <{/if}>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="item flt" id="ome_desktop_widgets_patchinfo">
+    <div class="dashbd-action"></div>
+    <div class="dashbd-bd">
+        <div class="dashbd-head">
+            <div class="dashbd-headl">升级补丁</div>
+        </div>
+
+        <div class="dashbd-list">
+            <div class="clearfix dashbd-row">
+                <{if $info.changelog}>
+                <table id="widgets_consultinfo" cellpadding="0" cellspacing="0">
+                    <{foreach from=$info.changelog item=item}>
+                        <tr>
+                            <th><{$item.url}></th>
+                            <td><{$item.publish_date}></td>
+                        </tr>
+                    <{/foreach}>
+                </table>
+                <{else}>
+                    <div class="no_infos">暂无任何升级补丁......</div>
+                <{/if}>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,82 @@
+<desktop>
+    <permissions>
+        <permission id="basic_material">基础物料</permission>
+        <permission id="basic_material_add">基础物料新增</permission>
+        <permission id="basic_material_edit">基础物料编辑</permission>
+        <permission id="basic_material_detail">基础物料查看详情</permission>
+        <permission id="basic_material_show_history">基础物料查看快照</permission>
+        <permission id="basic_material_export">基础物料导出</permission>
+        <permission id="basic_material_import">基础物料导入</permission>
+        <permission id="basic_material_delete">基础物料删除</permission>
+        <permission id="basic_material_sale">基础物料批量在售</permission>
+        <permission id="basic_material_unsale">基础物料批量停售</permission>
+        <permission id="basic_material_uselife">基础物料批量保质期</permission>
+        <permission id="basic_material_property">基础物料批量属性</permission>
+        <permission id="basic_material_omnichannel">基础物料批量全渠道</permission>
+        <permission id="sales_material">销售物料</permission>
+        <permission id="sales_material_add">销售物料新增</permission>
+        <permission id="sales_material_edit">销售物料编辑</permission>
+        <permission id="sales_material_export">销售物料导出</permission>
+        <permission id="sales_material_import">销售物料导入</permission>
+        <permission id="sales_material_delete">销售物料删除</permission>
+        <permission id="sales_show_history">销售物料查看快照</permission>
+        <permission id="sales_detail">销售物料查看详情</permission>
+        <permission id="barcode_manage">条码</permission>
+        <permission id="material_cat">基础物料分类</permission>
+        <permission id="material_channel">渠道商品列表</permission>
+        <permission id="sales_material_invoice_import">销售物料发票信息导入</permission>
+        <permission id="material_fukubukuro">福袋组合</permission>
+        <permission id="material_fukubukuro_add">福袋组合新增</permission>
+        <permission id="material_fukubukuro_edit">福袋组合编辑</permission>
+        <permission id="material_fukubukuro_delete">福袋组合删除</permission>
+        <permission id="material_fukubukuro_import">福袋组合导入</permission>
+        <permission id="material_fukubukuro_export">福袋组合导出</permission>
+        <permission id="material_customer_classify">客户分类</permission>
+    </permissions>
+
+    <workground name="基础档案" id="goods_manager"  order="600" icon="icon-jichudangan-01">
+        <menugroup name="物料管理" en="material-management">
+            <menu controller='admin_material_basic' action='index' permission='basic_material' display='true' order='1000100'>基础物料</menu>
+            <menu controller='admin_material_basic' action='add' permission='basic_material_add' display='false' order='1000100'>基础物料新增</menu>
+            <menu controller='admin_material_basic' action='edit' permission='basic_material_edit' display='false' order='1000100'>基础物料编辑</menu>
+            <menu controller='admin_material_basic' action='detail' permission='basic_material_detail' display='false' order='1000100'>基础物料查看详情</menu>
+            <menu controller='admin_material_basic' action='show_history' permission='basic_material_show_history' display='false' order='1000100'>基础物料查看快照</menu>
+            <menu controller='admin_material_basic' action='export' permission='basic_material_export' display='false' order='1000100'>基础物料导出</menu>
+            <menu controller='admin_material_basic' action='import' permission='basic_material_import' display='false' order='1000100'>基础物料导入</menu>
+            <menu controller='admin_material_basic' action='delete_material' permission='basic_material_delete' display='false' order='1000100'>基础物料删除</menu>
+            <menu controller='admin_material_basic' action='sale' permission='basic_material_sale' display='false' order='1000100'>基础物料批量在售</menu>
+            <menu controller='admin_material_basic' action='unsale' permission='basic_material_unsale' display='false' order='1000100'>基础物料批量停售</menu>
+            <menu controller='admin_material_basic' action='uselife' permission='basic_material_uselife' display='false' order='1000100'>基础物料批量保质期</menu>
+            <menu controller='admin_material_basic' action='property' permission='basic_material_property' display='false' order='1000100'>基础物料批量属性</menu>
+            <menu controller='admin_material_basic' action='omichannel' permission='basic_material_omnichannel' display='false' order='1000100'>基础物料批量全渠道</menu>
+            <menu controller='admin_material_sales' action='index' permission='sales_material' display='true' order='1000200'>销售物料</menu>
+            <menu controller='admin_material_sales' action='add' permission='sales_material_add' display='false' order='1000201'>销售物料新增</menu>
+            <menu controller='admin_material_sales' action='edit' permission='sales_material_edit' display='false' order='1000201'>销售物料编辑</menu>
+            <menu controller='admin_material_sales' action='export' permission='sales_material_export' display='false' order='1000201'>销售物料导出</menu>
+            <menu controller='admin_material_sales' action='import' permission='sales_material_import' display='false' order='1000201'>销售物料导入</menu>
+            <menu controller='admin_material_sales' action='delete_material' permission='sales_material_delete' display='false' order='1000201'>销售物料删除</menu>
+            <menu controller='admin_material_sales' action='show_history' permission='sales_show_history' display='false' order='1000201'>销售物料查看快照</menu>
+            <menu controller='admin_material_sales' action='detail' permission='sales_detail' display='false' order='1000201'>销售物料查看详情</menu>
+            <menu controller='admin_material_sales' action='execlImportDailog' permission='sales_material_invoice_import' display='false' order='1000100'>销售物料发票信息导入</menu>
+            <menu controller='admin_fukubukuro_combine' action='index' permission='material_fukubukuro' display='true' order='1000300'>福袋组合</menu>
+            <menu controller='admin_fukubukuro_combine' action='add' permission='material_fukubukuro_add' display='false' order='1000301'>福袋组合新增</menu>
+            <menu controller='admin_fukubukuro_combine' action='edit' permission='material_fukubukuro_edit' display='false' order='1000302'>福袋组合编辑</menu>
+            <menu controller='admin_fukubukuro_combine' action='delete' permission='material_fukubukuro_delete' display='false' order='1000303'>福袋组合删除</menu>
+            <menu controller='admin_fukubukuro_combine' action='import' permission='material_fukubukuro_import' display='false' order='1000304'>销售物料导入</menu>
+            <menu controller='admin_fukubukuro_combine' action='export' permission='material_fukubukuro_export' display='false' order='1000305'>销售物料导出</menu>
+        </menugroup>
+        <menugroup name="渠道管理" en="channel-management">
+            <menu controller='admin_material_channel' action='index' permission='material_channel' display='true' order='1000202'>渠道商品列表</menu>
+        </menugroup>
+        <!--
+        <menugroup name="条码管理">
+            <menu controller='admin_barcode' action='index' permission='barcode_manage' display='true' order='1000300'>条码</menu>
+        </menugroup>
+        -->
+        <menugroup name="基础物料配置" en="basic-material-config">
+            <menu controller='admin_material_cat' action='index' permission='material_cat' display='true' order='1000100'>基础物料分类</menu>
+            <menu controller='admin_customer_classify' action='index' permission='material_customer_classify' display='true' order='3000100'>客户分类</menu>
+        </menugroup>
+
+    </workground>
+</desktop>

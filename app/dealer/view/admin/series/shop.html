@@ -1,0 +1,24 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+    <h4>产品线店铺</h4>
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+        <thead>
+        <tr>
+            <th>店铺编码</th>
+            <th>店铺名称</th>
+        </tr>
+        </thead>
+        <tbody>
+        <{foreach from=$shopList item=shop}>
+        <tr>
+            <td><{$shop.shop_bn}></td>
+            <td><{$shop.name}></td>
+        </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+</div>

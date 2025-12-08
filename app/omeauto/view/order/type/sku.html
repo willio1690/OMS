@@ -1,0 +1,63 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    #role_content div { margin-bottom: 15px; font-size: 12px;}
+    #role_content div span {color:#666666;}
+    #role_content input {height: 18px; line-height: 18px; margin-bottom: 15px;}
+    #btn_add_product {margin-right: 25px;}
+    #btn_add_product_pkg {margin-left: 25px;}
+    .object-select{}
+</style>
+<div id="role_content">
+    <div>活动SKU: &nbsp;&nbsp;<span>(输入活动商品的SKU,多个用逗号分隔。如 EH-SHIRT-L,EH-OTHER-X)</span></div>
+<!--    <input type="text" name="s_skus" value="<{$init.content.sku}>" size="90"/> <br/>-->
+    <{input type='ome_object' object='sales_material@material' multiple=true  name='sm_id' textcol='material_name' get_sales_material='1' value=$sm_id  callback='product_object_callback'  emptytext='选取销售物料' filter="is_bind=1" }>
+    <h4>已添加的销售物料编码：</h4><input type="text" name="s_skus" value="<{$init.content.sku}>" size="90"/> <br/>
+    <ul>
+        <label><input type="radio" name="sku_range" value="true" <{if $init.content.sku_range == 'true' || $init.content.sku_range == ''}>checked<{/if}>/>匹配订单所有销售物料</label>
+        <label><input type="radio" name="sku_range" value='false' <{if $init.content.sku_range == 'false'}>checked<{/if}>/>匹配订单一个销售物料</label>
+        &nbsp;&nbsp;<{help}><b>匹配订单所有销售物料：</b>当订单上只购买了A商品，但规则活动SKU里设置了A、B两种商品，也算是满足条件；<br><b>匹配订单一个销售物料：</b>代表只要订单上购买的商品，其中有一个存在于规则活动SKU里，就算是满足条件；<{/help}>
+    </ul>
+    <div>选择生效的开始和结束时间：&nbsp;&nbsp;<span>(如长期有效，请留空)</span></div>
+    从&nbsp;<{input type="time" name="s_start" value="{$init.content.start}"}>&nbsp;开始至&nbsp;<{input type="time" name="s_end" value="{$init.content.end}"}> 结束
+</div>
+<script>
+    var callurl='index.php?app=ome&ctl=admin_order&act=getSalesMaterialBn', store=[];
+    function init(rs,s_name){
+        var bns='';
+        Object.each(rs,function(value){
+             bns += value.sales_material_bn+',';
+        });
+        bns=bns.substring(0,bns.length-1);
+        $('role_content').getElement('input[name='+s_name+']').value = bns;
+    }
+    $('btn_add_product').addEvent('click',function(e){
+        var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=ome&ctl=admin_order&act=findSalesMaterial');
+        var s_skus = "s_skus";
+        new finderDialog(url,{params:{url:callurl,name:'product_id[]'},width:1000,height:660,
+        onCallback:function(rs){
+          if(!rs)return;
+          rs=JSON.decode(rs);
+          init(rs,s_skus);
+        }
+      });
+    });
+
+    function product_object_callback(rs,handle){
+        console.log(rs);
+        console.log("wohuilaile");
+        rs=JSON.parse(rs);
+        var bns='';
+        Object.each(rs,function(value){
+            console.log(value);
+            bns += value.sales_material_bn+',';
+        });
+        console.log(bns);
+        bns=bns.substring(0,bns.length-1);
+        $('role_content').getElement('input[name="s_skus"]').value = bns;
+    }
+
+</script>

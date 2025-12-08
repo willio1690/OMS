@@ -1,0 +1,60 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<div class="division">
+<form method="post" action="index.php?<{$env.server.QUERY_STRING}>" id="terminal">
+<table cellspacing="0" cellpadding="0" border="0" >
+<tbody>
+  <tr>
+      <th width="100px"> 天猫3pl编码：</th>
+      <td>
+        <{input type="text" size="32" name="branch[3pl][branch_bn]" value=$branch_relation.3pl.relation_branch_bn}>
+      </td>
+  </tr>
+  <tr>
+      <th width="100px"> 架海金梁编码：</th>
+      <td>
+        <{input type="text" size="32" name="branch[wmscd][branch_bn]" value=$branch_relation.wmscd.relation_branch_bn}>
+      </td>
+  </tr>
+  <tr>
+      <th width="100px"> 唯品会仓中仓编码：</th>
+      <td>
+        <{input type="text" size="32" name="branch[vopczc][branch_bn]" value=$branch_relation.vopczc.relation_branch_bn}>
+      </td>
+  </tr>
+  <tr>
+      <th width="100px"> 唯品会JITX编码：</th>
+      <td>
+        <{input type="text" size="32" name="branch[vopjitx][branch_bn]" value=$branch_relation.vopjitx.relation_branch_bn}>
+      </td>
+  </tr>
+  <tr>
+      <th width="100px"> 抖音区域仓编码：</th>
+      <td>
+        <{input type="text" size="32" name="branch[luban][branch_bn]" value=$branch_relation.luban.relation_branch_bn}> &nbsp;&nbsp;<span style="color:#ff0000;">*</span>请填写抖音平台的区域仓库编码
+      </td>
+  </tr>
+  <tr>
+      <th width="100px">震坤行区域仓编码：</th>
+      <td>
+          <{input type="text" size="32" name="branch[zkh][branch_bn]" value=$branch_relation.zkh.relation_branch_bn}> &nbsp;&nbsp;<span style="color:#ff0000;">*</span>请填写震坤行平台的区域仓库编码
+      </td>
+  </tr>
+  <tr>
+    <th width="100px"> 京东云仓jdlvmi编码：</th>
+    <td>
+      <{input type="text" size="32" name="branch[jdlvmi][branch_bn]" value=$branch_relation.jdlvmi.relation_branch_bn}>
+    </td>
+</tr>
+</tbody>
+</table>
+<div class="table-action">
+<{button class="btn-primary" type="submit" id="saveterminal" name="submit" label="保存"}>
+</div>
+</form>
+</div>
+</div>

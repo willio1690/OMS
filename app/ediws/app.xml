@@ -1,0 +1,14 @@
+<app>
+    <name>EDIWMS接口服务</name>
+    <description>EDIWMS接口服务</description>
+    <author>
+        <name>shopex开发团队</name>
+        <email>dev@shopex.cn</email>
+        <url>http://www.shopex.cn</url>
+    </author>
+    <version>3.0.0</version>
+    <license>shopex license</license>
+    <api_ver>3.0</api_ver>
+    <parent_model_class>dbeav_model</parent_model_class>
+    <optional app="dev">开发者工具</optional>
+</app>

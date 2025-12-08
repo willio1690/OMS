@@ -1,0 +1,65 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=ome&ctl=admin_order_auto&act=doTimingConfirm" method="post" id="disForm">
+    <table class="tableform">
+        <tbody>
+        <tr>
+            <td colspan="2" style="color:red">设置后在定时审单生效前无法手工获取订单,针对所有明细生效</td>
+        </tr>
+        <tr>
+            <th>定时审单时间：</th>
+            <td>
+                <{input type="date" name="timing_confirm_time" vtype="date" }>
+            </td>
+        </tr>
+        <tr>
+            <th></th>
+            <td>
+                <{foreach from=$orderIds key=key item=item}>
+                <input type="hidden" name='order_id[]' value=<{$item}> />
+                <{/foreach}>
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+</form>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+        <tr>
+            <td><button class="btn btn-primary" id="btnSubmit" ><span><span><{t}>确定<{/t}></span></span></button></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<{/area}>
+<script>
+    $('disForm').store('target',{
+        onRequest:function(){
+            $('btnSubmit').set('disabled',true);
+        },
+        onSuccess:function(response){
+            $('btnSubmit').set('disabled',false);
+            $('btnSubmit').getParent('.dialog').retrieve('instance').close();
+            finderGroup['<{$env.get.finder_id}>'].refresh();
+        }
+    });
+    $('btnSubmit').addEvent('click',function(e){
+        e.stop();
+        var oTime = $E('input[name="timing_confirm_time"]').value;
+        oTime = new Date(oTime.replace(/\-/g, "\/"));
+        var oYesterday = new Date();
+        oYesterday.setTime(oYesterday.getTime()-24*60*60*1000);
+        if(oYesterday < oTime) {
+            $('disForm').fireEvent('submit', {stop: $empty});
+        } else {
+            alert('请设置今天及今天之后的日期');
+        }
+    });
+
+</script>

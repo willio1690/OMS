@@ -1,0 +1,52 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+  <h4><{t}>退货单号：<{$reshipData.reship_bn}><{/t}></h4>
+  <div class="division">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <{foreach from=$pdaReturnInfo item=pdaReturnInfoItem}>
+      <{foreach from=$pdaReturnInfoItem key=key item=reshipItem}>
+      <tr>
+        <th><{t}>基础物料编码：<{/t}></th>
+        <td><{$reshipItemsData.$key.bn}></td>
+        <th><{t}>基础物料名称：<{/t}></th>
+        <td><{$reshipItemsData.$key.product_name}></td>
+        <th><{t}>退货量：<{/t}></th>
+        <td><{$reshipItemsData.$key.num}></td>
+        <th><{t}>本次退货量：<{/t}></th>
+        <td><{$reshipItem.normal_num}></td>
+      </tr>
+      <tr>
+        <th><{t}>异常原因：<{/t}></th>
+        <td><{$reshipItem.reason}></td>
+      </tr>
+      <tr>
+        <th><{t}>备注：<{/t}></th>
+        <td><{$reshipItem.remark}></td>
+      </tr>
+      <!-- <tr>
+        <th><{t}>现场图片：<{/t}></th>
+        <td>
+        <{foreach from=$reshipItem.scenepicture item=picItem}>
+        <a href="<{$picItem}>" target="_blank"><img style="max-height: 30px;" src="<{$picItem}>" alt='现场图片'></a>
+        <{/foreach}>
+        </td>
+        <td></td>
+      </tr> -->
+      <tr>
+        <th><{t}>时间：<{/t}></th>
+        <td><{$reshipItem.add_time|cdate}></td>
+        <th><{t}>退货仓库：<{/t}></th>
+        <td><{$reshipItem.return_branch_id}></td>
+        <th><{t}>操作人：<{/t}></th>
+        <td><{$reshipItem.op_name}></td>
+      </tr>
+      <{/foreach}>
+      <{/foreach}>
+    </table>
+  </div>
+</div>
+ 

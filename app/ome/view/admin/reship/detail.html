@@ -1,0 +1,327 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<h4>退货单详情</h4>
+<form action='index.php?app=ome&ctl=admin_return_rchange&act=update_reship&p[0]=<{$detail.reship_id}>' method='post' >
+<div class="division">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <th><{t}>退货单号：<{/t}></th>
+    <td><{$detail.reship_bn}></td>
+    <th><{t}>订单号：<{/t}></th>
+    <td><{$detail.order_bn}></td>
+    <th><{t}>配送方式：<{/t}></th>
+    <td><{$detail.delivery|default:'-'}></td>
+    <th><{t}>操作员：<{/t}></th>
+    <td><{$detail.op_name}></td>
+  </tr>
+
+  <tr>
+    <th><{t}>物流费用：<{/t}></th>
+    <td><{$detail.money}></td>
+    <th><{t}>是否保价：<{/t}></th>
+    <td><{if $detail.is_protect}>是<{else}>否<{/if}></td>
+    <th><{t}>物流公司：<{/t}></th>
+    <td><{$detail.logi_name}></td>
+    <th><{t}>物流单号：<{/t}></th>
+    <td><{$detail.logi_no}></td>
+  </tr>
+
+    <tr>
+    <th><{t}>收货人：<{/t}></th>
+    <td><{$detail.ship_name|ciphertext:'delivery','ship_name',$detail.shop_type}></td>
+    <th><{t}>收货地区：<{/t}></th>
+    <td><{$detail.ship_area}></td>
+    <th><{t}>收货地址：<{/t}></th>
+    <td><{$detail.ship_addr|ciphertext:'delivery','ship_addr',$detail.shop_type}></td>
+    <th><{t}>收货邮编：<{/t}></th>
+    <td><{$detail.ship_zip}></td>
+  </tr>
+
+  <tr>
+    <th><{t}>电话：<{/t}></th>
+    <td><{$detail.ship_tel|default:'-'|ciphertext:'delivery','ship_tel',$detail.shop_type}></td>
+    <th><{t}>手机：<{/t}></th>
+    <td><{$detail.ship_mobile|default:'-'|ciphertext:'delivery','ship_mobile',$detail.shop_type}></td>
+    <th><{t}>收货人Email：<{/t}></th>
+    <td><{$detail.ship_email}></td>
+    <th><{t}>生成时间：<{/t}></th>
+    <td><{$detail.t_begin|cdate:'SDATE_FTIME'}></td>
+  </tr>
+
+  <tr>
+    <th><{t}>审核状态：<{/t}></th>
+    <td><{$detail.is_check}></td>
+    <th><{t}>退回物流单号：<{/t}></th>
+    <td><{input type="text" name="return_logi_no" value=$detail.return_logi_no}><{if $is_hqepay_on && $detail.return_logi_no}>
+      <a target="dialog::{width:600,height:350,title:'查询物流信息'}"
+         href="index.php?app=ome&ctl=admin_return_rchange&act=inquiry_delivery&logi_no=<{$detail.return_logi_no}>&order_bn=<{$detail.order_bn}>" label="查询">
+        <span style="color:red;font-weight:bold;text-decoration:underline" >物流跟踪</span>
+      </a>
+      <{/if}></td>
+    <th><{t}>退回物流公司名称：<{/t}></th>
+    <td>
+   <{input type="text" name="return_logi_name" value=$detail.return_logi_name}>
+
+    </td>
+    <th><{t}>退换货状态：<{/t}></th>
+    <td><{if $detail.return_type == 'return'}><{t}>退货<{/t}><{else}><{t}>换货<{/t}><{/if}></td>
+  </tr>
+
+  <{if $detail.problem_name}>
+    <tr>
+      <th>售后问题类型：</th>
+      <td><{$detail.problem_name}></td>
+    </tr>
+  <{/if}>
+</table>
+</div>
+
+<table cellspacing="0" cellpadding="0" border="0" class="gridlist">
+<tr>
+    <td><b><{t}>申请内容：<{/t}></b><{$detail.reason}></td>
+  </tr>
+  <tr>
+    <td><b><{t}>售后答复：<{/t}></b><{$detail.return_memo}></td>
+  </tr>
+  <tr>
+    <td><b><{t}>退货备注：<{/t}></b><{$detail.memo}></td>
+  </tr>
+  <tr>
+    <td><b><{t}>审核备注：<{/t}></b><{$detail.check_memo}></td>
+  </tr>
+</table>
+
+<{if $serviceList}>
+<div class="division">
+<h4><{t}>京东服务单:<{/t}></h4>
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="gridlist">
+    <thead>
+      <tr>
+          <th><{t}>服务单号<{/t}></th>
+          <th><{t}>服务单状态<{/t}></th>
+          <th><{t}>服务类型<{/t}></th>
+          <th><{t}>京东订单号<{/t}></th>
+          <th><{t}>售后申请单号<{/t}></th>
+          <th><{t}>WMS退款金额<{/t}></th>
+          <th><{t}>WMS物料编码<{/t}></th>
+          <th><{t}>退货数量<{/t}></th>
+          <th><{t}>退回物流公司编码<{/t}></th>
+          <th><{t}>退回物流单号<{/t}></th>
+          <th><{t}>处理环节<{/t}></th>
+          <th><{t}>处理结果<{/t}></th>
+          <{if $detail.return_type == 'change'}><th><{t}>换新京东订单号<{/t}></th><{/if}>
+      </tr>
+    </thead>
+    <{foreach from=$serviceList item=serItems}>
+    <{foreach from=$serItems['items'] item=itemVal}>
+    <tr>
+        <td><{$serItems.service_bn}></td>
+        <td><{$serItems.service_status}></td>
+        <td><{$serItems.service_type_value}></td>
+        <td><{$serItems.package_bn}></td>
+        <td><{$serItems.wms_order_code}></td>
+        <td><{$serItems.wms_refund_fee}>&nbsp;&nbsp;<{if $serItems.wms_refund_fee}><{help}>注意：相同服务单号的退款金额是同一个。<{/help}><{/if}></td>
+        <td><{$itemVal.wms_sku_bn}>&nbsp;&nbsp;<{help}>基础物料编码：<{$itemVal.bn}><{/help}></td>
+        <td><{$itemVal.num}></td>
+        <td>
+        <select id="logi_code_<{$serItems.service_bn}>" name="logi_code_<{$serItems.service_bn}>">
+        <option value=""></option>
+        <{if $corpList}>
+        <{foreach from=$corpList item=corpItem}>
+        <option value="<{$corpItem.type}>" <{if $corpItem.type==$serItems.logi_code}>selected="selected"<{/if}> ><{$corpItem.name}></option>
+        <{/foreach}>
+        <{/if}>
+        </select>
+        </td>
+        <td><input class="x-input" type="text" name="logi_no_<{$serItems.service_bn}>" id="logi_no_<{$serItems.service_bn}>" vtype="text" value="<{$serItems.logi_no}>"></td>
+        <td><{$serItems.step_type}></td>
+        <td><{$serItems.afsResultType}></td>
+        <{if $detail.return_type == 'change'}><td><{$serItems.new_package_bn}></td><{/if}>
+    </tr>
+    <{/foreach}>
+    <{/foreach}>
+</table>
+</div>
+<{/if}>
+
+<div class='tableAction' style='text-align:center;'>
+  <{button label='保存' type='button' onclick='W.page(this.form.action,{data:this.form});'}>
+</div>
+</form>
+
+<{if $return_freight_data}>
+<div class="division">
+  <h4><{t}>退货寄回运费:<{/t}></h4>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" class="gridlist">
+      <thead>
+        <tr>
+            <th><{t}>金额<{/t}></th>
+            <th><{t}>申请描述<{/t}></th>
+            <th><{t}>处理意见<{/t}></th>
+            <th><{t}>拒绝原因<{/t}></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><{$return_freight_data.amount}></td>
+          <td><{$return_freight_data.apply_desc}></td>
+          <td><{if $return_freight_data.handling_advice == "1"}>同意<{else}>拒绝<{/if}></td>
+          <td><{$return_freight_data.reject_desc}></td>
+        </tr>
+      </tbody>
+    </table>
+<{/if}>
+<{if $exchangeAddress}>
+    <div class="division">
+        <h4><{t}>换货联系方式：<{/t}></h4>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="gridlist" id="exchangeAddress">
+            <tr>
+                <th><{t}>买家昵称<{/t}></th>
+                <th><{t}>买家名称<{/t}></th>
+                <th><{t}>买家电话<{/t}></th>
+                <th><{t}>买家换货地区<{/t}></th>
+                <th><{t}>买家换货地址<{/t}></th>
+            </tr>
+            <tr>
+                <td><{$exchangeAddress.buyer_nick}></td>
+                <td><{$exchangeAddress.buyer_name|ciphertext:'delivery','buyer_name',$exchangeAddress.buyer_name}></td>
+                <td><{$exchangeAddress.buyer_phone|ciphertext:'delivery','buyer_phone',$exchangeAddress.buyer_phone}></td>
+                <td><{$exchangeAddress.buyer_province}><{$exchangeAddress.buyer_city}><{$exchangeAddress.buyer_district}><{$exchangeAddress.buyer_town}></td>
+                <td><{$exchangeAddress.buyer_address}></td>
+            </tr>
+        </table>
+    </div>
+<{/if}>
+  <div class="division">
+    <{foreach from=$items key=return_type item=aProduct }>
+      <h4><{t}><{if $return_type=='return'}>退<{elseif $return_type=='change'}>换<{/if}>货明细:<{/t}></h4>
+
+      <table width="100%" border="0" cellspacing="0" cellpadding="0" class="gridlist">
+        <thead>
+        <tr>
+          <th><{t}>基础物料编码<{/t}></th>
+          <th><{t}>物品类型<{/t}></th>
+          <th><{t}>基础物料名称<{/t}></th>
+          <th>销售物料编码</th>
+          <{if $lucky_flag}><th><{t}>福袋编码<{/t}></th><{/if}>
+          <th><{t}>规格<{/t}></th>
+          <th><{t}>价格<{/t}></th>
+          <{if $return_type=='change'}>
+          <th>换货仓库</th>
+          <{/if}>
+          <th>金额小计</th>
+          <th><{t}>退货量<{/t}></th>
+          <th><{t}>良品<{/t}></th>
+          <th><{t}>不良品<{/t}></th>
+          <th><{t}>GAP<{/t}></th>
+             <th>店铺货号</th>
+           <th>商品类型</th>
+           <th>计划数量</th>
+        </tr>
+        </thead>
+   <{foreach from=$aProduct item=aProducts}>
+   <tr <{if $item.is_del == 'true'}> style="background-color: #DBDBDB;" <{/if}> >
+         <td><{$aProducts.bn}></td>
+        <td>
+            <{if $aProducts.obj_type_name && $aProducts.obj_type_name != '商品'}>
+            <span style='width:18px;padding:2px;height:16px;background-color:blue;'><span style='color:#eeeeee;'><{$aProducts.obj_type_name}></span></span>
+            <{else}>
+            <span><{t}>商品<{/t}></span>
+            <{/if}>
+        </td>
+        <td><{$aProducts.product_name}></td>
+        <td ><{$aProducts.sales_material_bn}></td>
+        <{if $lucky_flag}><td><{$aProducts.combine_bn}></td><{/if}>
+        <td><{$aProducts.specifications}></td>
+        <td><{$aProducts.price}></td>
+        <{if $return_type=='change'}>
+        <td><{$aProducts.branch_name}></td>
+        <{/if}>
+        <td><{$aProducts.amount}></td>
+        <{if $detail.is_check=='待确认'}>
+            <td style="<{if $aProducts.num==$aProducts.normal_num}>color:#090;<{else}>color:red;<{/if}>"><{$aProducts.num}></td>
+            <td style="<{if $aProducts.num==$aProducts.normal_num}>color:#090;<{else}>color:red;<{/if}>"><{$aProducts.normal_num}></td>
+            <td style="<{if $aProducts.num==$aProducts.normal_num}>color:#090;<{else}>color:red;<{/if}>"><{$aProducts.defective_num}></td>
+            <td style="<{if $aProducts.gap==0}>color:#090;<{else}>color:red;<{/if}>"><{$aProducts.gap}></td>
+        <{else}>
+            <td><{$aProducts.num}></td>
+            <td><{$aProducts.normal_num}></td>
+            <td><{$aProducts.defective_num}></td>
+            <td><{$aProducts.gap}></td>
+        <{/if}>
+         <td><{$aProducts.shop_goods_bn}></td>
+           <td><{$aProducts.obj_type}></td>
+           <td><{$aProducts.quantity}></td>
+        </tr>
+        <{/foreach}>
+    </table>
+   <{/foreach}>
+ </div>
+
+<{if $packageList}>
+<div class="division">
+<h4><{t}>退货包裹明细(<a href="index.php?app=console&ctl=admin_delivery&act=selectPackageStatus&p[0]=0&reship_id=<{$detail.reship_id}>" target="_blank">查询京东订单发货状态</a>):<{/t}></h4>
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="gridlist">
+    <thead>
+      <tr>
+          <th><{t}>发货单号<{/t}></th>
+          <th><{t}>京东订单号<{/t}></th>
+          <th><{t}>配送状态<{/t}></th>
+          <th><{t}>基础物料编码<{/t}></th>
+          <th><{t}>WMS物料编码<{/t}></th>
+          <th><{t}>是否赠品<{/t}></th>
+          <th><{t}>退货数量<{/t}></th>
+          <th><{t}>同步状态<{/t}></th>
+          <th><{t}>京东售后申请单号<{/t}></th>
+      </tr>
+    </thead>
+    <{foreach from=$packageList item=pageItems}>
+    <{foreach from=$pageItems['items'] item=itemVal}>
+    <tr>
+        <td><{$pageItems.delivery_bn}></td>
+        <td><{$pageItems.wms_package_bn}></td>
+        <td><{if $pageItems.shipping_status}><span style="color:#F00"><{$pageItems.shipping_status}>(<{$pageItems.ship_status_name}>)</span><{/if}></td>
+        <td><{$itemVal.bn}></td>
+        <td><{$itemVal.outer_sku}></td>
+        <td><{if $itemVal.is_wms_gift=='true'}><span style="color:#F00">是</span><{else}>否<{/if}></td>
+        <td><{$itemVal.return_nums}></td>
+        <td><{if $pageItems.sync_status=='succ'}><span style="color:#090">succ</span><{elseif $pageItems.sync_status=='fail'}><span style="color:#F00">fail</span><{else}> - <{/if}></td>
+        <td><{if $pageItems.wms_order_code}><{$pageItems.wms_order_code}><{else}> - <{/if}></td>
+    </tr>
+    <{/foreach}>
+    <{/foreach}>
+</table>
+</div>
+<{/if}>
+
+<{if $addressList}>
+<div class="division">
+<h4><{t}>寄件地址<{if $addressList[0]['isEdit'] == 'true'}>(<a href="index.php?app=ome&ctl=admin_return_rchange&act=editReturnAddress&p[0]=<{$detail.reship_id}>&finder_id=<{$finder_id}>" target="dialog::{width:600,height:150,title:'补全寄件地址省市区'}">补全寄件地址省市区</a>)<{/if}>:<{/t}></h4>
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="gridlist">
+    <thead>
+      <tr>
+          <th><{t}>服务单号<{/t}></th>
+          <th><{t}>联系人<{/t}></th>
+          <th><{t}>联系方式<{/t}></th>
+          <th><{t}>邮编<{/t}></th>
+          <th><{t}>省/市/区<{/t}></th>
+          <th><{t}>详细地址<{/t}></th>
+      </tr>
+    </thead>
+    <{foreach from=$addressList item=serItems}>
+    <tr>
+        <td><{$serItems.service_bn}></td>
+        <td><{$serItems.contact_name}></td>
+        <td><{if $serItems.mobile_phone}><{$serItems.mobile_phone}><{else}><{$serItems.phone}><{/if}></td>
+        <td><{$serItems.zip_code}></td>
+        <td><{$serItems.province}>/<{$serItems.city}>/<{$serItems.country}></td>
+        <td><{$serItems.addr}></td>
+    </tr>
+    <{/foreach}>
+</table>
+</div>
+<{/if}>

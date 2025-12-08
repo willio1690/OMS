@@ -1,0 +1,130 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style type="text/css">
+#system-setting .subtitle{
+    color: #7493D4;
+    font-size:25px;
+    text-align: left;
+	
+}
+#system-setting .ssubtitle{
+    color: #7493D4;
+    font-size:40px;
+}
+</style>
+
+<div id='system-setting'>
+	<div class="tableform">
+	  <table cellspacing="0" cellpadding="0" border="0">
+		<tbody >	        
+			    <td >上传进度:</td>
+			    <td id='template_import_status'> 
+					  <div style="border:1px solid #CCC;width:300px;overflow:hidden;float:left;background:#FFF;padding:1px;">
+		                  <div id="processBar_upload" style="background:#7493D1;width:0%;height:15px;">&nbsp;</div>
+		              </div>&nbsp;
+		              
+		              <font color='red' id ='template_import_result'></font>
+			    </td>
+			  </tr>                  
+		</tbody>
+		</table>
+	  <div id="cc" class="noprint table-action">
+	      <{button  type="button" class="btn" id="upload" label="开始上传" onclick="start_upload();"}> &nbsp;
+	      <{button id="down4" class="btn-secondary" label=$___b2c="关闭"|t:'b2c'   type="button"}>
+	      
+	   </div>		
+	</div>
+</div>
+<script>
+var all_warehouse_id = JSON.decode('<{$all_warehouse_id}>');//所有发货网点
+var total_warehouse_amount = '<{$total_warehouse_amount}>';//总发货网点总数量
+
+setProcessBar("processBar_upload",'1%');
+function setProcessBar(id,w){
+	document.getElementById(id).style.width = w;
+}
+//开始上传
+function start_upload(task){
+    var exrecommend_souce = "<{$exrecommend_souce}>";
+    var info_fullfill = "<{$info_fullfill}>";
+    if(!info_fullfill){
+        var msg = '';
+        if(exrecommend_souce == 'taobao'){
+            msg = '菜鸟智选物流，需要先开启电子面单来源';
+        }else{
+            msg = '仓库信息不完整，请先完善仓库必填项';
+        }
+        alert(msg);return false;
+    }
+    $('upload').set('readOnly',true);
+    setProcessBar("processBar_upload",'1%');
+    page_no = 1;
+    var rs = true;
+    for(var key in all_warehouse_id){
+        page_no ++;
+       
+        var rs = ajax_template_upload(page_no,all_warehouse_id[key]);
+        if(!rs){
+            $('template_import_result').html = ''
+             var submit_html = '上传模板出错';
+             $('template_import_result').setHTML(submit_html);
+             rs = false;
+             break;
+        }
+    } 
+    if(rs){
+        var submit_html = "<span><span id='btn_name' >已上传完成</span></span>";
+        $('template_import_result').set('html','完成').setStyle('color','green');
+        $('upload').removeClass('btn');
+        $('upload').addClass('btn-secondary');
+        $('upload').set('html',submit_html);
+        $('upload').set('disabled','disabled');
+        ajax_upload_log(exrecommend_souce);
+    }
+    //所有物流上传完毕再检查下是否订单足够
+   return true;
+}
+$('down4').addEvent("click",function(){
+      $('down4').getParent('.dialog').retrieve('instance').close();
+});
+
+function ajax_template_upload(page_no,warehouse_id){
+	var status = true;
+	var exrecommend_souce =   "<{$exrecommend_souce}>";//智选物流提供方
+    new Request({
+    	url:'index.php?app=channel&ctl=admin_logistics_examin&act=ajax_warehouse_template_upload',
+   		method:'post',
+   		data:'warehouse_id='+warehouse_id+'&exrecommend_souce='+exrecommend_souce,
+   		async:false,
+        onComplete:function(oresponseText){
+        	var responseText = JSON.decode(oresponseText);
+        	if(responseText.status == 'succ'){
+        		percent = 100*(page_no-1)/total_warehouse_amount;
+        		percent = Math.round(percent);
+        	    setProcessBar("processBar_upload",percent+'%');
+        	    status = true;
+        	}else{
+        		status = false;
+        	}
+        }
+    }).send();	
+    return status;
+}
+function ajax_upload_log(exrecommend_souce){
+    var status = true;
+    new Request({
+        url:'index.php?app=channel&ctl=admin_logistics_exrecommend&act=ajax_upload_log',
+        method:'post',
+        data:'exrecommend_souce='+exrecommend_souce,
+        async:false,
+        onComplete:function(oresponseText){
+        }
+    }).send();  
+    return status;
+}
+
+
+</script>

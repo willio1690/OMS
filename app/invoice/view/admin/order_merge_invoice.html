@@ -1,0 +1,403 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<link rel="stylesheet" type="text/css" href="<{$env.app.res_url}>/style.css" media="screen"/>
+<div class="form-layout">
+    <form action="index.php?app=<{$env.get.app}>&ctl=<{$env.get.ctl}>&act=<{$act}>" method="post" id="order_frm" name="order_frm">
+        <div class="form-layout-block">
+            <h2>合并开票</h2>
+            <h3>发票相关信息</h3>
+            <div class="form-layout-fields">
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">订单号：</span>
+                    <{$invoice_order.order_bn}>
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">运费：</span>
+                    &yen;<{$invoice_order.cost_freight}>
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label"><strong class="red">开票金额：</strong></span>
+                    <input class="form-input" size="10" type="text" name="item[amount]" id="amount_input" value="<{$invoice_order.amount}>"/>
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label"><strong class="red">税金：</strong></span>
+                    &yen;<{$invoice_order.cost_tax}>
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">开票方式：</span>
+                    <div class="form-radios">
+                        <label><input type="radio" onclick="selectMode(this);" name="item[mode]" value="0" <{if $invoice_order.mode == '0'}> checked="checked"<{/if}>>纸质专用发票</label>
+                        <label><input type="radio" onclick="selectMode(this);" name="item[mode]" value="1" <{if $invoice_order.mode == '1' }>checked="checked"<{/if}>>电子发票</label>
+                    </div>
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">是否含税：</span>
+                    <div class="form-radios">
+                        <label><input type="radio" name="item[hsbz]" value="1" <{if $invoice_order.hsbz eq '1' || !$invoice_order.hsbz}>checked<{/if}>>含税</label>
+                        <label><input type="radio" name="item[hsbz]" value="0" <{if $invoice_order.hsbz eq '0'}>checked<{/if}>>不含税</label>
+                    </div>
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">零税率标识：</span>
+                    <select class="form-input" placeholder="请选择" name="item[lslbs]" >
+                        <option value="0" selected="selected" <{if $item.lslbs == 0}> selected="selected"<{/if}> >无</option>
+                        <option value="1" <{if $invoice_order.lslbs == 1}> selected="selected" <{/if}> >出口免税和其他免税优惠政策</option>
+                        <option value="2" <{if $invoice_order.lslbs == 2}> selected="selected" <{/if}> >不征增值税</option>
+                        <option value="3" <{if $invoice_order.lslbs == 3}> selected="selected" <{/if}> >普通零税率</option>
+                    </select>
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">优惠政策：</span>
+                    <div class="form-radios">
+                        <label><input type="radio" name="item[yhzcbs]" value="0" <{if $invoice_order.yhzcbs eq '0' || !$invoice_order.yhzcbs}>checked<{/if}>>未使用</label>
+                        <label><input type="radio" name="item[yhzcbs]" value="1" <{if $invoice_order.yhzcbs eq '1'}>checked<{/if}>>使用</label>
+                    </div>
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">增值税特殊管理：</span>
+                    <input class="form-input" id='zzstsgl' type="text" name="item[zzstsgl]"  value="<{$invoice_order.zzstsgl}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">发票内容：</span>
+                    <select style="width: 250px;" class="form-input" name="item[content]"  type="select">
+                        <{foreach from=$invoice_content item=val}>
+                        <option value="<{$val.content_name}>" <{if $invoice_order.content == $val.content_name}>selected<{/if}> ><{$val.content_name}></option>
+                        <{/foreach}>
+                    </select>
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">发票备注：</span>
+                    <input class="form-input" type="text" name="item[remarks]"  value="<{$invoice_order.remarks}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">开票需求：</span>
+                    <input class="form-input" type="text" name="item[memo]"  value="<{$invoice_order.memo.op_content}>">
+                </div>
+            </div>
+        </div>
+        <div class="form-layout-block">
+            <h3>开票明细商品</h3>
+            <div >
+                <div class="content-container" style="width: 100%">
+                    <table class="gridlist" >
+                        <thead>
+                        <tr>
+                            <th>商品编码</th>
+                            <th>业务原单号</th>
+                            <th>名称</th>
+                            <th>规格</th>
+                            <th>单位</th>
+                            <th>数量</th>
+                            <th>开票金额</th>
+                            <th>税收分类编码</th>
+                            <th>明细类型</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <{foreach from=$invoice_order_items item=val}>
+                        <tr>
+                            <input type="hidden" name="item[item_id][]" value="<{$val.item_id}>">
+                            <input type="hidden" name="item[bn][<{$val.item_id}>]" value="<{$val.bn}>">
+                            <td><{$val.bn}></td>
+                            <td><{$val.source_bn}></td>
+                            <td><input type="text" name="item[item_name][<{$val.item_id}>]" value="<{$val.item_name}>"></td>
+                            <td><input type="text" name="item[specification][<{$val.item_id}>]" value="<{$val.specification}>"></td>
+                            <td><input type="text" name="item[unit][<{$val.item_id}>]" value="<{$val.unit}>"></td>
+                            <td><{$val.quantity}></td>
+                            <td><{$val.amount}></td>
+                            <td><input type="text" name="item[tax_code][<{$val.item_id}>]" value="<{$val.tax_code}>"></td>
+                            <td><{if $val.item_type == 'ship'}>运费<{else/}>商品<{/if}></td>
+                        </tr>
+                        <{/foreach}>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="form-layout-block" id="invoiceinfo">
+            <h3>开票信息</h3>
+            <div class="form-layout-fields" >
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">发票抬头：</span>
+                    <input class="form-input" type="text" name="item[title]"  value="<{$invoice_order.title}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">购方税号：</span>
+                    <input class="form-input" sensitive-field="ship_tax" type="text" name="item[ship_tax]" maxlength="32" value="<{$invoice_order.ship_tax}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">开户银行：</span>
+                    <input class="form-input" type="text" name="item[ship_bank]" maxlength="30" value="<{$invoice_order.ship_bank}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">银行账号：</span>
+                    <input class="form-input" sensitive-field="ship_bank_no" type="text" name="item[ship_bank_no]" maxlength="32" value="<{$invoice_order.ship_bank_no}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">注册电话：</span>
+                    <input class="form-input" type="text" name="item[ship_company_tel]" maxlength="30" value="<{$invoice_order.ship_company_tel}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">注册地址：</span>
+                    <input class="form-input" type="text" name="item[ship_company_addr]" maxlength="255" value="<{$invoice_order.ship_company_addr}>">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-layout-block" id="consigneeinfo" >
+            <h3>收票人信息</h3>
+            <div class="form-layout-fields" >
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">收票人姓名：</span>
+                    <input class="form-input" type="text" name="item[tax_company]" maxlength="50"  value="<{$invoice_order.tax_company}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">收票人电话：</span>
+                    <input class="form-input" type="text" sensitive-field="ship_tel" name="item[ship_tel]" maxlength="32"  value="<{$invoice_order.ship_tel}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">收票地址：</span>
+                    <input class="form-input" type="text" sensitive-field="ship_addr" name="item[ship_addr]" maxlength="100"  value="<{$invoice_order.ship_addr}>">
+                </div>
+            </div>
+            <div class="form-layout-fields" style="display: none">
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">名称：</span>
+                    <input class="form-input" type="text" id="payee_name" name="item[payee_name]" value="<{$invoice_order.payee_name}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">税务登记号：</span>
+                    <input class="form-input" type="text" id="tax_no" name="item[tax_no]" value="<{$invoice_order.tax_no}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">地址：</span>
+                    <input class="form-input" type="text" id="address" name="item[address]" value="<{$invoice_order.address}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">电话：</span>
+                    <input class="form-input" type="text" id="telephone" name="item[telephone]" value="<{$invoice_order.telephone}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">开票人：</span>
+                    <input class="form-input" type="text" id="payee_operator" name="item[payee_operator]" value="<{$invoice_order.payee_operator}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">税率：</span>
+                    <input class="form-input" type="text" id="tax_rate" maxlength='2' name="item[tax_rate]" value="<{$invoice_order.tax_rate}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">开户银行：</span>
+                    <input class="form-input" type="text" id="bank" name="item[bank]" value="<{$invoice_order.bank}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">银行账号：</span>
+                    <input class="form-input" type="text" id="bank_no" name="item[bank_no]" value="<{$invoice_order.bank_no}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">收款人：</span>
+                    <input class="form-input" type="text" id="payee_receiver" name="item[payee_receiver]" value="<{$invoice_order.payee_receiver}>">
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">复核人：</span>
+                    <input class="form-input" type="text" id="payee_checker" name="item[payee_checker]" value="<{$invoice_order.payee_checker}>">
+                </div>
+            </div>
+        </div>
+        <{input type="hidden" name="item[id]" value=$invoice_order.id}>
+        <{input type="hidden" name="item[order_id]" value=$invoice_order.order_id}>
+        <{input type="hidden" name="item[order_bn]" value=$invoice_order.order_bn}>
+        <{input type="hidden" name="item[shop_id]" value=$invoice_order.shop_id}>
+        <{input type="hidden" name="item[shop_type]" value=$invoice_order.shop_type}>
+        <{input type="hidden" name="item[cost_tax]" value=$invoice_order.cost_tax}>
+        <{input type="hidden" name="item[cost_freight]" value=$invoice_order.cost_freight}>
+        <{input type="hidden" name="item[invoice_type]" value=$invoice_order.invoice_type}>
+        <{input type="hidden" name="item[is_make_invoice]" value=$invoice_order.is_make_invoice}>
+        <{input type="hidden" name="item[is_edit]" value=$invoice_order.is_edit}>
+        <{foreach from=$invoice_order_list item=invoice_order_row}>
+            <input type="hidden" name="order_list[<{$invoice_order_row.id}>][is_make_invoice]" value="<{$invoice_order_row.is_make_invoice}>">
+            <input type="hidden" name="order_list[<{$invoice_order_row.id}>][is_status]" value="<{$invoice_order_row.is_status}>">
+        <{/foreach}>
+        <input type="hidden" id="act" value="<{$act}>">
+        <div class="form-layout-block"  >
+            <div class="table-action text_left" style="text-align: center;"><{button label="添加新记录" type="button" id="btn_submit" name="btn_submit" }></div>
+        </div>
+    </form>
+</div>
+<style type="text/css">
+    .dialog .dialog-content-body {
+        background: #fff;
+        border: none;
+    }
+
+    .dialog .tableform {
+        background: none repeat scroll 0 0 #F8F8F8;
+        border: 1px solid #D9D9D9;
+    }
+
+    .gridlist thead th {
+        height: 27px;
+        line-height: 27px;
+        padding-left: 12px;
+    }
+
+    .edit_box {
+        padding: 10px 20px 5px 20px;
+    }
+
+    .h_10px {
+        clear: both;
+        width: 100%;
+        height: 10px;
+    }
+
+    .goods_list input {
+        width: 100%;
+    }
+</style>
+<script>
+    if ($('act').getValue() == 'history') {
+        $$("input", "button", "select").set('disabled', 'disabled');
+    }
+    window.addEvent('domready', function () {
+        Ex_Loader('security', function () {
+            new Security({
+                url: 'index.php?app=invoice&ctl=admin_order&act=showSensitiveData&p[0]=<{$invoice_order.id}>',
+                showData: true
+            }).desHtml($E(' #order_frm #consigneeinfo'));
+        });
+        Ex_Loader('security', function () {
+            new Security({
+                url: 'index.php?app=invoice&ctl=admin_order&act=showSensitiveData&p[0]=<{$invoice_order.id}>&p[1]=invoice',
+                showData: true
+            }).desHtml($E(' #order_frm #invoiceinfo'));
+        });
+    });
+
+
+    //纸质发票 电子发票 切换
+    function selectMode(obj) {
+        var mode = parseInt(obj.getAttribute("value"));
+        if (mode == 1) {
+            // $("tr_type_id").hide();
+        } else {
+            //选择的纸质发票
+            // $("tr_type_id").show();
+        }
+    }
+
+    //表单验证
+    function submit_frm() {
+        var _form = $('order_frm');
+        var mode = parseInt(_form.getElement("input[name='item[mode]']:checked").getValue()); //开票方式
+        var amount = parseInt($('amount_input').getValue()); //开票金额
+        var title = _form.getElement("input[name='item[title]']").getValue(); //发票抬头
+
+        var payee_name = _form.getElement("input[name='item[payee_name]']").getValue(); //开票方名称
+        var tax_no = _form.getElement("input[name='item[tax_no]']").getValue(); //开票方税号
+        var address = _form.getElement("input[name='item[address]']").getValue(); //开票方地址
+        var telephone = _form.getElement("input[name='item[telephone]']").getValue(); //开票方电话
+        var payee_operator = _form.getElement("input[name='item[payee_operator]']").getValue(); //开票人
+        var tax_rate = _form.getElement("input[name='item[tax_rate]']").getValue(); //税率
+        var bank = _form.getElement("input[name='item[bank]']").getValue(); //开票方开户银行
+        var bank_no = _form.getElement("input[name='item[bank_no]']").getValue(); //开票方银行账号
+
+        var is_yhzcbs = $E("input[type=radio][name=item[yhzcbs]]::checked").value;
+        var zzstsgl = _form.getElement("input[name='item[zzstsgl]']").getValue(); //增值税特殊管理
+
+        if (mode == 0) {
+            //纸质发票
+            if (!amount) {
+                alert("请填写开票金额");
+                $('amount_input').focus();
+                return false;
+            }
+        }
+        if (is_yhzcbs == '1' && !zzstsgl) {
+            alert("有优惠政策时，请填写增值税特殊管理！");
+            $('zzstsgl').focus();
+            return false;
+        }
+        if (!title) {
+            alert("请填写发票抬头");
+            _form.getElement("input[name='item[title]']").focus();
+            return false;
+        }
+        // if (!payee_name) {
+        //     alert("请填写开票方的名称");
+        //     _form.getElement("input[name='item[payee_name]']").focus();
+        //     return false;
+        // }
+        // if (!tax_no) {
+        //     alert("请填写开票方的税号");
+        //     _form.getElement("input[name='item[tax_no]']").focus();
+        //     return false;
+        // }
+        // if (!address) {
+        //     alert("请填写开票方的地址");
+        //     _form.getElement("input[name='item[address]']").focus();
+        //     return false;
+        // }
+        // if (!telephone) {
+        //     alert("请填写开票方的电话");
+        //     _form.getElement("input[name='item[telephone]']").focus();
+        //     return false;
+        // }
+        // if (!payee_operator) {
+        //     alert("请填写开票方的开票人");
+        //     _form.getElement("input[name='item[payee_operator]']").focus();
+        //     return false;
+        // }
+        // if (!tax_rate) {
+        //     alert("请填写开票方的税率");
+        //     _form.getElement("input[name='item[tax_rate]']").focus();
+        //     return false;
+        // }
+        // if (!bank) {
+        //     alert("请填写开票方的开户银行");
+        //     _form.getElement("input[name='item[bank]']").focus();
+        //     return false;
+        // }
+        // if (!bank_no) {
+        //     alert("请填写开票方的银行账号");
+        //     _form.getElement("input[name='item[bank_no]']").focus();
+        //     return false;
+        // }
+
+        return true;
+
+    }
+
+    (function () {
+
+        var _form = $('order_frm');
+        var btn = $('btn_submit');
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+
+        _form.store('target', {
+            onSuccess: function (response) {
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != "") {
+                    try {
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    } catch (e) {
+                    }
+                    if (_dialogIns) {
+                        _dialogIns.close();
+                        finder.refresh();
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click', function () {
+            var flag = submit_frm();
+            if (flag) {
+                _form.fireEvent('submit', {stop: $empty});
+            }
+        });
+
+    })();
+</script>

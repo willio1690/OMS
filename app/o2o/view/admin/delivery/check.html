@@ -1,0 +1,423 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{script src="coms/finder.js" app="desktop" }>
+<{css app="ome" src="style.css"}>
+<div class="division">
+    <h4><{$dly.delivery_bn}></h4>
+    <div>
+        <{button type="button" class="refuse" id="refuse_delivery" label="拒绝接单"}>
+        <{button type="button" class="need_check" disabled="disabled" id="print_electron" label="打印快递单"}>
+        <{button type="button" class="need_check" disabled="disabled" id="print_dly" label="打印装箱单"}>
+        <{button type="button" class="need_check" disabled="disabled" id="confirm_delivery" label="确认发货"}>
+    </div>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td width="39%">
+                <div><{input type="text" name="barcode" id="barcode" placeholder="扫描产品条形码" style="background: none repeat scroll 0 0 #FAFAFA;border: 2px solid #CCCCCC;border-radius: 10px 10px 10px 10px;color: #069CBC;font-size: 30px;height: 45px;line-height: 40px;margin-bottom: 10px;padding-left: 19px;width: 400px;" }></div>
+                <div><{input type="text" name="serial" id="serial" placeholder="扫描产品唯一码" style="background: none repeat scroll 0 0 #FAFAFA;border: 2px solid #CCCCCC;border-radius: 10px 10px 10px 10px;color: #069CBC;font-size: 30px;height: 45px;line-height: 40px;margin-bottom: 10px;padding-left: 19px;width: 400px;display: none" }></div>
+                <div id="msgShow" class="red"></div>
+            </td>
+            <td>
+                <table width="100%" style="border: 1px dashed #151515;font-size: 24px">
+                    <tr>
+                        <td width="180px">平台订单号:</td>
+                        <td>
+                            <{foreach from=$orders item=val}>
+                            <{$val.order_bn}>&nbsp;&nbsp;
+                            <{/foreach}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="180px">发货方式:</td>
+                        <td>
+                            <{$dly.logi_name}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="180px">顾客付款时间:</td>
+                        <td>
+                            <{foreach from=$orders item=val}>
+                            <{$val.paytime|cdate}>&nbsp;&nbsp;
+                            <{/foreach}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="180px">销售渠道:</td>
+                        <td>
+                            <{foreach from=$orders item=val}>
+                            <{$val.shop_type}>&nbsp;&nbsp;
+                            <{/foreach}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="180px">订单分配日期:</td>
+                        <td>
+                            <{$dly.createtime|cdate}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="180px">送货地址:</td>
+                        <td id='consigneeinfo'>
+                            <{$dly.ship_province}>&nbsp;<{$dly.ship_city}>&nbsp;<{$dly.ship_district}>&nbsp;&nbsp;<span sensitive-field="ship_addr"><{$dly.ship_addr|escape:'html'|ciphertext:'order','ship_addr',$dly.shop_type}></span>
+                            <{if $dly.is_encrypt}><a class="delivery-sensitive-btn data-hide" href="javascript:void(0);"></a><{/if}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="180px">发货单号:</td>
+                        <td>
+                            <{$dly.delivery_bn}>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="tableform">
+    <h4><div class="fl">货品信息:</div></h4>
+    <div class="division clear">
+        <table border="0" cellspacing="0" class="gridlist finder-list" cellpadding="0">
+            <thead>
+            <tr>
+                <th>基础物料编码:</th>
+                <th>条形码:</th>
+                <th>基础物料名称:</th>
+                <th>数量:</th>
+                <th>待发货数量</th>
+                <th>打包数量</th>
+                <th>已发货数量</th>
+            </tr>
+            </thead>
+            <tbody>
+            <{foreach from=$items item=item}>
+            <tr>
+                <td><{$item.bn}></td>
+                <td class="item_barcode"
+                    serial="<{$item.serial_number}>"
+                    productId="<{$item.product_id}>"
+                    bn="<{$item.bn}>"><{$item.barcode}></td>
+                <td><{$item.product_name}></td>
+                <td><{$item.number}></td>
+                <td class="wait"><{$item.number - $item.verify_num}></td>
+                <td class="package"><{if $dly.confirm=='1'}><{$item.number}><{else}>0<{/if}></td>
+                <td class="dly"><{if $dly.status=='3'}><{$item.number}><{else}>0<{/if}></td>
+            </tr>
+            <{/foreach}>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="noprint table-action">
+    <{button type="button" class="btn" id="return-btn" label="关 闭"}>
+</div>
+
+<script type="text/javascript">
+    (function(){
+        // 敏感数据处理
+        if ($defined($ES('.delivery-sensitive-btn')))
+          $ES('.delivery-sensitive-btn').addEvent('click',function(e){
+                  Ex_Loader('security',function(){
+                      new Security({url:'index.php?app=o2o&ctl=admin_delivery_pending&act=showSensitiveData&p[0]=<{$dly.delivery_id}>',clickElement:$(e.target)}).desHtml($E('#consigneeinfo'));
+                  });
+          });
+        if('<{$dly.confirm}>' == '1') {
+            $('refuse_delivery').setAttribute('disabled', 'disabled');
+            $('print_electron').removeAttribute('disabled');
+            $('print_dly').removeAttribute('disabled');
+            
+            if ('<{if $dly.process_status & 1 == 1}>true<{/if}>' == 'true') $('confirm_delivery').removeAttribute('disabled');
+        }
+
+        $$('.refuse').each(function (item) {
+            item.addEvent('click',function (e) {
+                var refuseItemId = this.get('refuseItemId');
+                new Dialog('index.php?app=o2o&ctl=admin_delivery_pending&act=refuse&finder_id=<{$env.GET.finder_id}>',{
+                    title: '拒绝发货',
+                    width: '600px',
+                    height: '250px',
+                    ajaxoptions:{
+                        data:{
+                            delivery_id: '<{$dly.delivery_id}>',
+                        },
+                        method:'post'
+                    },
+                    onClose: function() {
+                        $('return-btn').fireEvent('click', {target:$('return-btn')});
+                        //location.reload();
+                    }
+                });
+            })
+        });
+
+        $('barcode').focus();
+        var split_barcode_setting = '<{$split_barcode_setting}>';
+        split_barcode_setting = JSON.decode(split_barcode_setting);
+        //条码截屏功能
+        function split_barcode(orignal_barcode){
+            //未开启条码截屏功能，直接原样返回
+            if(split_barcode_setting.split != 1){
+                return orignal_barcode;
+            }
+            var splitLen = split_barcode_setting.splitLen;
+            var orignal_barcode_length =  orignal_barcode.length;
+            var mix_Len =  split_barcode_setting.mix_Len;
+            //长度小于最小长度的条码，不截取
+            if(orignal_barcode_length < mix_Len){
+                return orignal_barcode;
+            }
+            //前置
+            if(split_barcode_setting.splitType == 'front'){
+                var barcode = orignal_barcode.substring(splitLen);
+            }else{
+                var barcode = orignal_barcode.substring(0,orignal_barcode_length-splitLen);
+            }
+            if(barcode.length<=0){
+                return false;
+            }
+            return barcode;
+        }
+        var submitData = {};
+        submitData.delivery_id = '<{$dly.delivery_id}>';
+        submitData.checkType   = 'all';
+        submitData.count       = '<{$items|count}>';
+        submitData.number      = '<{$items|count}>';
+        submitData.logi_no     = '<{$dly.logi_no}>';
+        var oDiv = document.createElement('DIV');
+        var sHtml = '<div>你已完成拣货，请再次确认是否有残次</div>';
+        sHtml += '<div style="text-align:center; margin-top: 25px"><{button type="button" id="confirm_check" label="无残次确认"}>';
+        sHtml += '<{button type="button" id="cancel_check" label="有残次取消"}></div>';
+        oDiv.setHTML(sHtml);
+        oDiv.getElementById('cancel_check').addEvent('click', function () {
+            checkPrintDialog.close();
+            if ('<{$dly.verify}>' != 'true') {
+                submitData.serial_data = null;
+                $$('.item_barcode').each(function (oItem) {
+                    var intOldPackage = parseInt(oItem.getParent('tr').getElement('.package').getHTML());
+                    var intOldWait = parseInt(oItem.getParent('tr').getElement('.wait').getHTML());
+                    oItem.getParent('tr').getElement('.wait').setHTML(intOldPackage);
+                    oItem.getParent('tr').getElement('.package').setHTML(intOldWait);
+                });
+            }
+        });
+        oDiv.getElementById('confirm_check').addEvent('click', function (ce) {
+            new Request.JSON({
+                url: 'index.php?app=o2o&ctl=admin_delivery_pending&act=doConfirm',
+                method: 'post',
+                data: submitData,
+                onRequest: function () {
+                    ce.target.setAttribute('disabled', 'disabled');
+                    new MessageBox(LANG_Dialog['loading'], {autohide: true});
+                },
+                onComplete: function (result) {
+                    ce.target.removeAttribute('disabled');
+                    if (!result) {
+                        return false;
+                    } else {
+                        if (result.res == 'succ') {
+                            $('print_electron').removeAttribute('disabled');
+                            $('print_electron').fireEvent('click', {target: $('print_electron')});
+                        } else {
+                            MessageBox.error(result.msg ? result.msg : '确认失败');
+                        }
+                    }
+                }
+            }).send();
+        });
+        var checkPrintDialog;
+        window.addEvent('load', function() {
+            checkPrintDialog = new Dialog(oDiv);
+            checkPrintDialog.popup = function (url, options) {
+                this.setOptions(options);
+                this.dialog.style.display = 'block';
+                this.fireEvent('onShow', this);
+                this.initContent(url, options);
+                if ($type(url) == 'string') {
+                    this.showDialog.call(this);
+                }
+            };
+            checkPrintDialog.close = function () {
+                try {
+                    this.fireEvent('onClose', this.dialog);
+                } catch (e) {
+                }
+                this.dialog.style.display = 'none';
+                if (this.options.modal) {
+                    MODALPANEL.hide();
+                }
+            };
+            checkPrintDialog.close();
+        });
+        $('barcode').addEvent('keydown', function (e) {
+            if(e.key == 'enter') {
+                var barcode = split_barcode(e.target.value.trim());
+                var checkSubmit = true;
+                var barcodeEach = false;
+                $('msgShow').setHTML('');
+                $$('.item_barcode').each(function (item) {
+                    var intWait = parseInt(item.getParent('tr').getElement('.wait').getHTML());
+                    if(intWait > 0) {
+                        if(!barcodeEach && item.getHTML() == barcode) {
+                            barcodeEach = true;
+                            var serial = item.getAttribute('serial');
+                            if(serial == 'true') {
+                                var serial_number = $('serial').value.trim();
+                                if(!serial_number) {
+                                    $('serial').style.display = 'block';
+                                    $('serial').focus();
+                                    checkSubmit = false;
+                                    return false;
+                                }
+                                if(submitData.serial_data) {
+                                    for(var i in submitData.serial_data) {
+                                        for(var j in submitData.serial_data[i]){
+                                            if(serial_number == submitData.serial_data[i][j]) {
+                                                $('msgShow').setHTML('唯一码'+serial_number+'已存在');
+                                                $('serial').value = '';
+                                                $('serial').focus();
+                                                checkSubmit = false;
+                                                return false;
+                                            }
+                                        }
+                                    }
+                                }
+                                new Request.JSON({
+                                    url:'index.php?app=ome&ctl=admin_serial&act=ajaxCheckSerial',
+                                    async:false,
+                                    method:'post',
+                                    data:'serial='+serial_number,
+                                    onComplete:function(result){
+                                        if(!result){
+                                            $('msgShow').setHTML('唯一码验证失败');
+                                        }else{
+                                            if(result.result == 'true') {
+                                                //
+                                            } else {
+                                                $('msgShow').setHTML(result.msg ? result.msg : '唯一码验证失败');
+                                            }
+                                        }
+                                    }
+                                }).send();
+                                if($('msgShow').getHTML()) {
+                                    $('serial').value = '';
+                                    $('serial').focus();
+                                    checkSubmit = false;
+                                    return false;
+                                }
+                                var pID = item.getAttribute('productId');
+                                var pBN = item.getAttribute('bn');
+                                if(!submitData.serial_data) {
+                                    submitData.serial_data = {};
+                                    submitData.product = {};
+                                }
+                                if(!submitData.serial_data[pBN]) {
+                                    submitData.serial_data[pBN] = [];
+                                    submitData.product[pBN] = pID;
+                                }
+                                submitData.serial_data[pBN].push(serial_number);
+                            }
+                            var intPackage = parseInt(item.getParent('tr').getElement('.package').getHTML());
+                            intWait = intWait - 1;
+                            item.getParent('tr').getElement('.wait').setHTML(intWait);
+                            item.getParent('tr').getElement('.package').setHTML(intPackage + 1);
+                            if(serial == 'true') {
+                                $('serial').value = '';
+                                if (intWait > 0) {
+                                    $('serial').focus();
+                                } else {
+                                    $('serial').style.display = 'none';
+                                    $('barcode').value = '';
+                                    $('barcode').focus();
+                                }
+                            } else {
+                                $('barcode').value = '';
+                                $('barcode').focus();
+                            }
+                        }
+                    }
+                    if(intWait > 0) {
+                        checkSubmit = false;
+                    }
+                });
+                if(checkSubmit) {
+                    var options = {
+                        title: '确认操作',
+                        width: 200,
+                        height: 100,
+                        modal: true
+                    };
+                    checkPrintDialog.popup(oDiv,options);
+                } else {
+                    if(!barcodeEach) {
+                        $('msgShow').setHTML('条形码'+barcode+'未找到');
+                        $('barcode').value = '';
+                        $('barcode').focus();
+                    }
+                }
+            }
+        });
+        $('serial').addEvent('keydown', function(e){
+            if(e.key == 'enter') {
+                $('barcode').fireEvent('keydown', {key: 'enter', target: $('barcode')});
+            }
+        });
+        $('print_electron').addEvent('click', function (e) {
+            var oTmpDiv = document.createElement('DIV');
+            var sTmpHtml = '<div style="font-size: 32px">正在请求快递单号，请稍候</div>';
+            oTmpDiv.setHTML(sTmpHtml);
+            checkPrintDialog.popup(oTmpDiv,{});
+            /*checkPrintDialog.popup("index.php?app=ome&ctl=admin_check_print&act=toPrint&delivery_id=<{$dly.delivery_id}>",{
+                width:"500",
+                height:"200",
+                ajaxoptions: {
+                    update:checkPrintDialog.dialog_body
+                },
+                onClose:function(){
+                    location.reload();
+                }
+            });*/
+            window.open('<{$print_express_url}>');
+            location.reload();
+        });
+        $('print_dly').addEvent('click', function () {
+            var win = window.open('<{$print_dly_url}>');
+        });
+        $('confirm_delivery').addEvent('click', function (e) {
+            new Request.JSON({
+                url: 'index.php?app=o2o&ctl=admin_delivery_pending&act=doConsign',
+                method: 'post',
+                data: {delivery_id: '<{$dly.delivery_id}>'},
+                onRequest: function(){
+                    new MessageBox(LANG_Dialog['loading'],{autohide:true});
+                    var oDiv = document.createElement('DIV');
+                    oDiv.id = 'consigning';
+                    var sHtml = '<div>正在发货 请稍后</div>';
+                    oDiv.setHTML(sHtml);
+                    new Dialog(oDiv, {title:'发货', width:100,height:70})
+                },
+                onComplete: function (result) {
+                    if($('consigning')) $('consigning').getParent('.dialog').getElement('.btn-close').fireEvent('click');
+                    if (!result) {
+                        return false;
+                    } else {
+                        if(result.res == 'succ') {
+                            $('return-btn').fireEvent('click', {target:$('return-btn')});
+                        } else {
+                            MessageBox.error(result.msg ? result.msg : '发货失败');
+                        }
+                    }
+                }
+            }).send();
+        });
+        $("return-btn").addEvent('click', function (e) {
+            window.close();
+            var openFrom = 'href="index.php?app=o2o&ctl=admin_delivery_pending&act=index"';
+            var oGion = opener.$('side');
+            if(opener.$E('['+openFrom+']', oGion) && opener.$E('['+openFrom+']', oGion).classList.contains('current')) {
+                opener.finderGroup['<{$env.GET.finder_id}>'].refresh();
+            }
+        });
+    })();
+</script>

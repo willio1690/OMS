@@ -1,0 +1,35 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $dataList}>
+    <{foreach from=$dataList item=item}>
+        <ul class="no-bullet">
+            <li class="row">
+                <div class="grid-1" style="width:auto;">
+                    <span class="text-reverse">统计日期：</span><em><{$item.createtime|date_format:'%Y-%m-%d'}></em>
+                </div>
+            </li>
+            <li class="row">
+                <div class="grid-1" style="width:auto;">
+                    <span class="text-reverse">订单总数：</span><em><{$item.order_sum}></em>
+                </div>
+                <div class="grid-6 text-right"><span class="text-reverse">货品数：</span><em><{$item.sale_sum}></em></div>
+            </li>
+            </li>
+            <li class="row">
+                <div class="grid-1" style="width:auto;">
+                    <span class="text-reverse">确认数：</span><em><{$item.confirm_num}></em>
+                </div>
+                <div class="grid-6 text-right"><span class="text-reverse">拒绝数：</span><em><{$item.refuse_num}></em></div>
+            </li>
+            <li class="row">
+                <div class="grid-1" style="width:auto;">
+                    <span class="text-reverse">发货数：</span><em><{$item.send_num}></em>
+                </div>
+                <div class="grid-6 text-right"><span class="text-reverse">核销数：</span><em><{$item.verified_num}></em></div>
+            </li>
+        </ul>
+    <{/foreach}>
+<{/if}>

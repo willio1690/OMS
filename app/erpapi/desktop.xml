@@ -1,0 +1,11 @@
+<desktop>
+    <adminpanel group="desktop_apilog" permission="api_order_log" controller='admin_api_fail' action='retry' display='true' order='1000'>失败重试</adminpanel>
+    <permissions>
+        <permission id="setting_api_log">失败重试</permission>
+    </permissions>
+    <workground name="日志管理" id="monitor_center"  order="1820" icon="icon-caozuorizhi-01">
+        <menugroup name="接口日志" en="api-log">
+            <menu controller='admin_api_fail' action='retry' permission='setting_api_log' display='true'  order='600003'>失败重试</menu>
+        </menugroup>
+    </workground>
+</desktop>

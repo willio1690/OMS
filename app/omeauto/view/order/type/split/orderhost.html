@@ -1,0 +1,16 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="mt-10">
+    <div>
+        <span style="color:red">* </span>达人ID：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="text" name="split_config[is_host][author]" placeholder="支持多个, 以逗号符分隔" value="<{$data.split_config.is_host.author}>" >
+        <br>
+        <{help}><{t}>设置了达人ID同时也设置直播间ID，<br>两个条件间是“并且”的关系，<br>如果条件间互斥，则规则选出的订单为空<{/t}><{/help}>
+        直播间ID：
+        <input type="text" name="split_config[is_host][room]" placeholder="支持多个, 以逗号符分隔" value="<{$data.split_config.is_host.room}>" >
+        &nbsp;
+    </div>
+</div>

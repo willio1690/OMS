@@ -1,0 +1,13 @@
+<desktop>
+    <permissions>
+            <permission id="logistics_rule">规则设置</permission>
+    </permissions>
+
+    <workground name="系统设置" id="setting_tools" order="1100" icon="icon-xitongshezhi-01">
+        <menugroup name="物流管理" en="logistics-management">
+                <menu controller='admin_rule' action='index'  permission='logistics_rule' display='true' order='3000200'>自动选物流设置</menu>
+                <menu controller='admin_area' action='index' permission='logistics_rule' display='true' order='3000300'>地区设置</menu>
+                <menu controller='admin_area_router' action='index' permission='logistics_rule' display='true' order='3000250'>物流就近设置</menu>
+        </menugroup>
+    </workground>
+</desktop>

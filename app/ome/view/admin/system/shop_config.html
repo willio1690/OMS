@@ -1,0 +1,83 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="post" action="index.php?app=ome&ctl=admin_shop&act=saveConfig&finder_id=<{$env.get.finder_id}>&p[0]=<{$shop.shop_id}>">
+    <div class="tableform">
+        <{if $shop.node_type == 'taobao'}>
+        <div class="division">
+            <h4>淘宝物流升级</h4>
+            <table  width="100%" cellspacing="0" cellpadding="0" border="0" >
+                <tbody>
+                <tr>
+                    <th style="vertical-align: top;">清除平台指定仓：</th>
+                    <td>
+                        <input type="radio" name="config[clear_plate_branch]" value="true" <{if $shop.config.clear_plate_branch == 'true'}>checked="checked"<{/if}>> 清除平台指定仓
+                        <input type="radio" name="config[clear_plate_branch]" value="false" <{if !$shop.config.clear_plate_branch || $shop.config.clear_plate_branch == 'false'}>checked="checked"<{/if}>> 不清除平台指定仓
+                    </td>
+                </tr>
+                <tr>
+                    <th style="vertical-align: top;">仓库编码映射：</th>
+                    <td>
+                        <{button id='add' label="增加映射仓"}>
+                        <{foreach from=$shop.config.aging key=key value=value}>
+                        <div>平台仓编码:<{input type="text" name="time_plate_bn[]" value=$key}> - ERP仓库编码:<{input type="text" name="time_branch_bn[]" value=$value}></div>
+                        <{foreachelse}>
+                        <div>平台仓编码:<{input type="text" name="time_plate_bn[]" value}> - ERP仓库编码:<{input type="text" name="time_branch_bn[]" value}></div>
+                        <{/foreach}>
+                    </td>
+                </tr>
+                <tr>
+                    <th style="vertical-align: top;">物流公司映射：</th>
+                    <td>
+                        <{button id='cpAdd' label="增加映射关系" style="margin-bottom:10px;"}>
+                        <{foreach from=$shop.config.cpmapping key=key value=value}>
+                        <div>平台物流编码:<{input type="text" name="plat_cp_code[]" value=$key}> - ERP物流编码:<{input type="text" name="erp_cp_code[]" value=$value}></div>
+                        <{foreachelse}>
+                        <div>平台物流编码:<{input type="text" name="plat_cp_code[]" value}> - ERP物流编码:<{input type="text" name="erp_cp_code[]" value}></div>
+                        <{/foreach}>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <{/if}>
+        <div class="table-action">
+            <{button label="保存" type="submit"}>
+        </div>
+    </div>
+</form>
+
+<script type="text/javascript">
+    (function () {
+        if($('add')) {
+            $('add').addEvent('click', function (e) {
+                var pTd = this.getParent('td');
+                var oDiv = document.createElement('DIV');
+                var sHtml = '平台仓编码:<{input type="text" name="time_plate_bn[]" value}> - ERP仓库编码:<{input type="text" name="time_branch_bn[]" value}>';
+                oDiv.setHTML(sHtml);
+                oDiv.inject(pTd);
+            });
+        }
+        if($('cpAdd')) {
+            $('cpAdd').addEvent('click', function (e) {
+                var pTd = this.getParent('td');
+                var oDiv = document.createElement('DIV');
+                var sHtml = '平台物流编码:<{input type="text" name="plat_cp_code[]" value}> - ERP物流编码:<{input type="text" name="erp_cp_code[]" value}>';
+                oDiv.setHTML(sHtml);
+                oDiv.inject(pTd);
+            });
+        }
+
+        $('modifysku-form').store('target', {
+            onComplete:function(resp){
+                resp = JSON.decode(resp);
+
+                if (resp.error){
+                    $ES('input[name=config[modifysku]]').getLast().checked='checked';
+                }
+            }
+        });
+    })();
+</script>

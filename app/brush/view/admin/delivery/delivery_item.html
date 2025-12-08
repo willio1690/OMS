@@ -1,0 +1,37 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<link href="../app/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<div class="tableform">
+
+    <h4>货品信息:<!-- (填写每种货品在每个货位中需要) --></h4>
+
+    <div class="division">
+        <table border="0" cellspacing="0" class="gridlist" cellpadding="0">
+            <thead>
+            <tr>
+                <th>货号:</th>
+                <th>货品名称:</th>
+                <th>规格:</th>
+                <th>货品数量:</th>
+            </tr>
+            </thead>
+            <tbody><{foreach from=$items item=item}>
+            <tr>
+                <td><{$item.bn}></td>
+                <td><{$product[$item.product_id]['name']}></td>
+                <td><{$product[$item.product_id]['spec_info']}></td>
+                <td>
+                    <font color="red"><{$item.number}></font>
+                </td>
+            </tr>
+            <{/foreach}>
+            </tbody>
+        </table>
+    </div>
+</div>

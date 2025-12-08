@@ -1,0 +1,64 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<input type="hidden" id="delivery_id" name="delivery_id" value="<{$dlyInfo.delivery_id}>" />
+<table cellspacing="0" cellpadding="0" border="0" class="gridlist" id="package-print-list">
+    <thead>
+        <tr>
+            <th><input type="checkbox" id="package-all"></th>
+            <th>物流公司</th>
+            <th>物流运单号</th>
+            <th>包裹号</th>
+            <th>重量</th>
+            <th>创建时间</th>
+            <th>状态</th>
+            <th>明细</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        <{foreach from=$dlyBillAllInfo item=item}>
+            <tr <{if $item.type == "1"}>style="background-color:#f6f6f6; color:red; font-weight:bold;height:35px;"<{else}>style="background-color:#f6f6f6; font-weight:bold;height:35px;"<{/if}> >
+                <td><{if $item.type != "1"}><input type="checkbox" value="<{$item.b_id}>"><{/if}></td>
+                <td><{$item.logi_name}></td>
+                <td><{$item.logi_no}></td>
+                <td><{$item.package_bn}></td>
+                <td><{$item.weight}></td>
+                <td></td>
+                <td><{$item.status}></td>
+                <td>
+                    <{foreach from=$item.products item=p}>
+                        <div class="clearfix">
+                            <div class="span-6">物料编码：<{$p.bn}></div>
+                            <div class="span-auto">物料名称：<{$p.product_name}></div>
+                            <div class="span-3">包裹数量：<{$p.number}></div>
+                        </div>
+                    <{/foreach}>
+                </td>
+                <td>
+                    <{if $item.type != '1'}>
+                        <button type="button" onclick="del_deliveryBill('<{$item.b_id}>','<{$item.delivery_id}>')" style="height:28px;width:40px;">删除</button>
+                    <{/if}>
+                </td>
+            </tr>
+        <{foreachelse}>
+            <tr>
+                <td colspan="8"></td>
+            </tr>
+        <{/foreach}>
+    </tbody>
+</table>
+<script type="text/javascript">
+(function(){
+    $('package-all').addEvent('click',function(){
+        $ES('#package-print-list tbody input[type=checkbox]').set('checked',this.checked);
+    })
+    $ES('#package-print-list tbody input[type=checkbox]').addEvent('click',function(){
+        if (!this.checked){
+            $('package-all').set('checked',false);
+        }
+    })
+})();
+</script>

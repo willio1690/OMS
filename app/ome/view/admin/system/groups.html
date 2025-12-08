@@ -1,0 +1,148 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<h4 class="head-title"><{if $group}>编辑订单确认组<{else}>添加订单确认组<{/if}></h4>
+<style>
+.admin-checkbox-container {
+    width: 80% !important;
+    display: inline-block !important;
+    vertical-align: top !important;
+    min-width: 200px !important;
+    padding: 5px !important;
+    box-sizing: border-box !important;
+    line-height: 1.8 !important;
+    overflow-wrap: break-word !important;
+}
+.admin-checkbox-container input[type="checkbox"] {
+    margin-right: 5px !important;
+    margin-bottom: 0 !important;
+    vertical-align: middle !important;
+}
+.admin-checkbox-container label {
+    display: inline-flex !important;
+    align-items: center !important;
+    margin-right: 15px !important;
+    margin-bottom: 5px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 180px !important;
+    font-size: 12px !important;
+}
+#ajax_get_ops {
+    position: relative !important;
+    z-index: 2 !important;
+}
+.tableform .division table td {
+    position: relative !important;
+}
+.description-textarea {
+    max-width: 63% !important;
+    box-sizing: border-box !important;
+}
+</style>
+<div class="tableform">
+<div class="division">
+<form method="post" action="index.php?app=ome&ctl=admin_group&act=save_group" id="form-group">    
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+        <tr>
+        <th>名称：</th>
+          <td><input type="text" name="groups[name]" value="<{$group.name}>" vtype="required"/></td>
+        </tr>
+        <tr>
+        <th>选择运营组织：</th>
+            <td>
+                <select name='groups[org_id]' id="chose_org">
+                <{foreach from=$orgs item=item}>
+                <option value="<{$item.org_id}>" <{if $group.org_id == $item.org_id}>selected<{/if}> ><{$item.name}></option>
+                <{/foreach}>
+                </select>
+            </td>
+        </tr>
+        <tr>
+        <th>选择管理员：</th>
+            <td id="ajax_get_ops" class="admin-checkbox-container">
+                <{if $group.group_id }>
+                <{foreach from=$operators item=operator}>
+                <label><input name="groups[op_id][]" type="checkbox" value="<{$operator.user_id}>" <{$operator.checked}>/><{$operator.name}></label>
+                <{/foreach}>
+                <{/if}>
+            </td>
+        </tr>
+        <tr>
+        <th>说明：</th>
+          <td><textarea name="groups[description]" rows="5" cols="50" class="description-textarea"><{$group.description}></textarea></td>
+        </tr>
+        </tbody>
+      </table>
+      <{if $group}>
+	  <input type="hidden" id="group_id" name="groups[group_id]" value="<{$group.group_id}>">
+	  <{/if}>
+</form>   
+  </div>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td><button class="btn btn-primary" id="submit_btn" ><span><span><{t}>确定<{/t}></span></span></button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<{/area}>
+<script>
+window.addEvent('domready', function() {
+
+    var group_id = $('form-group').getElement('input[name^=groups[group_id]]');
+
+    $('chose_org').addEvent('change',function(){
+        new Request.HTML({
+            url:'index.php?app=ome&ctl=admin_group&act=ajax_get_ops_html&p[0]='+ this.value,
+            method:'post',
+            update:$('ajax_get_ops'),
+            onSuccess:function(){
+            }
+        }).send();
+    });
+
+    if(!group_id){
+        $('chose_org').fireEvent('change',{stop:$empty});
+    }
+});
+
+
+(function(){
+    var _form = $('form-group');//表单ID 
+    var btn   = $('submit_btn');//按钮ID
+    
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    _form.store('target',{
+        onComplete:function(){
+        },
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+
+                if(_dialogIns){
+                     finder.refresh();
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+
+    btn.addEvent('click',function(){
+      _form.fireEvent('submit',{stop:$empty});
+    });
+})();
+</script>
+
+

@@ -1,0 +1,156 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app='omeauto' src="style.css"}>
+<{/capture}>
+<div class="tableform">
+    <div class="division">
+        <form action="index.php?app=console&ctl=admin_replenish_task&act=save" method="post" id="submit_form"> 
+        <input type="hidden" name="task_id" id="task_id" value="<{$data.task_id}>">
+            <table width="100%" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc"><span style="color:red;">*</span>补货任务名称：</label> </th>
+                        <td><{input type="text&&required" name="task_name" id='task_name' size="30" value=$data.task_name}>&nbsp;&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc"><span style="color:red;">*</span>补货门店类型：</label> </th>
+                        <td>
+                            <select name='store_mode' id="store_mode">
+                            <{foreach from=$storeType key=itemKey item=itemVal}>
+                            <option value="<{$itemKey}>" <{if $itemKey == $store_mode}>selected<{/if}> ><{$itemVal}></option>
+                            <{/foreach}>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc"><span style="color:red;">*</span>销售统计日期：</label> </th>
+                        <td>
+                        <{input type='date' name='start_time' value=$data.start_time vtype="required" }>
+                        &nbsp;&nbsp;<strong style="font-weight:bold;">至</strong>&nbsp;&nbsp;
+                        <{input type='date' name='end_time' value=$data.end_time vtype="required" }>&nbsp;&nbsp;<{help}>统计选择时间范围内销售的库存数量，销售统计结束日期必须早于今天。<{/help}>
+                      </td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc"><span style="color:red;">*</span>销售补货系数：</label> </th>
+                        <td><{input type="number&&required" size="5" maxlength="4" name="multipl_num" id='multipl_num' value=$data.multipl_num onkeyup="value=value.replace(/[^0-9\.]/g,'')" }>&nbsp;&nbsp;(默认1，最大可填写3)</td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc"><span style="color:red;">*</span>调出仓库：</label> </th>
+                        <td>
+                            <select name='out_branch_id' id="out_branch_id">
+                            <option>请选择</option>
+                            <{foreach from=$branchList key=itemKey item=itemVal}>
+                            <option value="<{$itemKey}>" <{if $itemKey == $data.out_branch_id}>selected<{/if}> ><{$itemVal.name}></option>
+                            <{/foreach}>
+                            </select>&nbsp;&nbsp;<{help}>自动补货时，商品库存从哪个电商仓库调拨出库。<{/help}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="60" height="80"><label for="dom_el_bc">店铺范围：</label> </th>
+                        <td>
+                            <input type='checkbox' name='store_ids[]' value='_ALL_' onclick='allShop(this);' <{if $data.store_ids == '_ALL_'}>checked<{/if}>>所有店铺
+
+                            <ul id='store_list' <{if $data.store_ids == '_ALL_'}>style="display:none;"<{/if}>>
+                                <{foreach from=$storeList item=storeItem key=key}>
+                                <li class='span-auto' style='min-width: 118px;margin-bottom:5px;'>
+                                    <input type='checkbox' name='store_ids[]' value="<{$storeItem.store_id}>"  <{if in_array($storeItem.store_id, $select_store_ids)}>checked<{/if}> onchange="javascript:if(this.checked){this.getNext('span').setStyle('color','red');}else{this.getNext('span').setStyle('color','');}"/>
+                                    <span <{if in_array($storeItem.store_id, $select_store_ids)}>style='font-size:14px;font-weight:bold;color:red;' <{else}>style='font-size:14px;font-weight:bold;' <{/if}> ><{$storeItem.name}></span>
+                          </li>
+                                <{/foreach}>
+                          </ul>
+                      </td>
+                    </tr>
+                    <tr>
+                        <th width="60" height="80"><label for="dom_el_bc"><{help}>默认不选择，则是所有商品<{/help}>商品范围：</label> </th>
+                        <td>
+                        <div id='add_sku_postion'>
+                        <{input type='inventorydepth_object' object='basic_material@material' multiple=true breakpoint='0' name='bm_id' filter='visibled=1' textcol='material_name' value=$bm_ids callback='product_object_callback' replacehtml=$bcreplacehtml emptytext='选取基础物料' }>
+                        </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center">
+                            <{button class="btn-primary" label="确定" type="button" id="msaveBtn"}>
+                            <{button class="btn-primary" label="取消" type="button" id="mcancelBtn"}>
+                        </td>
+                    </tr>
+              </tbody>
+            </table>
+        </form>
+    </div> 
+</div>
+<script> 
+function allShop(el)
+{
+    if (el.checked){
+        $('store_list').hide();
+        $('store_list').getElements('input').set('disabled',true);
+    }else{
+        $('store_list').show();
+        $('store_list').getElements('input').set('disabled',false);
+    }
+}
+
+function product_object_callback(rs,handle)
+{
+    var length = handle.getElements('.row').length;
+    var html = '已选择了'+length+'个库存商品,'+"<a href='javascript:void(0);' onclick='product_selected_show();'>查看选中的库存商品.</a>";
+    if ($defined($('hand-selected-product'))){
+        $('hand-selected-product').setHTML(html);
+    } else {
+        var div = new Element('div',{'html':html,'id':'hand-selected-product'});
+        div.injectBefore(handle); 
+    }
+}
+
+function product_selected_show()
+{
+    new Dialog('index.php?app=crm&ctl=admin_gift_rulebase&act=showProducts',{
+        ajaxoptions:{data:$('hand-selected-product').getNext('div'),method:'post'}
+    });
+}
+
+(function() {
+    var task_id = "<{$data.task_id}>";
+    var _form = $('submit_form');
+    var btn = $('msaveBtn');
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    
+    //关闭按钮
+    $('mcancelBtn').addEvent('click', function(){
+        $('mcancelBtn').getParent('.dialog').retrieve('instance').close();
+    });
+    
+    //保存按钮
+    $('msaveBtn').addEvent('click', function()
+    {
+        _form.fireEvent('submit', {stop:$empty});
+    });
+    
+    _form.store('target',{
+        onComplete:function(){
+        },
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+            
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){
+                    //==
+                }
+                
+                if(_dialogIns){
+                    finder.refresh();
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+    
+})();
+</script>

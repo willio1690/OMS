@@ -1,0 +1,10 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<th><label for="dom_el_bc">处理方式：</label> </th>
+<td >
+<input name="cnf[allocate][stockoutin]" type="radio" value="1" <{if $cnf.allocate.stockoutin == 1}>checked="checked"<{/if}> <{if !$cnf.allocate.stockoutin}>checked="checked"<{/if}>/><label>传统入库(货号、条码)</label>&nbsp;&nbsp;<input name="cnf[allocate][stockoutin]" type="radio" value="2" <{if $cnf.allocate.stockoutin == 2}>checked="checked"<{/if}> /><label>关闭</label>
+</td>
+

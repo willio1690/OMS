@@ -1,0 +1,77 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=o2o&ctl=admin_branch_product&act=doSetConfig" method="post" id="order_frm" name="order_frm">
+    <div id="gEditor-Body">
+      <div class="spage-main-box">
+          <div class="tableform">
+          <div id="x-g-basic" class="goods-detail">
+            <div class="edit_box">
+
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td align="center" nowrap="nowrap"><strong>库存：</strong></td>
+                  <td>
+                    <span>
+                        <input type="radio" name="is_ctrl_store" value="1" <{if $o2o_branch_product.is_ctrl_store == '1'}> checked="checked"<{/if}>>有&nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="is_ctrl_store" value="2" <{if $o2o_branch_product.is_ctrl_store == '2' }>checked="checked"<{/if}>>无
+                     </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" nowrap="nowrap"><strong>销售状态：</strong></td>
+                  <td>
+                    <span>
+                        <input type="radio" name="status" value="1" <{if $o2o_branch_product.status == '1'}> checked="checked"<{/if}>>在售&nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="status" value="2" <{if $o2o_branch_product.status == '2' }>checked="checked"<{/if}>>停售
+                     </span>
+                  </td>
+                </tr>
+              </table>
+              <table>
+                 <tr>
+                    <td>&nbsp;
+                      <{input type="hidden" name="id" value=$o2o_branch_product.id}>
+                    </td>
+                     <td><div class="table-action text_left" style = "border-top:0px"><{button label="保存" type="button" id="btn_submit" name="btn_submit" }></div></td>
+                     <td>&nbsp;</td>
+                     <td>&nbsp;</td>
+                 </tr>
+              </table>
+              
+            </div>
+          </div>
+          </div>
+      </div>
+    </div>
+</form>
+<script>
+(function(){
+    
+    var _form = $('order_frm');
+    var btn = $('btn_submit');
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    
+    _form.store('target',{
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+                if(_dialogIns){
+                    _dialogIns.close();
+                    finder.refresh();
+                }
+            }
+        }
+    });
+    
+    btn.addEvent('click',function(){
+        _form.fireEvent('submit',{stop:$empty});    
+    });
+    
+})();
+</script>

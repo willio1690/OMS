@@ -1,0 +1,157 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.notice a {color: blue; font-size: 12px; font-weight: 700;margin-left: 4px; margin-right: 4px;}
+</style>
+<div class='division'>
+<{if $chk_msg}>
+    <div class='notice' style="padding-top: 15px;padding-bottom: 15px;">
+        <span style="weight:bold">
+        <{foreach from=$chk_msg item=chk_msg}>
+            <{$chk_msg}><br>
+        <{/foreach}>
+        </span>
+    </div>
+<{/if}>
+</div>
+
+<{if $error_msg}>
+    <div class='division'>
+        <{foreach from=$error_msg item=error}>
+            <p><{$error}></p>
+        <{/foreach}>
+    </div>
+<{/if}>
+
+<div class="division" id="process_info">
+    <h3>处理信息</h3><br>
+    共 <span style="color:#000000;font-weight:bold"> <{$need_return_list_count}> </span> 条记录可以处理,
+    已确认 <span id="iTotal" style="color:#083E96;font-weight:bold">0</span> 条记录,
+    剩 <span id="need_confirm" style="color:green;font-weight:bold"><{$need_return_list_count}></span> 条需确认<br><br>
+    
+    <span id='fail_text' style="display:none">
+        共失败：<span id='fail_return' style="color:#F00;font-weight:bold"></span> 条记录；失败列表如下：<br /><br />
+        <textarea id="iFailInfo" rows="4" cols="100" style="line-height:150%"></textarea>
+    </span>
+    
+    <div id="processBarBg" style="border:1px solid #999999; width:98%; margin:5px; height:25px;line-height:25px;padding:1px; background:#EEEEEE;">
+      <div style=" background:#3366cc; width:0px; padding-bottom:1px;overflow:hidden;" id='processBar'>
+          &nbsp;
+      </div>
+    </div>
+</div>
+
+<div class="table-action">
+    <{if $need_return_list_count>0}>
+      <{button type="button" id="confirm_return_form"  class="btn btn-primary" label="批量审核通过" }>
+    <{/if}>
+    <{button type="button" class="btn" id="return-btn" label="关 闭" }>
+</div>
+
+<script>
+var OrderGroups = <{$need_return_list}>;
+var total = parseInt(<{$need_return_list_count}>);
+
+var OrderQueue = new Array();
+var doTotal = 0;
+var failTotal = 0;
+var doFailInfo='';
+
+if ($('confirm_return_form'))
+{
+    $('confirm_return_form').addEvent('click', function(){
+        doRun();
+    });
+}
+
+function getTotal() {
+    return total;
+}
+
+function doRun(){
+    result = initOptQueue();
+    if(result == false){
+        alert("没有可操作的数据!");
+        return false;    
+    }
+    
+    $('confirm_return_form').disabled = true;
+    $('confirm_return_form').set('html', '<span><span>数据处理中，请稍候！</span></span>');
+    
+    doAjaxProcess(1);
+}
+
+function initOptQueue() {
+    var OrderHash = '';
+    
+    if (OrderGroups == '') {
+        return false;
+    }
+    
+    for (var i=0;i<OrderGroups.length;i++) {
+        OrderHash = OrderGroups[i];
+        
+        OrderQueue.push(OrderHash);
+    }
+}
+
+/**
+ * AJAX循环执行
+ */
+function doAjaxProcess(idx) {
+    if (idx > OrderQueue.length || doTotal >= getTotal()) {
+        $('processBar').setStyle('width', '100%');
+        $('iTotal').set('html',getTotal());
+        $('confirm_return_form').set('html', '<span><span>处理已完成!</span></span>');
+    } else {
+        var reship_id = OrderQueue[idx-1];
+        
+        new Request({url:'index.php?app=ome&ctl=admin_return_rchange&act=ajax_batch_approve',method:'post',data:{reship_id:reship_id},
+            onComplete:function(result){
+                if(!result) return;
+                
+                doTotal++;
+                
+                ret = JSON.decode(result);
+                
+                subTtotal = getTotal() - doTotal;
+                if(subTtotal<0){
+                    subTtotal=0;
+                }
+                
+                $('iTotal').set('html',doTotal);
+                $('need_confirm').set('html',subTtotal);
+                $('processBar').setStyle('width', (doTotal*100/(getTotal())) + '%');
+                
+                if(ret.rsp == 'fail'){
+                    failTotal++;
+                    $('fail_return').set('html', failTotal);
+                }
+                
+                if(ret.error_msg){
+                    $('fail_text').setStyle('display','');
+                    failHtml = $('iFailInfo').get('html');
+                    failHtml += ret.error_msg + '\n';
+                    
+                    $('iFailInfo').set('html', failHtml);
+                }
+                
+                setTimeout(function(){doAjaxProcess(idx+1);},500);
+            }
+        }).send();
+    }
+}
+
+if ($('return-btn'))
+{
+    $('return-btn').addEvent('click',function(e){
+        var _this=this;
+        
+        _this.getParent('.dialog').retrieve('instance').close();
+        window.finderGroup['<{$finder_id}>'].refresh();
+    });
+}
+</script>

@@ -1,0 +1,101 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<link href="../../../app/desktop/statics/perfect/main.css" rel="stylesheet" type="text/css">
+<div class="form-layout">
+    <form method="post" id="dealer_series_form" action="index.php?app=dealer&ctl=admin_series&act=setStatus&p[0]=<{$series_id}>&p[1]=close">
+        <div class="form-layout-block">
+            <h3><em class="red">关停</em>产品线，以下商品将<em class="red">自动改为自发货方式</em></h3>
+            <div class="form-layout-fields">
+                <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>基础物料编码</th>
+                        <th>基础物料名称</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <{if $drop_shipping}>
+                        <{foreach from=$drop_shipping item=log}>
+                        <tr>
+                            <td><{$log.material_bn}></td>
+                            <td><{$log.material_name}></td>
+                        </tr>
+                        <{/foreach}>
+                    <{else}>
+                        <tr>
+                            <td colspan="5" align="center"><div style="text-align:center; width:100%;">没有代发货商品...</div></td>
+                        </tr>
+                    <{/if}>
+                    </tbody>
+                </table>
+            </div>
+            <div id="cc" class="noprint table-action">
+                <{button class="btn-primary" type="button" id="series_btn" label="关 停"}>
+                    &nbsp;
+                <{button class="btn-secondary" type="button" id='close_btn' label='取 消' }>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+
+
+(function() {
+	window.addEvent('domready', function() {
+        $('close_btn').addEvent('click', function(){
+            try{
+                var _dialogIns = this.getParent('.dialog').retrieve('instance');
+            }catch(e){}
+
+            if(_dialogIns){
+                // setTimeout(finder.refresh(),30000);
+                _dialogIns.close();
+            }
+        });
+        //点击提交表单
+        $('series_btn').addEvent('click',function(e){
+            var _this = this;
+            var form = this.getParent('form');
+            form.store('target',{
+                onRequest:function(){
+                    _this.disabled=true;
+                },
+                onComplete:function(jsontext){
+                    _this.disabled=false;
+                },
+                onSuccess:function(response){
+                    var hash_res_obj = JSON.decode(response);
+                    if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                        try{
+                            var _dialogIns = $('series_btn').getParent('.dialog').retrieve('instance');
+                        }catch(e){}
+
+                        if(_dialogIns){
+                            // setTimeout(finder.refresh(),30000);
+                            _dialogIns.close();
+                        }
+                    }
+                }
+            });
+            form.fireEvent('submit',e);
+        });
+    });
+})();
+</script>
+
+<style>
+.form-layout {
+    background: #EEF5F9;
+    padding-bottom: 0px;
+}
+</style>

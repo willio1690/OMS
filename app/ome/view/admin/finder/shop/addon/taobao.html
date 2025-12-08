@@ -1,0 +1,62 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table>
+    <tr>
+        <th>虚拟商品发货回传：</th>
+        <td><{input type="select" name="config[enable_virtual]" options=["enable"=>"启用(默认)","close"=>"关闭"] value=$shop.config.enable_virtual|default:"enable"}></td>
+    </tr>
+    <tr>
+      <th>自动下载支付宝流水：</th>
+      <td><{input type="radio" name="config[download_settle_bill]" value=$shop.config.download_settle_bill|default:"no" options=array("yes"=>"是","no"=>"否") separator="&nbsp;"}></td>
+  </tr>
+</table>
+<{if $shop.business_type == "maochao"}>
+<table>
+    <tr>
+        <th>供货商ID(间隔使用|)：</th>
+        <td><{input type="text" name="config[supplier_id]" value=$shop.config.supplier_id}></td>
+    </tr>
+</table>
+<{/if}>
+
+<table style="margin: 20px;">
+    <tr>
+        <th><strong>开启自助修改SKU：</strong></th>
+        <td>
+            <a id="updatesku" style="color: blue;">点击开启</a>
+            <span class="notice-inline">开启自助修改SKU后，消费者下单付款后发现拍错，可在APP端发起修改SKU申请，在订单未发货前系统会自动更换SKU。</span>
+        </td>
+    </tr>
+</table>
+<script>
+    $('updatesku').addEvent('click',function(event){
+      var shop_id = "<{$shop.shop_id}>";
+      var request_data = {
+        'shop_id':shop_id
+      };
+   
+      new Request({url:'index.php?app=ome&ctl=admin_shop&act=updateSkuContract',method:'post',data:request_data,
+        onComplete:function(result) {
+          ret = JSON.decode(result);
+          if(ret['rsp'] == 'succ'){
+            alert('签约成功!');
+          }
+          else{
+            var error = '';
+            if(ret['msg']){
+              error = ret['msg'];
+            }
+   
+            if(ret['err_msg']){
+              error = ret['err_msg'];
+            }
+            alert('签约失败：'+error);
+          }
+        }
+      }).send();
+   
+    });
+</script>

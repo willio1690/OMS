@@ -1,0 +1,46 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <h5>退货单明细</h5>
+        <table class="gridlist"  style="margin:4px 0;">
+        <thead>
+            <tr>
+                <th>商品编号</th>
+                <th>货号</th>
+                <th>备件条码</th>
+                <th>条码</th>
+                <th>商品名称</th>
+                <th>平台原始订单号</th>
+                <th>运单号</th>
+                <th>确认收货人</th>
+                <th>退货价格</th>
+                <th>入库数量</th>
+                <th>SAP价格</th>
+                <th>成本价</th>
+            </tr>
+        </thead>
+       
+            <{foreach from=$items item=item}>
+            <tr>
+                <th><{$item.wareid}></th>
+                <th><{$item.bn}></th>
+                <th><{$item.partcode}></th>
+                <th><{$item.barcode}></th>
+                <th><{$item.productname}></th>
+                <th><{$item.saleordid}></th>
+                <th><{$item.shipcode}></th>
+                <th><{$item.confirmreceiptpeople}></th>
+                <th><{$item.price}></th>
+                <th><{$item.in_num}></th>
+                <th><{$item.sap_price}></th>
+                <th><{$item.cost}></th>
+            </tr>
+            <{/foreach}>
+       
+        </table>
+    </div>
+</div>

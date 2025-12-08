@@ -1,0 +1,25 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<tr>
+    <td style='width:100px;height:30px;'>导出模版：</td>
+     <td style='text-align:left;'>
+     <select name='salesExportType' onchange="changeDownExport(this.value);">
+     <option value='ar'>销售应收账单</option>
+     <option value='normal'>销售实收账单</option>
+     </select>
+     </td>
+</tr>
+<script>
+function changeDownExport(flag){
+     if(flag == 'ar'){
+          $('filename').set('value','销售应收账单导入');
+     }
+     if(flag == 'normal'){
+          $('filename').set('value','销售实收账单导入');
+     }
+}
+changeDownExport('ar');
+</script>

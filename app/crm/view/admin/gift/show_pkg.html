@@ -1,0 +1,23 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id='sm-selected-body'>
+<{include file="finder/input-row.html" app="inventorydepth"}>
+</div>
+<{area inject=".mainFoot"}>
+<div class='table-action'>
+    <{button label='确定' id='primary-btn' onclick='change_sm();'}>
+</div>
+<{/area}>
+<script>
+function change_sm(){
+    var handle = $('hand-selected-sm').getNext('div');
+    handle.setHTML($('sm-selected-body').innerHTML);
+    var length = $('sm-selected-body').getElements('.row').length;
+    var html = '已选择了'+length+'个销售物料,'+"<a href='javascript:void(0);' onclick='sm_selected_show();'>查看选中销售物料.</a>";
+    $('hand-selected-sm').setHTML(html);
+    $('primary-btn').getParent('.dialog').retrieve('instance').close();
+}
+</script>

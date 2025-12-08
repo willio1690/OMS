@@ -1,0 +1,347 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout-block">
+    <h3>日志备份周期设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">API同步日志备份周期：</span>
+            <select class="form-input"  name="set[ome.api_log.clean_time]">
+                <option value="7" <{if $setData.ome_api_log_clean_time=='7'}>selected="selected"<{/if}>>7天</option>
+                <option value="15" <{if $setData.ome_api_log_clean_time=='15' || $setData.ome_api_log_clean_time == ''}>selected="selected"<{/if}>>半个月</option>
+                <option value="21" <{if $setData.ome_api_log_clean_time=='21'}>selected="selected"<{/if}>>21天</option>
+                <option value="31" <{if $setData.ome_api_log_clean_time=='31'}>selected="selected"<{/if}>>一个月</option>
+            </select>
+            <span class="form-remark">设置天数以上的同步日志将被清除</span>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>显示方式设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">订单备注显示方式：</span>
+            <div class="form-radios">
+                <input id="ome_order_mark_on" name="set[ome.order.mark]" <{if $setData['ome_order_mark'] == 'all'}>checked<{/if}> type="radio" value="all">
+                <label for="ome_order_mark_on">显示全部</label>
+                <input id="ome_order_mark_off" name="set[ome.order.mark]" <{if $setData['ome_order_mark'] == 'last'}>checked<{/if}> type="radio" value="last">
+                <label for="ome_order_mark_off" >显示最新</label>
+            </div>
+            <span class="form-remark" style="color:red;">此备注显示指在发货单上展示订单备注</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">TAB显示方式：</span>
+            <div class="form-radios">
+                <input id="desktop_finder_tab_on" name="set[desktop.finder.tab]" <{if $setData['desktop_finder_tab'] == '1'}>checked<{/if}> type="radio" value="1">
+                <label for="desktop_finder_tab_on">快速显示</label>
+                <input id="desktop_finder_tab_off" name="set[desktop.finder.tab]" <{if $setData['desktop_finder_tab'] != '1'}>checked<{/if}> type="radio" value="2">
+                <label for="desktop_finder_tab_off" >普通显示</label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>标记设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">忽略配送方式并在备注中标记：</span>
+            <div class="form-radios">
+                <input id="ome_checkems_on" name="set[ome.checkems]" <{if $setData['ome_checkems'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="ome_checkems_on">开启</label>
+                <input id="ome_checkems_off" name="set[ome.checkems]" <{if $setData['ome_checkems'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="ome_checkems_off" >关闭</label>
+            </div>
+            <span class="form-remark">只针对淘宝拍拍店铺定义的EMS配送方式</span>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>扫码配置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">扫码配置：</span>
+            <div class="form-radios">
+                <input id="ome_product_serial_merge_on" onchange="check(1)"  name="set[ome.product.serial.merge]" <{if $setData['ome_product_serial_merge'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="ome_product_serial_merge_on">开启</label>
+                <input id="ome_product_serial_merge_off" onchange="check(1)"  name="set[ome.product.serial.merge]" <{if $setData['ome_product_serial_merge'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="ome_product_serial_merge_off" >关闭</label>
+            </div>
+            <span class="form-remark">开启条形码唯一码合并</span>
+        </div>
+        <div class="form-field" id="serial_separate">
+            <span class="form-field-label">设置分隔符：</span>
+            <input class="form-input" type="text" placeholder="请输入分隔符" name="set[ome.product.serial.separate]" size=6 value="<{$setData.ome_product_serial_separate}>" vtype="required" />
+            <span class="form-remark" style="color:red;">请用一个特殊字符作为分隔符</span>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>执行发货方式设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">执行发货方式：</span>
+            <div class="form-radios">
+                <input id="ome_delivery_method_on" name="set[ome.delivery.method]" <{if $setData['ome_delivery_method'] == 'on'}>checked<{/if}> type="radio" value="on">
+                <label for="ome_delivery_method_on">开启</label>
+                <input id="ome_delivery_method_off" name="set[ome.delivery.method]" <{if $setData['ome_delivery_method'] != 'on'}>checked<{/if}> type="radio" value="off">
+                <label for="ome_delivery_method_off" >关闭</label>
+            </div>
+            <span class="form-remark">启用【在线下单】方式执行发货操作 (如果不启用，默认使用【自己联系物流】方式执行发货操作) 该方式只针对淘宝</span>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>发货单推送失败</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">自动重试推送：</span>
+            <div class="form-radios">
+                <input id="ome_delivery_retry_push_on" name="set[ome.delivery.retry_push]" <{if $setData['ome_delivery_retry_push'] == 'on'}>checked<{/if}> type="radio" value="on">
+                <label for="ome_delivery_retry_push_on">开启</label>
+                <input id="ome_delivery_retry_push_off" name="set[ome.delivery.retry_push]" <{if $setData['ome_delivery_retry_push'] != 'on'}>checked<{/if}> type="radio" value="off">
+                <label for="ome_delivery_retry_push_off" >关闭</label>
+            </div>
+            <span class="form-remark">启用&nbsp;&nbsp;只针对【京东云交易】无货时,每3小时自动重试推送【商品无货】的发货单</span>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>同步订单设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">同步订单备注是否暂停订单：</span>
+            <div class="form-radios">
+                <input id="ome_orderpause_to_syncmarktext_on" name="set[ome.orderpause.to.syncmarktext]" <{if $setData['ome_orderpause_to_syncmarktext'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="ome_orderpause_to_syncmarktext_on">开启</label>
+                <input id="ome_orderpause_to_syncmarktext_off" name="set[ome.orderpause.to.syncmarktext]" <{if $setData['ome_orderpause_to_syncmarktext'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="ome_orderpause_to_syncmarktext_off" >关闭</label>
+            </div>
+            <span class="form-remark" style="color:red;">暂停操作只适用于已审核的订单</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">API同步失败自动重试间隔时间：</span>
+            <select class="form-input" name="set[ome.apifail.retry]">
+                <option value="2" <{if $setData.ome_apifail_retry=='2'}>selected="selected"<{/if}>>2分钟</option>
+                <option value="5" <{if $setData.ome_apifail_retry=='5'}>selected="selected"<{/if}>>5分钟</option>
+                <option value="10" <{if $setData.ome_apifail_retry=='10'}>selected="selected"<{/if}>>10分钟</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>队列日志设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">订单收订进队列：</span>
+            <div class="form-radios">
+                <input id="ome_orderrpc_mq_on" name="set[ome.orderrpc.mq]" <{if $setData['ome_orderrpc_mq'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="ome_orderrpc_mq_on">开启</label>
+                <input id="ome_orderrpc_mq_off" name="set[ome.orderrpc.mq]" <{if $setData['ome_orderrpc_mq'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="ome_orderrpc_mq_off" >关闭</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">第三方仓储发货进队列：</span>
+            <div class="form-radios">
+                <input id="ome_wmsrpc_mq_on" name="set[ome.wmsrpc.mq]" <{if $setData['ome_wmsrpc_mq'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="ome_wmsrpc_mq_on">开启</label>
+                <input id="ome_wmsrpc_mq_off" name="set[ome.wmsrpc.mq]" <{if $setData['ome_wmsrpc_mq'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="ome_wmsrpc_mq_off" >关闭</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">callback回调进队列：</span>
+            <div class="form-radios">
+                <input id="ome_callback_mq_on" name="set[ome.callback.mq]" <{if $setData['ome_callback_mq'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="ome_callback_mq_on">开启</label>
+                <input id="ome_callback_mq_off" name="set[ome.callback.mq]" <{if $setData['ome_callback_mq'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="ome_callback_mq_off" >关闭</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">同步日志-失败重试是否进队列：</span>
+            <div class="form-radios">
+                <input id="ome_saas_apifail_mq_on" name="set[ome.saas.apifail_mq]" <{if $setData['ome_saas_apifail_mq'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="ome_saas_apifail_mq_on">开启</label>
+                <input id="ome_saas_apifail_mq_off" name="set[ome.saas.apifail_mq]" <{if $setData['ome_saas_apifail_mq'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="ome_saas_apifail_mq_off" >关闭</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">系统内部日志：</span>
+            <div class="form-radios">
+                <input id="ome_kernel_log_on" name="set[ome.kernel.log]" <{if $setData['ome_kernel_log'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="ome_kernel_log_on">开启</label>
+                <input id="ome_kernel_log_off" name="set[ome.kernel.log]" <{if $setData['ome_kernel_log'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="ome_kernel_log_off" >关闭</label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>御城河设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">御城河是否开启：</span>
+            <div class="form-radios">
+                <input id="ome_hcsafe_config_on" name="set[ome.hcsafe.config]" <{if $setData['ome_hcsafe_config'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="ome_hcsafe_config_on">开启</label>
+                <input id="ome_hcsafe_config_off" name="set[ome.hcsafe.config]" <{if $setData['ome_hcsafe_config'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="ome_hcsafe_config_off" >关闭</label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>账号安全</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">强制重置密码周期：</span>
+            <{input type='select' name='set[desktop.password.reset.cycle]' options=array('week'=>'每周一次','month'=>'每月一次') value=$setData.desktop_password_reset_cycle}>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">密码长度限制：</span>
+            <div class="form-radios">
+                <input id="desktop_password_length_limit_on" name="set[desktop.password.length.limit]" <{if $setData['desktop_password_length_limit'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="desktop_password_length_limit_on">开启</label>
+                <input id="desktop_password_length_limit_off" name="set[desktop.password.length.limit]" <{if $setData['desktop_password_length_limit'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="desktop_password_length_limit_off" >关闭</label>
+            </div>
+            <span class="form-remark" style="color:red;">开启后，admin 密码长度16-32位 普通账号长度12-32位； 未开启 长度为12-32位</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">强制账号二次验证：</span>
+            <div class="form-radios">
+                <input id="desktop_account_mobile_verify_on" name="set[desktop.account.mobile.verify]" <{if $setData['desktop_account_mobile_verify'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="desktop_account_mobile_verify_on">开启</label>
+                <input id="desktop_account_mobile_verify_off" name="set[desktop.account.mobile.verify]" <{if $setData['desktop_account_mobile_verify'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="desktop_account_mobile_verify_off" >关闭</label>
+            </div>
+            <span class="form-remark" style="color:red;">开启后，登陆需要手机短信码验证。只适用于开启御城河且有淘宝店或开启短信服务且有验证码模板的商家</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">冻结账号：</span>
+            <div class="form-radios">
+                <input id="desktop_account_error_freeze_on" name="set[desktop.account.error.freeze]" <{if $setData['desktop_account_error_freeze'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="desktop_account_error_freeze_on">开启</label>
+                <input id="desktop_account_error_freeze_off" name="set[desktop.account.error.freeze]" <{if $setData['desktop_account_error_freeze'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="desktop_account_error_freeze_off" >关闭</label>
+            </div>
+            <span class="form-remark" style="color:red;">开启后，错5次密码冻结10分钟</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">账号限制：</span>
+            <div class="form-radios">
+                <input id="desktop_account_use_limit_on" name="set[desktop.account.use.limit]" <{if $setData['desktop_account_use_limit'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="desktop_account_use_limit_on">开启</label>
+                <input id="desktop_account_use_limit_off" name="set[desktop.account.use.limit]" <{if $setData['desktop_account_use_limit'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="desktop_account_use_limit_off" >关闭</label>
+            </div>
+            <span class="form-remark" style="color:red;">开启后，90天未登录账号 自动禁用</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">同账号登录限制：</span>
+            <div class="form-radios">
+                <input id="desktop_account_equal_restrict_on" name="set[desktop.account.equal.restrict]" <{if $setData['desktop_account_equal_restrict'] != 'false'}>checked<{/if}> type="radio" value="true">
+                <label for="desktop_account_equal_restrict_on">开启</label>
+                <input id="desktop_account_equal_restrict_off" name="set[desktop.account.equal.restrict]" <{if $setData['desktop_account_equal_restrict'] == 'false'}>checked<{/if}> type="radio" value="false">
+                <label for="desktop_account_equal_restrict_off" >关闭</label>
+            </div>
+            <span class="form-remark" style="color:red;">开启后，相同的账号登录时：系统会自动退出前一个人的登录。</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">IDAAS认证：</span>
+            <div class="form-radios">
+                <input id="pam_passport_idaas_enable_on" name="set[pam.passport.idaas.enable]" <{if $setData['pam_passport_idaas_enable'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="pam_passport_idaas_enable_on">开启</label>
+                <input id="pam_passport_idaas_enable_off" name="set[pam.passport.idaas.enable]" <{if $setData['pam_passport_idaas_enable'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="pam_passport_idaas_enable_off" >关闭</label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>OIDC单点登陆</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">OIDC启用：</span>
+            <div class="form-radios">
+                <input id="pam_passport_oidc_enable_on" name="set[pam.passport.oidc.enable]" <{if $setData['pam_passport_oidc_enable'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="pam_passport_oidc_enable_on">开启</label>
+                <input id="pam_passport_oidc_enable_off" name="set[pam.passport.oidc.enable]" <{if $setData['pam_passport_oidc_enable'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="pam_passport_oidc_enable_off" >关闭</label>
+            </div>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">强制跳转：</span>
+            <div class="form-radios">
+                <input id="pam_passport_oidc_info_on" name="set[pam.passport.oidc.info][to_out]" <{if $setData['pam_passport_oidc_info']['to_out'] == 'true'}>checked<{/if}> type="radio" value="true">
+                <label for="pam_passport_oidc_info_on">开启</label>
+                <input id="pam_passport_oidc_info_off" name="set[pam.passport.oidc.info][to_out]" <{if $setData['pam_passport_oidc_info']['to_out'] != 'true'}>checked<{/if}> type="radio" value="false">
+                <label for="pam_passport_oidc_info_off" >关闭</label>
+            </div>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">超管账号：</span>
+            <{input type='text' class='form-input' placeholder='请输入超管账号' name='set[pam.passport.oidc.info][super_account]' value=$setData.pam_passport_oidc_info.super_account size=30}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">client id：</span>
+            <{input type='text' class='form-input' placeholder='请输入client id' name='set[pam.passport.oidc.info][client_id]' value=$setData.pam_passport_oidc_info.client_id size=30}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">client secret：</span>
+            <{input type='text' class='form-input' placeholder='请输入client secret' name='set[pam.passport.oidc.info][client_secret]' value=$setData.pam_passport_oidc_info.client_secret size=30}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">authorization endpoint：</span>
+            <{input type='text' class='form-input' placeholder='请输入authorization endpoint' name='set[pam.passport.oidc.info][authorization]' value=$setData.pam_passport_oidc_info.authorization size=80}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">token endpoint：</span>
+            <{input type='text' class='form-input' placeholder='请输入token endpoint' name='set[pam.passport.oidc.info][token]' value=$setData.pam_passport_oidc_info.token size=80}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">userinfo endpoint：</span>
+            <{input type='text' class='form-input' placeholder='请输入userinfo endpoint' name='set[pam.passport.oidc.info][userinfo]' value=$setData.pam_passport_oidc_info.userinfo size=80}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">endsession endpoint：</span>
+            <{input type='text' class='form-input' placeholder='请输入endsession endpoint' name='set[pam.passport.oidc.info][endsession]' value=$setData.pam_passport_oidc_info.endsession size=80}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">redirect uri：</span>
+            <{input type='text' class='form-input' placeholder='请输入redirect uri' name='set[pam.passport.oidc.info][redirect]' value=$setData.pam_passport_oidc_info.redirect size=80}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">get permission：</span>
+            <{input type='text' class='form-input' placeholder='请输入get permission' name='set[pam.passport.oidc.info][permission]' value=$setData.pam_passport_oidc_info.permission size=80}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">sync permission：</span>
+            <{input type='text' class='form-input' placeholder='请输入sync permission' name='set[pam.passport.oidc.info][syncpermission]' value=$setData.pam_passport_oidc_info.syncpermission size=80}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">oidc type：</span>
+            <{input type='text' class='form-input' placeholder='请输入oidc type' name='set[pam.passport.oidc.info][oidctype]' value=$setData.pam_passport_oidc_info.oidctype size=80}>
+        </div>
+    </div>
+</div>
+<script>
+    var set= $$('input[name=set[pam.passport.oidc.enable]]:checked').get('value');
+    show_oidc_content(set);
+
+    $$('input[name=set[pam.passport.oidc.enable]]').addEvent('click',function(e){
+        show_oidc_content(this.value)
+    });
+    function show_oidc_content(setting) {
+        if (setting=='true') {
+            $$('.oidc-content').setStyle('display','');
+
+        } else {
+            $$('.oidc-content').setStyle('display','none');
+        }
+    }
+</script>

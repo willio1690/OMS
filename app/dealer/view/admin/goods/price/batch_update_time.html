@@ -1,0 +1,167 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=dealer&ctl=admin_goods_price&act=doBatchUpdateTime" method="post" id="batchUpdateForm">
+    <input type="hidden" name="action_type" value="<{$action_type}>">
+    
+    <table class="tableform">
+        <tbody>
+        <tr>
+            <td colspan="2" style="color:red">请在列表页面选择要更新的记录，然后设置新的时间进行批量更新</td>
+        </tr>
+        <tr>
+            <th>新的<{if $action_type == 'start_time'}>生效时间<{else}>过期时间<{/if}>：</th>
+            <td>
+                <{input type="date" name="new_time" vtype="date" }>
+            </td>
+        </tr>
+        <tr id="error-message-row" style="display:none;">
+            <td colspan="2">
+                <div id="error-message" style="background-color:#f8d7da;color:#721c24;padding:10px;border:1px solid #f5c6cb;border-radius:4px;margin:5px 0;"></div>
+            </td>
+        </tr>
+        <tr>
+            <th></th>
+            <td>
+                <{foreach from=$selectedIds key=key item=item}>
+                <input type="hidden" name='selected_ids[]' value=<{$item}> />
+                <{/foreach}>
+            </td>
+        </tr>
+        <!--
+        <tr>
+            <th>说明：</th>
+            <td>
+                <{if $action_type == 'start_time'}>
+                    生效时间将设置为选择日期的 00:00:00
+                <{else}>
+                    过期时间将设置为选择日期的 23:59:59
+                <{/if}>
+            </td>
+        </tr>
+        -->
+        </tbody>
+    </table>
+</form>
+
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+        <tr>
+            <td><button class="btn btn-primary" id="btnSubmit" ><span><span><{t}>确定<{/t}></span></span></button></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<{/area}>
+
+<script>
+    var actionType = '<{$action_type}>';
+    var fieldName = actionType === 'start_time' ? '生效时间' : '过期时间';
+    
+    // 使用AJAX方式提交表单
+    function submitForm() {
+        $('btnSubmit').set('disabled',true);
+        // 隐藏之前的错误信息
+        $('error-message-row').setStyle('display', 'none');
+        
+        // 收集表单数据
+        var formData = {
+            'action_type': $E('input[name="action_type"]').value,
+            'new_time': $E('input[name="new_time"]').value,
+            'selected_ids': []
+        };
+        
+        // 收集选中的ID
+        $$('input[name="selected_ids[]"]').each(function(input) {
+            formData.selected_ids.push(input.value);
+        });
+        
+        // 调试：输出表单数据
+        console.log('表单数据:', formData);
+        
+        new Request({
+            url: $('batchUpdateForm').get('action'),
+            method: 'post',
+            data: formData,
+            onSuccess: function(response) {
+                $('btnSubmit').set('disabled',false);
+                
+                // 调试信息
+                console.log('服务器响应:', response);
+                
+                // 解析响应数据
+                var responseData;
+                try {
+                    responseData = JSON.parse(response);
+                    console.log('解析后的数据:', responseData);
+                } catch (e) {
+                    console.log('JSON解析失败:', e);
+                    responseData = {success: false, message: '响应格式错误: ' + response};
+                }
+                
+                if (responseData.success) {
+                    // 全部成功，关闭对话框并刷新列表
+                    $('btnSubmit').getParent('.dialog').retrieve('instance').close();
+                    finderGroup['<{$env.get.finder_id}>'].refresh();
+                } else {
+                    // 有错误（包括部分成功），显示错误信息
+                    showErrorMessage(responseData.message, responseData.error_messages);
+                }
+            },
+            onFailure: function() {
+                $('btnSubmit').set('disabled',false);
+                showErrorMessage('请求失败，请重试');
+            }
+        }).send();
+    }
+    
+    // 显示错误信息的函数
+    function showErrorMessage(message, errorMessages) {
+        var errorHtml = '<strong>操作结果：</strong>' + (message || '未知错误');
+        
+        if (errorMessages && errorMessages.length > 0) {
+            errorHtml += '<br><br><strong>详细错误：</strong><ul style="margin:5px 0;padding-left:20px;">';
+            for (var i = 0; i < errorMessages.length; i++) {
+                errorHtml += '<li>' + errorMessages[i] + '</li>';
+            }
+            errorHtml += '</ul>';
+        }
+        
+        $('error-message').set('html', errorHtml);
+        $('error-message-row').setStyle('display', 'table-row');
+        
+        // 滚动到错误信息位置
+        $('error-message-row').scrollIntoView();
+    }
+    
+    $('btnSubmit').addEvent('click',function(e){
+        e.stop();
+        var oTime = $E('input[name="new_time"]').value;
+        console.log('获取到的日期值:', oTime);
+        
+        if (!oTime) {
+            alert('请选择日期');
+            return;
+        }
+        
+        oTime = new Date(oTime.replace(/\-/g, "\/"));
+        var oToday = new Date();
+        oToday.setHours(0, 0, 0, 0);
+        console.log('解析后的日期:', oTime);
+        console.log('今天日期:', oToday);
+        
+        submitForm();
+    });
+    
+    // 监听对话框关闭事件，关闭时刷新列表
+    var dialog = $('btnSubmit').getParent('.dialog').retrieve('instance');
+    if (dialog) {
+        dialog.addEvent('close', function() {
+            finderGroup['<{$env.get.finder_id}>'].refresh();
+        });
+    }
+</script>

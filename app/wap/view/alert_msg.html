@@ -1,0 +1,54 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id='alert_msg' style="position:absolute;top:50%;left:50%;z-index:999;border:1px solid #f96;width:120px;height:32px;line-height:32px;margin:0 0 0 -60px;background-color:#ffc;border-radius:5px;color:#666;display:none;"></div>
+
+<script>
+function alert_msg(msg){
+    var msg_info = msg;
+    var alert_msg = $('alert_msg');
+    $(alert_msg).setStyle('display','none');
+    $(alert_msg).setStyle('margin-left',-60);
+    $(alert_msg).setStyle('opacity',1);
+
+    var myEffect = new Fx.Morph(alert_msg, { duration: '2500', transition: Fx.Transitions.Sine.easeOut });
+    var scrollTop = getScrollTop();
+    var clientHeight = getClientHeight();
+    var currTop = scrollTop+clientHeight/2;
+
+    $(alert_msg).set('text',msg_info);
+    $(alert_msg).setStyle('display','block');
+    $(alert_msg).setStyle('top',currTop);
+    myEffect.start({ 'margin-left': 60, 'opacity': 0});
+}
+
+function getScrollTop()
+{
+    var scrollTop=0;
+    if(document.documentElement&&document.documentElement.scrollTop)
+    {
+        scrollTop=document.documentElement.scrollTop;
+    }
+    else if(document.body)
+    {
+        scrollTop=document.body.scrollTop;
+    }
+    return scrollTop;
+}
+
+function getClientHeight()
+{
+    var clientHeight=0;
+    if(document.body.clientHeight&&document.documentElement.clientHeight)
+    {
+        var clientHeight = (document.body.clientHeight<document.documentElement.clientHeight)?document.body.clientHeight:document.documentElement.clientHeight;        
+    }
+    else
+    {
+        var clientHeight = (document.body.clientHeight>document.documentElement.clientHeight)?document.body.clientHeight:document.documentElement.clientHeight;    
+    }
+    return clientHeight;
+}
+</script>

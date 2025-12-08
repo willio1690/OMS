@@ -1,0 +1,174 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+	<{script src="coms/highcharts.js" app="desktop"}>
+<{/capture}>
+
+<div style='width:100%;'>
+	<div id="chart-container" style='width:100%;margin:0 auto;'></div>
+	<div class='date' id='date' style='position: absolute;bottom:50px;right:10px;font-size:15px;'>日期：<span></span></div>
+	<!--<div class='time' id='time' style='float:right;right:20px;'>时间：<span></span></div>-->
+</div>
+
+<script type="text/javascript">
+
+window.addEvent('domready',function(){
+    var chart;
+
+	function requestData() {
+		new Request.JSON({
+			url: 'index.php?app=tgkpi&ctl=admin_analysis_pick&act=ajaxChartData',
+			onComplete: function(resp) {
+				if (resp=='')
+				{
+					var element = chart.renderer.text('暂时无显示员工拣货状态',650,250);
+					var style = {
+						fontSize:20
+					};
+					element.css(style).add();
+				}
+
+				var options = {
+					categories:[],
+					series:[{fpickNum:[],lpickNum:[],fdeliveryId:[],ldeliveryId:[]}]
+				};
+				var options = $merge(options,resp);
+				//draw_column.delay(300,this,options);
+				
+				(function(){
+					chart.get('opno').setCategories(options.categories);
+					chart.get('fpickNum').setData(options.series.fpickNum);
+					chart.get('lpickNum').setData(options.series.lpickNum);
+					chart.get('fdeliveryId').setData(options.series.fdeliveryId);
+					chart.get('ldeliveryId').setData(options.series.ldeliveryId); 
+				}).delay(500);
+
+				setTimeout(requestData,4*60*1000);
+			}
+		}).send();
+	}
+
+	chart = new Highcharts.Chart({
+		chart: {
+			renderTo: 'chart-container',
+			type: '<{$chart}>',
+			events: {
+                load: requestData
+            },
+			height:(window.getHeight()-50),
+			width:(window.getWidth()-20),
+			spacingTop:15
+		},
+
+		title: {
+			text: '员工拣货绩效',
+			style:{
+				fontSize:'30px'
+			}
+		},
+
+		xAxis: {
+			categories: [],
+			id:'opno',
+			labels:{
+				style:{
+					color:'#006600',
+					fontSize:'20px',
+					paddingTop:'10px'
+				}
+			},
+			lineWidth:0,
+			offset:10
+		},
+
+		yAxis: {
+			allowDecimals: false,
+			min: 0,
+			title: {
+				text: ''
+			}
+		},
+			
+		tooltip: {
+			formatter: function() {
+				var name = '';
+				switch (this.series.options.id)
+				{
+					case 'fpickNum': name='已完成/总件数';break;
+					case 'lpickNum': name='未完成/总件数';break;
+					case 'fdeliveryId': name='已完成/总单数';break;
+					case 'ldeliveryId': name='未完成/总单数';break;	
+				}
+				return '<b>'+ this.x +'</b><br/>'+
+					name +': '+ this.y + '/ '+ this.point.stackTotal;
+			}
+		},
+
+		plotOptions: {
+			column: {
+				stacking: 'normal'
+			}
+		},
+
+		//series: []
+		
+		series: [{
+			name: '未拣单数',
+			data: [],
+			stack: 'd',
+			id:'ldeliveryId',
+			color:'#ff99cc'
+		} , {
+			name: '已拣单数',
+			data: [],
+			stack: 'd',
+			id:'fdeliveryId',
+			color:'#ff33cc'
+		} , {
+			name: '未拣件数',
+			data: [],
+			stack: 'j',
+			id:'lpickNum',
+			color:'#0099ff'
+		} , {
+			name: '已拣件数',
+			data: [],
+			stack: 'j',
+			id:'fpickNum',
+			color:'#0033ff'
+		}]
+	});
+
+	/*日期显示*/
+
+	
+	function showData(){
+		var today = new Date();
+		var hours = today.getHours();
+		hours = hours>=10 ? hours : ('0'+hours);
+		var minutes = today.getMinutes();
+		minutes = minutes>=10 ? minutes : ('0'+minutes);
+		var seconds = today.getSeconds();
+		seconds = seconds>=10 ? seconds : ('0'+seconds);
+		var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+'  '
+		+hours+':'+minutes+':'+seconds;
+		$E('#date span').setText(date);
+		setTimeout(showData,1000);
+	}
+	
+	showData();
+
+	window.addEvent('resize',function(){
+		chart.setSize.delay(100,this,[(window.getWidth()-20),(window.getHeight()-50)]);
+	});
+
+});
+
+</script>
+
+
+
+

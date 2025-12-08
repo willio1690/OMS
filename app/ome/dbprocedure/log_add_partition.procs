@@ -1,0 +1,26 @@
+DELIMITER $$
+CREATE PROCEDURE ome_log_add_partition()
+BEGIN
+    -- 提前创建后天的分区（防止任务失败导致数据丢失）
+    SET @next_date = CURDATE() + INTERVAL 2 DAY; 
+    SET @partition_name = CONCAT('p', DATE_FORMAT(@next_date, '%Y_%m_%d'));
+    SET @partition_limit = UNIX_TIMESTAMP(DATE_ADD(@next_date, INTERVAL 1 DAY));
+
+    SET @partition_name_exist = (SELECT PARTITION_NAME FROM INFORMATION_SCHEMA.PARTITIONS WHERE TABLE_NAME = '{table}ome_api_log' AND TABLE_SCHEMA = '{db}' AND PARTITION_NAME = @partition_name LIMIT 1);
+
+    -- Check if partition already exists
+    IF @partition_name_exist IS  NULL THEN
+        -- 动态SQL重组p_future分区
+        SET @sql = CONCAT(
+            'ALTER TABLE {table}ome_api_log REORGANIZE PARTITION p_future INTO (',
+                'PARTITION ', @partition_name, ' VALUES LESS THAN (', @partition_limit, '), ',
+                'PARTITION p_future VALUES LESS THAN MAXVALUE',
+            ')'
+        );
+        PREPARE stmt FROM @sql;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END IF;
+END$$
+
+DELIMITER ;

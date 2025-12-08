@@ -1,0 +1,82 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+<form id='material-sync-form'>
+    <input type="hidden" name="filter" value='<{$input}>'>
+    <table>
+        <tbody>
+            <tr>
+                <th width="5%">仓库:</th>
+                <td width="17%">
+                    <select name="branch_id">
+                        <option value="">请选择</option>
+                        <{foreach from=$branches item=item}>
+                            <option value="<{$item.branch_id}>"><{$item.name}></option>
+                        <{/foreach}>
+                    </select>
+                </td>
+                <th width="15%">商品名拼接规格:</th>
+                <td><input type="checkbox" name="isNameSpec" value="1"></td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+</div>
+
+<div>统计:<span id="curTotal" style="color: red;">0</span>/<span id="total"><{$total}></span></div>
+<div id="processBarBg" style="border:1px solid #999999; width:98%; height:25px;line-height:25px;padding:1px; background:#EEEEEE;">
+<div style=" background:#3366cc; width:0px; padding-bottom:1px;overflow:hidden;" id='processBar'>&nbsp;</div>
+</div>
+<div id='sync-error'></div>
+<div class="table-action">
+<{button label="开始" id="start"  type="button"}>
+</div>
+
+<script type="text/javascript">
+void function(){
+    var doSync=function(pageno){
+
+        new Request.JSON({
+            url:'index.php?app=wms&ctl=admin_material&act=do_sync&p[0]='+pageno,
+            method:'post',
+            data:$('material-sync-form'),
+            onRequest:function(){
+                $('start').disabled=true;
+                $('start').style.cursor='not-allowed';
+                $('start').set('html', '<span><span>请求中</span></span>');
+            },
+            onSuccess:function(resp){
+                if (resp.success){
+                    var curTotal = $('curTotal').getText().toInt()+resp.count;
+                    var total = $('total').getText().toInt();
+                    $('curTotal').setText(curTotal);
+
+                    var rate = total <= 0 ? '100' : curTotal/total*100;
+
+                    $('processBar').setStyle('width',rate+'%');
+
+                    if (rate == 100) {
+                        $('start').set('html', '<span><span>完成</span></span>');
+                        var dialog = $('start').getParent('.dialog').retrieve('instance');
+                        dialog.close.delay(800,dialog);
+                        window.finderGroup['<{$env.get.finder_id}>'].refresh();
+                        return;
+                    }
+
+                    doSync(++pageno);
+                }
+            }
+        }).send();
+    };
+
+    $('start').addEvent('click',function(){
+        var branch_id = $E('select[name=branch_id]').value;
+        if (!branch_id) return MessageBox.error('请选择仓库');
+
+        doSync(1);
+    });
+}();
+</script>

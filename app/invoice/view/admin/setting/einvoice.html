@@ -1,0 +1,81 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table border="0" cellpadding="0" cellspacing="0"><tbody>
+    <tr><th>开票渠道：</th>
+        <td>
+            <{input type="object" object="channel@invoice" name="item[channel_id]" value=$item.channel_id }>
+            <!-- <em class="c-red">&nbsp;*</em> -->
+        </td>
+    </tr>
+</tbody></table>
+
+<div id="einvoice-channel-content"></div>
+
+<table border="0" cellpadding="0" cellspacing="0"><tbody>
+    <tr><th>应用开票店铺：</th>
+        <td>
+            <div class="form-checkbox">
+                <div><input type='checkbox' name='item[shopids][]' value='_ALL_'  id='all_shop' <{if in_array('_ALL_',$item.shopids)}> checked="checked"<{/if}>>所有店铺<b class="font-red f-14">(注：如店铺已选择有渠道，就不可再选)</b></div>
+                <{foreach from=$shopList item=value key=key}>
+                    <div>
+                        <input type='checkbox' name='item[shopids][]' value="<{$value.shop_id}>" <{if in_array($value.shop_id,$item.shopids) }>checked="checked"<{/if}> <{if in_array($value.shop_id,$usedShopList)}>disabled="true"<{/if}>/>
+                        <span class="f-14 <{if in_array($value.shop_id,$item.shopids)}>c-red<{/if}>" > <{$value.name}></span>
+                        <{if in_array($value.shop_id,$usedShopList)}><span class="f-14 c-blue" > (已配置)</span><{/if}>
+                    </div>
+                <{/foreach}>
+            </div>
+        </td>
+    </tr>
+
+    <tr><th>开票触发动作：</th>
+        <td>
+        <{input type="radio" name="item[einvoice_operating_conditions]" value=$item.einvoice_operating_conditions|default:"1" options=array('1'=>'已发货','2'=>'已付款','3'=>'已完成') required="true" separator=" "}>
+        <em class="c-red">&nbsp;*</em>
+        <div class="c-red">选择订单相应的电子发票记录的操作条件（开蓝、冲红、上传天猫等）默认条件为已发货</div>
+        </td>
+    </tr>
+</tbody></table>
+
+<style>
+    .form-checkbox {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .form-checkbox > div{
+        width: 200px;
+        display: flex;
+        align-items: center;
+        margin-left: 10px;
+    }
+    .form-checkbox > div > span {
+        margin-left: 6px;
+    }
+</style>
+
+<script type="text/javascript">
+    (function(){
+        $ES('input[name="item[shopids][]"]').addEvent('click',function(){
+            if ($defined(this.getNext('span'))) return this.checked ? this.getNext('span').addClass('c-red') :this.getNext('span').removeClass('c-red');
+        });
+
+        $E('select[name=item[channel_id]]').addEvent('change',function(){
+            W.page('index.php?app=invoice&ctl=admin_order_setting&act=loadChannelConfig&p[0]=<{$item.sid}>&p[1]='+this.value,{
+                update:$('einvoice-channel-content'),
+                clearUpdateMap:false
+            });
+        });
+
+        $E('select[name=item[channel_id]]').fireEvent('change');
+
+        $('all_shop').addEvent('click',function(){
+            $ES('input[name="item[shopids][]"]').filter(function(item){console.log(item.disabled);return !item.disabled}).set('checked',this.checked);
+            var _this = this;
+            $ES('input[name="item[shopids][]"]').filter(function(item){return item.value != '_ALL_'}).fireEvent('click');
+        });
+
+    })();
+</script>

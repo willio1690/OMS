@@ -1,0 +1,44 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=finance&ctl=settlement&act=doVerificationImport&finder_id=<{$env.get.finder_id}>" enctype="multipart/form-data" method="post" id="form1" isCloseDialog>
+     <div class="tableform">
+      <div class="division">
+ <table width="100%" border="0" cellpadding="0" cellspacing="0" class="girdlist">
+<h4><{t}>上传文件，支持<font color="red">csv、xls、xlsx</font>文件<{/t}></h4>
+
+<tr><th>模板下载</th><td >
+            <a onclick="javascript:window.location.href='/app/finance/statics/import/force_verification.xlsx';" class="btn" style="margin-left:0px;padding-left:0px;"><span><span>导出模板</span></span></a>
+          </td></tr>
+<tr>
+            <th><em class="c-red">*</em> 导入文件：</th>
+            <td>
+                <input id='import_file' name='import_file' accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" type='file' value='' style='width:240px;'/><br /><br />
+            </td>
+          </tr>
+ </table>
+
+<div class="table-action">
+      <{button label="确定" id="btn-submit" class="btn-primary"}> &nbsp; &nbsp;
+      <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+<input type='hidden' id='finder_id' name='finder_id' value='<{$finder_id}>'>
+  </div>  </div>
+</form>
+<script>
+
+
+
+
+$('btn-submit').addEvent('click',function(e){
+
+  var _this = this;_this.set('disabled',true);
+  var _data = _this.form.toQueryString().replace(/\+/g,"%2B");
+
+  $('form1').fireEvent('submit');
+
+});
+</script>
+

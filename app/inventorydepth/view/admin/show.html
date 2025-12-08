@@ -1,0 +1,108 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="data-action" id="dataAction">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td colspan="5">
+                <label class="label_title">选择店铺:</label>
+                <select name="shop_id" id="shop_id"  data-search="fuzzy_search" >
+                    <{foreach from=$shopdata item=val}>
+                    <option value="<{$val.shop_id}>" <{if $shop_id == $val.shop_id}>selected="selected"<{/if}> ><{$val.name}></option>
+                    <{/foreach}>
+                </select>
+                <{button class="filterBtn btn-thirdly" label='查询'}>&nbsp;
+            </td>
+        </tr>
+    </table>
+</div>
+<style>
+    /* 只针对当前页面的样式，避免全局冲突 */
+    #dataAction .label_title {
+        float: left;
+        line-height: 32px;
+        margin-right: 5px;
+    }
+    #dataAction .filterBtn{
+        float: left;
+        margin-top: 3px;
+        margin-left: 10px;
+    }
+    /* 为当前页面的 tail.select 添加特定样式 */
+    #dataAction .tail-select{
+        float: left;
+    }
+    /* 确保下拉框在 finder 标题区域正确显示 */
+    #dataAction .select-dropdown {
+        z-index: 99999 !important;
+        position: absolute !important;
+        max-height: 300px !important;
+        overflow-y: auto !important;
+    }
+    /* 只针对当前页面的容器，避免影响其他元素 */
+    #dataAction {
+        position: relative !important;
+    }
+    /* 使用 JavaScript 动态设置父容器的 overflow，避免影响其他元素 */
+    /* 只针对包含当前页面的父容器，不影响其他元素 */
+    .top_extra {
+        overflow: visible !important;
+    }
+    .finder-title {
+        overflow: visible !important;
+    }
+    /* 确保右侧图标不受影响 */
+    .finder-options {
+        position: relative !important;
+        z-index: 1 !important;
+    }
+</style>
+<script type="text/javascript">
+    // 动态创建 filter 对象
+    var finderId = '<{$name}>';
+    var filterInstance = new Filter('#panel-filter-list-<{$name}>', finderId, {
+        onChange: function(){
+            // 筛选条件变化时的回调
+        }
+    });
+    
+    // 重写 Filter 类的 update 方法，简化处理只有一个 shop_id 的情况
+    filterInstance.update = function() {
+        var shopId = $('shop_id').value;
+        var qstr = 'shop_id=' + encodeURIComponent(shopId);
+        
+        // 使用 MooTools Cookie 方法保存到 cookie
+        Cookie.write('adj_shop_id', shopId);
+
+        this.finderObj.filter.value = qstr;
+
+        this.finderObj.refresh();
+
+        this.fireEvent('change');
+    };
+    
+    // 页面加载时从 cookie 中读取 shop_id
+    var cookieShopId = Cookie.read('adj_shop_id');
+    if (cookieShopId && $('shop_id')) {
+        $('shop_id').value = cookieShopId;
+    }
+    
+    // 使用类似 filter_<{$finder_id}>.update() 的方式进行查询
+    $('dataAction').getElement('.filterBtn').addEvent('click', function(e){
+        // 直接使用局部变量 filterInstance
+        if (filterInstance && typeof filterInstance.update === 'function') {
+            // 使用重写的 filter.update 方法
+            filterInstance.update();
+        }
+    });
+    
+    // 初始化 tail.select
+    tail.select('select[data-search="fuzzy_search"]', {
+        search: true,
+        hideDisabled: true,
+        multiContainer: true,
+        hideSelected: true,
+    });
+</script>

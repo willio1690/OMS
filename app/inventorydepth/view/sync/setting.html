@@ -1,0 +1,35 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="post" action="index.php?app=inventorydepth&ctl=sync_set&act=index" id="form-setting" >
+<div class="tableform tableform-tabs">
+    <div class="division">
+    <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+            <tr>
+                <th>库存同步基准设置</th>
+                <td>
+                    <input type="radio" name="set[stock.sync.set]" value="sales" <{if $setData.stock_sync_set != 'skuid'}> checked<{/if}>>销售物料
+                    <input type="radio" name="set[stock.sync.set]" value="skuid"  <{if $setData.stock_sync_set == 'skuid'}> checked<{/if}>>平台SKUID
+                    &nbsp;&nbsp;<span style="color:red;">* 选择平台skuid时，需在商品上架时同步店铺商品。（暂支持<{$support_name}>）</span>
+                 </td>
+            </tr>
+            <tr>
+                <th>库存同步方式设置</th>
+                <td>
+                    <input type="radio" name="set[stock.sync.mode]" value="full" <{if $setData.stock_sync_mode != 'increment'}> checked<{/if}>>全量库存
+                    <input type="radio" name="set[stock.sync.mode]" value="increment"  <{if $setData.stock_sync_mode == 'increment'}> checked<{/if}>>增量库存
+                    &nbsp;&nbsp;<span style="color:red;">* 选择增量库存的时候，会对比上一次库存进行加减。（增量仅支持<{$mode_support_name}>）</span>
+                 </td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+    
+    <div class="table-action">
+        <{button label="提交" type="submit" name="submit" id="btn-setting"}>
+    </div>
+</div>
+</form>

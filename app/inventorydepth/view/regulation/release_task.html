@@ -1,0 +1,48 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.info{font-weight:bold;font-size:30px;}
+</style>
+<{if $error}>
+<div class='division info' style='color:red;'>
+<{$error}>
+</div>
+<{area inject='.mainFoot'}>
+  <div class='table-action'>
+    <{button label='取消' type='button' isCloseDialogBtn='true'}>
+  </div>
+<{/area}>
+
+<{else}>
+
+<div class='division info'>
+批量发布活动商品库存，任务会先进队列。<br/>稍后执行，确认吗？
+</div>
+<{area inject='.mainFoot'}>
+  <div class='table-action'>
+    <{button label='确定' type='button' id='submitbtn'}>
+    <{button label='取消' type='button' isCloseDialogBtn='true'}>
+  </div>
+<{/area}>
+<script type="text/javascript">
+    
+$('submitbtn').addEvent('click',function(){
+  $('submitbtn').set('disabled',true);
+    new Request.JSON({
+      url:"index.php?app=inventorydepth&ctl=regulation_skus&act=releaseUpload",
+      data:"<{$post}>",
+      onComplete:function(resp){
+        if (resp.error) {
+          $E('.info').setHTML('<div style="color:red;font-size:30px;">'+resp.error+'</div>');
+          return;
+        }
+        MessageBox.success('成功插入队列！');
+        $E('.info').getParent('.dialog').retrieve('instance').close();
+      }
+    }).send();
+});
+</script>
+<{/if}>

@@ -1,0 +1,26 @@
+<desktop>
+    <permissions>
+        <permission id="pos_orders_list">POS订单列表</permission>
+        <permission id="pos_refunds_list">POS退款单列表</permission>
+        <permission id="pos_aftersale_list">POS售后单列表</permission>
+        <permission id="pos_product_sync">POS基础物料分配</permission>
+        <permission id="pos_product_price">POS价格列表</permission>
+        <permission id="pos_stockin">POS其他入库单</permission>
+        <permission id="pos_stockout">POS其他出库单</permission>
+        <permission id="pos_inventory_snapshot">POS库存快照</permission>
+        <permission id="pos_store_list">POS门店列表</permission>
+    </permissions>
+    <workground  name="接口中心" id="pos_center" order="2500" icon="icon-pos">
+        <menugroup name="POS单据" en="pos">
+            <menu controller='orders' action='index' permission='pos_orders_list' display='true'>订单列表</menu>
+            <menu controller='refund' action='index' permission='pos_refunds_list' display='true'>退款单列表</menu>
+            <menu controller='aftersale' action='index' permission='pos_aftersale_list' display='true'>售后单列表</menu>
+            <menu controller='productsync' action='index' permission='pos_product_sync' display='true'>基础物料分配</menu>
+            <menu controller='productprice' action='index' permission='pos_product_price' display='true'>价格列表</menu>
+            <menu controller='stockin' action='index' permission='pos_stockin' display='true'>其他入库单</menu>
+            <menu controller='stockout' action='index' permission='pos_stockout' display='true'>其他出库单</menu>
+            <menu controller='inventory_snapshot' action='index' permission='pos_inventory_snapshot' display='true'>库存快照</menu>
+            <menu controller='store' action='index' permission='pos_store_list' display='true'>门店列表</menu>
+        </menugroup>
+    </workground>
+</desktop>

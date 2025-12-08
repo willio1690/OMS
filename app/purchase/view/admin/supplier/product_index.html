@@ -1,0 +1,286 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style type="text/css">
+.button_select_all {float:left; width:100%; height:25px; line-height:25px;border-bottom: 1px solid #7394bf;color: #333;text-align: center;background: #e9eff5 none repeat scroll 0 0; }
+</style>
+<{if !$env.get.target}><div class="division" container="true"><{/if}>
+<h3>关联物料</h3>
+<div style="width:100%;">
+    <form action="index.php?app=purchase&ctl=admin_supplier_goods&&act=dispatch" method="post" id="search_form">
+        <input type="hidden" name="search" value="true" />
+        <input type="hidden" id="count" name="count" value="<{$count}>" />
+        <table>
+        <tr>
+            <td height="50" style="width:40%;">
+                <table>
+                    <tr>
+                        <td align="right" style="width:90px;">选择供应商：</td>
+                        <td align="left">
+                            <select name="sel_supplier" id="sel_supplier" vtype="required" onchange="set_supplier_id(this)">
+                            <option>=请选择=</option>
+                            <{foreach from=$supplierList item=item key=key}>
+                                <option class="search" value="<{$item.supplier_id}>"><{$item.name}></option>
+                            <{/foreach}>
+                          </select>
+                      </td>
+                      <td>&nbsp;</td>
+                    </tr>
+                </table>
+            </td>
+            <td>&nbsp;</td>
+            <td align="right" style="width:40%;">
+                <table>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td align="right" style="width:100px;">
+                            <select name="search_key" vtype="required" onchange="change_search(this)">
+                                <{foreach from=$search item=item key=key}>
+                                    <option <{if $key== $search_key}>selected='selected'<{/if}> class="search" value="<{$key}>"><{$item}></option>
+                                <{/foreach}>
+                            </select>
+                        </td>
+                        <td align="left" nowrap="nowrap" style="width:100px; padding-left:10px; text-align:left;">
+                            <{input id="default_show" type="text" style="display:block" name="search_value" vtype="required" value="{$search_value}"}>
+                            <{foreach from=$search_list item=items key=keys}>
+                                <select vtype="required" id="show_<{$keys}>" style="display:none" name="search_value_<{$keys}>" vtype="required" >
+                                    <{foreach from=$items item=item key=key}>
+                                        <option <{if $key==$search_value_key.$keys}>selected='selected'<{/if}> value="<{$key}>"><{$item}></option>
+                                    <{/foreach}>
+                                </select>
+                            <{/foreach}>
+                        </td>
+                        <td style="width:60px; text-align:left; padding-left:5px;">
+                            <a class="finder-search-btn lnk-search" href="javascript:void(0);" onclick="do_search()">
+                                <span><{t}>搜索<{/t}></span>
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+      </table>
+    </form>
+</div>
+
+<form action="index.php?app=purchase&ctl=admin_supplier_goods&act=do_save" method="post" id="goods_form">
+<div id="button_select_all" class="button_select_all" style="display:none;">
+    <span id="msg">&nbsp;</span>
+    <span class="lnk" style="font-weight: bold;" onclick="no_select_all()">取消选定</span>&nbsp;
+    <span class="lnk" style="font-weight: bold;" onclick="set_select_all()">选定全部</span>
+</div>
+    <input type="hidden" name="select_all" value="false" id="select_all" />
+    <input type="hidden" name="search_key" value="<{$search_key}>"/>
+    <input type="hidden" name="search_value" value="<{$search_value_last}>"/>
+    <input type="hidden" name="supplier_id" id="supplier_id" value="" />
+
+    <table cellpadding="0" cellspacing="0" border="0" class="gridlist">
+        <thead>
+            <tr>
+            <th><input type="checkbox" name="selDataListAll" id="selDataListAll" onclick="selectAll()" /></th>
+            <th>基础物料名称</th>
+            <th>基础物料编码</th>
+            <th>品牌</th>
+            <th>分类</th>
+            <th>规格</th>
+            </tr>
+        </thead>
+        <tbody>
+        <{foreach item=item from=$rows}>
+            <tr>
+                <td><input type="checkbox" onclick="selectone()" class="product_item" name="bm_id[]" value="<{$item.bm_id}>"></td>
+                <td><{$item.material_name}></td>
+                <td><{$item.material_bn}></td>
+                <td><{$item.brand_name}></td>
+                <td><{$item.type_name}></td>
+                <td><{$item.specifications}></td>
+            </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+    <div class="table-action">
+        <{$pager}>
+    </div>
+</form>
+
+<{if !$env.get.target}></div><{/if}>
+<{if !$env.get.target}>
+    <{capture name="footbar"}>
+    <div class="table-action">
+        <{button label="确定" type="button" id="submit_button" onclick="do_submit()"}>
+    </div>
+    <{/capture}>
+<{/if}>
+
+<script>
+change_search();
+//var i=0;
+function selectAll(){
+    rs = is_select_all();
+    if(rs == false) return;
+    if($('selDataListAll').checked){
+        var j=0;
+        $$('.product_item').each(function(el){
+            el.set('checked','checked');
+            el.set('name','bm_id[]');
+            j++;
+        });
+        $('msg').set('text','选中当前'+j+'条数据！');
+        $('button_select_all').set('style','display:block;');
+    }else{
+        $$('.product_item').each(function(el){
+            el.set('checked','');
+            el.set('name','');
+        });
+        $('button_select_all').set('style','display:none');
+    }
+    //i = i+1;
+}
+function set_select_all(){
+    var count = $('count').get('value');
+    $('select_all').set('value','true');
+    $$('.product_item').each(function(el){
+        el.set('checked','checked');
+        el.set('name','bm_id[]');
+        $('msg').set('text','选中全部'+count+'数据！');
+    });
+}
+function no_select_all(){
+    $('select_all').set('value','false');
+    window.location.reload(1);
+}
+function selectone(el){
+    rs = is_select_all();
+    if(rs == false) return;
+    var i=0;
+    
+    $$('.product_item').each(function(el){
+        var ch = el.get('checked');
+        if(ch === true){
+            
+            i++;
+        }
+    });
+    
+    if(i > 1){
+        $('button_select_all').set('style','display:block;');
+        $('msg').set('text','选中当前'+ i +'条数据！');
+    }
+    else
+    {
+        $('button_select_all').set('style','display:none;');
+        $('msg').set('text','选中当前'+ i +'条数据！');
+    }
+}
+
+function do_submit(flag){
+    
+    var supplier_id = $("supplier_id").value;
+    if(supplier_id=="" || supplier_id=="0")
+    {
+        alert("请选择供应商");
+        return false;    
+    }
+    
+    var is_empty    = true;
+    $$("form input[name=bm_id[]]:checked").each(function(item){
+        is_empty = false;
+    });
+    
+    if(is_empty)
+    {
+        alert("请选择基础物料");
+        return false;
+    }
+    
+    new Request({
+        url:$('goods_form').get('action'),
+        data:$('goods_form').toQueryString(),
+        onRequest:function(){
+           $('submit_button').set('disabled', 'true');
+           $('submit_button').getElements('span')[1].set('text','提交中');
+        },
+        onComplete:function(jsontext){
+            try{
+                var json = JSON.decode(jsontext);
+                if (typeof(json.error)!='undefined')
+                {
+                    alert(json.error);
+                    $('submit_button').disabled=false;
+                    $('submit_button').getElements('span')[1].set('text','确定');
+                    return false;
+                }else{
+                    $('submit_button').disabled=true;
+                    opener.finderGroup['<{$env.get.finder_id}>'].refresh();
+                    window.close();
+                }
+            }catch(e){}
+        }
+    }).send();
+    
+}
+
+function do_search(){
+    new Request({
+        url:$('search_form').get('action'),
+        data:$('search_form').toQueryString(),
+        onComplete:function(re){
+            if(!re){
+                alert('请输入搜索条件！');
+                return;
+            }
+            $('main').set('html',re);
+            change_search();
+        }
+    }).send();
+}
+
+function change_search(el){
+    $$('.search').each(function(e){
+        var selected = e.get('selected');
+        if(selected === true ){
+            var value = e.get('value');
+            
+            $('show_brand_name').set('style','display:none');
+            $('show_type_name').set('style','display:none');
+            $('default_show').set('style','display:none');
+            if(value == 'type_name') {
+               $('show_type_name').set('style','display:block');
+               $('default_show').set('value','');
+            }    
+            if(value == 'brand_name'){
+                $('show_brand_name').set('style','display:block');
+                $('default_show').set('value','');
+            }  
+            if(value == 'material_bn' || value == 'material_name'){
+                $('default_show').set('style','display:block');
+            }  
+        }
+    });
+}
+
+//不能按回车
+document.onkeydown=function(event) {
+    e = event ? event :(window.event ? window.event : null); 
+    if(e.keyCode==13){ 
+    //执行的方法 
+    return false;
+    } 
+}
+
+function is_select_all(){
+    var flag = $('select_all').get('value');
+    if(flag == 'true'){
+        no_select_all();
+        return false;
+    }
+    return true;
+}
+
+function set_supplier_id(obj)
+{
+    $('supplier_id').set('value', obj.value);
+}
+</script>

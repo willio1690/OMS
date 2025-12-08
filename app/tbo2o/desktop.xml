@@ -1,0 +1,25 @@
+<desktop>
+    <permissions>
+        <permission id='tbo2o_store_manage'>门店管理</permission>
+        <permission id='tbo2o_shop_manage'>全渠道配置</permission>
+        <permission id='tbo2o_shop_skus'>前端宝贝</permission>
+        <permission id='tbo2o_shop_products'>后端商品</permission>
+        <permission id='tbo2o_store_cat'>门店类目</permission>
+        <permission id='tbo2o_store_items'>门店供货关系</permission>
+    </permissions>
+
+    <workground name="阿里全渠道" id='tbo2o_center' order='1500' icon="icon-aliquanqudao-01">
+        <menugroup name='全渠道配置' en="all-channel-management">
+            <menu controller='admin_shop' action='setting' permission='tbo2o_shop_manage' display='true' order='1001'>全渠道配置</menu>
+        </menugroup>
+       <menugroup name='门店信息管理' en="store-information-management">
+             <menu controller='admin_store_cat' action='index' permission='tbo2o_store_cat' display='true' order='1002'>门店类目</menu>
+             <menu controller='admin_store' action='index' permission='tbo2o_store_manage' display='true' order='1003'>门店管理</menu>
+             <menu controller='admin_store_items' action='index' permission='tbo2o_store_items' display='true' order='1004'>门店供货关系</menu>
+        </menugroup>
+        <menugroup name='商品信息管理' en="product-information-management">
+            <menu controller='admin_shop_skus' action='index' permission='tbo2o_shop_skus' display='true' order='1005'>前端宝贝</menu>
+            <menu controller='admin_shop_products' action='index' permission='tbo2o_shop_products' display='true' order='1006'>后端商品</menu>
+        </menugroup>
+    </workground>
+</desktop>

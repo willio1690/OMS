@@ -1,0 +1,106 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+  <div class="division">
+    <h3>包裹基本信息</h3>
+    <table width="100%" cellspacing="0" cellpadding="0" border="0">
+      <tbody>
+        <tr>
+          <th>发货单号：</th>
+          <td><{$delivery_bill.delivery_bn}></td>
+          <th>物流编码：</th>
+          <td><{$delivery_bill.logi_code}></td>
+        </tr>
+        <tr>
+          <th>物流单号：</th>
+          <td><{$delivery_bill.logi_no}></td>
+          <th>包裹状态：</th>
+          <td>
+            <{if $delivery_bill.status == '0'}>未发货
+            <{elseif $delivery_bill.status == '1'}>已发货
+            <{elseif $delivery_bill.status == '2'}>已取消
+            <{elseif $delivery_bill.status == '3'}>已接受
+            <{elseif $delivery_bill.status == '4'}>已签收
+            <{elseif $delivery_bill.status == '5'}>已支付
+            <{else}>未知
+            <{/if}>
+          </td>
+        </tr>
+        <tr>
+          <th>订单号：</th>
+          <td><{$delivery_bill.order_bn}></td>
+          <th>京东订单号：</th>
+          <td><{$delivery_bill.package_bn}></td>
+        </tr>
+        <tr>
+          <th>创建时间：</th>
+          <td><{if $delivery_bill.create_time}><{$delivery_bill.create_time|date_format:'%Y-%m-%d %H:%M:%S'}><{else}>-<{/if}></td>
+          <th>发货时间：</th>
+          <td><{if $delivery_bill.delivery_time}><{$delivery_bill.delivery_time|date_format:'%Y-%m-%d %H:%M:%S'}><{else}>-<{/if}></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="tableform" style="margin-top: 20px;">
+  <div class="division">
+    <h3>包裹明细列表</h3>
+    <{if $packages}>
+      <table class="table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background-color: #f5f5f5;">
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">包裹ID</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">京东子单号</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">基础物料号</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">外部SKU</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">数量</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">包裹状态</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">配送状态</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">是否WMS赠品</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">申请退货数量</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">已退货数量</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">创建时间</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">发货时间</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">签收时间</th>
+          </tr>
+        </thead>
+        <tbody>
+          <{foreach from=$packages item=package}>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><{$package.package_id}></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><{$package.package_bn}></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><{$package.bn}></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><{$package.outer_sku}></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><{$package.number}></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><{$package.status}></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><{$package.shipping_status}></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
+                <{if $package.is_wms_gift == 'true'}>是<{else}>否<{/if}>
+              </td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><{$package.apply_num}></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><{$package.return_num}></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><{if $package.create_time}><{$package.create_time|date_format:'%Y-%m-%d %H:%M:%S'}><{else}>-<{/if}></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><{if $package.delivery_time}><{$package.delivery_time|date_format:'%Y-%m-%d %H:%M:%S'}><{else}>-<{/if}></td>
+              <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><{if $package.sign_time}><{$package.sign_time|date_format:'%Y-%m-%d %H:%M:%S'}><{else}>-<{/if}></td>
+            </tr>
+          <{/foreach}>
+        </tbody>
+      </table>
+      
+      <div style="margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #007bff; border-radius: 4px;">
+        <p style="margin: 0; color: #666; font-size: 14px;">
+          <strong>统计信息：</strong>共 <{$packages|@count}> 个包裹明细
+        </p>
+      </div>
+    <{else}>
+      <div style="text-align: center; padding: 40px; color: #666;">
+        <p style="font-size: 16px; margin-bottom: 10px;">暂无包裹明细</p>
+        <p style="font-size: 14px; color: #999;">该包裹下没有明细数据</p>
+      </div>
+    <{/if}>
+  </div>
+</div> 

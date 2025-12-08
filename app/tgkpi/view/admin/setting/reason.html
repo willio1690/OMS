@@ -1,0 +1,70 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">       
+<{/capture}>
+
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=tgkpi&ctl=admin_setting&act=addreason" id="form-abnormal">      
+            <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tbody>
+                     <tr>
+                         <th>内容：</th>
+                         <td>
+                              <input type="text" size="30" name="memo" value="<{$reason.reason_memo}>" vtype="required"/>
+                              <{help}><{t}>设置校验过程中可能导致完成校验的原因，如拣货拣错数量或货品<{/t}><{/help}>
+                         </td>
+                     </tr>
+                </tbody>
+            </table>
+            <{if $reason.reason_id}>
+              <input type="hidden" name="reason_id" value="<{$reason.reason_id}>">
+            <{/if}> 
+        </form>
+    </div>  
+</div>
+
+<{area inject=".mainFoot"}>
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td><button class="btn btn-primary" id='submit_btn'><span><span><{t}>确定<{/t}></span></span></button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<{/area}>
+<script>
+(function(){
+    var _form = $('form-abnormal');//表单ID 
+    var btn   = $('submit_btn');//按钮ID
+
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    _form.store('target',{
+        onComplete:function(){
+        },
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+
+                if(_dialogIns){
+                    setTimeout(finder.refresh(),30000);
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+
+    btn.addEvent('click',function(){
+      _form.fireEvent('submit',{stop:$empty});
+    });
+})();
+</script>

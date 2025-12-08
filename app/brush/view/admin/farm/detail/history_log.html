@@ -1,0 +1,68 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <th><{t}>规则名称：<{/t}></th>
+                <td>
+                    <{$arrFarm.farm_name}>
+                </td>
+                <th><{t}>商城名称：<{/t}></th>
+                <td>
+                    <{$shopName}>
+                </td>
+            </tr>
+            <tr>
+                <th><{t}>帐号：<{/t}></th>
+                <td><{$arrFarm.user_name}>
+                </td>
+                <th><{t}>商品货号：<{/t}></th>
+                <td>
+                    <{if $arrFarm.product_bn_match == 0 }>
+                    全部匹配
+                    <{/if}>
+                    <{if $arrFarm.product_bn_match == 1 }>
+                    部分匹配
+                    <{/if}>
+                    <br/><{$arrFarm.product_bn}>
+                </td>
+            </tr>
+            <tr>
+                <th><{t}>订单总额：<{/t}></th>
+                <td>
+                    <{if $arrFarm.condition eq 'gt'}>大于<{$arrFarm.money}><{/if}>
+                    <{if $arrFarm.condition eq 'lt'}>小于<{$arrFarm.money}><{/if}>
+                    <{if $arrFarm.condition eq 'eq'}>等于<{$arrFarm.money}><{/if}>
+                </td>
+                <th><{t}>客户备注：<{/t}></th>
+                <td>
+                    <{$arrFarm.custom_mark}>
+                </td>
+            </tr>
+            <tr>
+                <th><{t}>商家备注：<{/t}></th>
+                <td>
+                    <{$arrFarm.mark_text}>
+                </td>
+                <th></th>
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <th><{t}>淘宝旗标：<{/t}></th>
+                <td>
+                    <{$markType}>
+                </td>
+                <th><{t}>状态：<{/t}></th>
+                <td>
+                    <{if $arrFarm.status eq '1'}>开启 <{/if}>
+                    <{if $arrFarm.status eq '0'}>关闭 <{/if}>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

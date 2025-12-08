@@ -1,0 +1,172 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta name="author" content="tyler chao">
+  <meta name="keywords" content="keywords">
+  <meta name="description" content="description">
+  <title>签收核销</title>
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/mobile.min.css">
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/main.min.css">
+</head>
+<body>
+<{if $show_header}>
+<header class="fixed">
+  <div class="top-bar" data-topbar>
+    <div class="pos-left">
+      <a href="javascript:history.back();" class="icon-arrow-back"></a>
+    </div>
+    <h1>签收核销</h1>
+    <div class="pos-right"><a href="" class="icon-refresh"></a></div>
+  </div>
+</header>
+<{/if}>
+
+<main id="main" class="container no-margin">
+  <form action="<{$delivery_link.doSign}>" method="post" class="order-confirm-form" data-validator="ajax">
+    <ul class="no-bullet">
+      <li class="form-row">
+        <div class="prefix">
+          <i class="icon-paper"></i>
+        </div>
+        <div class="grid-1">
+          <input type="text" name="delivery_bn" id="delivery_bn" class="act-input-union" required placeholder="发货单单号" data-alerts="请先输入发货单单号" value="<{$deliveryInfo.delivery_bn}>" data-url="<{$delivery_link.showOrderInfo}>">
+          <span class="alert-box error">请输入发货单单号</span>
+        </div>
+      </li>
+      
+      <{if $code_html_show}>
+      <li class="form-row">
+        <div class="prefix">
+          <i class="icon-barcode"></i>
+        </div>
+        <div class="grid-5">
+          <input type="text" name="sms_code" id="sms_code" class="act-input-change" required placeholder="提货码/激活码" data-alerts="请输入提货码/激活码">
+          <span class="alert-box error">请输入提货码/激活码</span>
+        </div>
+        <div class="grid-5" style="margin-left:10px; overflow:hidden;">
+            <button type="button" id="but_resend_msg" class="primary small" style="height:2.75rem; overflow:hidden;" onClick="ajax_resend_sms()">重新生成提货码</button>
+        </div>
+      </li>
+      <{/if}>
+      
+      <li class="form-row">
+        <div class="grid-1"><button type="submit" id="but_consign" class="primary expand act-confirm-receipt">确认收货</button>
+          <input type="hidden" name="flag" id="flag" value="">
+        </div>
+      </li>
+    </ul>
+  </form>
+  <div id="order_item" class="container blank order-item">
+  </div>
+</main>
+
+<{include file="store/footer.html"}>
+<script>
+$('.act-confirm-receipt').on('click', function(e) {
+    $('#flag').val("consign");
+});
+$('.order-confirm-form').on('complete.validator', function(e, rs) {
+    
+    if(rs.error)
+    {
+        if(rs.flag == 'delivery_bn')
+        {
+            $(this).find('input[name=delivery_bn]').val('');
+        }
+        else if(rs.flag == 'sms_code')
+        {
+            $(this).find('input[name=sms_code]').val('');
+        }
+        else
+        {
+            $(this).find('input').val('');
+        }
+    }
+});
+
+$('.act-input-union').on('blur', function(e) {
+    showDlyInfo();
+});
+
+$(function() {
+    var delivery_bn = $('#delivery_bn').val();
+    if(delivery_bn)
+    {
+        showDlyInfo();
+    }
+});
+
+function showDlyInfo()
+{
+    var $this = $('.act-input-union');
+    var form = $this.parents('form');
+    
+    $('#flag').val("");
+    
+    if ($this.val()) {
+        setTimeout(function() {
+            $('#order_item').load($this.data('url'), form.serializeArray());
+        }, 250);
+    }
+}
+function ajax_resend_sms()
+{
+    var ajax_url    = "<{$delivery_link.sendMsg}>";
+    var delivery_bn = $('#delivery_bn').val();
+    
+    if(delivery_bn == "" || delivery_bn == "发货单号")
+    {
+        $(document).mobile('tips', 'show', ["请填写发货单号", 'msg']);
+        return false;
+    }
+    
+    $('#but_resend_msg').prop('disabled', true);
+    
+    $.post(ajax_url, {'delivery_bn': delivery_bn}, function(rs) {
+        if (rs) {
+            json = JSON.parse(rs);
+            
+            if(json.res == 'succ')
+            {
+                sendTime();
+                
+                $(document).mobile('tips', 'show', [json.msg, 'msg']);
+            }
+            else
+            {
+                $(document).mobile('tips', 'show', [json.msg, 'msg']);
+                $('#but_resend_msg').prop('disabled', false);
+            }
+        }else {
+            $(document).mobile('tips', 'show', ['操作失败', 'msg']);
+            $('#but_resend_msg').prop('disabled', false);
+        }
+    });
+}
+
+var wait = 60;
+function sendTime()
+{
+    if (wait == 0) {
+        $('#but_resend_msg').prop('disabled', false);
+        $('#but_resend_msg').html("重新生成提货码");
+        wait = 60;
+    } else {
+        $('#but_resend_msg').prop('disabled', true);
+        $('#but_resend_msg').html("重新发送(" + wait + ")");
+        wait--;
+        setTimeout(function(){sendTime()}, 1000);
+    }
+}
+</script>
+</body>
+</html>

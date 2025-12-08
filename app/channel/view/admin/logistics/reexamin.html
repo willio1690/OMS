@@ -1,0 +1,89 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">  
+  <h4></h4>
+    已用次数:<{$used_times}>&nbsp;&nbsp;&nbsp;可使用次数：<{$available_times}> &nbsp;&nbsp;&nbsp;
+    <span id='buy_notice' style='display:none;'><a target="_blank"  style="font-size:15px;" href="http://fuwu.shopex.cn/detail/1158"><font style="color:red;">未购买体检服务或可用次数不足</font> 点击购买</a></span>
+    </p>
+  <div class="division">
+  <table cellpadding="0" cellspacing="0" border="0">
+
+  <tr>
+        <th><{t}>更新进度：<{/t}></th>
+        <td>
+        <div style="border:1px solid #CCC;width:350px;overflow:hidden;float:left;background:#FFF;padding:1px;">
+            <div id="processBar_add_examin_task" style="background:#7493D1;width:1%;height:15px;">&nbsp;</div>
+        </div>&nbsp;
+        </td>
+      </tr>
+  <tr>
+  <th><{t}>新体检：<{/t}></th>
+  <td><{button id="down2" class="btn-primary" label=$___b2c="开始"|t:'b2c' type="button"}>
+    <{button id="down4" class="btn-secondary" label=$___b2c="关闭"|t:'b2c'   type="button"}>
+  </td>
+  </tr>
+  </table></div>
+  <div id="status">....</div>
+  </div>
+<script>
+    var used_times = parseInt("<{$used_times}>");
+    var available_times = parseInt("<{$available_times}>");
+	function setProcessBar(id,w){
+		document.getElementById(id).style.width = w;
+	}
+	$('down2').addEvent('click',function(){
+		ajax_add_examin_task('add_examin_task',1);	
+	});
+	
+	$('down4').addEvent('click',function(){
+		var btn = $('down4');
+	    var finder = finderGroup['<{$env.get.finder_id}>'];
+        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+        if(_dialogIns){
+            finder.refresh();
+            _dialogIns.close();
+        } 
+	});
+	function ajax_add_examin_task(task,page_no) {
+		if(used_times >= available_times){
+			    $('buy_notice').setStyle('display','');
+		        alert('未购买体检服务或可用次数不足，请先购买');return false;
+		}
+		var history_order_count = '<{$history_order_count}>';
+	    if( history_order_count <500){
+	        alert('历史单量小于500，无法体检');return false;
+	    }
+		if (!page_no) page_no = 1;
+		var percent = '1%';
+		if (task == 'add_examin_task') percent = 100*(page_no-1)/1;
+		percent = Math.round(percent);
+		setProcessBar("processBar_"+task,'30%');
+		var data_str = '';
+		var pingRequest = new Request({
+					method : "post",
+					url : "index.php?app=channel&ctl=admin_logistics_report&act=add_examin_task",
+					data:data_str,
+					onSuccess : function(oresponseText) {
+						var responseText = JSON.decode(oresponseText);
+						if (responseText.status == "finish"){	
+							setProcessBar("processBar_"+task,'100%');
+							 if(window.confirm('体检任务已提交，请转到物流体检报告查看')){
+			                       window.location.href="index.php?app=channel&ctl=admin_logistics_report&act=index"; 
+			                  }else{
+			                	  document.getElementById("status").innerHTML = "<font size='4px' color='green'>体检任务已提交，需要一点时间，请稍后在体检报告列表查看";
+			                  }
+					        
+						} else{
+							document.getElementById("status").innerHTML = responseText;	
+						}
+					},
+					onFailure : function() {
+						document.getElementById("status").innerHTML = "failed";
+					}
+				});
+		pingRequest.send();
+	}
+</script>

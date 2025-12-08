@@ -1,0 +1,129 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+#add_af table tr{height:30px; line-height:30px;}
+#add_af .gridlist thead td input{height:22px; line-height:22px;}
+#add_af .gridlist thead td .bd_map_tools{height:28px;}
+#add_af .first_td{width:110px;text-align:right}
+#add_af input{height:24px;line-height:24px}
+#hand-selected-product {width:245px;float:left}
+.object-select{float:left;width:115px}
+</style>
+<div class="division" id="add_af" style="margin:0px">
+	<form action="index.php?app=console&ctl=admin_stock_artificial_freeze&act=do_add" method="post">
+		<table border="0" cellspacing="0" cellpadding="0">
+			<tbody>
+				<tr>
+					<td class="first_td"><em class="c-red">*</em>选择仓库：</td>
+					<td>&nbsp;
+					   <select name='branch_id' class="x-input-select inputstyle" onchange='change_branch(this.value);' vtype="required">
+							<option value=''>请选择</option> 
+							<{foreach from=$branch_list item=item key=key}>
+							<option value="<{$item.branch_id}>"><{$item.name}></option>
+							<{/foreach}>
+					   </select>
+					   <input type="hidden" id="branch_id">（请先确定仓库）
+					</td>
+				</tr>
+				<tr style="line-height:25px">
+                    <td class="first_td"><em class="c-red">*</em>选择基础物料：</td>
+                    <td>
+                        <div id="ajax_get_div_contents" style="padding:0px 0px 0px 6px"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="first_td"><em class="c-red">*</em>预占数量：</td>
+                    <td>&nbsp;
+                        <input type="text" name="freeze_num" size="15" vtype="required"> 
+                    </td>
+                </tr>
+                <tr>
+                    <td class="first_td">预占原因：</td>
+                    <td>&nbsp;
+                        <input type="text" name="freeze_reason" size="40"> 
+                    </td>
+                </tr>
+                <tr>
+                    <td class="first_td">组名：</td>
+                    <td>&nbsp;
+                        <input type="text" name="group_name" size="40"> 
+                    </td>
+                </tr>
+			</tbody>
+		</table>
+		
+		<div class="table-action">
+	      <{button label="确定" class="btn-primary" type="button" id="btnMemSubmit"}> &nbsp; &nbsp;
+	      <{button label="取消" class="btn-secondary" isCloseDialogBtn="true"}>
+	    </div>
+
+	</form>
+</div>
+<script>
+(function(){
+	$('btnMemSubmit').addEvent('click',function(){
+	      var _this=this;
+	      var form = this.getParent('form');
+	      if(! validate(form)) return;
+	      new Request({url:form.action,method:'post',data:form.toQueryString(),
+	        onRequest:function(){
+	          MessageBox.show('正在提交表单');
+	        },
+	        onComplete:function(json){
+	          json = JSON.decode(json);
+	          if(json.rsp=='succ'){
+	            _this.getParent('.dialog').retrieve('instance').close();
+	            window.finderGroup['<{$finder_id}>'].refresh(true);
+	          }else{
+	        	  alert(json.error_msg);
+	        	  return false;
+	          }
+	        }
+	      }).send();
+	    });
+})();
+
+
+function product_object_callback(rs,handle){
+    var length = handle.getElements('.row').length;
+    var html = '已选择了'+length+'个基础物料,'+"<a href='javascript:void(0);' onclick='product_selected_show()'>查看选中的基础物料.</a>";
+    if ($defined($('hand-selected-product'))){
+        $('hand-selected-product').setHTML(html);
+    }else{
+        var div = new Element('div',{'html':html,'id':'hand-selected-product'});
+        div.injectBefore(handle);
+    }
+}
+
+function product_selected_show(){
+    new Dialog('index.php?app=console&ctl=admin_stock_artificial_freeze&act=show_selected_products',{
+        ajaxoptions:{data:$('hand-selected-product').getNext('div'),method:'post'}
+    });
+}
+
+function change_branch(value){
+	ajax_onload_html(value);
+}
+
+void function (){
+	//默认加载branch_id为空
+	var branch_id = "";
+    ajax_onload_html(branch_id);
+}();
+
+function ajax_onload_html(branch_id){
+    new Request.HTML({
+        url:'index.php?app=console&ctl=admin_stock_artificial_freeze&act=ajax_basic_material_html&p[0]='+ branch_id,
+        method:'post',
+        update:$('ajax_get_div_contents'),
+        data:{'apiName':'request_html'},
+        onSuccess:function(){
+
+        }
+    }).send();
+}
+
+</script>

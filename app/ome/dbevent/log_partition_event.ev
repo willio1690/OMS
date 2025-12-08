@@ -1,0 +1,11 @@
+DELIMITER $$
+CREATE EVENT ome_log_partition_event
+ON SCHEDULE EVERY 1 DAY
+STARTS '2025-02-05 00:00:00' -- 根据需要调整开始时间
+DO
+BEGIN
+    CALL ome_log_add_partition();
+    CALL ome_log_remove_partition();
+END$$
+
+DELIMITER ;

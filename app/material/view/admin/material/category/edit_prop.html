@@ -1,0 +1,273 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="post" action="index.php?app=material&ctl=admin_material_cat&act=save_prop" id='add_prop_form'>
+
+    <input type="hidden" name="cat_id"  value="<{$cat_id}>">
+
+<div class="tableform">
+    <div class="">
+        <div class="">
+        
+          
+            <table >
+            <tr>
+                <td width="85"><b>分类名称：</b></td>
+                <td><{$all_cat[$cat_id]['cat_name']}></td>
+            </tr>
+            
+            <tr >
+                <td><b>扩展属性：</b></td>
+                <td>
+                所有下级分类将继承所有上级分类的扩展属性，请新增本级分类或子分类共有的扩展属性。系统预置的顶级分类的扩展属性会应用到所有物料，如有需要，请设置所有物料共有的属性，比如产地、上市月份等。</td>
+            </tr>
+            </table>
+            
+            <{if $parentPropetyList}>
+            <table class="gridlist">
+                  <thead>
+                    <tr>
+                        <th width="80" align="center" nowrap="nowrap">上级分类</th>
+                        <th width="120">属性名称</th>
+                        <th width="80">
+                            <{t}>属性可选值<{/t}>
+                        </th>
+                        <th width="80">
+                            <{t}>自动创建<{/t}>
+                        </th>
+                    </tr>
+                  </thead>
+                  <tbody>                  
+                  <{foreach from=$parentPropetyList item=itemVal key=itemKey}> 
+                    <tr  class="property_tr_li">
+                      <td width="90" nowrap="nowrap" align="center"><{$all_cat[$itemVal.cat_id]['cat_name']}></td>
+                      <td align="center"><{$itemVal.prop_name}></td>
+                      <td>       
+                          <{if $itemVal.select}>                      
+                              <{foreach from=$itemVal.select item=selVal key=selKey}>
+                              <{$selVal}>；
+                              <{/foreach}>                  
+                          <{/if}>
+                      </td>
+                      <td >
+                                <{if($itemVal.auto_create==1)}>
+                                    是
+                                <{/if}>
+                          </td>
+                    </tr>                      
+                  <{/foreach}>
+                  </tbody>
+            </table><{/if}>
+            
+        
+          <div class="gridlist-action" style="margin-top:1em;">
+            <{button app="desktop" label="添加一个扩展属性" icon="btn_add.gif" id="addPropsItem"}>
+            <span class="notice-inline">&nbsp;</span>
+            
+            <{button class="hide" app="desktop" label="复制其它分类扩展属性" icon="afresh.gif" id="copyPropsItem"}>
+          </div>
+          <div id="select_div_contents">
+              <table class="gridlist">
+                  <thead>
+                    <tr>
+                        <th width="80" align="center" nowrap="nowrap">序号</th>
+                        <th width="120">属性名称</th>
+                        <th width="80">
+                            <{t}>选择项可选值<{/t}>
+                            <{help}><{t}>必填项，属性对应的下拉列表中可选择的值；选择项最多能添加20个！<{/t}><{/help}>
+                        </th>
+                        <th width="80">
+                            <{t}>自动创建<{/t}>
+                            <{help}><{t}>勾选后，导入时自动创建不存在的属性值<{/t}><{/help}>
+                        </th>
+                        <th width="100">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="property_list">
+                  <{if $propetyList}>
+                  <{foreach from=$propetyList item=itemVal key=itemKey}>                       
+                        <tr class="property_tr_li">
+                          <td width="90" nowrap="nowrap" align="center"><{$itemKey}><input name="property_ids[]" type="hidden" value="<{$itemVal.prop_id}>" /></td>
+                          <td align="center"><input name="property_name[]" type="text" size="30" maxlength="30" vtype="required" value="<{$itemVal.prop_name}>" <{if !$itemVal.edit_del}>readonly="readonly"<{/if}> /></td>
+                          <td>                          
+                              <span id="property_select_<{$itemKey}>">
+                                  <{if $itemVal.select}>
+                                  <select name="property_select">
+                                      <{foreach from=$itemVal.select item=selVal key=selKey}>
+                                      <option value="<{$selKey}>"><{$selVal}></option>
+                                      <{/foreach}>
+                                  </select>
+                                  <{/if}>
+                              </span>
+                              &nbsp;<{button type="button" label="编辑选择项" prop_id="{$itemVal.prop_id}" edit_id="{$itemKey}" class="editItem editItem_2" icon="btn_edit.gif" app="desktop"}>
+                              <input type="hidden" name="property_select_values[]" id="property_select_values_<{$itemKey}>" value="<{$itemVal.selectVal}>" />
+                          </td>
+                          <td style="text-align:center;">
+                                <{input type="hidden" name="property_auto_create[]" value=$itemVal.auto_create }>
+                                <{if($itemVal.auto_create==1)}>
+                                    <{input type="checkbox" checked="checked" }>
+                                <{else}>
+                                    <{input type="checkbox"}>
+                                <{/if}>
+                          </td>
+                          <td align="center">
+                            <{img app=desktop src="bundle/icon_asc.gif" class="pointer btn-asc btn-asc_2" title="向上移动"}> &nbsp; &nbsp; 
+                            <{img app=desktop src="bundle/icon_desc.gif" class="pointer btn-desc btn-desc_2" title="向下移动"}> &nbsp; &nbsp; 
+                            <{if $itemVal.edit_del}><{img src="bundle/delete.gif" app="desktop" key="state" class="pointer btn-delete-item btn-delete-item_2"}><{else}>&nbsp; &nbsp;<{/if}>
+                          </td>
+                        </tr>                      
+                  <{/foreach}>
+                  <{/if}>
+                  </tbody>
+              </table>
+              
+              <table border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                      <td>&nbsp;</td>
+                  </tr>
+              </table>
+         </div>
+        </div>
+    </div>
+
+</div>
+
+    <{area inject='.mainFoot'}>
+        <div class="table-action">
+            <{button id="save_btn" label=$___b2c="保存"|t:'b2c'  type="submit" }>
+            
+            <!--<{button label="保存并继续添加" type="button" id='easy-save-category'}>-->
+            
+            <{button class="btn-secondary " label=$___b2c="取消"|t:'b2c' isclosedialogbtn="true" onclick="W.page('index.php?app=material&ctl=admin_material_cat&act=index')" }>
+        </div>
+    <{/area}>
+
+</form>
+
+
+<script>
+var cat_id = "<{$cat_id}>";
+var new_propety_i = parseInt("<{$item_propety_num}>");
+    new_propety_i = isNaN(new_propety_i) ? 0 : new_propety_i;
+    
+(function()
+{
+    //create property item
+    var getTemp = function(i){
+        var html_str = '';
+        html_str += '<td width="90" nowrap="nowrap" align="center">'+ i +'<input name="property_ids[]" type="hidden" value="0"></td><td align="center"><input name="property_name[]" type="text" size="30" maxlength="30" vtype="required" value=""></td><td><span id="property_select_'+ i +'"><select name="property_select"><option>请先添加</option></select></span>&nbsp;<{button type="button" label="增加选择项" edit_id="'+ i +'" class="editItem" icon="btn_edit.gif" app="desktop"}><input type="hidden" name="property_select_values[]" id="property_select_values_'+ i +'" value="" /></td><td style="text-align:center;"><{input type="hidden" name="property_auto_create[]" value="0" }><{input type="checkbox" }></td><td align="center"><{img app=desktop src="bundle/icon_asc.gif" class="pointer btn-asc" title="向上移动"}> &nbsp; &nbsp; <{img app=desktop src="bundle/icon_desc.gif" class="pointer btn-desc" title="向下移动"}> &nbsp; &nbsp; <{img src="bundle/delete.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>';
+        
+        return html_str;
+    };
+    
+    $('save_btn').addEvent('click',function(){
+        $('add_prop_form').fireEvent('submit',{stop:$empty});
+    });
+    
+    $ES('#copyPropsItem').addEvent('click',function(){
+        new Dialog('index.php?app=material&ctl=admin_material_cat&act=get_cat_select',{width:600,height:300,title:'选择要复制的分类',ajaxoptions:{data:{cat_id:cat_id},method:'get'}});
+    });
+    
+    $ES('#addPropsItem').addEvent('click',function()
+    {
+        new_propety_i++;
+        
+        /***
+        if(new_propety_i > 30){
+            alert("最多只能添加30个属性");
+            return false;
+        }
+        ***/
+        
+        var newRow = new Element('tr.property_tr_li',{html:getTemp(new_propety_i)}).inject($('property_list'));
+        
+    });
+    
+    $('add_prop_form').store('target',{
+        onRequest:function(){
+            $('save_btn').set('disabled', 'true');
+            $('save_btn').getElements('span')[1].set('text', '正在保存');
+        },
+        onComplete:function(jsontext){
+            $('save_btn').getElements('span')[1].set('text', '保存');
+            var json = Json.evaluate(jsontext);
+            if (typeof(json.error) != 'undefined'){
+                $('save_btn').set('disabled', '');
+            }else{
+                $('save_btn').set('disabled', 'true');
+                
+                try{
+                    var _dialogIns = $('save_btn').getParent('.dialog').retrieve('instance');
+                }catch(e){}
+                if(_dialogIns)
+                {	
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+    
+    init_prop_event();
+    
+})();
+
+function init_prop_event(){
+
+    $('property_list').addEventListener('click',  function(event){    
+        
+        var item = event.target;
+        if(item.type == 'checkbox') {
+            if(item.checked) {
+                item.getPrevious().set('value', 1);
+            } else {
+                item.getPrevious().set('value', 0);
+            }
+            return;
+        }
+        
+        event.preventDefault();
+        
+        if(item.hasClass('btn-delete-item')){
+            if(confirm('确定要删除这一行吗？')){
+                item.getParent('tr').destroy();
+            }
+            return;
+        }
+        
+        if(item.hasClass('btn-asc')){
+            var div = item.getParent().getParent();
+            var pre = div.getPrevious('tr');            
+            if(pre){
+                div.injectBefore(pre);    
+            }
+            return;
+        }
+        
+        if(item.hasClass('btn-desc')){
+            var div = item.getParent('tr');
+            var next = div.getNext('tr');            
+            if(next){
+                div.injectAfter(next);    
+            }
+            return;
+        }
+        
+        if(item.getParent('button') && item.getParent('button').hasClass('editItem')){
+            var edit_id = item.getParent('button').get('edit_id');
+            var operation_id = "property_select_values_"+ edit_id;
+            var property_select_values = $(operation_id).value;
+            
+            if(edit_id == ""){
+                alert('无效的操作,请检查!');
+                return false;
+            }
+            
+            new Dialog('index.php?app=material&ctl=admin_material_cat&act=add_property_select',{width:700,height:350,title:'添加选项列表值',ajaxoptions:{data:{cat_id:cat_id,edit_id:edit_id,property_select_values:property_select_values},method:'post'}});
+        }
+        
+    });
+    
+}
+</script>

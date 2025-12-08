@@ -1,0 +1,86 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <form action="" method="post" id="feature_group_manage">
+    <input type="hidden" name="ftgp_id" value="<{$feature_group_info.ftgp_id}>">
+        <div class="division">
+                <table width="100%" cellspacing="0" cellpadding="0">
+                    <tbody>
+                        <tr>
+                            <th width="60"><label for="dom_el_bc">类目名称：</label> </th>
+                            <td ><{input type="text&&required" name="name" value=$feature_group_info.ftgp_name}></td>
+                        </tr>
+                        <tr>
+                            <th width="60"><label for="dom_el_bc">绑定特性：</label> </th>
+                            <td >	<{input type='inventorydepth_object' object='feature@flowctrl' multiple=true breakpoint='0' name='ft_id' textcol='ft_name' value=$ft_ids callback='feature_object_callback' replacehtml=$replacehtml emptytext='选取特性' style='float:left;width:350px;' }></td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
+
+        <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td colspan="2" align="center">
+                    <{button class="btn-primary" label="确定" type="button" id="msaveBtn"}>
+                    <{button class="btn-primary" label="取消" type="button" id="mcancelBtn"}>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+    </form>
+</div>
+<script> 
+    (function() {
+        var form = $('feature_group_manage');
+        //关闭按钮
+        $('mcancelBtn').addEvent('click', function(){
+            $('mcancelBtn').getParent('.dialog').retrieve('instance').close();
+        });
+
+        //保存按钮
+        $('msaveBtn').addEvent('click', function(){
+            new Request ({
+                url:'index.php?app=flowctrl&ctl=admin_feature_group&act=toEdit',
+                method:'post',
+                data:form.toQueryString(),
+                onRequest: function () {
+                    $('msaveBtn').set('disabled', 'true');
+                    $('mcancelBtn').set('disabled', 'true');
+                },
+                onSuccess: function(result) {
+                    if (result =='SUCC') {
+                        finderGroup["<{$env.get.finder_id}>"].refresh.delay(400,finderGroup["<{$env.get.finder_id}>"]);
+                        $('msaveBtn').getParent('.dialog').retrieve('instance').close();
+                    } else {
+                        $('msaveBtn').set('disabled', '');
+                        $('mcancelBtn').set('disabled', '');
+                        //提示信息
+                        alert(result);
+                    }
+                }
+            }).send();
+        });
+    })();
+
+function feature_object_callback(rs,handle){
+    var length = handle.getElements('.row').length;
+    var html = '已选择了'+length+'个特性,'+"<a href='javascript:void(0);' onclick='feature_selected_show()'>查看选中的特性.</a>";
+    if ($defined($('hand-selected-product')))
+    {
+        $('hand-selected-product').setHTML(html);
+    } else {
+        var div = new Element('div',{'html':html,'id':'hand-selected-product'});
+        div.injectBefore(handle); 
+    }
+}
+
+function feature_selected_show(){
+	new Dialog('index.php?app=flowctrl&ctl=admin_feature_group&act=showFeature',{
+		ajaxoptions:{data:$('hand-selected-product').getNext('div'),method:'post'}
+	});
+}
+</script>

@@ -1,0 +1,108 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=console&ctl=admin_difference&act=save" id="frm">
+            <input type="hidden" name="id" value="<{$main.id}>">
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th>差异单号：</th>
+                        <td><{$main.diff_bn}></td>
+                        <th>系统库存：</th>
+                        <td><{$main.oms_stores}></td>
+                        <th>WMS库存：</th>
+                        <td><{$main.wms_stores}></td>
+                    </tr>
+                    <tr>
+                        <th>库存差异：</th>
+                        <td><{$main.diff_stores}></td>
+                        <th>仓库名称：</th>
+                        <td><{$main.branch_name}></td>
+                        <th></th>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <h4>差异明细</h4>
+            <table class="gridlist" border="0" cellspacing="0" cellpadding="0" >
+                <thead>
+                    <tr>
+                        <th>基础物料编码</th>
+                        <th>WMS库存</th>
+                        <th>系统库存</th>
+                        <th>库存差异</th>
+                        <th>数量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <{foreach from=$items item=item}>
+                    <tr>
+                        <td><{$item.material_bn}></td>
+                        <td><{$item.wms_stores}></td>
+                        <td><{$item.oms_stores}></td>
+                        <td><{$item.diff_stores}></td>
+                        <td><input type="number" name="number[<{$item.id}>]" value="<{$item.number}>" /></td>
+                    </tr>
+                    <{/foreach}>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' class="btn-primary"  label='保存' }>
+                    <{button type="button" id='close_btn' class="btn-secondary" label='关闭' }>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = opener.finderGroup['<{$env.get.finder_id}>'];
+        $('close_btn').addEvent('click', function(){
+            if(finder){
+                setTimeout(finder.refresh(),3000);
+            }
+            setTimeout('window.close()',200);
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    if(finder){
+                        setTimeout(finder.refresh(),3000);
+                    }
+                    setTimeout('window.close()',200);
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+    })();
+</script>

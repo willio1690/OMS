@@ -1,0 +1,49 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+    <h4><{if $title}><{$title}><{else}>产品线商品<{/if}></h4>
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+        <thead>
+        <tr>
+            <th>基础物料编码</th>
+            <th>基础物料名称</th>
+            <{if $bmSmList}>
+            <th>成本价</th>
+            <th>数量</th>
+            <{if $smInfo.sales_material_type != '3'}>
+            <th>组合价格贡献占比</th>
+            <{/if}>
+            <{/if}>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 
+        <{foreach from=$bmList item=item}>
+            <tr>
+                <td><{$item.material_bn}></td>
+                <td><{$item.material_name}></td>
+            </tr>
+        <{/foreach}>
+         -->
+        <{foreach from=$bmSmList item=sm}>
+        <tr>
+            <td><{$bmList.[$sm.bm_id].material_bn}></td>
+            <td><{$bmList.[$sm.bm_id].material_name}></td>
+            <td><{$bmExtList.[$sm.bm_id].cost}></td>
+            <{if $smInfo.sales_material_type == '1'}>
+                <td>1</td>
+                <td>100.00</td>
+            <{elseif $smInfo.sales_material_type == '2'}>
+                <td><{$sm.number}></td>
+                <td><{$sm.rate}></td>
+            <{else}>
+                <td><{$sm.number}></td>
+            <{/if}>
+        </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+</div>

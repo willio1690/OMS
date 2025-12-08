@@ -1,0 +1,114 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<link href="../../../../app/desktop/statics/perfect/main.css" rel="stylesheet" type="text/css">
+<div class="form-layout">
+    <form method="post" id="series_form" action="index.php?app=dealer&ctl=admin_series&act=toEditMaterial">
+        <input type="hidden" id="series_id" name="series_id" value="<{$series_info.series_id}>">
+        <div class="form-layout-block">
+            <h3>添加物料</h3>
+            <div class="form-layout-fields form-layout-fields-column">
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>产品线编码：</span>
+                    <{$series_info.series_code}>
+                    <input type="hidden" id="series_code" name="series_code" value="<{$series_info.series_code}>" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>产品线名称：</span>
+                    <{$series_info.series_name}>
+                    <input type="hidden" id="series_name" name="series_name" value="<{$series_info.series_name}>">
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>产品线描述：</span>
+                    <{$series_info.description}>
+                    <input type="hidden" id="description" name="description" value="<{$series_info.description}>">
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>产品线分类：</span>
+                    <{$series_info.cat_name}>
+                    <input type="hidden" id="cat_name" name="cat_name" value="<{$series_info.cat_name}>">
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">产品线备注：</span>
+                    <{$series_info.remark}>
+                    <input type="hidden" id="remark" name="remark" value="<{$series_info.remark}>">
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">所属贸易公司：</span>
+                    <{foreach from=$betcs item=betc}>
+                        <{if $series_info.betc_id == $betc.betc_id}>
+                            <{$betc.betc_name}>
+                            <input type="hidden" id="betc_id" name="betc_id" value="<{$betc.betc_id}>">
+                        <{/if}>
+                    <{/foreach}>
+                </div>
+                <div class="form-field" id="bind_basic_material">
+                    <span class="form-field-label">基础物料：</span>
+                    <{input type='dealer_object' object='basic_material@material' multiple=true breakpoint='0' name='bm_id' textcol='material_name' value=$bind_bm_ids callback='product_object_callback' replacehtml=$replacehtml emptytext='选择基础物料' style='float:left;width:500px;' filter=$bm_filter }>
+                </div>
+            </div>
+            <div id="cc" class="noprint table-action">
+                <{button type="button" id="series_btn" label="保 存"}> &nbsp;
+                <{button type="button" class="btn-secondary" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+//基础物料选择后展示模块
+function product_object_callback(rs,handle){
+    var length = handle.getElements('.row').length;
+    var html = '已选择了'+length+'个基础物料,'+"<a href='javascript:void(0);' onclick='product_selected_show()'>查看选中的基础物料.</a>";
+    if ($defined($('hand-selected-product'))){
+        $('hand-selected-product').setHTML(html);
+    }else{
+        var div = new Element('div',{'html':html,'id':'hand-selected-product'});
+        div.injectBefore(handle);
+        $('hand-selected-product').style.cssText = 'float:left;margin:10px 10px 10px 5px';
+    }
+}
+
+//基础物料明细展示
+function product_selected_show(){
+    new Dialog('index.php?app=dealer&ctl=admin_series&act=showProducts',{
+        ajaxoptions:{data:$('hand-selected-product').getNext('div'),method:'post'}
+    });
+}
+
+(function() {
+    window.addEvent('domready', function() {
+        //点击提交表单
+        $('series_btn').addEvent('click',function(e){
+            var _this = this;
+            var form = this.getParent('form');
+            form.store('target',{
+                onRequest:function(){
+                    _this.disabled=true;
+                },
+                onComplete:function(jsontext){
+                    try{
+                        var json = JSON.decode(jsontext);
+                        if (typeof(json.error)!='undefined'){
+                            _this.disabled=false;
+                        }else{
+                            _this.disabled=true;
+                            if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                            setTimeout('window.close()',200);
+                        }
+                    }catch(e){}
+                }
+            });
+            form.fireEvent('submit',e);
+        });
+    });
+})();
+</script>

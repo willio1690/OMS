@@ -1,0 +1,103 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <h3>商品状态回传</h3>
+    <div class="division">
+        <form action="index.php?app=omevirtualwms&ctl=admin_wms&act=callback_goods_call&p[0]=<{$log_detail.msg_id}>" method="post"  id="form-goods">
+            <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tbody>
+              <tr>
+                <th>msg_id:</th>
+                <td><{$log_detail.msg_id}></td>
+              </tr>
+              <tr>
+                <th>任务状态：</th>
+                <td>
+                    <select name="rsp">
+                        <option value="succ">成功</option>
+                        <option value="fail">失败</option>
+                    </select>
+               </td>
+              </tr>
+              <tr>
+                <th>错误码：</th>
+                <td>
+                    <select name="res">
+                        <option value="">请选择</option>
+                        <option value="w03020">无此接口</option>
+                    </select>
+               </td>
+              </tr>
+              <tr>
+                <th>错误消息：</th>
+                <td>
+                    <input type="text" name="err_msg" value="" size="30" />
+               </td>
+              </tr>
+            </tbody>
+        </table>
+        <div class="tableform">
+        <div><span style="font-weight:bold;">商品明细:</span></div>
+
+        <div id="listArea" class="division">
+            <div style="margin-bottom:3px;border:1px solid #ccc;">
+                <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                    <tr>
+                    <{foreach from=$items.item item=data name=product}>
+                        <th>货品编号</th>
+                        <td><{$data.item_code}>
+                        <select name="bn[<{$data.item_code}>]">
+                            <option value="succ">成功</option>
+                            <option value="error">失败</option>
+                            <option value="w03109">已存在</option>
+                        </select>
+                        外部SKU:<input type="text" name="wbn[<{$data.item_code}>]" value="" size="30" />
+                        </td>
+                    <{if $smarty.foreach.product.iteration % 5 == 0}>
+                    </tr>
+                    <{/if}>
+                    <{/foreach}>
+                </table>
+            </div>
+        </div>
+        </div>
+        <div class="table-action">
+            <span id="result"></span>
+            <{button label="回传" type="submit" name="submit" id="btn-submit"}>
+        </div>
+      </form>
+  </div>
+</div>
+<script>
+/*
+$('btn-submit').addEvent('click', function(){
+    var msg_id = '<{$log_detail.msg_id}>';
+    var rsp = $$('select[name=rsp]').get('value');
+    var err_msg = $$('input[name=err_msg]').get('value');
+    var bn = $$('select[name^=bn]').get('value');
+    new Request({url:'index.php?app=omevirtualwms&ctl=admin_wms&act=callback_goods_call&p[0]='+msg_id+'&p[1]='+rsp,data:{'err_msg':err_msg,'bn':bn},method:'POST',
+       onRequest:function(){
+           $('btn-submit').set('disabled', 'true');
+           $('btn-submit').getElements('span')[1].set('text','正在回传');
+       },
+        onComplete:function(json){
+            var json = JSON.decode(json);
+            if (json.rsp == 'succ')
+            {
+               alert('回传成功');
+               W.page('index.php?app=omevirtualwms&ctl=admin_wms&act=callback');
+               return;
+            }else{
+               $('btn-submit').set('disabled', '');
+               $('btn-submit').getElements('span')[1].set('text','回传');
+            }
+            $('result').set('html',json.html);
+        },
+        }).send();
+});
+*/
+</script>  
+  

@@ -1,0 +1,129 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <table border="0" cellspacing="0" cellpadding="0" >
+            <tbody>
+                <tr>
+                    <th style="width: 80px;" nowrap="nowrap">规则名称：</th>
+                    <td><{$rr.heading}></td>
+                    <th style="width: 80px;" nowrap="nowrap">规则内容：</th>
+                    <td><{$rr.content.result}></td>
+                    <th style="width: 80px;" nowrap="nowrap">回写数量：</th>
+                    <td><{$quantity}></td>
+                    <th style="width: 80px;" nowrap="nowrap">回写基准：</th>
+                    <td><{$asRs.info}></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="tableform">
+    <{if $asRs.luckybag}>
+    <div class="division">
+        <h4>福袋库存详情</h4>
+        <table class="gridlist" border="0" cellspacing="0" cellpadding="0" >
+            <thead>
+            <tr>
+                <th>福袋编码</th>
+                <th>选中件数</th>
+                <th>包含件数</th>
+                <th>最大可售库存</th>
+            </tr>
+            </thead>
+            <tbody>
+            <{foreach from=$asRs.luckybag item=luckyItem key=luckyKey}>
+            <tr>
+                <td><{$luckyKey}></td>
+                <td><{$luckyItem['selected_number']}></td>
+                <td><{$luckyItem['include_number']}></td>
+                <td><{$luckyItem['quantity']}></td>
+            </tr>
+            <{/foreach}>
+            </tbody>
+        </table>
+    </div>
+    <{/if}>
+
+    <div class="division">
+        <h4>可售库存详情</h4>
+        <table class="gridlist" border="0" cellspacing="0" cellpadding="0" >
+            <thead>
+                <tr>
+                    <th>基础物料</th>
+                    <th>可售库存</th>
+                    <th>计算公式</th>
+                    <th>库存</th>
+                    <th>全局预占</th>
+                    <th>仓库预占</th>
+                    <th>指定仓预占</th>
+                    <th>安全可售</th>
+                </tr>
+            </thead>
+            <tbody>
+                <{foreach from=$asRs.basic item=rs key=rsKey}>
+                <tr>
+                    <td><{$rsKey}></td>
+                    <td><{$rs.quantity}></td>
+                    <td><{$rs['info']['公式']}><{if $rs['基础数量']}>=(<{$rs['基础数量']}>)/<{$rs['单位数量']}><{/if}>=<{$rs.quantity}></td>
+                    <td><{$rs['info']['库存']}></td>
+                    <td><{$rs['info']['全局预占']}></td>
+                    <td><{$rs['info']['仓库预占']}></td>
+                    <td><{$rs['info']['指定仓预占']}></td>
+                    <td><{$rs['info']['安全可售']}></td>
+                </tr>
+                <{/foreach}>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="tableform">
+    <div class="division">
+        <h4>仓库库存详情</h4>
+        <table class="gridlist" border="0" cellspacing="0" cellpadding="0" >
+            <thead>
+                <tr>
+                    <th>基础物料</th>
+                    <th>仓库</th>
+                    <th>库存</th>
+                    <th>仓库预占</th>
+                    <th>安全库存</th>
+                    <th>指定仓预占</th>
+                    <th>安全可售</th>
+                </tr>
+            </thead>
+            <tbody>
+            <{foreach from=$asRs.basic item=rs key=rsKey}>
+                <{foreach from=$rs.info.detail item=item key=itemKey}>
+                <tr>
+                    <td><{$rsKey}></td>
+                    <td><{$itemKey}></td>
+                    <td><{$item['库存']}></td>
+                    <td><{$item['仓库预占']}></td>
+                    <td><{$item['安全库存']}></td>
+                    <td><{$item['指定仓预占']}></td>
+                    <td><{$item['安全可售']['quantity']}></td>
+                </tr>
+                <{/foreach}>
+            <{/foreach}>
+            </tbody>
+        </table>
+    </div>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='close_btn' class="btn-secondary" label='关闭' isCloseDialogBtn="true"}>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<{/area}>

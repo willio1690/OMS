@@ -1,0 +1,47 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0" >
+  <tbody>
+    <tr>
+      <th ><em class="c-red">*</em>私钥：</th>
+      <td>
+        <input autocomplete="off" class="x-input " name="config[private_key]" vtype="required" value="<{$config['private_key']}>" size="32" id="dom_el_3db5b10" type="text">
+        &nbsp;&nbsp;<a id="private_key"><{img src="bundle/refresh.gif" app="desktop" }></a>
+      </td>
+    </tr>
+    <tr>
+      <th ><em class="c-red">*</em>api地址：</th>
+      <td>
+        <input autocomplete="off" class="x-input" name="config[api_url]" vtype="required" value="<{$config['api_url']}>" size="32" id="dom_el_19e5c71" type="text">
+      </td>
+    </tr>
+
+    <{if $platform_params}>
+    <{foreach from=$platform_params item=item key=key}>
+    <tr>
+      <th ><em class="c-red">*</em><{$item}>：</th>
+      <td>
+        <{input name="config[{$key}]" vtype="required" value=$config[$key] size="32"}>
+        <{if $key=="private_key" }>&nbsp;&nbsp;<a id="private_key"><{img src="bundle/refresh.gif" app="desktop" }></a><{/if}>
+      </td>
+    </tr>
+    <{/foreach}>
+    <{/if}>
+  </tbody>
+</table>
+<script type="text/javascript">
+  (function(){
+    if ($defined($('private_key'))) {
+      $('private_key').addEvent('click',function(){
+        var _this = this;
+        new Request({url:'index.php?app=wmsmgr&ctl=admin_wms&act=gen_private_key',
+          onComplete:function(rs){
+            _this.getPrevious('input').set('value',rs);
+          }}).send();
+      });
+    };
+  })();
+</script>

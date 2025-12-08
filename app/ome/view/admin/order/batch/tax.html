@@ -1,0 +1,105 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table width="100%" >
+    <tbody> 
+        <tr>
+	        <td><input type='hidden' name='order_id' value='<{$order_id}>'></input></td>
+        </tr>
+    </tbody>
+</table>
+<div  id='error'><font color='red'></div>
+<div  style ="display:none" id='all_order_ids'><{$all_order_ids}></div>
+
+
+  <table cellpadding="0" cellspacing="0" border="0">
+
+  <tr>
+        <th><{t}>开始进度：<{/t}></th>
+        <td>
+        <div style="border:1px solid #CCC;width:350px;overflow:hidden;float:left;background:#FFF;padding:1px;">
+            <div id="processBar" style="background:#7493D1;width:1%;height:15px;">&nbsp;</div>
+        </div>&nbsp;
+        </td>
+      </tr>
+  <tr>
+
+  </table>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td>
+        <button class="btn btn-primary" id="btn-submit" onclick="dosubmit()"><span><span id='rs'>提交</span></span></button>
+         <{button id="confirm_memo" class="btn-secondary" label=$___b2c="关闭"|t:'b2c'   type="button"}>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<{/area}>
+
+<script>
+
+
+
+
+
+function dosubmit(){
+	var all_order_id = document.getElementById("all_order_ids").innerHTML;
+	var all_order_ids = JSON.decode(all_order_id);
+	if(all_order_ids.length<=0){
+		alert('没有订单需要处理！');return;
+	}
+	var order_num = "<{$order_num}>";
+	for(var i=0;i<all_order_ids.length;i++){
+		percent = 100*(i+1)/order_num;
+		percent = Math.round(percent);
+		process(all_order_ids[i]);
+		setProcessBar("processBar",percent+'%');
+	}
+	document.getElementById("rs").innerHTML =  "<fon>处理已完成，本窗口将在3秒后自动关闭！</font>";
+	$('btn-submit').set('disabled',true);
+	setTimeout("$('btn-submit').getParent('.dialog').retrieve('instance').close();",2000);
+}
+function process(order_id){
+	var data_str = 'order_id='+order_id+'&is_tax='+"<{$is_tax}>";
+	var pingRequest = new Request({
+		method : "post",
+		url : "index.php?app=ome&ctl=admin_batch_order&act=doBatchTax",
+		data:data_str,
+		onSuccess : function(responseText) {
+			var result = JSON.decode(responseText);	
+			if (result.status == "success") {
+				return true;
+				document.getElementById("error").innerHTML =  "<span><font color='green'>处理已完成，本窗口将在3秒后自动关闭！</font></span>";
+				setTimeout("$('btn-submit').getParent('.dialog').retrieve('instance').close();",2000);
+			} else if (result.status == "error"){
+				document.getElementById("error").innerHTML = "<font color='red'>"+result.msg+"</font>";
+			}else if(result.status == "finish"){
+				setProcessBar("processBar",'100%');
+				document.getElementById("error").innerHTML = '任务完成';
+			}
+		},
+		onFailure : function() {
+			document.getElementById("error").innerHTML = "<font color='red'>"+result.msg+"</font>";
+}
+});pingRequest.send();	
+}
+
+$('confirm_memo').addEvent('click',function(){
+	var btn = $('confirm_memo');
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+    if(_dialogIns){
+        _dialogIns.close();
+    } 
+});
+function setProcessBar(id,w){
+	document.getElementById(id).style.width = w;
+}
+
+</script>

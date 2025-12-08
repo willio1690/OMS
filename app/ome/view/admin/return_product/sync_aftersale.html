@@ -1,0 +1,47 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=ome&ctl=admin_return&act=do_sync_aftersale&finder_id=<{$env.get.finder_id}>" method="post" id="form1" isCloseDialog>
+     <div class="tableform">
+      <div class="division">
+ <table width="100%" border="0" cellpadding="0" cellspacing="0" class="girdlist">
+<tr><th>选择店铺:</th><td>
+    <select name="shop_id">
+<{foreach from=$shop item=shop}>
+<option value="<{$shop.shop_id}>"><{$shop.name}></option>
+
+<{/foreach}>
+</select></td></tr>
+<tr><th>换货单号:</th><td><input type="text" id="aftersale_bn" name="aftersale_bn" size='30' vtype="required"></td></tr>
+ </table>
+
+<div class="table-action">
+      <{button label="确定" id="btn-submit" class="btn-primary"}> &nbsp; &nbsp;
+      <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+<input type='hidden' id='finder_id' name='finder_id' value='<{$finder_id}>'>
+  </div>  </div>
+</form>
+<script>
+$('btn-submit').addEvent('click',function(e){
+
+  var aftersale_bn = $('aftersale_bn').value;
+  if (aftersale_bn==''){
+    alert('换货单号不可为空!');
+    return false;
+  }
+  var _this = this;_this.set('disabled',true);
+  var _data = _this.form.toQueryString().replace(/\+/g,"%2B");
+  new Request.JSON({
+            url:_this.form.get('action'),
+            data:_data,
+            onComplete:function(rs){
+              alert(rs.msg);
+              finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+              _this.getParent('.dialog').retrieve('instance').close();
+            }
+        }).send();
+});
+</script>

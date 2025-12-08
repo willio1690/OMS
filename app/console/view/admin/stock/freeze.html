@@ -1,0 +1,149 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if !$env.get.target}><div class="division" container="true"><{/if}>
+  <h3>库存查看<span class="num">(货品冻结量:<strong><{$store_freeze_num}></strong>)</span></h3>
+  <table cellpadding="0" cellspacing="0" border="0" class="gridlist">
+    <thead>
+      <tr>
+      <th>序号</th>
+      <th>订单号</th>
+      <th>来源店铺</th>
+      <th>创建时间</th>
+      <th>支付状态</th>
+      <th>发货状态</th>
+      <th>购买数量</th>
+      <th>已发货数量</th>
+      <th>指定仓发货</th>
+      </tr>
+    </thead>
+    <tbody>
+    <{assign var='num' value=1}>
+    <{foreach item=item from=$rows}>
+      <tr>
+        <td><{$num}></td>
+        <td><{$item.order_bn}></td>
+        <td><{$item.shop_name}></td>
+        <td><{$item.createtime}></td>
+        <td><{$item.pay_status}><{if $item.pay_status=='未支付'}>(失效时间:<{$item.order_limit_time}>)<{else}>(付款时间:<{$item.paytime}>)<{/if}></td>
+        <td><{$item.status}></td>
+        <td><{$item.nums}></td>
+        <td><{$item.sendnum}></td>
+        <td><{if $item.is_assign_store=='true'}><span style="color:red;">是</span><{else}>否<{/if}></td>
+        <input type="hidden" value=<{$num++}>></input>
+      </tr>
+    <{/foreach}>
+    </tbody>
+  </table>
+  <div class="table-action">
+      <{$pager}>
+  </div>
+
+<{if !$env.get.target}></div><{/if}>
+
+
+<{if $dealerOrders}>
+<h3>经销一件代发订单</h3>
+<table cellpadding="0" cellspacing="0" border="0" class="gridlist">
+    <thead>
+    <tr>
+        <th>序号</th>
+        <th>订单号</th>
+        <th>来源店铺</th>
+        <th>创建时间</th>
+        <th>审核状态</th>
+        <th>购买数量</th>
+    </tr>
+    </thead>
+    <tbody>
+    <{assign var='num' value=1}>
+    <{foreach item=item from=$dealerOrders}>
+    <tr>
+        <td><{$num}></td>
+        <td><{$item.plat_order_bn}></td>
+        <td><{$item.shop_name}></td>
+        <td><{$item.createtime|cdate}></td>
+        <td><{$item.process_status}></td>
+        <td><{$item.nums}></td>
+
+        <input type="hidden" value=<{$num++}>></input>
+    </tr>
+    <{/foreach}>
+    </tbody>
+</table>
+<{/if}>
+
+<{if $return_list || $stock_list || $reship_list || $stockout_list || $stockdump_list || $af_list}>
+<h3>其他出库</h3>
+<table cellpadding="0" cellspacing="0" border="0" class="gridlist">
+    <thead>
+      <tr>
+      <th>单号</th>
+      <th>数量</th>
+      <th>单据类型</th>
+      </tr>
+    </thead>
+    <{foreach from=$return_list item=rp}>
+    <tr>
+    <td><{$rp.rp_bn}></td>
+    <td><{$rp.num}></td>
+    <td>采购退货</td></tr>
+    <{/foreach}>
+    <{foreach from=$stock_list item=stock}>
+    <tr>
+    <td><{$stock.iso_bn}></td>
+    <td><{$stock.nums}></td>
+    <td>其它出库</td></tr>
+    <{/foreach}>
+    <{foreach from=$reship_list item=reship}>
+    <tr>
+    <td><{$reship.reship_bn}></td>
+    <td><{$reship.num}></td>
+    <td>售后换货</td></tr>
+    <{/foreach}>
+    
+    <{foreach from=$stockout_list item=stockItem}>
+    <tr>
+    <td><{$stockItem.stockout_no}></td>
+    <td><{$stockItem.num}></td>
+    <td>唯品会出库</td></tr>
+    <{/foreach}>
+    
+    <{foreach from=$stockdump_list item=stockdump}>
+    <tr>
+    <td><{$stockdump.stockdump_bn}></td>
+    <td><{$stockdump.num}></td>
+    <td>转储出库</td></tr>
+    <{/foreach}>
+    
+    <{foreach from=$af_list item=af}>
+    <tr>
+    <td><{if $af.original_bn}><{$af.original_bn}><{else}><{$af.bmsaf_id}><{/if}></td>
+    <td><{$af.freeze_num}></td>
+    <td>人工库存预占<{if $af.original_type}>(类型：<span style="color:#ff0000;"><{$af.original_type}></span>)<{/if}></td></tr>
+    <{/foreach}>
+
+    <{if $jitOrders}>
+    <{foreach from=$jitOrders item=itemList}>
+    <{foreach from=$itemList item=itemInfo}>
+    <tr>
+        <td><{$itemInfo.order_sn}></td>
+        <td><{$itemInfo.amount}></td>
+        <td>vop销售订单</td>
+    </tr>
+    <{/foreach}>
+    <{/foreach}>
+    <{/if}>
+</table>
+<{/if}>
+  
+<{if !$env.get.target}>
+<{capture name="footbar"}>
+<div class="table-action">
+    <{button label="确 定" type="button" onclick="window.close();"}>
+</div>
+<{/capture}>
+<{/if}>
+

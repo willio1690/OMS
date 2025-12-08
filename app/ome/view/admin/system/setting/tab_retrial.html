@@ -1,0 +1,195 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout-block">
+    <h3>修改订单复审设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">是否对修改订单进行复审：</span>
+            <div class="form-radios">
+                <input id="ome_order_is_retrial_on" type="radio" name="set[ome.order.is_retrial]" value="true" <{if $setData.ome_order_is_retrial == 'true'}> checked<{/if}> >
+                <label for="ome_order_is_retrial_on">开启</label>
+                <input id="ome_order_is_retrial_off" type="radio" name="set[ome.order.is_retrial]" value="false" <{if $setData.ome_order_is_retrial == 'false'}> checked<{/if}>>
+                <label for="ome_order_is_retrial_off" >关闭</label>
+            </div>
+            <span class="form-remark">订单复审不支持前端店铺是：易开店、Ecstore、分销王。）</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">复审日志保留：</span>
+            <div class="form-radios">
+                <input id="ome_order_clean_day_on" type="radio" name="set[ome.order.clean_day]" value="180" <{if $setData.ome_order_clean_day != '90'}> checked<{/if}> >
+                <label for="ome_order_clean_day_on">180天</label>
+                <input id="ome_order_clean_day_off" type="radio"  name="set[ome.order.clean_day]" value="90" <{if $setData.ome_order_clean_day == '90'}> checked<{/if}> >
+                <label for="ome_order_clean_day_off" >90天</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">复审规则：</span>
+            <div class="form-checkbox">
+                <input type="checkbox" id="ome_order_retrial_product" name="set[ome.order.retrial][product]" value='1' <{if $setData.ome_order_retrial.product=='1'}>checked<{/if}> >
+                <label for="ome_order_retrial_product"><span style="color:#ff0000;">商品变化</span>的订单进行复审</label>
+                <input type="checkbox" id="ome_order_retrial_order"  name="set[ome.order.retrial][order]" value='1' <{if $setData.ome_order_retrial.order=='1'}>checked<{/if}> >
+                <label for="ome_order_retrial_order"><span style="color:#ff0000;">订单金额变化</span>的订单进行复审</label>
+                <input type="checkbox" id="ome_order_retrial_delivery"  name="set[ome.order.retrial][delivery]" value='1' <{if $setData.ome_order_retrial.delivery=='1'}>checked<{/if}> >
+                <label for="ome_order_retrial_delivery"><span style="color:#ff0000;">配送信息变化</span>的订单进行复审</label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>价格监控设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">价格监控设置：</span>
+            <div class="form-radios">
+                <input id="ome_order_is_monitor_on" type="radio" name="set[ome.order.is_monitor]" value="true" <{if $setData.ome_order_is_monitor == 'true'}> checked<{/if}> >
+                <label for="ome_order_is_monitor_on">开启</label>
+                <input id="ome_order_is_monitor_off" type="radio" name="set[ome.order.is_monitor]" value="false" <{if $setData.ome_order_is_monitor == 'false'}> checked<{/if}>>
+                <label for="ome_order_is_monitor_off" >关闭</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label"></span>
+            <div class="form-radios">
+                <input id="ome_order_monitor_ordergoods_on" type="radio" name="set[ome.order.monitor.ordergoods]" value="0" <{if $setData['ome_order_monitor_ordergoods']!=1}>checked<{/if}> >
+                <label for="ome_order_monitor_ordergoods_on">整单计算</label>
+                <input id="ome_order_monitor_ordergoods_off" type="radio"  name="set[ome.order.monitor.ordergoods]" value="1" <{if $setData['ome_order_monitor_ordergoods']==1}>checked<{/if}> >
+                <label for="ome_order_monitor_ordergoods_off" >子商品计算</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label"></span>
+            <div class="form-checkbox">
+                <input id="ome_order_cost_multiple" type="checkbox" name="set[ome.order.cost_multiple][flag]" value='1' <{if $setData.ome_order_cost_multiple.flag==1}>checked<{/if}> >
+                <label for="ome_order_cost_multiple">监控最低价格为基础物料<span style="color:#ff0000;">成本价</span>的</label><input type="text" size="6" maxlength="5" name="set[ome.order.cost_multiple][value]"  value="<{if $setData.ome_order_cost_multiple.value}><{$setData.ome_order_cost_multiple.value}><{else}>1.05<{/if}>" vtype="required" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')" />倍<br /><br />
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label"></span>
+            <div class="form-checkbox">
+                <input id="ome_order_sales_multiple" type="checkbox" name="set[ome.order.sales_multiple][flag]" value='1' <{if $setData.ome_order_sales_multiple.flag==1}>checked<{/if}> >
+                <label for="ome_order_sales_multiple">监控最低价格为销售物料<span style="color:#ff0000;">最低销售价</span>的</label><input name="set[ome.order.sales_multiple][value]" type="text" value="<{if $setData.ome_order_sales_multiple.value}><{$setData.ome_order_sales_multiple.value}><{else}>1.0<{/if}>" size="6" maxlength="5" vtype="required" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')" />倍
+            </div>
+            <span class="form-remark" style="color:red;">注：整单计算是对整单销售价格进行监控，只要整单价格大于商品成本价最小值相加，则不会预警（整体订单不亏钱就能出货的原则）</span>
+            <span class="form-remark" style="color:red;">子商品计算是对单个基础物料或销售物料进行监控，当监控的子商品价格为0时，表示该商品不做监控。</span>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>过滤掉订单赠品设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">是否过滤掉订单赠品：</span>
+            <div class="form-radios">
+                <input id="ome_order_retrial_gift_on" type="radio" name="set[ome.order.retrial_gift]" value="true" <{if $setData.ome_order_retrial_gift == 'true'}> checked<{/if}> >
+                <label for="ome_order_retrial_gift_on">是</label>
+                <input id="ome_order_retrial_gift_off" type="radio" name="set[ome.order.retrial_gift]" value="false" <{if $setData.ome_order_retrial_gift == 'false'}> checked<{/if}>>
+                <label for="ome_order_retrial_gift_off" >否</label>
+            </div>
+            <span class="form-remark" style="color:red;">（复审监控价格时不计算订单中的赠品）</span>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+var check_product	= document.getElementsByName("set[ome.order.retrial][product]");
+var check_order	= document.getElementsByName("set[ome.order.retrial][order]");
+var check_delivery	= document.getElementsByName("set[ome.order.retrial][delivery]");
+
+var set_order_is_retrial = $$('input[name=set[ome.order.is_retrial]]:checked').get('value');
+
+if (set_order_is_retrial == 'false') {
+
+    for(var i=0; i<check_product.length;i++)
+    {
+        check_product[i].checked = false;
+        check_product[i].disabled = true;
+    }
+    for(var i=0; i<check_order.length;i++)
+    {
+        check_order[i].checked = false;
+        check_order[i].disabled = true;
+    }
+    for(var i=0; i<check_delivery.length;i++)
+    {
+        check_delivery[i].checked = false;
+        check_delivery[i].disabled = true;
+    }
+}
+
+$$('input[name=set[ome.order.is_retrial]]').addEvent('click',function(e)
+{
+	var value = this.value;
+	
+	if(value == 'false')
+	{
+		for(var i=0; i<check_product.length;i++)
+		{
+			check_product[i].checked = false;
+			check_product[i].disabled = true;
+		}
+		for(var i=0; i<check_order.length;i++)
+		{
+			check_order[i].checked = false;
+			check_order[i].disabled = true;
+		}
+		for(var i=0; i<check_delivery.length;i++)
+		{
+			check_delivery[i].checked = false;
+			check_delivery[i].disabled = true;
+		}
+	}
+	else
+	{
+		for(var i=0; i<check_product.length;i++)
+		{
+			check_product[i].checked = false;
+			check_product[i].disabled = false;
+		}
+		for(var i=0; i<check_order.length;i++)
+		{
+			check_order[i].checked = false;
+			check_order[i].disabled = false;
+		}
+		for(var i=0; i<check_delivery.length;i++)
+		{
+			check_delivery[i].checked = false;
+			check_delivery[i].disabled = false;
+		}
+	}
+});
+$$('input[name=set[ome.order.is_monitor]]').addEvent('click',function(e)
+{
+	var value = this.value;
+	var cost_multiple	= document.getElementsByName("set[ome.order.cost_multiple][flag]");
+	var sales_multiple	= document.getElementsByName("set[ome.order.sales_multiple][flag]");
+	
+	if(value == 'false')
+	{
+		for(var i=0; i<cost_multiple.length;i++)
+		{
+			cost_multiple[i].checked = false;
+			cost_multiple[i].disabled = true;
+		}
+		for(var i=0; i<sales_multiple.length;i++)
+		{
+			sales_multiple[i].checked = false;
+			sales_multiple[i].disabled = true;
+		}
+	}
+	else
+	{
+		for(var i=0; i<cost_multiple.length;i++)
+		{
+			cost_multiple[i].checked = false;
+			cost_multiple[i].disabled = false;
+		}
+		for(var i=0; i<sales_multiple.length;i++)
+		{
+			sales_multiple[i].checked = false;
+			sales_multiple[i].disabled = false;
+		}
+	}
+});
+</script>

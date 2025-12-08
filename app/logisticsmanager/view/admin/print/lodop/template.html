@@ -1,0 +1,52 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <title>
+        表单
+    </title>
+    <!-- <script language="javascript" src="http://www.lodop.net/demolist/LodopFuncs.js"></script> -->
+    <link href="<{$env.BASE_URL}>/app/logisticsmanager/statics/print/css/index-bundle-80b66.css" rel="stylesheet"></head>
+<style>
+    .maskModel{
+        z-index: 1000000000 !important;
+    }
+</style>
+<body>
+
+<div id="app">
+
+</div>
+
+<input type="hidden" id="type" value="<{$type}>">
+
+<!-- 打印面单 -->
+<input type="hidden" id="print_type" value="<{$print_type}>">
+<input type="hidden" id="host" value="<{$host}>">
+<input type="hidden" id="ids" value="<{$vid}>">
+<textarea id="print_data" style="display: none;"><{$lodopPrintData}></textarea>
+<form id='print_filter' method="POST" action="">
+    <{foreach from=$postData item=item key=key}>
+        <input type="hidden" class="dailog-batch-ipt" name="<{$key}>" value="<{$item}>">
+    <{/foreach}>
+</form>
+
+<!-- 编辑模板 -->
+<input type="hidden" id="template_type" value="<{$template_type}>">
+<input type="hidden" id="template_id" value="<{$template_id}>">
+<textarea id="print_template" style="display: none;"><{$lodopPrintTemplate|json_encode}></textarea>
+
+
+<script type="text/javascript" src="<{$env.BASE_URL}>/app/logisticsmanager/statics/print/dll/libs.dll.js"></script>
+<script type="text/javascript" src="<{$env.BASE_URL}>/app/logisticsmanager/statics/print/dll/vue.dll.js"></script>
+
+<!-- built files will be auto injected -->
+<script type="text/javascript" src="<{$env.BASE_URL}>/app/logisticsmanager/statics/print/js/manifest-bundle-80b66.js"></script>
+<script type="text/javascript" src="<{$env.BASE_URL}>/app/logisticsmanager/statics/print/js/index-bundle-80b66.js"></script>
+</html>

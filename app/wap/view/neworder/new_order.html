@@ -1,0 +1,1692 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="./common.css" />
+    <link rel="stylesheet" type="text/css" href="./index.css" />
+    <script src="./axios.min.js"></script>
+    <script src="./flexible.js"></script>
+  </head>
+
+  <body>
+    <div class="page flex-col">
+      <!-- heder -->
+      <div class="section_1">
+        <div class="text-wrapper_1 flex-row align-center justify-between">
+          <img src="./icon-back.png" class="icon-back" />
+          <span class="text_1">验货退款</span>
+          <img src="./icon-refresh.png" class="icon-refresh" />
+        </div>
+      </div>
+      <!-- tab -->
+      <div class="section_2 flex-col">
+        <div class="group_1 flex-col tab-scroll-container">
+          <div class="group_2 flex-row">
+            <div class="group_3 flex-col">
+              <span class="text_5">全部</span>
+            </div>
+            <div class="group_3 flex-col">
+              <span class="text_5">待退款确认</span>
+              <div class="text-wrapper_3 flex-col">
+                <span class="text_6">6</span>
+              </div>
+            </div>
+            <div class="group_3 flex-col">
+              <span class="text_5">已同意</span>
+              <div class="text-wrapper_3 flex-col">
+                <span class="text_6">5</span>
+              </div>
+            </div>
+            <div class="group_3 flex-col">
+              <span class="text_5">已拒绝待客服确认</span>
+            </div>
+            <div class="group_3 flex-col">
+              <span class="text_5 tab-active">客服已拒绝</span>
+            </div>
+            <div class="group_4 flex-row"></div>
+          </div>
+        </div>
+        <div class="group_6 flex-col justify-between">
+          <!-- 日期选择 -->
+          <div class="date-select-box flex-row">
+            <button class="date-select-item active">今天</button>
+            <button class="date-select-item">昨天</button>
+            <button class="date-select-item">本月</button>
+            <button class="date-select-item" onclick="showTimeModal()">
+              自定义
+            </button>
+          </div>
+          <div class="flex-row justify-between">
+            <div class="box_1 flex-row justify-between" id="customSelect">
+              <span class="text_9 current-type">订单号</span>
+              <img
+                class="thumbnail_1"
+                referrerpolicy="no-referrer"
+                src="./icon-arrow-down.png"
+              />
+            </div>
+            <div class="select-options" id="selectOptions">
+              <div class="option-item" data-value="order_no">订单号</div>
+              <div class="option-item" data-value="channel">渠道</div>
+              <div class="option-item" data-value="buyer_mobile">
+                买家手机号
+              </div>
+              <div class="option-item" data-value="receiver_mobile">
+                收货人手机号
+              </div>
+              <div class="option-item" data-value="express_no">快递单号</div>
+            </div>
+
+            <div class="text-wrapper_4 flex-col search-box">
+              <input
+                class="text_10 search-input"
+                type="text"
+                placeholder="请输入订单号"
+                style="display: block"
+              />
+              <img src="./icon-scan.png" class="search-scan-icon" />
+              <select
+                class="text_10 search-input channel-select"
+                style="display: none"
+                onchange="handleSearch(this.value)"
+              >
+                <option value="渠道1">渠道1</option>
+                <option value="渠道2">渠道2</option>
+                <option value="渠道3">渠道3</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- list -->
+      <div class="section_4 flex-col">
+        <!-- 模拟 订单列表，方面后端使用订单模版 -->
+        <div class="list-item">
+          <div class="text-wrapper_5 flex-row justify-between">
+            <span class="text_11">渠道：</span>
+            <span class="text_12">视频号</span>
+            <span class="text_13">待退款确认</span>
+          </div>
+          <div class="text-wrapper_5 flex-row justify-between">
+            <span class="text_11">订单号：</span>
+            <span class="text_12">575679345343466</span>
+            <span
+              class="text_13 countdown"
+              data-deadline="1739999618000"
+            ></span>
+          </div>
+          <div class="text-wrapper_5 flex-row justify-between">
+            <span class="text_11">发货单号：</span>
+            <span class="text_12">O353443654657</span>
+          </div>
+          <div class="text-wrapper_4 flex-col">
+            <input class="text_10 search-input" type="text" placeholder="请输入订单号" style="display:block">
+            <div class="custom-channel-select" data-name="channel" style="display:none">
+              <div class="custom-channel-select-trigger">
+                <span class="custom-channel-select-value">请选择渠道</span>
+                <img class="custom-channel-select-arrow" src="./icon-arrow-down.png" />
+              </div>
+              <div class="custom-channel-select-options">
+                <div class="custom-channel-select-option" data-value="">请选择渠道</div>
+                <div class="custom-channel-select-option" data-value="渠道1">渠道1</div>
+                <div class="custom-channel-select-option" data-value="渠道2">渠道2</div>
+                <div class="custom-channel-select-option" data-value="渠道3">渠道3</div>
+              </div>
+            </div>
+          </div>
+          <div class="text-wrapper_5 flex-row justify-between">
+            <span class="text_11">下单时间：</span>
+            <span class="text_12">2024-12-13&nbsp;14:14:46</span>
+          </div>
+          <div class="text-wrapper_5 flex-row pr">
+            <span class="text_11">收件人：</span>
+            <span
+              class="text_26 sensitive-text flex-shrink-1"
+              data-raw="屏先生（15912343352）"
+              data-masked="屏*（159****3352）"
+              >屏*（159****3352）</span
+            >
+            <span class="text_27 copy-btn" data-copy="15912343352">复制</span>
+            <div class="toggle-visibility label_1">
+              <i class="eye-icon hidden"></i>
+            </div>
+            <!-- <img class="label_1 toggle-visibility" referrerpolicy="no-referrer" src="./icon-eye.png" /> -->
+          </div>
+          <div class="text-wrapper_5 flex-row">
+            <span class="text_11">收货地址：</span>
+            <span
+              class="text_26 sensitive-text flex-shrink-1"
+              data-raw="浙江省杭州市西湖区文三路XXX号"
+              data-masked="****"
+              >****</span
+            >
+            <span
+              class="text_27 copy-btn"
+              data-copy="浙江省杭州市西湖区文三路XXX号"
+              >复制</span
+            >
+            <div class="status-order-box">
+              <span class="status-order">已签收</span>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <!-- goodsInfo -->
+          <div class="section_6 flex-row">
+            <img
+              class="image_2"
+              referrerpolicy="no-referrer"
+              src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794"
+            />
+            <div class="text-group_1 flex-col">
+              <div class="status-info">
+                <span class="text_28 flex-shrink-1"
+                  >MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span
+                >
+                <span class="status-returned">已退货</span>
+              </div>
+              <span class="text_29">商品货号：787876756454</span>
+              <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+              <!-- <span class="text_31">￥1800.00</span> -->
+            </div>
+          </div>
+          <div class="section_6 justify-between flex-wrap">
+            <div class="mrg-side-4">
+              <span class="text_36">买家</span
+              ><span class="text_37">￥1000.23</span>
+            </div>
+            <div class="mrg-side-4">
+              <span class="text_36">优惠</span
+              ><span class="text_37">￥1000.23</span>
+            </div>
+            <div class="mrg-side-4">
+              <span class="text_36">商家</span
+              ><span class="text_37">￥1000.23</span>
+            </div>
+          </div>
+
+          <div class="section_6 flex-row">
+            <img
+              class="image_2"
+              referrerpolicy="no-referrer"
+              src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794"
+            />
+            <div class="text-group_1 flex-col">
+              <div class="status-info">
+                <span class="text_28 flex-shrink-1"
+                  >MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span
+                >
+              </div>
+              <span class="text_29">商品货号：787876756454</span>
+              <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+              <!-- <span class="text_31">￥1800.00</span> -->
+            </div>
+          </div>
+          <div class="section_6 justify-between flex-wrap">
+            <div class="mrg-side-4">
+              <span class="text_36">买家</span
+              ><span class="text_37">￥1000.23</span>
+            </div>
+            <div class="mrg-side-4">
+              <span class="text_36">优惠</span
+              ><span class="text_37">￥1000.23</span>
+            </div>
+            <div class="mrg-side-4">
+              <span class="text_36">商家</span
+              ><span class="text_37">￥1000.23</span>
+            </div>
+          </div>
+          <!-- total -->
+          <!-- 买家实付  优惠   商家收入 -->
+          <!-- <div class="section_6 justify-between flex-wrap">
+          <div class="mrg-side-4">
+            <span class="text_36">买家</span><span class="text_37">￥1000.23</span>
+          </div>
+          <div class="mrg-side-4">
+            <span class="text_36">优惠</span><span class="text_37">￥1000.23</span>
+          </div>
+          <div class="mrg-side-4">
+            <span class="text_36">商家</span><span class="text_37">￥1000.23</span>
+          </div>
+        </div> -->
+          <div class="text-wrapper_11 flex-row">
+            <span class="text_36">总价：</span>
+            <span class="text_37">￥3600.00</span>
+          </div>
+          <div class="section_7 flex-row justify-end">
+            <div class="text-wrapper_12 flex-col">
+              <span class="text_38" onclick="showSendModal()">确认发货</span>
+            </div>
+            <div class="text-wrapper_12 flex-col">
+              <span class="text_38" onclick="showInterceptModal()"
+                >拦截登记</span
+              >
+            </div>
+            <div class="text-wrapper_12 flex-col">
+              <span class="text_38" onclick="showWriteOffModal()"
+                >确认核销</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="list-item">
+          <div class="text-wrapper_5 flex-row justify-between">
+            <span class="text_11">渠道：</span>
+            <span class="text_12">视频号</span>
+            <span class="text_13">待退款确认</span>
+          </div>
+          <div class="text-wrapper_5 flex-row justify-between">
+            <span class="text_11">订单号：</span>
+            <span class="text_12">575679345343466</span>
+            <span
+              class="text_13 countdown"
+              data-deadline="1736998618000"
+            ></span>
+          </div>
+          <div class="text-wrapper_5 flex-row justify-between">
+            <span class="text_11">发货单号：</span>
+            <span class="text_12">O353443654657</span>
+          </div>
+          <div class="text-wrapper_5 flex-row justify-between">
+            <span class="text_11">下单时间：</span>
+            <span class="text_12">2024-12-13&nbsp;14:14:46</span>
+          </div>
+          <div class="text-wrapper_5 flex-row pr">
+            <span class="text_11">收件人：</span>
+            <span
+              class="text_26 sensitive-text flex-shrink-1"
+              data-raw="屏先生（15912343352）"
+              data-masked="屏*（159****3352）"
+              >屏*（159****3352）</span
+            >
+            <span class="text_27 copy-btn" data-copy="15912343352">复制</span>
+            <div class="toggle-visibility label_1">
+              <i class="eye-icon hidden"></i>
+            </div>
+            <!-- <img class="label_1 toggle-visibility" referrerpolicy="no-referrer" src="./icon-eye.png" /> -->
+          </div>
+          <div class="text-wrapper_5 flex-row">
+            <span class="text_11">收货地址：</span>
+            <span
+              class="text_26 sensitive-text flex-shrink-1"
+              data-raw="浙江省杭州市西湖区文三路XXX号"
+              data-masked="****"
+              >****</span
+            >
+            <span
+              class="text_27 copy-btn"
+              data-copy="浙江省杭州市西湖区文三路XXX号"
+              >复制</span
+            >
+            <div class="status-order-box">
+              <span class="status-order">已签收</span>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <!-- goodsInfo -->
+          <div class="section_6 flex-row">
+            <img
+              class="image_2"
+              referrerpolicy="no-referrer"
+              src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794"
+            />
+            <div class="text-group_1 flex-col">
+              <div class="status-info">
+                <span class="text_28 flex-shrink-1"
+                  >MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span
+                >
+                <span class="status-returned">已退货</span>
+              </div>
+              <span class="text_29">商品货号：787876756454</span>
+              <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+              <span class="text_31">￥1800.00</span>
+            </div>
+          </div>
+          <div class="section_6 flex-row">
+            <img
+              class="image_2"
+              referrerpolicy="no-referrer"
+              src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794"
+            />
+            <div class="text-group_1 flex-col">
+              <div class="status-info">
+                <span class="text_28 flex-shrink-1"
+                  >MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span
+                >
+              </div>
+              <span class="text_29">商品货号：787876756454</span>
+              <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+              <span class="text_31">￥1800.00</span>
+            </div>
+          </div>
+          <!-- total -->
+          <div class="text-wrapper_11 flex-row">
+            <span class="text_36">总价：</span>
+            <span class="text_37">￥3600.00</span>
+          </div>
+          <div class="section_7 flex-row justify-end">
+            <div class="text-wrapper_12 flex-col">
+              <span class="text_38">查看物流</span>
+            </div>
+            <div class="text-wrapper_12 flex-col">
+              <span class="text_38" onclick="showTrackingModal()"
+                >补录运单号</span
+              >
+            </div>
+          </div>
+        </div>
+        <!-- 售后申请审核 -->
+        <div class="list-item">
+          <div class="text-wrapper_5 flex-row justify-between">
+            <span class="text_11">渠道：</span>
+            <span class="text_12">视频号</span>
+            <span class="text_13">待退款确认</span>
+          </div>
+          <div class="text-wrapper_5 flex-row justify-between">
+            <span class="text_11">订单号：</span>
+            <span class="text_12">575679345343466</span>
+            <span
+              class="text_13 countdown"
+              data-deadline="1736998618000"
+            ></span>
+          </div>
+          <div class="text-wrapper_5 flex-row justify-between">
+            <span class="text_11">发货单号：</span>
+            <span class="text_12">O353443654657</span>
+          </div>
+          <div class="text-wrapper_5 flex-row justify-between">
+            <span class="text_11">下单时间：</span>
+            <span class="text_12">2024-12-13&nbsp;14:14:46</span>
+          </div>
+          <div class="text-wrapper_5 flex-row pr">
+            <span class="text_11">收件人：</span>
+            <span
+              class="text_26 sensitive-text flex-shrink-1"
+              data-raw="屏先生（15912343352）"
+              data-masked="屏*（159****3352）"
+              >屏*（159****3352）</span
+            >
+            <span class="text_27 copy-btn" data-copy="15912343352">复制</span>
+            <div class="toggle-visibility label_1">
+              <i class="eye-icon hidden"></i>
+            </div>
+            <!-- <img class="label_1 toggle-visibility" referrerpolicy="no-referrer" src="./icon-eye.png" /> -->
+          </div>
+          <div class="text-wrapper_5 flex-row">
+            <span class="text_11">收货地址：</span>
+            <span
+              class="text_26 sensitive-text flex-shrink-1"
+              data-raw="浙江省杭州市西湖区文三路XXX号"
+              data-masked="****"
+              >****</span
+            >
+            <span
+              class="text_27 copy-btn"
+              data-copy="浙江省杭州市西湖区文三路XXX号"
+              >复制</span
+            >
+            <div class="status-order-box">
+              <span class="status-order">已签收</span>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <!-- goodsInfo -->
+          <div class="section_6 flex-row">
+            <img
+              class="image_2"
+              referrerpolicy="no-referrer"
+              src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794"
+            />
+            <div class="text-group_1 flex-col">
+              <div class="status-info">
+                <span class="text_28 flex-shrink-1"
+                  >MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span
+                >
+                <span class="status-returned">已退货</span>
+              </div>
+              <span class="text_29">商品货号：787876756454</span>
+              <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+              <span class="text_31">￥1800.00</span>
+            </div>
+          </div>
+          <div class="return_goods">
+            <div class="text-wrapper_5 flex-row justify-between align-center">
+              <span class="text_32">换货单号：</span>
+              <span class="text_33">886679345343466</span>
+            </div>
+            <div class="text-wrapper_5 flex-row justify-between align-center">
+              <span class="text_32">申请理由：</span>
+              <span class="text_33">尺码不合适</span>
+            </div>
+            <div class="section_6 flex-row">
+              <img
+                class="image_2"
+                referrerpolicy="no-referrer"
+                src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794"
+              />
+              <div class="text-group_1 flex-col">
+                <div class="status-info">
+                  <span class="text_28 flex-shrink-1"
+                    >MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span
+                  >
+                </div>
+                <span class="text_29">商品货号：787876756454</span>
+                <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+                <!-- <span class="text_31">￥1800.00</span> -->
+              </div>
+            </div>
+          </div>
+
+          <!-- total -->
+          <div class="text-wrapper_11 flex-row">
+            <span class="text_36">总价：</span>
+            <span class="text_37">￥3600.00</span>
+          </div>
+          <div class="section_7 flex-row justify-end">
+            <div class="text-wrapper_12 flex-col">
+              <span class="text_38" onclick="showReturnModal()"
+                >售后申请审核</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mask" id="mask"></div>
+    <div class="toast" id="toast"></div>
+    <!-- 弹窗组件 -->
+    <!-- 弹窗组件模板 -->
+    <div class="modal" id="commonModal" style="display: none">
+      <div class="modal-mask"></div>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3 class="modal-title"></h3>
+          <span class="modal-close">×</span>
+        </div>
+        <div class="modal-content">
+          <!-- 动态内容区域 -->
+        </div>
+        <div class="modal-footer justify-between">
+          <button class="modal-btn modal-cancle">取消</button>
+          <button class="modal-btn modal-confirm">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- loading -->
+    <div class="loading-container" style="display: none">
+      <div class="loading-spinner"></div>
+      <span class="loading-text">加载中...</span>
+    </div>
+
+    <!-- 引入共用的js -->
+    <script src="./common.js"></script>
+    <script>
+      // 初始化弹窗实例
+      const modal = new Modal();
+
+      // API 方法封装
+      const api = {
+        getOrders(params) {
+          return request.get('/orders', params);
+        },
+        // 发货
+        search(params) {
+          return request.post('/search', params);
+        },
+      };
+
+      // 通用功能模块
+      const commonFeatures = {
+        // 复制功能
+        initCopyFeature(container = document) {
+          const copyButtons = container.querySelectorAll('.copy-btn');
+          copyButtons.forEach((button) => {
+            button.addEventListener('click', async () => {
+              const textToCopy = button.getAttribute('data-copy');
+              try {
+                await navigator.clipboard.writeText(textToCopy);
+                showToast('复制成功');
+              } catch (err) {
+                this.fallbackCopy(textToCopy);
+              }
+            });
+          });
+        },
+
+        // 降级复制方法
+        fallbackCopy(text) {
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          document.body.appendChild(textarea);
+
+          textarea.select();
+          try {
+            document.execCommand('copy');
+            showToast('复制成功');
+          } catch (err) {
+            console.error('复制失败:', err);
+          }
+          document.body.removeChild(textarea);
+        },
+
+        // 敏感信息切换功能
+        initToggleVisibility(container = document) {
+          const toggleBtns = container.querySelectorAll('.toggle-visibility');
+          toggleBtns.forEach((toggleBtn) => {
+            const listItem = toggleBtn.closest('.list-item');
+            const eyeIcon = toggleBtn.querySelector('.eye-icon');
+            const sensitiveTexts = listItem.querySelectorAll('.sensitive-text');
+            let isVisible = false;
+
+            toggleBtn.addEventListener('click', function () {
+              isVisible = !isVisible;
+              eyeIcon.classList.toggle('hidden');
+              eyeIcon.classList.toggle('visible');
+              sensitiveTexts.forEach((text) => {
+                text.textContent = isVisible
+                  ? text.getAttribute('data-raw')
+                  : text.getAttribute('data-masked');
+
+                // 同时更新复制按钮的data-copy属性
+                const copyBtn = text.nextElementSibling;
+                if (copyBtn && copyBtn.classList.contains('copy-btn')) {
+                  copyBtn.setAttribute(
+                    'data-copy',
+                    isVisible
+                      ? text.getAttribute('data-raw')
+                      : text.getAttribute('data-masked'),
+                  );
+                }
+              });
+            });
+
+            // 添加触摸反馈
+            toggleBtn.addEventListener('touchstart', function () {
+              this.style.opacity = '0.7';
+            });
+
+            toggleBtn.addEventListener('touchend', function () {
+              this.style.opacity = '1';
+            });
+          });
+        },
+
+        // 倒计时功能
+        initCountdown(container = document) {
+          const countdownElements = container.querySelectorAll('.countdown');
+
+          function formatCountdown(milliseconds) {
+            if (milliseconds <= 0) return '已超时';
+
+            const seconds = Math.floor(milliseconds / 1000);
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+
+            return `即将超时${String(h).padStart(2, '0')}:${String(m).padStart(
+              2,
+              '0',
+            )}:${String(s).padStart(2, '0')}`;
+          }
+
+          countdownElements.forEach((element) => {
+            const deadline = parseInt(element.getAttribute('data-deadline'));
+            const timer = setInterval(() => {
+              const now = Date.now();
+              const remaining = deadline - now;
+
+              if (remaining <= 0) {
+                clearInterval(timer);
+                element.textContent = '已超时';
+                return;
+              }
+
+              element.textContent = formatCountdown(remaining);
+            }, 1000);
+          });
+        },
+
+        // 初始化所有功能
+        initAll(container = document) {
+          this.initCopyFeature(container);
+          this.initToggleVisibility(container);
+          this.initCountdown(container);
+        },
+      };
+
+      // 日期选择功能实现, 模拟请求
+      const dateButtons = document.querySelectorAll('.date-select-item');
+
+      dateButtons.forEach((button) => {
+        button.addEventListener('click', async function () {
+          // 移除其他按钮的活跃状态
+          dateButtons.forEach((btn) => btn.classList.remove('active'));
+          // 添加当前按钮的活跃状态
+          this.classList.add('active');
+
+          const dateType = this.getAttribute('data-type');
+          await fetchOrdersByDate(dateType);
+        });
+      });
+
+      // 获取订单数据
+      async function fetchOrdersByDate(dateType) {
+        try {
+          const params = {
+            dateType,
+            // 可以添加其他参数
+            page: 1,
+            pageSize: 10,
+          };
+
+          const data = await api.getOrders(params);
+          // 处理返回的数据，更新页面
+          console.log('订单数据:', data);
+        } catch (error) {
+          console.error('获取订单失败:', error);
+        }
+      }
+
+      // 拉下框实现
+      const selectBox = document.getElementById('customSelect');
+      const options = document.getElementById('selectOptions');
+      const currentType = selectBox.querySelector('.current-type');
+      const searchInput = document.querySelector('.search-input');
+      const mask = document.querySelector('.mask');
+      let isOpen = false;
+
+      function openSelect() {
+        if (!isOpen) {
+          options.style.display = 'block';
+          mask.style.display = 'block';
+          selectBox.classList.add('active');
+          isOpen = true;
+        }
+      }
+
+      function closeSelect() {
+        if (isOpen) {
+          options.style.display = 'none';
+          mask.style.display = 'none';
+          selectBox.classList.remove('active');
+          isOpen = false;
+        }
+      }
+
+      // 点击选择框
+      selectBox.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (!isOpen) {
+          openSelect();
+        } else {
+          closeSelect();
+        }
+      });
+
+      // 点击选项
+      document.querySelectorAll('.option-item').forEach((item) => {
+        item.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const value = this.getAttribute('data-value');
+          const text = this.textContent;
+
+          currentType.textContent = text;
+
+          const placeholders = {
+            order_no: '请输入订单号',
+            order_date: '请选择订单日期',
+            channel: '请选择渠道',
+            buyer_mobile: '请输入买家手机号',
+            receiver_mobile: '请输入收货人手机号',
+            express_no: '请输入快递单号',
+            return_express_no: '请输入退货物流单号',
+          };
+          searchInput.placeholder = placeholders[value] || '请输入搜索内容';
+          searchInput.value = '';
+          if (value === 'channel') {
+            // showChannelModal()
+            showChannelSelect();
+          } else {
+            hideChannelSelect();
+          }
+          closeSelect();
+        });
+      });
+
+      // 点击遮罩层关闭
+      mask.addEventListener('click', closeSelect);
+
+      // 点击页面其他区域关闭
+      document.addEventListener('click', closeSelect);
+
+      // 渠道选择
+      // function showChannelModal() {
+      //   modal.show({
+      //     title: '渠道选择',
+      //     fields: [
+      //       {
+      //         type: 'select',
+      //         name: 'channelType',
+      //         label: '渠道',
+      //         required: true,
+      //         options: [
+      //           { value: '渠道1', label: '渠道1' },
+      //           { value: '渠道2', label: '渠道2' },
+      //           { value: '渠道3', label: '渠道3' }
+      //         ]
+      //       }
+      //     ],
+      //     onConfirm: async (formData) => {
+
+      //       console.log("🚀🚀🚀 ~ onConfirm: ~ formData:", formData)
+
+      //       try {
+      //         if (formData.channelType) {
+      //           const searchInput = document.querySelector('.search-input');
+      //           searchInput.value = formData.channelType
+      //           modal.hide();
+      //           handleSearch(formData.channelType)
+      //         }
+      //       } catch (error) {
+      //         console.error('补录运单号失败:', error);
+      //       }
+      //     }
+      //   });
+      // }
+
+      /* 显示渠道选择 */
+      function showChannelSelect() {
+        const channelSelect = document.querySelector('.custom-channel-select');
+        channelSelect.style.display = 'block';
+        const channelInput = document.querySelector('.search-input');
+        channelInput.style.display = 'none';
+
+        // 初始化自定义渠道选择组件
+        initCustomChannelSelect();
+      }
+
+      /*隐藏渠道选择*/
+      function hideChannelSelect() {
+        const channelSelect = document.querySelector('.custom-channel-select');
+        channelSelect.style.display = 'none';
+        const channelInput = document.querySelector('.search-input');
+        channelInput.style.display = 'block';
+      }
+
+      // 初始化自定义渠道选择组件
+      function initCustomChannelSelect() {
+        const channelSelect = document.querySelector('.custom-channel-select');
+        if (!channelSelect || channelSelect.hasAttribute('data-events-bound')) {
+          return;
+        }
+
+        const trigger = channelSelect.querySelector('.custom-channel-select-trigger');
+        const options = channelSelect.querySelector('.custom-channel-select-options');
+        const valueSpan = channelSelect.querySelector('.custom-channel-select-value');
+        const arrow = channelSelect.querySelector('.custom-channel-select-arrow');
+
+        // 标记为已绑定事件
+        channelSelect.setAttribute('data-events-bound', 'true');
+
+        // 点击触发器切换下拉菜单
+        trigger.addEventListener('click', function(e) {
+          e.stopPropagation();
+          channelSelect.classList.toggle('active');
+        });
+
+        // 点击选项
+        const optionElements = channelSelect.querySelectorAll('.custom-channel-select-option');
+        optionElements.forEach(option => {
+          option.addEventListener('click', function(e) {
+            e.stopPropagation();
+
+            // 移除其他选项的选中状态
+            optionElements.forEach(opt => opt.classList.remove('selected'));
+
+            // 设置当前选项为选中状态
+            option.classList.add('selected');
+
+            // 更新显示值
+            valueSpan.textContent = option.textContent;
+
+            // 关闭下拉菜单
+            channelSelect.classList.remove('active');
+
+            // 处理搜索
+            const value = option.getAttribute('data-value');
+            if (value) {
+              handleSearch(value);
+            }
+          });
+        });
+
+        // 点击页面其他地方关闭下拉菜单
+        document.addEventListener('click', function() {
+          channelSelect.classList.remove('active');
+        });
+      }
+
+      // 分页相关的状态管理
+      const pageState = {
+        page: 1,
+        pageSize: 10,
+        loading: false,
+        hasMore: true,
+        keyword: '',
+        searchType: '',
+      };
+
+      // 页面加载时初始化所有功能
+      commonFeatures.initAll();
+
+      const customSelect = document.getElementById('customSelect');
+      const listContainer = document.querySelector('.section_4');
+
+      // 初始化加载第一页数据，
+      // loadOrders(); // 如果第一页还是用smarty页面数据，这个注释掉
+
+      // 加载订单数据
+      async function loadOrders(isLoadMore = false) {
+        if (pageState.loading || !pageState.hasMore) return;
+
+        try {
+          pageState.loading = true;
+          loading.show(isLoadMore); // 显示 loading
+
+          // 构建请求参数
+          const params = {
+            page: pageState.page,
+            pageSize: pageState.pageSize,
+          };
+
+          if (pageState.keyword) {
+            params.keyword = pageState.keyword;
+            params.searchType = pageState.searchType;
+          }
+
+          // const result = await api.getOrders(params);
+          console.log('请求参数 params', params);
+          // 模拟返回数据
+          const resultData = {
+            data: {
+              hasMore: true,
+              html: `<div class="list-item">
+        <div class="text-wrapper_5 flex-row justify-between">
+          <span class="text_11">渠道：</span>
+          <span class="text_12">视频号</span>
+          <span class="text_13">待退款确认</span>
+        </div>
+        <div class="text-wrapper_5 flex-row justify-between">
+          <span class="text_11">订单号：</span>
+          <span class="text_12">575679345343466</span>
+          <span class="text_13 countdown" data-deadline="1739999618000"></span>
+        </div>
+        <div class="text-wrapper_5 flex-row justify-between">
+          <span class="text_11">发货单号：</span>
+          <span class="text_12">O353443654657</span>
+        </div>
+        <div class="text-wrapper_5 flex-row justify-between">
+          <span class="text_11">下单时间：</span>
+          <span class="text_12">2024-12-13&nbsp;14:14:46</span>
+        </div>
+        <div class="text-wrapper_5 flex-row pr">
+          <span class="text_11">收件人：</span>
+          <span class="text_26 sensitive-text flex-shrink-1" data-raw="屏先生（15912343352）"
+            data-masked="屏*（159****3352）">屏*（159****3352）</span>
+          <span class="text_27 copy-btn" data-copy="15912343352">复制</span>
+          <div class="toggle-visibility label_1">
+            <i class="eye-icon hidden"></i>
+          </div>
+          <!-- <img class="label_1 toggle-visibility" referrerpolicy="no-referrer" src="./icon-eye.png" /> -->
+        </div>
+        <div class="text-wrapper_5 flex-row">
+          <span class="text_11">收货地址：</span>
+          <span class="text_26 sensitive-text flex-shrink-1" data-raw="浙江省杭州市西湖区文三路XXX号" data-masked="****">****</span>
+          <span class="text_27 copy-btn" data-copy="浙江省杭州市西湖区文三路XXX号">复制</span>
+          <div class="status-order-box">
+            <span class="status-order">已签收</span>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <!-- goodsInfo -->
+        <div class="section_6 flex-row">
+          <img class="image_2" referrerpolicy="no-referrer"
+            src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794" />
+          <div class="text-group_1 flex-col">
+            <div class="status-info"> <span class="text_28 flex-shrink-1">MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span>
+              <span class="status-returned">已退货</span>
+            </div>
+            <span class="text_29">商品货号：787876756454</span>
+            <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+            <span class="text_31">￥1800.00</span>
+          </div>
+
+        </div>
+        <div class="section_6 flex-row">
+          <img class="image_2" referrerpolicy="no-referrer"
+            src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794" />
+          <div class="text-group_1 flex-col">
+            <div class="status-info"> <span class="text_28 flex-shrink-1">MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span>
+            </div>
+            <span class="text_29">商品货号：787876756454</span>
+            <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+            <span class="text_31">￥1800.00</span>
+          </div>
+        </div>
+        <div class="text-wrapper_11 flex-row">
+          <span class="text_36">总价：</span>
+          <span class="text_37">￥3600.00</span>
+        </div>
+        <div class="section_7 flex-row justify-end">
+          <div class="text-wrapper_12 flex-col">
+            <span class="text_38" onclick="showSendModal()">确认发货</span>
+          </div>
+          <div class="text-wrapper_12 flex-col">
+            <span class="text_38" onclick="showInterceptModal()">拦截登记</span>
+          </div>
+          <div class="text-wrapper_12 flex-col">
+              <span class="text_38" onclick="showWriteOffModal()"
+                >确认核销</span
+              >
+            </div>
+        </div>
+      </div>`.repeat(10),
+            },
+          };
+          const result = await new Promise((resolve) => {
+            setTimeout(() => {
+              resolve(resultData);
+            }, 1000);
+          });
+          // console.log(123, result.data)
+          if (result && result.data) {
+            if (isLoadMore) {
+              // 追加数据
+              listContainer.insertAdjacentHTML('beforeend', result.data.html);
+            } else {
+              // 替换数据并滚动到顶部
+              listContainer.innerHTML = result.data.html;
+              window.scrollTo({
+                top: 0,
+                // behavior: 'smooth' // 平滑滚动效果
+              });
+            }
+
+            pageState.hasMore = result.data.hasMore;
+            if (pageState.hasMore) {
+              pageState.page++;
+            } else if (isLoadMore) {
+              // 如果是加载更多且没有更多数据，显示提示
+              const noMore = document.createElement('div');
+              noMore.className = 'loading-more';
+              noMore.innerHTML = '没有更多数据了';
+              document.querySelector('.section_4').appendChild(noMore);
+            }
+
+            commonFeatures.initAll(listContainer);
+          }
+        } catch (error) {
+          console.error('加载订单失败:', error);
+          showToast('加载失败，请重试');
+        } finally {
+          pageState.loading = false;
+          loading.hide(); // 隐藏 loading
+        }
+      }
+
+      // 处理搜索
+      async function handleSearch(value) {
+        if (!value.trim()) return;
+
+        try {
+          loading.show(); // 显示 loading
+
+          // 重置分页状态
+          pageState.page = 1;
+          pageState.hasMore = true;
+          pageState.keyword = value;
+          pageState.searchType =
+            customSelect.querySelector('.current-type').textContent;
+
+          await loadOrders();
+        } catch (error) {
+          console.error('搜索失败:', error);
+          showToast('搜索失败，请重试');
+        } finally {
+          loading.hide(); // 隐藏 loading
+        }
+      }
+
+      // 添加滚动监听
+      function initScrollLoad() {
+        let lastScrollTime = 0;
+        const throttleDelay = 50; // 节流延迟时间
+        let scrollTimer = null; // 新增：用于debounce的timer
+
+        window.addEventListener('scroll', () => {
+          const now = Date.now();
+
+          // 如果正在加载或没有更多数据，直接返回
+          if (pageState.loading || !pageState.hasMore) return;
+
+          // 节流控制
+          // if (now - lastScrollTime < throttleDelay) return;
+          // lastScrollTime = now;
+
+          // 清除之前的定时器
+          if (scrollTimer) clearTimeout(scrollTimer);
+
+          // 使用setTimeout进行debounce
+          scrollTimer = setTimeout(() => {
+            const scrollHeight = document.documentElement.scrollHeight;
+            const scrollTop =
+              document.documentElement.scrollTop || document.body.scrollTop;
+            const clientHeight = document.documentElement.clientHeight;
+
+            // 距离底部100px时开始加载
+            if (scrollHeight - scrollTop - clientHeight < 100) {
+              console.log('加载更多');
+              loadOrders(true);
+            }
+          }, 100); // 100ms的防抖延迟
+        });
+      }
+
+      // 初始化滚动加载
+      initScrollLoad();
+
+      // 搜索相关事件监听
+      searchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleSearch(this.value);
+        }
+      });
+
+      searchInput.addEventListener('compositionend', function () {
+        handleSearch(this.value);
+      });
+
+      // 下拉刷新功能
+      let startY = 0;
+      let distance = 0;
+      const threshold = 100; // 下拉阈值
+
+      document.addEventListener('touchstart', (e) => {
+        const scrollTop =
+          document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollTop === 0) {
+          startY = e.touches[0].pageY;
+        }
+      });
+
+      document.addEventListener('touchmove', (e) => {
+        if (startY > 0) {
+          distance = e.touches[0].pageY - startY;
+          if (distance > 0 && distance < threshold) {
+            // 可以添加一些视觉反馈
+          }
+        }
+      });
+
+      document.addEventListener('touchend', () => {
+        if (distance >= threshold) {
+          // 重置分页状态并重新加载
+          pageState.page = 1;
+          pageState.hasMore = true;
+          pageState.keyword = '';
+          loadOrders();
+        }
+        startY = 0;
+        distance = 0;
+      });
+
+      // 添加滚动到激活tab的功能
+      const container = document.querySelector('.tab-scroll-container');
+      const activeTab = document.querySelector('.tab-active');
+
+      if (container && activeTab) {
+        // 获取容器的左边距
+        const containerLeft = container.getBoundingClientRect().left;
+        // 获取激活tab的左边距
+        const activeTabLeft = activeTab.getBoundingClientRect().left;
+        // 计算需要滚动的距离
+        const scrollLeft =
+          activeTabLeft -
+          containerLeft -
+          container.offsetWidth / 2 +
+          activeTab.offsetWidth / 2;
+
+        // 使用平滑滚动效果
+        container.scrollTo({
+          left: scrollLeft,
+          // behavior: 'smooth'
+        });
+      }
+
+      // 日期选择
+      function showTimeModal() {
+        modal.show({
+          title: '选择日期',
+          fields: [
+            {
+              type: 'date',
+              label: '开始日期',
+              name: 'beginDate',
+              required: true,
+              placeholder: '请选择开始日期',
+            },
+            {
+              type: 'date',
+              label: '结束日期',
+              name: 'endDate',
+              required: true,
+              placeholder: '请选择结束日期',
+            },
+          ],
+          onConfirm: async (formData) => {
+            console.log(
+              '🚀🚀🚀 ~ file: new_order.html:904 ~ onConfirm: ~ formData:',
+              formData,
+            );
+
+            try {
+              // 发请求
+              // await api.***({
+              //   ...formData
+              // });
+              modal.hide();
+            } catch (error) {
+              console.error('日期选择失败:', error);
+            }
+          },
+        });
+        // diyDatePicker.init('#datePicker');
+      }
+
+      // 补录运单号
+      function showTrackingModal(orderId) {
+        modal.show({
+          title: '补录运单号',
+          fields: [
+            {
+              type: 'select',
+              name: 'expressCompany',
+              label: '物流公司',
+              required: true,
+              options: [
+                { value: 'sf', label: '顺丰' },
+                { value: 'yd', label: '韵达' },
+                { value: 'zt', label: '中通' },
+              ],
+            },
+            {
+              type: 'input',
+              name: 'trackingNo',
+              label: '快递单号',
+              placeholder: '请输入快递单号',
+              required: true,
+            },
+            // {
+            //   type: 'input',
+            //   name: 'remark',
+            //   label: '备注',
+            //   placeholder: '请输入备注信息'
+            // }
+          ],
+          onConfirm: async (formData) => {
+            try {
+              // 发请求
+              // await api.***({
+              //   orderId,
+              //   ...formData
+              // });
+              if (formData.trackingNo === '1') {
+                // 刷新订单列表
+                showToast('快递单号输入错误，请重新输入');
+              } else {
+                showToast('补录运单号成功');
+                modal.hide();
+              }
+            } catch (error) {
+              console.error('补录运单号失败:', error);
+            }
+          },
+        });
+      }
+      // 使用示例2：
+      function showInterceptModal1(orderId) {
+        modal.show({
+          title: '拦截登记',
+          fields: [
+            {
+              type: 'select',
+              name: 'interceptReason',
+              label: '拦截原因',
+              required: true,
+              options: [
+                { value: '1', label: '客户要求' },
+                { value: '2', label: '地址错误' },
+                { value: '3', label: '其他原因' },
+              ],
+            },
+            {
+              type: 'input',
+              name: 'contactPerson',
+              label: '联系人',
+              required: true,
+              placeholder: '请输入联系人姓名',
+            },
+            {
+              type: 'input',
+              name: 'contactPhone',
+              label: '联系电话',
+              required: true,
+              placeholder: '请输入联系电话',
+            },
+            {
+              type: 'input',
+              name: 'remark',
+              label: '备注说明',
+              placeholder: '请输入备注说明',
+            },
+          ],
+          onConfirm: async (formData) => {
+            console.log(formData);
+            try {
+              // await api.createIntercept({
+              //   orderId,
+              //   ...formData
+              // });
+              showToast('拦截登记成功');
+              modal.hide();
+            } catch (error) {
+              console.error('拦截登记失败:', error);
+            }
+          },
+        });
+      }
+
+      // 拦截登记
+      function showInterceptModal() {
+        const goodsHtml = `
+    <div class="intercept-goods-item">
+      <div class="section_6 flex-row">
+          <img class="image_2" referrerpolicy="no-referrer"
+            src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794" />
+          <div class="text-group_1 flex-col">
+            <span class="text_28">MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span>
+            <span class="text_29">商品货号：787876756454</span>
+            <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+          </div>
+        </div>
+    </div>
+  `;
+
+        modal.show({
+          title: '发起拦截',
+          fields: [
+            {
+              type: 'html',
+              html: `
+      <div class="intercept-modal-content">
+        ${goodsHtml}
+      </div>
+    `,
+            },
+          ],
+          onConfirm: async (formData) => {
+            try {
+              // 这里添加拦截登记的API调用
+              // await api.createIntercept(formData);
+              showToast('拦截登记成功');
+              modal.hide();
+            } catch (error) {
+              console.error('拦截登记失败:', error);
+            }
+          },
+        });
+      }
+
+      //确认核销
+
+      function showWriteOffModal() {
+        const goodsHtml = `
+    <div class="intercept-goods-item flex-col verify-box">
+ <div class="list-item verify-info">
+        <div class="text-wrapper_5 flex-row justify-between">
+          <span class="text_11">订单号：</span>
+          <span class="text_12">6942287127788887</span>
+        </div>
+         <div class="text-wrapper_5 flex-row justify-between">
+          <span class="text_11">门店：</span>
+          <span class="text_12">上海DESCEMTE</span>
+        </div>
+         <div class="text-wrapper_5 flex-row justify-between">
+          <span class="text_11">渠道：</span>
+          <span class="text_12">抖音</span>
+        </div>
+         <div class="text-wrapper_5 flex-row justify-between">
+          <span class="text_11">发票单号：</span>
+          <span class="text_12">2542287127788887</span>
+        </div>
+         <div class="text-wrapper_5 flex-row justify-between">
+          <span class="text_11">下单时间：</span>
+          <span class="text_12">2025-05-07 18:22:22</span>
+        </div>
+      </div>
+      <div class="verify-good-box">
+         <div class="section_6 flex-row verify-good">
+          <img class="image_2" referrerpolicy="no-referrer"
+            src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794" />
+          <div class="text-group_1 flex-col">
+            <span class="text_28">MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span>
+            <span class="text_29">商户货号：787876756454</span>
+            <span class="text_29">子订单号：69422787876756454</span>
+            <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+          </div>
+        </div>
+      </div>
+
+        <div class="section_6 flex-wrap verify-price">
+            <div class="mrg-side-4">
+              <span class="text_36">买家</span
+              ><span class="text_37">￥790.23</span>
+            </div>
+            <div class="mrg-side-4">
+              <span class="text_36">优惠</span
+              ><span class="text_37">￥0.00</span>
+            </div>
+            <div class="mrg-side-4">
+              <span class="text_36">商家</span
+              ><span class="text_37">￥1000.23</span>
+            </div>
+          </div>
+
+
+    </div>
+  `;
+
+        modal.show({
+          title: '订单核销',
+          confirmText: '确认核销',
+          cancelText: '返回',
+          isShowCancleBtn: true,
+          fields: [
+            {
+              type: 'html',
+              html: `
+      <div class="intercept-modal-content">
+        ${goodsHtml}
+      </div>
+    `,
+            },
+            {
+              type: 'input',
+              name: 'code',
+              label: '',
+              placeholder: '请输入核销码',
+              className: 'verify-input',
+              required: false,
+            },
+          ],
+          onConfirm: async (formData) => {
+            const { code } = formData;
+            if (!code) {
+              showToast('请填写核销码');
+              return
+            }
+            try {
+              // 这里添加拦截登记的API调用
+              // await api.createIntercept(formData);
+              showToast('核销成功');
+              modal.hide();
+            } catch (error) {
+              console.error('核销失败:', error);
+            }
+          },
+          onCancel: async (formData) => {
+            modal.hide();
+          },
+        });
+      }
+
+      // 确认发货
+      function showSendModal() {
+        const goodsHtml = `
+    <div class="intercept-goods-item">
+      <div class="section_6 flex-row">
+          <img class="image_2" referrerpolicy="no-referrer"
+            src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794" />
+          <div class="text-group_1 flex-col">
+            <span class="text_28">MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span>
+            <span class="text_29">商品货号：787876756454</span>
+            <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+          </div>
+        </div>
+    </div>
+    <div class="intercept-goods-item">
+      <div class="section_6 flex-row">
+          <img class="image_2" referrerpolicy="no-referrer"
+            src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794" />
+          <div class="text-group_1 flex-col">
+            <span class="text_28">MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span>
+            <span class="text_29">商品货号：787876756454</span>
+            <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+          </div>
+        </div>
+    </div>
+  `;
+        modal.show({
+          title: '确认发货',
+          fields: [
+            {
+              type: 'html',
+              html: `
+      <div class="intercept-modal-content">
+        ${goodsHtml}
+      </div>
+    `,
+            },
+          ],
+          onConfirm: async (formData) => {
+            try {
+              // 这里添加拦截登记的API调用
+              // await api.createIntercept(formData);
+              showToast('确认发货成功');
+              modal.hide();
+            } catch (error) {
+              console.error('确认发货失败:', error);
+            }
+          },
+        });
+      }
+
+      // 售后申请 拒绝弹窗
+      function showAfterSaleModal() {
+        modal.show({
+          title: '售后申请',
+          confirmText: '拒绝',
+          fields: [
+            {
+              type: 'html',
+              html: `
+              <div class="intercept-modal-content">
+                <div class="intercept-modal-content__html">用户退款理由：尺码不合适。</div>
+              </div>
+            `,
+            },
+            {
+              type: 'textarea',
+              name: 'refuseResult',
+              label: '拒绝理由',
+              placeholder: '请填写拒绝原因',
+              required: true,
+            },
+            {
+              type: 'image',
+              name: 'refuseImage',
+              label: '拒绝理由图片',
+              required: true,
+            },
+          ],
+
+          onConfirm: async (formData) => {
+            console.log('🚀🚀🚀 ~ onConfirm: ~ formData:', formData);
+            // 创建FormData对象
+            const formDataObj = new FormData();
+
+            // 添加拒绝理由
+            formDataObj.append('refuseResult', formData.refuseResult);
+
+            // 添加图片数据
+            formData.refuseImage.forEach((base64, index) => {
+              // 将base64转换为blob
+              const byteString = atob(base64.split(',')[1]);
+              const mimeString = base64
+                .split(',')[0]
+                .split(':')[1]
+                .split(';')[0];
+              const ab = new ArrayBuffer(byteString.length);
+              const ia = new Uint8Array(ab);
+              for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+              }
+              const blob = new Blob([ab], { type: mimeString });
+
+              // 验证Blob是否有效
+              if (blob.size === 0) {
+                console.error('Blob无效，无法创建URL');
+                return; // 如果Blob无效，终止当前循环
+              }
+
+              // 创建Object URL并验证
+              const objectUrl = URL.createObjectURL(blob);
+              const img = new Image();
+              img.onload = () => {
+                console.log(`Blob验证成功: ${objectUrl}`);
+                // 在页面中显示图像
+                URL.revokeObjectURL(objectUrl); // 释放URL对象
+              };
+              img.onerror = () => {
+                console.error('Blob验证失败，无法加载图像');
+              };
+              img.src = objectUrl; // 尝试加载Blob
+
+              // 添加到FormData
+              formDataObj.append(`refuseImage[${index}]`, blob);
+            });
+
+            // 替换原formData
+            formData = formDataObj;
+            // console.log("🚀🚀🚀 ~ onConfirm: ~ formData2:", formData)
+
+            request({
+              url: '/', // 提交售后申请审核api
+              method: 'post',
+              data: formData,
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            });
+            // 拒绝
+            showToast('售后申请拒绝成功');
+            modal.hide();
+          },
+        });
+      }
+
+      // 售后申请
+      function showReturnModal() {
+        const goodsHtml = `
+    <div class="intercept-goods-item">
+      <div class="section_6 flex-row">
+          <img class="image_2" referrerpolicy="no-referrer"
+            src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794" />
+          <div class="text-group_1 flex-col">
+            <span class="text_28">MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span>
+            <span class="text_29">商品货号：787876756454</span>
+            <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+          </div>
+        </div>
+    </div>
+    <div class="intercept-goods-item">
+      <div class="section_6 flex-row">
+          <img class="image_2" referrerpolicy="no-referrer"
+            src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794" />
+          <div class="text-group_1 flex-col">
+            <span class="text_28">MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span>
+            <span class="text_29">商品货号：787876756454</span>
+            <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+          </div>
+        </div>
+    </div>
+  `;
+        modal.show({
+          title: '售后申请2',
+          confirmText: '同意换货',
+          cancelText: '拒绝换货',
+          isShowCancleBtn: true,
+          fields: [
+            {
+              type: 'html',
+              html: `
+      <div class="intercept-modal-content">
+        ${goodsHtml}
+      </div>
+    `,
+            },
+          ],
+          onConfirm: async (formData) => {
+            try {
+              // 这里添加拦截登记的API调用
+              // await api.createIntercept(formData);
+              showToast('同意换货成功');
+              modal.hide();
+            } catch (error) {
+              console.error('确认发货失败:', error);
+            }
+          },
+          onCancel: (formData) => {
+            modal.hide();
+            // 拒绝
+            showAfterSaleModal();
+          },
+        });
+      }
+
+      // 添加 loading 控制函数
+      const loading = {
+        show(isBottom = false) {
+          if (isBottom) {
+            // 如果是底部加载更多，显示在列表底部
+            const loadingMore = document.createElement('div');
+            loadingMore.className = 'loading-more';
+            loadingMore.innerHTML = '加载中...';
+            document.querySelector('.section_4').appendChild(loadingMore);
+          } else {
+            // 居中显示的 loading
+            document.querySelector('.loading-container').style.display = 'flex';
+          }
+        },
+        hide() {
+          document.querySelector('.loading-container').style.display = 'none';
+          const loadingMore = document.querySelector('.loading-more');
+          if (loadingMore) {
+            loadingMore.remove();
+          }
+        },
+      };
+    </script>
+  </body>
+</html>

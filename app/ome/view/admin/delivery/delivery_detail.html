@@ -1,0 +1,430 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../app/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<{if $write != '1' || $write_memo!='1'}><form name="form1" id="deliveryForm" method="POST" action="index.php?app=ome&ctl=admin_receipts_print&act=doDetail"><{/if}>
+<div class="tableform">
+<style>
+.logi-no-input{width:150px;height:20px;}
+</style>
+<h4><{if $dly.is_encrypt}><a class="delivery-sensitive-btn data-hide" href="javascript:void(0);"></a><{/if}>发货单信息:</h4>
+<input type="hidden" name="status" value="<{$status}>" />
+<input type="hidden" name="delivery_id" value="<{$dly.delivery_id}>" />
+<div class="division">
+<table border="0" cellspacing="0" cellpadding="0" id="deliveryinfo">
+    <tr>
+        <th>发货单号：</th>
+        <td ><{$dly.delivery_bn}></td>
+        <th>订单号：</th>
+        <td ><{foreach from=$order_bn item=item}><{$item}><br><{/foreach}></td>
+        <th >配送方式：</th>
+        <td ><{$dly.delivery}></td>
+        <th ><{if $dly.is_encrypt && $dly.shop_type == 'pinduoduo'}><a data-type = 'uname' class="delivery-sensitive-btn-detail data-hide" style="background-size: 13px 10px;" href="javascript:void(0);"></a><{/if}>会员：</th>
+        <td ><span sensitive-field="uname"><{$dly.member_name|ciphertext:'delivery','uname',$dly.shop_type}></span></td>
+    </tr>
+    <tr>
+        <th ><{if $dly.is_encrypt && $dly.shop_type == 'pinduoduo'}><a data-type = 'uname' class="delivery-sensitive-btn-detail data-hide" style="background-size: 13px 10px;" href="javascript:void(0);"></a><{/if}>收货人：</th>
+        <td ><span sensitive-field="ship_name"><{$dly.consignee.name|ciphertext:'delivery','ship_name',$dly.shop_type}></span></td>
+        <th ><{if $dly.is_encrypt && $dly.shop_type == 'pinduoduo'}><a data-type = 'tel' class="delivery-sensitive-btn-detail data-hide" style="background-size: 13px 10px;" href="javascript:void(0);"></a><{/if}>电话：</th>
+        <td ><span sensitive-field="ship_tel"><{$dly.consignee.telephone|ciphertext:'delivery','ship_tel',$dly.shop_type}></span></td>
+        <th ><{if $dly.is_encrypt && $dly.shop_type == 'pinduoduo'}><a data-type = 'mobile' class="delivery-sensitive-btn-detail data-hide" style="background-size: 13px 10px;" href="javascript:void(0);"></a><{/if}>手机：</th>
+        <td ><span sensitive-field="ship_mobile"><{$dly.consignee.mobile|ciphertext:'delivery','ship_mobile',$dly.shop_type}></span></td>
+        <th>Email：</th>
+        <td><{$dly.consignee.email}></td>
+    </tr>
+    <tr>
+        <th >邮编：</th>
+        <td ><{$dly.consignee.zip}></td>
+        <th >物流公司：</th>
+        <td ><{if $write != '1'}><{input type="select" name="dly[logi_id]" rows=$dly_corp valueColumn="corp_id" labelColumn="name" value=$dly.logi_id}><{else}><input type="hidden" name="dly[logi_id]" value="<{$dly.logi_id}>"><{$dly.logi_name}><{/if}></td>
+        <th >物流费用：</th>
+        <td ><{$dly.delivery_cost_actual|cur}></td>
+        <th >预计物流费用：</th>
+        <td ><{$dly.delivery_cost_expect|cur}></td>
+    </tr>
+    <tr>
+        <th >重量：</th>
+        <td >
+
+            <{if $dly.status=='succ'}>
+            <{input type="text" name="weight" value=$dly.weight vtype="number"}><{else}>
+            <{$dly.weight}>
+            <{/if}>
+        </td>
+        <th >商品重量:</th>
+        <td ><{$dly.net_weight}></td>
+        <th >生成时间：</th>
+        <td ><{$dly.create_time}></td>
+        <th >物流运单号：</th>
+        <td ><{if $write != '1'}><input type="text" name="dly[logi_no]" size="10"  value="<{$dly.logi_no}>" class="logi-no-input" /><{else}><{$dly.logi_no}><{/if}></td>
+        
+    </tr>
+    <tr>
+        <th >订单支付方式：</th>
+        <td ><b><font color="orange"><{if $dly.is_cod=='true'}>货到付款<{else}>款到发货<{/if}></font></b></td>
+        <th >发货区域：</th>
+        <td ><{$dly.consignee.area|region}></td>
+        <th >配送地址：&nbsp;</th>
+        <td ><span sensitive-field="ship_addr"><{$dly.consignee.addr|ciphertext:'delivery','ship_addr',$dly.shop_type}></span></td>
+        <th >第三方单号：&nbsp;</th>
+        <td ><{$dly.original_delivery_bn}></td>
+    </tr>
+    <tr>
+        <th>发票抬头：</th>
+        <td ><{$tax_titles}></td>
+        <th>订单附言：</th>
+        <th colspan="5">
+         <{$dly.memo}>
+        </th>
+    </tr>
+</table>
+</div>
+
+
+<div class="tableform">
+    <table width="100%" cellspacing="0" cellpadding="0" border="0" class="finderInform">
+        <tbody>
+            <tr>
+                <th><strong>补发原因：</strong></th>
+                <{if $bufa_reason}>
+                <td>
+                    <{foreach from=$bufa_reason item=items}>
+                    <div id="memo_show">
+                        <b><{$items}></b>
+                    </div>
+                    <{/foreach}>
+                </td>
+                <{/if}>
+            </tr>
+            <tr><th><strong>会员备注：</strong></th>
+                 
+                     <{if $custom_mark}>
+                          <{foreach from=$custom_mark key=key item=v}>
+                          <td>
+                           <{foreach from=$v item=items}>
+                               <div id="memo_show">
+                                     <b><{$items.op_content|escape:"HTML"}></b> <{$key}>&nbsp;<{$items.op_time}> by <{$items.op_name}>
+                               </div>
+                          <{/foreach}>
+                          </td>
+                          <{/foreach}>
+                     <{/if}>
+                
+           </tr>
+           
+           <tr>
+                <th><strong>订单备注：</strong></th>
+                   
+                      <{if $mark_text}>
+                      
+                       <{foreach from=$mark_text key=key item=val}>
+                       <td>
+                           <{foreach from=$val item=items}>
+                               <div id="memo_show">
+                                    <b><{$items.op_content|escape:"HTML"}></b> <{$key}> &nbsp;<{$items.op_time}> by <{$items.op_name}>
+                              </div>
+                          <{/foreach}>
+                          </td>
+                           <{/foreach}>
+                     <{/if}>
+                 
+          </tr>
+          <tr>
+                <th><strong>同步失败原因：</strong></th>
+                   
+                    <td><{$dly.sync_msg}></td>
+                 
+          </tr>
+           <{if $dly.signimage_attachment_url}>
+           <tr>
+            <th>签收照片</th>
+
+            <td>
+ <{input type="image_magnifier" name="material_image" target_type="delivery" target_id="{$dly.delivery_id}" display_width="150" display_height="150" magnifier="true" border_style="2px dashed #ddd" border_radius="4px" cursor_style="pointer" readonly="true" max_images=3}>
+               </td>
+                 
+          </tr>
+          <{/if}>
+        </tbody>
+    </table>
+</div>
+
+<{if $packageList}>
+    <div class="division">
+    <h4>发货包裹明细<{if $dly.status=='succ' || $dly.status=='return_back'}>(<a href="index.php?app=console&ctl=admin_delivery&act=selectPackageStatus&p[0]=<{$dly.delivery_id}>" target="_blank">查询包裹发货状态</a>)<{/if}>:</h4>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="gridlist">
+        <thead>
+          <tr>
+              <th><{t}>京东订单号<{/t}></th>
+              <th><{t}>状态<{/t}></th>
+              <th><{t}>基础物料编码<{/t}></th>
+              <th><{t}>WMS物料编码<{/t}></th>
+              <th><{t}>发货数量<{/t}></th>
+              <th><{t}>物流编码<{/t}></th>
+              <th><{t}>物流单号<{/t}></th>
+              <th><{t}>发货时间<{/t}></th>
+              <th><{t}>配送方式<{/t}></th>
+              <th><{t}>配送费用<{/t}></th>
+              <th><{t}>配送状态<{/t}></th>
+              <th><{t}>是否WMS赠品<{/t}></th>
+          </tr>
+        </thead>
+        <{foreach from=$packageList item=itemVal}>
+        <tr>
+            <td><{$itemVal.package_bn}></td>
+            <td><{$itemVal.status}></td>
+            <td><{$itemVal.bn}></td>
+            <td><{$itemVal.outer_sku}></td>
+            <td><{$itemVal.number}></td>
+            <td><{$itemVal.logi_bn}></td>
+            <td><{$itemVal.logi_no}></td>
+            <td><{if $itemVal.delivery_time}><{$itemVal.delivery_time|date:"Y-m-d H:i:s"}><{else}><{$itemVal.create_time|date:"Y-m-d H:i:s"}><{/if}></td>
+            <td><{$dly.shipping_type_name}></td>
+            <td><{$dly.delivery_cost_actual}></td>
+            <td><{$itemVal.ship_status_name}></td>
+            <td><{if $itemVal.is_wms_gift == 'true'}><span style="color:red;">是</span><{else}>否<{/if}></td>
+        </tr>
+        <{/foreach}>
+    </table>
+        <{if $isRepairDelivery}>
+        <div style="text-align:center; height:40px; line-height:40px;">
+            <{button label="强制修复发货单" type="button" id="btn_repair"}> <{help}>删除京东云交易已经取消成功(状态：cancel)的商品，并且把是京东云交易已发货的商品(状态：delivery)完成发货；订单上未发货的商品可以继续审核生成发货单。<{/help}>
+        </div>
+        <{/if}>
+    </div>
+<{/if}>
+
+<h4>操作日志:</h4>
+<div class="division">
+<table border="0" cellspacing="0" class="gridlist" cellpadding="0">
+    <thead>
+    <tr>
+        <th >操作时间</th>
+        <th >操作员</th>
+        <th >操作类型</th>
+        <th >操作内容</th>
+    </tr>
+    </thead>
+    <tbody>
+    <{foreach from=$log item=item}>
+    <tr>
+        <td ><{$item.operate_time}></td>
+        <td ><{$item.op_name}></td>
+        <td ><{$item.operation}></td>
+        <td ><{$item.memo}></td>
+        </tr>
+    <{/foreach}>
+    </tbody>
+</table>
+</div>
+
+<{foreach from=$orderLogs item=item key=key}>
+<h4>订单 <span class="red"><{$key}></span> 操作记录</h4>
+<div class="division">
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+        <thead>
+        <tr>
+            <th>操作时间</th>
+            <th>操作人</th>
+            <th>行为</th>
+            <th>操作内容</th>
+        </tr>
+        </thead>
+        <tbody>
+        <{foreach from=$item item=log}>
+        <tr>
+            <td><{$log.operate_time}></td>
+            <td><{$log.op_name}></td>
+            <td><{$log.operation}></td>
+            <td><{$log.memo}></td>
+        </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+</div>
+<{/foreach}>
+
+<br /><{if $write_memo != '1'}>
+<h4>备注:</h4>
+<div class="division">
+    <textarea name="dly[memo]" rows="6" cols="60"><{$dly.memo}></textarea>
+    <input type="hidden" name="dly[delivery_id]" value="<{$dly.delivery_id}>" />
+    <input type="hidden" name="ctl" value="<{$url}>" />
+    <input type="hidden" name="dly_count" value="<{$dly_count}>" />
+</div>
+
+</div>
+<div style="text-align:center;"><{button type="submit" label="提交" }><{/if}></div>
+<{if $write != '1' || $write_memo!='1'}></form><{/if}>
+
+<script type="text/javascript">
+// 敏感数据处理
+if ($defined($E('.delivery-sensitive-btn')))
+  $E('.delivery-sensitive-btn').addEvent('click',function(e){
+        Ex_Loader('security',function(){new Security({url:'index.php?app=console&ctl=admin_delivery&act=showSensitiveData&p[0]=<{$dly.delivery_id}>',clickElement:$(e.target)}).desHtml($('deliveryinfo')); });
+  });
+
+//敏感数据处理 拼多多
+if ($defined($E('.delivery-sensitive-btn-detail')))
+  $ES('.delivery-sensitive-btn-detail').addEvent('click',function(e){
+      var type = this.get('data-type');
+      Ex_Loader('security',function(){
+          new Security({url:'index.php?app=console&ctl=admin_delivery&act=showSensitiveData&p[0]=<{$dly.delivery_id}>&p[1]='+type,clickElement:$(e.target)}).desHtml($('deliveryinfo'));
+      });
+  });
+
+$('btn_repair').addEvent('click',function(e){
+    if (!confirm('确定把京东云交易：cancel状态的商品删除掉，并且把delivery状态的商品完成发货么？')){
+        return false;
+    }
+    
+    $('deliveryForm').action = 'index.php?app=console&ctl=admin_delivery&act=repairDelivery';
+$('deliveryForm').fireEvent('submit', e);
+});
+
+// ===== WAP风格图片预览：showimgFromData / showimg =====
+function notifyError(message) {
+  try {
+    if (window.MessageBox && typeof MessageBox.error === 'function') {
+      MessageBox.error(message);
+      return;
+    }
+  } catch (e) {}
+  alert(message);
+}
+
+function showimgFromData(element) {
+  var imgUrls = element && element.getAttribute ? element.getAttribute('data-images') : null;
+  showimg(imgUrls);
+}
+
+function showimg(imgUrls) {
+  var imageUrls = [];
+  try {
+    if (Array.isArray(imgUrls)) {
+      imageUrls = imgUrls;
+    } else if (typeof imgUrls === 'string') {
+      var decodedString = imgUrls
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&');
+      imageUrls = JSON.parse(decodedString);
+    } else if (imgUrls) {
+      imageUrls = [imgUrls];
+    }
+  } catch (e) {
+    console && console.error && console.error('解析图片URL失败:', e, imgUrls);
+    notifyError('图片数据格式错误');
+    return;
+  }
+
+  if (!Array.isArray(imageUrls)) imageUrls = [imageUrls];
+  imageUrls = imageUrls.filter(function(url){ return url && String(url).trim() !== ''; });
+  if (imageUrls.length === 0) {
+    notifyError('暂无签收照片');
+    return;
+  }
+
+  var currentIndex = 0;
+  var totalImages = imageUrls.length;
+
+  var imageModalHtml = ''+
+    '<div class="modal" id="imagePreviewModal" style="display: block; position: fixed; inset: 0; z-index: 100000;">' +
+    '  <div class="modal-mask" style="position: absolute; inset: 0; background: rgba(0,0,0,0.6);"></div>' +
+    '  <div class="modal-container" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 90vw; max-height: 80vh; width: auto; height: auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 12px 48px rgba(0,0,0,0.3);">' +
+    '    <div class="modal-header" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid #eee; background: #f8f9fa;">' +
+    '      <h3 class="modal-title" style="margin: 0; font-size: 16px; font-weight: 600;">查看签收照片 ('+(currentIndex+1)+'/'+totalImages+')</h3>' +
+    '      <span class="modal-close" onclick="closeImagePreview()" style="cursor: pointer; font-size: 20px; line-height: 1; padding: 2px 6px;">×</span>' +
+    '    </div>' +
+    '    <div class="modal-content" style="text-align: center; padding: 12px; position: relative;">' +
+    '      <div class="image-loading" style="display: flex; align-items: center; justify-content: center; height: 200px;">' +
+    '        <span style="color: #666;">加载中...</span>' +
+    '      </div>' +
+    '      <img src="'+imageUrls[currentIndex]+'" alt="签收照片" style="max-width: 100%; max-height: 60vh; object-fit: contain; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: none;" ' +
+    '           onload="this.style.display=\'block\'; this.previousElementSibling.style.display=\'none\';" ' +
+    '           onerror="this.style.display=\'none\'; this.previousElementSibling.innerHTML=\'<span style=\\\'color: #dc3545;\\\'>图片加载失败</span>\'; this.previousElementSibling.style.display=\'flex\';">' +
+    (totalImages > 1 ? (
+      '      <div class="image-navigation" style="position: absolute; top: 50%; transform: translateY(-50%); width: 100%; display: flex; justify-content: space-between; padding: 0 12px; pointer-events: none;">' +
+      '        <button class="nav-btn prev-btn" onclick="changeImage(-1)" style="background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; pointer-events: auto; '+(currentIndex===0?'opacity: 0.3;':'')+'">' +
+      '          <span style="font-size: 18px;">‹</span>' +
+      '        </button>' +
+      '        <button class="nav-btn next-btn" onclick="changeImage(1)" style="background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; pointer-events: auto; '+(currentIndex===totalImages-1?'opacity: 0.3;':'')+'">' +
+      '          <span style="font-size: 18px;">›</span>' +
+      '        </button>' +
+      '      </div>' +
+      '      <div class="image-indicators" style="display: flex; justify-content: center; margin-top: 10px; gap: 6px;">' +
+      imageUrls.map(function(_, index){ return '        <div class="indicator '+(index===currentIndex?'active':'')+'" onclick="goToImage('+index+')" style="width: 8px; height: 8px; border-radius: 50%; background: '+(index===currentIndex?'#000':'#ccc')+'; cursor: pointer;"></div>'; }).join('') +
+      '      </div>'
+    ) : '') +
+    '    </div>' +
+    '    <div class="modal-footer" style="padding: 10px 14px; border-top: 1px solid #eee; text-align: right; background: #f8f9fa;">' +
+    '      <button class="modal-btn modal-confirm" onclick="closeImagePreview()" style="padding: 6px 12px; background: #2d8cf0; color: #fff; border: none; border-radius: 4px; cursor: pointer;">关闭</button>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+
+  document.body.insertAdjacentHTML('beforeend', imageModalHtml);
+  window.currentImageUrls = imageUrls;
+  window.currentImageIndex = currentIndex;
+
+  var modal = document.getElementById('imagePreviewModal');
+  var mask = modal.querySelector('.modal-mask');
+  mask.addEventListener('click', closeImagePreview);
+
+  var handleEscKey = function(e){ if (e.key === 'Escape') { closeImagePreview(); document.removeEventListener('keydown', handleEscKey); } };
+  document.addEventListener('keydown', handleEscKey);
+
+  var handleArrowKeys = function(e){ if (e.key === 'ArrowLeft') { changeImage(-1); } else if (e.key === 'ArrowRight') { changeImage(1); } };
+  document.addEventListener('keydown', handleArrowKeys);
+}
+
+function changeImage(direction) {
+  if (!window.currentImageUrls || window.currentImageUrls.length <= 1) return;
+  var newIndex = window.currentImageIndex + direction;
+  if (newIndex >= 0 && newIndex < window.currentImageUrls.length) {
+    goToImage(newIndex);
+  }
+}
+
+function goToImage(index) {
+  if (!window.currentImageUrls || index < 0 || index >= window.currentImageUrls.length) return;
+  window.currentImageIndex = index;
+  var img = document.querySelector('#imagePreviewModal img');
+  var loading = document.querySelector('#imagePreviewModal .image-loading');
+  var title = document.querySelector('#imagePreviewModal .modal-title');
+  var indicators = document.querySelectorAll('#imagePreviewModal .indicator');
+  var prevBtn = document.querySelector('#imagePreviewModal .prev-btn');
+  var nextBtn = document.querySelector('#imagePreviewModal .next-btn');
+  if (img) {
+    img.style.display = 'none';
+    loading.style.display = 'flex';
+    loading.innerHTML = '<span style="color: #666;">加载中...</span>';
+    img.src = window.currentImageUrls[index];
+    title.textContent = '查看签收照片 ('+(index+1)+'/'+window.currentImageUrls.length+')';
+    for (var i=0;i<indicators.length;i++) {
+      var active = (i === index);
+      indicators[i].classList.toggle('active', active);
+      indicators[i].style.background = active ? '#000' : '#ccc';
+    }
+    if (prevBtn) prevBtn.style.opacity = index === 0 ? '0.3' : '1';
+    if (nextBtn) nextBtn.style.opacity = index === window.currentImageUrls.length - 1 ? '0.3' : '1';
+  }
+}
+
+function closeImagePreview() {
+  var modal = document.getElementById('imagePreviewModal');
+  if (modal) {
+    window.currentImageUrls = null;
+    window.currentImageIndex = null;
+    if (modal.parentNode) modal.parentNode.removeChild(modal);
+  }
+}
+// ===== /WAP风格图片预览 =====
+</script>

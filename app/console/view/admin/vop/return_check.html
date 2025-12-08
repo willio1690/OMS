@@ -1,0 +1,146 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=console&ctl=admin_vopreturn&act=doCheck" id="frm">
+            <h5>基本信息</h5>
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th>退供单号：</th>
+                        <td>
+                            <{$data.return_sn}>
+                            <{input type="hidden" name="id" value=$data.id}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>仓库</th>
+                       
+                        <td>
+                            <select name="branch_id">
+                                <option value=''>请选择</option>
+                                <{foreach from=$branchs item=branch}>
+                               <option value="<{$branch.branch_id}>"><{$branch.name}></option>
+                               <{/foreach}>
+                            </select></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="gridlist"  style="margin:4px 0;">
+            <thead>
+                <tr>
+                    <th>商品条形码</th>
+                    <th>商品名称</th>
+                    <th>货品等级</th>
+                    <th>采购订单号</th>
+                    <th>退供数量</th>
+                    <th>已拆数量</th>
+                    <th>实退数量</th>
+                    <th>退供箱号</th>
+                    <th>供应商入库单号</th>
+                    <th>供应商入库单箱号</th>
+                </tr>
+            </thead>
+            <tbody id="dataNode">
+                <{foreach from=$items item=item}>
+                <tr>
+                    <th><{$item.barcode}></th>
+                    <th><{$item.product_name}></th>
+                    <th><{$item.grade}></th>
+                    <th><{$item.po_no}></th>
+                    <th class="actual-qty"><{$item.qty}></th>
+                    <th class="split-qty"><{$item.split_num}></th>
+                    <th><{input type="text&unsigned" class="return-nums" name="items[{$item.id}]" item_id="{$item.id}" value="{$item.remaining_qty}" size=6}></th>
+                    <th><{$item.box_no}></th>
+                    <th><{$item.storage_no}></th>
+                    <th><{$item.storage_box_no}></th>
+                </tr>
+                <{/foreach}>
+            </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' label='确认' }>
+                    <{button type="button" id='close_btn' label='关闭' }>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = opener.finderGroup['<{$env.get.finder_id}>'];
+        $('close_btn').addEvent('click', function(){
+            if(finder){
+                setTimeout(finder.refresh(),3000);
+            }
+            setTimeout('window.close()',200);
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    if(finder){
+                        setTimeout(finder.refresh(),3000);
+                    }
+                    setTimeout('window.close()',200);
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+        if ($defined($ES('.return-nums'))) {
+            $ES('.return-nums').addEvent('change', function () {
+                var value = this.value;
+
+                // 检查输入是否为非负整数
+                if (!/^\d+$/.test(value)) {
+                    MessageBox.error('请输入大于等于0的整数');
+                    $('submit_btn').disabled = 'disabled';
+                    return;
+                }
+
+                // 获取当前行的元素
+                var row = this.closest('tr');
+                var qty = row.getElement('.actual-qty').getText().toInt();
+                var split = row.getElement('.split-qty').getText().toInt();
+
+                var remainingQty = qty - split;
+                if (value > remainingQty) {
+                    MessageBox.error('可退数量不足');
+                    $('submit_btn').disabled = 'disabled';
+                    this.removeClass('c-green').addClass('c-red');
+                } else {
+                    $('submit_btn').disabled = '';
+                    this.removeClass('c-red');
+                }
+            })
+        }
+    })();
+</script>

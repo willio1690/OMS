@@ -1,0 +1,48 @@
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+.dialog {
+    background: #FFFFFF;
+    border-radius: 4px 4px 0px 0px;
+}
+.dialog-box {
+    background: #FFFFFF;
+    border-radius: 4px 4px 0px 0px!important;
+    border: none!important;
+}
+
+.dialog-box .dialog-head {
+    height: 48px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #262626;
+    line-height: 48px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #F0F0F0;
+}
+.dialog .btn-close {
+    margin-top: 17px;
+}
+
+.dialog .dialog-content-body {
+    background: #FFFFFF;
+}
+
+.dialog .dialog-content-body table tr td textarea{
+    width: 550px !important;
+}
+
+.dialog .dialog-content-body table tr #content ul{
+    width: 550px !important;
+}
+
+.dialog .dialog-content-body table tr #content ul li div{
+    width: 425px !important;
+}
+
+.dialog .dialog-content-foot {
+    background: #FFFFFF;
+    padding: 0;
+}

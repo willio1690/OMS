@@ -1,0 +1,40 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=wmsmgr&ctl=admin_wms&act=index&finder_id=<{$env.get.finder_id}>" id="add_link">
+<input type="hidden" name="channel_id" value="<{$channel_id}>">
+<input type="hidden" id="cancel_flag" name="cancel_flag" value="0">
+</form>
+<br />
+<div style="font-size:16px; font-weight:bold;">确定要解除绑定关系：<span style="color:#F00;"><{$wmsInfo.channel_name}>(<{$wmsInfo.channel_bn}>)</span>?</div>
+<br />
+<div class="table-action">
+<{button label="确定" id="btn-cancel" class="btn-primary" onclick="sub_form(event);"}> &nbsp; &nbsp;
+<{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+</div>
+<script>
+var channel_id = "<{$channel_id}>";
+function sub_form(event)
+{
+    new Request({url:'index.php?app=wmsmgr&ctl=admin_wms&act=finish_unbind&p[0]='+channel_id, method:'POST',
+        onRequest:function(){
+            $('btn-cancel').set('disabled', 'true');
+            $('btn-cancel').getElements('span')[1].set('text','正在解除绑定...'); 
+        },
+        onComplete:function(json){
+            json = JSON.decode(json);
+            if(json.rsp == 'fail'){
+               alert('解绑失败：'+json.error_msg);
+              $('btn-cancel').set('disabled', '');
+              $('btn-cancel').getElements('span')[1].set('text','确定'); 
+              return false;
+            }else{
+                finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+                $('add_link').getParent('.dialog').retrieve('instance').close();
+            }
+        },
+    }).send();
+}
+</script>    

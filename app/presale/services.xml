@@ -1,0 +1,8 @@
+<services>
+    <service id="desktop_finder.presale_mdl_orders">
+        <class>ome_finder_orders</class>
+    </service>
+    <service id="extend_filter_presale_mdl_orders">
+        <class>ome_finder_extend_filter_orders</class>
+    </service>
+</services>

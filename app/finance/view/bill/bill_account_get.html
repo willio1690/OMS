@@ -1,0 +1,62 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="post" action="index.php" id="add_form">
+    <input type="hidden" value='<{$json}>' id="json" />
+  
+    <div>
+        <table class="gridlist" style="*width:97%;">
+            <tr>
+                <th><{t}>进度：<{/t}></th>
+                <td colspan='2'>
+                    <div style="border:1px solid #CCC;width:360px;overflow:hidden;float:left;background:#FFF;padding:1px;">
+                        <div id="processBar" style="background:#7493D1;width:1%;height:15px;">&nbsp;</div>
+                    </div>&nbsp;<span id="processPercent">0%</span>
+                </td>
+        </table>
+        <table class="table-action" style="*width:97%;">
+            <tr>
+                <td colspan='2'>
+                    <{button id="down1" class="btn-primary" label=$___b2c="开始"|t:'b2c' type="button"}>
+                    <{button id="down2" class="btn-primary" label=$___b2c="下载中"|t:'b2c' type="button" style="display:none;"}>
+                    <{button type="button" class="btn-secondary" id="return-btn" label="完成" style="display:none;" onclick="javascript:this.getParent('.dialog').retrieve('instance').close();"}></td>
+            </tr>
+        </table>
+    </div>
+</form>
+<script>
+    $('down1').addEvent('click',function(){
+        
+      //  $E('.btn-close',this.dialog_head).style.display = 'none';
+        uploadToTaobao(1);
+    });
+    function setProcessBar(id,w){
+        document.getElementById(id).style.width = w;
+    }
+    function uploadToTaobao(page_no){
+        var percent = '1%';
+        document.getElementById('return-btn').style.display="none";
+        document.getElementById('down1').style.display="none";
+        document.getElementById('down2').style.display="inline";
+
+        new Request({
+            url:'index.php?app=finance&ctl=bill_setting&act=do_bill_account_get',
+            data:'',
+            method:'post',
+            onSuccess:function(responseText){
+                var cd = responseText.split('@');
+                setProcessBar('processBar',Math.round(cd[1])+'%');
+                document.getElementById('processPercent').innerHTML = Math.round(cd[1])+'%';
+                if (cd[0] == 'finish') {
+                    document.getElementById('down2').style.display="none";
+                    document.getElementById('return-btn').style.display="inline";
+                }else{
+                    document.getElementById('processPercent').innerHTML = '失败';
+                    document.getElementById('return-btn').style.display="inline";
+                }
+            }
+        }).send();
+    }
+</script>

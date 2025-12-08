@@ -1,0 +1,155 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="notice clearfix tableform" id="browser_notice" style="display:none;">
+<div class="flt">
+<b class="f-14">    我们强烈建议您升级或更换到新型浏览器，提升后台操作体验（响应速度更快、视觉效果更佳）!</b>
+<p>被推荐的浏览器有：
+    Google <a href="http://www.google.com/chrome?hl=zh-cn" target="_blank"><b class="c-blue">Chrome</b></a>、
+    Apple  <a href="http://www.apple.com.cn/safari/download/" target="_blank"><b class="c-blue">Safari</b></a>、
+    Mozilla <a href="http://www.mozillaonline.com/" target="_blank"><b class="c-blue">Firefox</b></a>、
+    Microsoft <a href="http://www.microsoft.com/china/windows/internet-explorer/" target="_blank"><b class="c-blue">IE7＋</b></a>
+</p>
+</div>
+<div class="frt">
+    <span class="btn pointer close" onclick="$('browser_notice').dispose();"><span><span>知道了</span></span></span>
+</div>
+</div>
+
+<script>
+void function(){
+    if(window.ie6){
+        if('know'==Cookie.read('browser-notice'))return;
+        $('browser_notice').show();
+        $$('#browser_notice .close').addEvent('click',function(){
+                Cookie.write('browser-notice','know',{duration:1});
+        });
+        
+    
+    }
+}();    
+</script>
+<div class="widgets clearfix"> 
+    <div id="l-1" class="line1 l-1 clearfix">
+        <{foreach from=$widgets_1 item=widget name="widget"}>
+          <div class="item <{$widget.className}> flt" id="<{$widget.class_full_name}>">
+             <div class="dashbd-action"></div>
+             <div class="dashbd-bd">
+                 <div class="dashbd-head">
+                    <div class="dashbd-headl"><{t}><{$widget.title}><{/t}></div>
+                </div>
+                <div class="dashbd-list">
+                    <{$widget.html}>
+                </div>
+             </div>
+           </div> 
+        <{/foreach}>
+    </div>
+
+    <div id="l-2" class="line2 l-2 clearfix">
+        <{foreach from=$widgets_2 item=widget name="widget"}>
+          <div class="item <{$widget.className}> flt" id="<{$widget.class_full_name}>">
+             <div class="dashbd-action"></div>
+             <div class="dashbd-bd">
+                 <div class="dashbd-head">
+                    <div class="dashbd-headl"><{$widget.title}></div>
+                </div>
+                <div class="dashbd-list">
+                    <{$widget.html}>
+                </div>
+             </div>
+           </div> 
+        <{/foreach}>
+    </div>
+
+<div id="l-3" class="line3 l-3 clearfix">
+    <{foreach from=$widgets_3 item=widget name="widget"}>
+        <{$widget.html}>
+    <{/foreach}>
+</div>
+
+</div>
+
+<input type="hidden" id="dashboard-side-r-trigger"/>
+<script>
+    //new Equalizer('.span-9').equalize();
+   $$('.widgets .valigntop').each(function(item){
+        item.injectTop(item.getParent());
+   });
+
+  //  new Side_R('index.php?app=desktop&ctl=dashboard&act=advertisement',{width:250,title:'<span class="font9px">advertisement</span>',trigger:$('dashboard-side-r-trigger'),
+        // onShow:function(){this.container.setStyle('overflow-y','hidden');}
+  //  });
+
+    $$('.head-nav .wg').removeClass('current');
+
+    function setTipsStatus(e){
+        if(e==true) {
+            Cookie.write('updateTips', 'hide');
+        }else{
+            Cookie.write('updateTips', 'show');
+        }
+    }
+    
+    //封装的nextSib方法出去空白节点
+    function nextSib(t){
+        var n=t.nextSibling;
+        if(t.nextSibling.nodeType!=1){
+            n=n.nextSibling;
+        }
+        return n;
+    }
+    
+    //封装的insertAfter
+    function insertAfter(newChild,target){
+        var oParent=target.parentNode;
+        if(oParent.lastChild==target){
+            oParent.appendChild(newChild);
+        }else{
+            oParent.insertBefore(newChild,nextSib(target));
+        }
+    }
+    
+    function addCheckbox(){
+        var iframes = document.getElementsByName('dialog-frame');
+        var obj = document.createElement('div');
+        obj.innerHTML = '<div style="padding:0 0 0 10px;"><input onclick="setTipsStatus(this.checked);" id="donot_show" type="checkbox" /> <label for="donot_show">下次不再显示此提示</label></div>';
+        insertAfter(obj,iframes[0]);
+    }
+
+    function setTipsStatus(e){
+        if(e==true) {
+            Cookie.write('updateTips', 'hide');
+        }else{
+            Cookie.write('updateTips', 'show');
+        }
+    }
+    
+    //封装的nextSib方法出去空白节点
+    function nextSib(t){
+        var n=t.nextSibling;
+        if(t.nextSibling.nodeType!=1){
+            n=n.nextSibling;
+        }
+        return n;
+    }
+    
+    //封装的insertAfter
+    function insertAfter(newChild,target){
+        var oParent=target.parentNode;
+        if(oParent.lastChild==target){
+            oParent.appendChild(newChild);
+        }else{
+            oParent.insertBefore(newChild,nextSib(target));
+        }
+    }
+    
+    function addCheckbox(){
+        var iframes = document.getElementsByName('dialog-frame');
+        var obj = document.createElement('div');
+        obj.innerHTML = '<div style="padding:0 0 0 10px;"><input onclick="setTipsStatus(this.checked);" id="donot_show" type="checkbox" /> <label for="donot_show">下次不再显示此提示</label></div>';
+        insertAfter(obj,iframes[0]);
+    }
+</script>

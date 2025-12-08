@@ -1,0 +1,157 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<div class="division">
+
+    <h5>账单编码：<{$bills.bill_number}></h5>
+        <form method="post" action="index.php?app=vop&ctl=admin_bill&act=doConfirm" id="frm">
+            <input type="hidden" name="bill_id" value="<{$bills.id}>" />
+           <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+    <thead>
+        <tr>
+           
+            <th></th>
+
+            
+         
+            <th>采购结算金额(含税)</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+       
+        <tr>
+            <th>本期销售</th>
+         
+          
+            <td><{$bills.cr_cust_amount}></td>
+
+          
+        </tr>
+          <tr>
+            <th>本期客退</th>
+         
+          
+            <th><{$bills.dr_cust_amount}></th>
+
+          
+        </tr>
+          <tr>
+            <th>本期其他</th>
+         
+           
+            <th><{$bills.other_amount}></th>
+
+          
+        </tr>
+          <tr>
+            <th>活动折扣优惠</th>
+           
+           
+            <th><{$discounts.dis_amount}></th>
+
+          
+        </tr>
+        <tr>
+             <th>会员价保</th>
+           
+       
+            <th><{$insures.insure_amount}></th>
+
+          
+        </tr>
+       <tr>
+             <th>退货差异</th>
+           
+       
+            <th><{$details.reship_amount}></th>
+
+          
+        </tr>
+        <tr>
+             <th>客服特殊退款-仅退款</th>
+           
+       
+            <th><{$details.refund_amount}></th>
+
+          
+        </tr>
+       
+
+        <tr>
+            <th style='color: red;font-weight: bold;'>最终金额合计</th>
+           
+          
+            <th style='color: red;font-weight: bold;'><{$total_amount}></th>
+
+          
+        </tr>
+
+        <tr style="background-color: #ccffff">
+            <th >PO单汇总合计</th>
+           
+          
+            <th><{$pos.total_amount}></th>
+
+          
+        </tr>
+    </tbody>
+    </table>
+        </form>
+   
+</div>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' label='保存' }>
+                    <{button type="button" id='close_btn' label='关闭' }>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = opener.finderGroup['<{$env.get.finder_id}>'];
+        $('close_btn').addEvent('click', function(){
+            if(finder){
+                setTimeout(finder.refresh(),30000);
+            }
+            setTimeout('window.close()',200);
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    if(finder){
+                        setTimeout(finder.refresh(),30000);
+                    }
+                    setTimeout('window.close()',200);
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+    })();
+</script>

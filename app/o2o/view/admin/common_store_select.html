@@ -1,0 +1,97 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div style="border: 0px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;float:left">
+    <div style="float:left;">组织架构：</div>
+    <div style="float:left;"><{input type='organization' app='organization' show="onlytree" effect="organization_stores_list"}></div>
+</div>
+<!--
+<div style="border: 0px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;float:left">
+    <div style="float:left;">门店名称：</div>
+    <div style="float:left;"><input type="text" id="store_name_filter" onblur="filter_store_list(this);" class="x-input"></div>
+</div>
+-->
+<div style="border: 0px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;float:left">
+    <div style="float:left;">选择门店：</div>
+    <div style="float:left;" id="organization_stores_list"></div>
+    <div style="float:left;color:red">&nbsp;*<{help}><{t}>筛选特定门店请做选择,以上两项是用来过滤此门店下拉的列表。 <{/t}><{/help}></div>
+</div>
+
+<script>
+
+window.addEvent('domready', function() {
+    //页面加载时 默认显示所有组织门店
+    load_organization_stores_list("", "", "onload");
+});
+
+//根据组织架构加载选择门店的option
+function load_organization_stores_list(org_id,value,action){
+    if (action == "onchange" && org_id == '_NULL_') {
+        //在选择过程中 选择了 “请选择...” 选择门店options 这里自动显示父类下拉框的门店信息
+        var org_id = "";
+        if (value) {
+            var arr_cur_select = value.split(":");
+            org_id = arr_cur_select[2];
+        }
+    }
+    new Request({
+          url : "index.php?app=o2o&ctl=admin_branch_product&act=organization_stores_list",
+          async : false,
+          method : 'post',
+          data : {
+              p_org_id : org_id,
+          },
+          onComplete : function(store_html) {
+              $("organization_stores_list").set('html', store_html);
+              
+              //filter_store_list_by_org();
+          }
+      }).send();
+}
+
+//选择组织架构时 根据填写的门店名称 过滤最终选择门店的option
+function filter_store_list_by_org(){
+    var store_name_val = $("store_name_filter").getValue().trim();
+    get_store_list(store_name_val);
+}
+
+//onblur事件根据填写的门店名称 过滤最终选择门店的option
+function filter_store_list(obj){
+    var store_name_val = obj.getValue().trim();
+    get_store_list(store_name_val);
+}
+
+function get_store_list(store_name_val){
+    if(!store_name_val){
+        return false;
+    }
+    var select_store_name = $("organization_stores_list").getElements("option:selected")[0].text;
+    //如果门店名称和选择项不一样 默认给请选择... 来重新选择
+    if(select_store_name.indexOf(store_name_val) == -1 && select_store_name != "请选择..."){
+        $("organization_stores_list").getElements("option")[0].selected=true;
+        $("organization_stores_list").getElements("option:selected")[0].text = "请选择...";
+    }
+    //先显示当前组织架构的门店option
+    $("organization_stores_list").getElements("option").each(function(item){
+            item.removeAttribute("style");
+    });
+    //过滤option项
+    $("organization_stores_list").getElements("option").each(function(item){
+        if(item.value == "_NULL_"){
+            //不过滤 请选择选项
+            return true;
+        }
+        if(item.text.indexOf(store_name_val) == -1){
+            //不符合填写内容的过滤掉
+            item.setAttribute("style","display:none");
+        }
+    });
+}
+
+function type_radio(obj)
+{
+    
+}
+</script>

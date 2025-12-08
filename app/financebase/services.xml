@@ -1,0 +1,87 @@
+<services> 
+    <service id="desktop_finder.financebase_mdl_bill_category_rules">
+        <class>financebase_finder_bill_category_rules</class>
+    </service>
+
+    <service id="desktop_finder.financebase_mdl_queue">
+        <class>financebase_finder_queue</class>
+    </service>
+
+    <service id="desktop_finder.financebase_mdl_bill_verification_error">
+        <class>financebase_finder_bill_verification_error</class>
+    </service>
+
+    <service id="desktop_finder.financebase_mdl_bill">
+        <class>financebase_finder_bill</class>
+    </service>
+
+    <service id="desktop_finder.financebase_mdl_base">
+        <class>financebase_finder_base</class>
+    </service>
+    <service id="desktop_finder.financebase_mdl_cainiao">
+        <class>financebase_finder_base</class>
+    </service>
+    <service id="desktop_finder.financebase_mdl_expenses_export_log">
+        <class>financebase_finder_expenses_export_log</class>
+    </service>
+
+    <service id="desktop_finder.financebase_mdl_expenses_rule">
+        <class>financebase_finder_expenses_rule</class>
+    </service>
+
+    <service id="desktop_finder.financebase_mdl_bill_unverification">
+        <class>financebase_finder_bill_unverification</class>
+    </service>
+
+    <service id="desktop_finder.financebase_mdl_bill_fee_type">
+        <class>financebase_finder_bill_fee_type</class>
+    </service>
+
+    <service id="bill_category_rules_set">
+        <class>financebase_data_bill_category_rules</class>
+    </service>
+
+    <service id="desktop_finder.financebase_mdl_bill_import">
+        <class>financebase_finder_cainiao</class>
+    </service>
+    
+    <service id="desktop_finder.financebase_mdl_expenses_split">
+        <class>financebase_finder_expenses_split</class>
+    </service>
+    <service id="desktop_finder.financebase_mdl_expenses_unsplit">
+        <class>financebase_finder_expenses_unsplit</class>
+    </service>
+
+    <service id="desktop_finder.financebase_mdl_bill_import_order">
+        <class>financebase_finder_bill_import_order</class>
+    </service>
+    <service id="desktop_finder.financebase_mdl_bill_import_sale">
+        <class>financebase_finder_bill_import_sale</class>
+    </service>
+    <service id="desktop_finder.financebase_mdl_bill_import_sku">
+        <class>financebase_finder_bill_import_sku</class>
+    </service>
+
+    <service id="extend_filter_financebase_mdl_bill_import">
+        <class>financebase_finder_extend_filter_bill_import</class>
+    </service>
+
+
+    <service id="extend_filter_financebase_mdl_bill_import_order">
+        <class>financebase_finder_extend_filter_bill_import_order</class>
+    </service>
+    <service id="extend_filter_financebase_mdl_bill_import_sale">
+        <class>financebase_finder_extend_filter_bill_import_sale</class>
+    </service>
+    <service id="extend_filter_financebase_mdl_bill_import_sku">
+        <class>financebase_finder_extend_filter_bill_import_sku</class>
+    </service>
+
+    <service id="extend_filter_financebase_mdl_expenses_split">
+        <class>financebase_finder_extend_filter_expenses_split</class>
+    </service>
+
+    <service id="extend_filter_financebase_mdl_expenses_unsplit">
+        <class>financebase_finder_extend_filter_expenses_unsplit</class>
+    </service>
+</services>

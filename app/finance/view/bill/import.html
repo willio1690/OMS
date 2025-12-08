@@ -1,0 +1,54 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!--div class="tableform">
+    <h3>账单导入</h3>
+    <class="division">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tbody>
+            <tr>
+               <td style='width:100px;text-align:right;'>选择导入模版：</td>
+               <td>
+               <input type='button' value='下载模版' onclick="new Dialog('index.php?app=omecsv&ctl=admin_export&act=main&add=finance&ctler=finance_mdl_bill&filter[template]=1',{'title':'<{t}>下载模版<{/t}>','width':400,'height':170});" >
+               </td>
+               </tr>
+               <tr>
+               <td style='width:100px;text-align:right;'>导入模版：</td>
+               <td>
+               <input type='button' value='导入账单' onclick="new Dialog('index.php?app=omecsv&ctl=admin_import&act=main&add=finance&ctler=finance_mdl_bill&filter[checkTime]=after',{'title':'<{t}>导入账单<{/t}>','width':400,'height':180});" >
+               </td>
+               </tr>
+            </tbody>
+        </table>  
+    </div-->
+    <div id="system-setting" class="tableform tableform-tabs">
+        <{tabber}>
+        <{foreach from=$settingTabs item=item key=key}>
+        <{tab name=$item.name url=$item.url current=$item.current}>
+        <{include file=$item.file_name app=$item.app}>
+        <{/tab}>
+        <{/foreach}>
+        <{/tabber}>
+    </div>
+<!--div id="error_msg" style="display:none;color:red;">
+<{$error_msg}>
+</div-->
+</div>
+<script>
+    (function(){
+        var state;
+        $('ImportBtn').addEvent('click',function(e){
+           
+            if(state||!$('ImportCSV').value.length)return false;
+            state=true;
+            this.style.cursor='not-allowed';
+        });
+        $('ImportCSV').addEvent('change',function(e){
+            state=false;
+            $('ImportBtn').style.cursor='pointer';
+        });
+
+    })();
+</script>

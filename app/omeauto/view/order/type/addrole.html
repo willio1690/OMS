@@ -1,0 +1,171 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app='omeauto' src="style.css"}>
+<{/capture}>
+<div class="tableform">
+    <div class="division">
+        <form action="index.php?app=omeauto&ctl=order_type&act=createRole" method="post" id="m_con_form">
+            <input type="hidden" id='org_id' name="org_id" value="<{$org_id}>">
+            <table width="100%" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <!--
+                    <tr>
+                        <th width="60"><label for="dom_el_bc">简单说明：</label> </th>
+                        <td><input type="text" size="50" /> (此处内容仅用于便于阅读，不具有其它作用)</td>
+                    </tr>
+                    -->
+                    <tr>
+                        <th width="60"><label for="dom_el_bc">筛选条件：</label> </th>
+                        <td >
+                            <select name="type_id" id="type_id">
+                                <option value="address" <{if $init.role=='address'}>selected<{/if}>>收货地址</option>
+                                <option value="platform" <{if $init.role=='platform'}>selected<{/if}>>来源平台</option>
+                                <option value="shop" <{if $init.role=='shop'}>selected<{/if}>>前端店铺</option>
+                                <option value="cod" <{if $init.role=='cod'}>selected<{/if}>>付款方式</option>
+                                <option value="money" <{if $init.role=='money'}>selected<{/if}>>订单金额</option>
+                                <option value="sku" <{if $init.role=='sku'}>selected<{/if}>>活动订单</option>
+                                <option value="skunum" <{if $init.role=='skunum'}>selected<{/if}>>商品种类数</option>
+                                <option value="itemnum" <{if $init.role=='itemnum'}>selected<{/if}>>商品总数量</option>
+                                <option value="weight" <{if $init.role=='weight'}>selected<{/if}>>商品总重量</option>
+                                <option value="memo" <{if $init.role=='memo'}>selected<{/if}>>备注关键字</option>
+                                <option value="ordertype" <{if $init.role=='ordertype'}>selected<{/if}>>订单类型</option>
+                                <option value="materialtype" <{if $init.role=='materialtype'}>selected<{/if}>>按基础物料类型</option>
+                                <option value="orderhost" <{if $init.role=='orderhost'}>selected<{/if}>>按达人信息</option>
+                                <option value="shopmode" <{if $init.role=='shopmode'}>selected<{/if}>>店铺发货模式</option>
+                                <option value="customer" <{if $init.role=='customer'}>selected<{/if}>>客户分类</option>
+                                <option value="orderlabel" <{if $init.role=='orderlabel'}>selected<{/if}>>订单标记</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc">条件设定：</label> </th>
+                        <td>
+                            <div id="type_content">
+
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+
+<{area inject='.mainFoot'}>
+    <div class="table-action">
+        <table width="100%" cellspacing="0" cellpadding="0">
+            <tbody>
+                <tr>
+                    <td align="center">
+                        <{button class="btn-primary"  label="确定" type="button" id="saveBtn"}>
+                        <{button class="btn-secondary"  label="取消" type="button" id="cancelBtn"}>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+<{/area}>
+<script>
+    (function() {
+
+        var uid = '<{$uid}>';
+
+        function displayDetail(role,sku_str) {
+
+            var type = $('type_id').value;
+            var org_id = $('org_id').value;
+            new Request.HTML({
+                url : 'index.php?app=omeauto&ctl=order_type&act=ajax',
+                method : 'post',
+                evalScripts : true,
+                update : $('type_content'),
+                onSuccess: function(){
+
+                }
+            }).post('p[0]='+type+'&p[1]=getUI&p[2]='+role+'&p[3]='+org_id+'&sku_str='+sku_str);
+        }
+        //增加事件
+        $('type_id').addEvent('change',function(){
+            displayDetail('','<{$sku_str}>');
+        });
+        //关闭按钮
+        $('cancelBtn').addEvent('click', function(){
+            $('cancelBtn').getParent('.dialog').retrieve('instance').close();
+        });
+        //保存按钮
+        $('saveBtn').addEvent('click', function(){
+            $('m_con_form').fireEvent('submit', {
+                stop: function() {
+                }
+            });
+        });
+        $('m_con_form').removeEvents('submit').addEvent('submit', function(e) {
+            e.stop();
+
+            new Request.JSON ({
+                url:this.action,
+                onRequest: function () {
+
+                    $('saveBtn').set('disabled', 'true');
+                    $('cancelBtn').set('disabled', 'true');
+                },
+                onSuccess: function(result) {
+
+                    if (result.code =='SUCC') {
+                        //成功
+                        if (uid=='') {
+                            addRole(result.msg);
+                        } else {
+                            editRole(result.msg, uid);
+                        }
+                        $('saveBtn').getParent('.dialog').retrieve('instance').close();
+                    } else {
+                        $('saveBtn').set('disabled', '');
+                        $('cancelBtn').set('disabled', '');
+                        //提示信息
+                        alert(result.msg);
+                    }
+                }
+            })[this.method](this);
+        });
+        function addRole(role) {
+
+            var info = Json.evaluate(role);
+            var addItem=new Element('li .roleItem',{html:'<div title="'+info.caption+'">' + info.caption + '</div><span><a href="javascript:void(0);" class="edit" ref=\''+role+'\'>编辑</a>&nbsp;<a href="javascript:void(0);" class="del">删除</a></span>'}).inject('roleList');
+            addItem.id = 'm_item_'+ uniqueID();
+            addItem.getElement('.del').addEvent("click",function(){
+                if (confirm("你确定要删除当前指定规则吗？")) {
+                    this.getParent().getParent().destroy();
+                }
+            });
+            addItem.getElement('.edit').addEvent("click",function(){
+                var role = this.get('ref');
+                var uid = this.getParent().getParent().id;
+                var org_id = $('chose_org').value;
+                new Dialog('index.php?ctl=order_type&act=addrole&app=omeauto&role=' + role + '&uid=' + uid+ '&org_id=' + org_id,{width:760,height:560,title:'规则设定'});
+            });
+        };
+        function editRole(role, uid) {
+
+            var info = Json.evaluate(role);
+            var editItem = $(uid);
+            editItem.set('html','<div title="'+info.caption+'">' + info.caption + '</div><span><a href="javascript:void(0);" class="edit" ref=\''+role+'\'>编辑</a>&nbsp;<a href="javascript:void(0);" class="del">删除</a></span>');
+            editItem.getElement('.del').addEvent("click",function(){
+                if (confirm("你确定要删除当前指定规则吗？")) {
+                    this.getParent().getParent().destroy();
+                }
+            });
+            editItem.getElement('.edit').addEvent("click",function(){
+                var role = this.get('ref');
+                var uid = this.getParent().getParent().id;
+                var org_id = $('chose_org').value;
+                new Dialog('index.php?ctl=order_type&act=addrole&app=omeauto&role=' + role + '&uid=' + uid+ '&org_id=' + org_id,{width:760,height:560,title:'规则设定'});
+            });
+        };
+        displayDetail('<{$role}>','<{$sku_str}>');
+    })();
+</script>

@@ -1,0 +1,21 @@
+<?php
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+/**
+ * @author ykm 2016/8/16
+ * @describe 新蘑菇街订单处理
+ */
+
+class erpapi_shop_matrix_mgj_response_order extends erpapi_shop_response_order
+{
+
+    protected function get_update_components()
+    {
+        $components = array('master','markmemo','marktype','custommemo');
+
+        return $components;
+    }
+}

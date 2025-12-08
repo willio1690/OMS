@@ -1,0 +1,33 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+    <table class="gridlist"  style="margin:4px 0;">
+    <thead>
+        <tr>
+            <th>商品编码</th>
+        
+            <th>销售类型</th>
+            <th>吊牌价</th>
+            <th>结算金额</th>
+            <th>出入库数量</th>
+            <th>结算总价</th>
+        </tr>
+    </thead>
+    <tbody id="dataNode">
+        <{foreach from=$items item=item}>
+        <tr>
+            <th><{$item.barcode}></th>
+          
+            <th><{$item.detail_line_name}></th>
+            <th><{$item.price_retail}></th>
+            <th><{$item.price}></th>
+            <th><{if $item.detail_line_name != '销售'}>-<{/if}><{$item.qty}></th>
+            <th><{if $item.detail_line_name != '销售'}>-<{/if}><{$item.amount}></th>
+        </tr>
+        <{/foreach}>
+    </tbody>
+    </table>
+</div>

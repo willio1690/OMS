@@ -1,0 +1,164 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+
+<{/capture}>
+
+<form method="post" id="fm1" action="index.php?app=purchase&ctl=admin_purchase&act=doSave">
+    <div class="tableform">
+      <h3>新建采购订单</h3>
+      <div class="division">
+        <h5>基本信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+        <thead>
+            <tr>
+                <td width="10%" align="right" nowrap="nowrap">
+                    采购单名称：
+                </td>
+                <td colspan="3">
+                    <span id="exigence" style="color:red; display:none">！</span>
+                    <input type="text" size="32" onblur="checkName(this.value);" id="purchase_name" name="purchase_name" value="<{$cur_date}>" />
+                    <input type="checkbox" name="emergency" value="true" onchange="chgexigence(this);" />紧急采购：
+                </td>
+            </tr>
+
+            <tr>
+                <td align="right">供应商：</td>
+                <td width="40%">
+                  <span id="auto_supp">
+                    <{img class="pointer btn_supplier" title="查看供应商列表" app="desktop" src="bundle/zoom_btn.gif"}>
+                    <input type="text" id="supplier" name="supplier" vtype="required" class="x-input" />
+                    <input type="hidden" name="supplier_id" id="supplier_id" value="" />
+                  </span>
+                  <span style="color:red;">*</span></td>
+                <td width="10%" align="right">采购方式：</td>
+              <td>
+                <input type="radio" name="type" value="cash" <{if $po_type=='cash'}>checked<{/if}> onclick="prichange('1')" /> 现购 <input type="radio" name="type" value="credit" <{if $po_type=='credit' or $po_type==''}>checked<{/if}> onclick="prichange('2')" /> 赊购
+              
+              </td>
+          </tr>
+          <tr>
+            <td align="right">到货仓库：</td>
+            <td>
+                <{if $is_super}>
+                  <{if count($branch)=='1'}>
+                    <{$branch.0.name}>
+                    <input type="hidden" name="branch" value="<{$branch.0.branch_id}>" />
+                  <{elseif count($branch)>'5' }>
+                      <{input type="select" name="branch" vtype="required" rows=$branch valueColumn="branch_id" labelColumn="name" value=""}> <span style="color:red">*</span>
+                  <{else}>
+                    <{foreach from=$branch item=items key=keys}>
+                    <input type="radio" name="branch" vtype="requiredradio" value="<{$items.branch_id}>" <{if $keys==0}>checked="checked"<{/if}> />
+                    <{$items.name}>
+                    <{/foreach}> <span style="color:red">*</span>
+                  <{/if}>
+              <{else}>
+                  <{if !$branch_list}>
+                    <font color="red">* 当前没有操作仓库的权限，请联系管理员分配。  *</font>
+                    <script>
+                       $$("input","button","select").set('disabled',true);
+                    </script>
+                  <{else}>
+                    <{if count($branch_list)==1}>
+                        <{$branch_list.0.name}>
+                        <input type="hidden" name="branch" value="<{$branch_list.0.branch_id}>" />
+                    <{elseif count($branch_list)>5}>
+                        <{input type="select" name="branch" vtype="required" rows=$branch_list valueColumn="branch_id" labelColumn="name" value=""}> <span style="color:red">*</span>
+                    <{else}>
+                        <{foreach from=$branch_list item=items key=keys}>
+                        <input type="radio" name="branch" vtype="requiredradio" <{if $keys==0}>checked="checked"<{/if}> value="<{$items.branch_id}>" />
+                        <{$items.name}>
+                        <{/foreach}> <span style="color:red">*</span>
+                    <{/if}>
+                  <{/if}>
+              <{/if}>
+            </td>
+            <td align="right" nowrap="nowrap" title="一次性物流费用">物流费用：</td>
+            <td><input type="text" vtype="number" name="d_cost" size="6"/>
+              元</td>
+          </tr>
+              <tr>
+                  <td align="right">
+                      <span class="endd" style="display:none">预付款：</span>
+                  </td>
+                  <td>
+                       <span class="endd" style="display:none"><input type="text" id="price"  vtype="required" name="price" size="6"/>元<span style="color:red">*</span></span>
+                  </td>
+                  <td align="right" nowrap="nowrap">
+                      预计到货天数：
+                  </td>
+                  <td>
+                      <input type="hidden" id="arrive" name="arrive" value="" />
+                      <input class='x-input' type="text" size="2" id="arrive_days" name="arrive_days"  onchange="pushDate(this);" maxlength="3" /> 天　
+                      <b id="pushdate"></b>
+                  </td>
+
+              </tr>
+          </thead>
+      </table>
+      <h5 style="margin-top:10px;">采购商品</h5>
+
+      <{button label="供应商频道" id="supplier-find-btn" }>
+      <{button label="基础物料库频道" id="purchase-find-btn" }>
+
+      <span id='pfba'>
+          <label>按基础物料编码索引：</label>
+          <input type="text" name="bn" />
+      </span> 
+      <span id='pfba2'>
+          <label>按基础物料名称索引：</label>
+          <input name="name" type="text" size="35"/>
+      </span>
+      <span id='pfba3'>
+          <label>按条码索引：</label>
+          <input name="barcode" type="text" size="35" />
+      </span>
+      <table class="gridlist" id="purchase_table"  style="margin:4px 0;">
+          <thead>
+            <tr>
+            <th><input type="checkbox" class='selectall' onclick="this.blur()"></th>
+              <th>基础物料编码</th>
+              <th style="width:240px;">基础物料名称</th>
+              <th>规格</th>
+              <th>条形码</th>
+              <th>数量</th>
+              <th>单价</th>
+              <th>合计</th>
+              <th style="width:30px;">删除</th>
+            </tr>
+          </thead>
+          <tbody id="dataNode">
+              <tr>
+                  <td colspan="8" style="padding:0;"><div class="note" style="margin:0;"> 暂无采购货品信息 </div></td>
+              </tr>
+          </tbody>
+      </table>
+          <div align="right">
+              购买总量: <span id="buy_count">0</span> 
+              总金额: <span id="buy_amount">0</span> &nbsp; 
+              <{button label="删除选中" id="purchase-del-btn"}> &nbsp;
+              <{button type="button" id="purchase-delall-btn" label="全部删除" }>
+          </div>
+      </div>  
+      <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-top:10px;">
+          <tr>
+              <td width="10%" align="right">备注:</td>
+              <td align="left"><textarea id="memo" maxth="255" rows="3" cols="80%" name="memo" type="textarea"></textarea></td>
+          </tr>
+          <tr>
+              <td align="right">经办人:</td>
+              <td align="left"><input name="operator" type="text" value="<{$operator}>" size="15" vtype="required"/></td>
+          </tr>
+      </table>
+      <div id="cc" class="noprint table-action">
+          <{button type="button" id="purchase-save-btn" label="保 存"}> &nbsp;
+          <{button type="button" class="btn-secondary" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}>
+      </div>
+    </div>
+</form>
+

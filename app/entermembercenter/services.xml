@@ -1,0 +1,5 @@
+<services>
+	<service id="openapi.entermembercenter_callback">
+		<class>entermembercenter_callback</class>
+	</service>
+</services>

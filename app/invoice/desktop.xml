@@ -1,0 +1,24 @@
+<desktop>
+    <permissions>
+		<!--订单发票权限-->
+<!--		<permission id="invoice_order_front">预发票列表</permission>-->
+		<permission id="invoice_list">发票列表</permission>
+	   <permission id="setting_invoice_content">发票内容管理</permission>
+		<permission id="invoice_manager">发票信息配置</permission>
+		<permission id="invoice_channel">发票渠道配置</permission>
+		<permission id="make_invoice">发票开票操作</permission>
+		<permission id="rush_red_invoice">发票冲红操作</permission>
+    </permissions>
+	
+    <workground name="财务管理" id="finance_center" order="400" icon="icon-caiwuguanli-01">
+		<menugroup name="订单发票" en="order-invoice-management">
+<!--            <menu controller='admin_order_front' action='index' permission='invoice_order_front' display='true' order='1000100'>预发票列表</menu>-->
+            <menu controller='admin_order' action='index' permission='invoice_list' display='true' order='1000300'>发票列表</menu>
+             <menu controller='admin_content' action='index' permission='setting_invoice_content' display='true' order='1000350'>发票内容管理</menu>
+            <menu controller='admin_order_setting' action='index' permission='invoice_manager' display='true' order='1000400'>发票信息配置</menu>
+             <menu controller='admin_channel' action='index' permission='invoice_channel' display='true' order='1000500'>发票渠道配置</menu>
+             <menu controller='admin_order' action='batchBill' permission='make_invoice' display='false' order='1000500'>发票开票操作</menu>
+             <menu controller='admin_order' action='batchCancel' permission='rush_red_invoice' display='false' order='1000500'>发票冲红操作</menu>
+        </menugroup>
+    </workground>
+</desktop>

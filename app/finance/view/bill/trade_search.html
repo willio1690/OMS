@@ -1,0 +1,120 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="post" action="index.php" id="add_form">
+    <input type="hidden" value='<{$json}>' id="json" />
+   
+    <div>
+        <table class="gridlist" style="*width:97%;">
+            <tr>
+                <td>时间范围</td>
+                <td><{input type="time" name="start_time" id="start_time" vtype="required" /}>至
+                <{input type="time" name="end_time" id="end_time" vtype="required" /}></td>
+            </tr>
+            <tr>
+                <td>支付宝订单号</td>
+                <td><input type="text" vtype="required" name="alipay_order_no" id="alipay_order_no" style="width:200px;" /></td>
+            </tr>
+            <tr>
+                <td>商户订单号</td>
+                <td><input type="text" vtype="required" name="merchant_order_no" id="merchant_order_no" style="width:200px;" /></td>
+            </tr>
+            <tr>
+                <th><{t}>进度：<{/t}></th>
+                <td colspan='2'>
+                    <div style="border:1px solid #CCC;width:360px;overflow:hidden;float:left;background:#FFF;padding:1px;">
+                        <div id="processBar" style="background:#7493D1;width:1%;height:15px;">&nbsp;</div>
+                    </div>&nbsp;<span id="processPercent">0%</span>
+                </td>
+        </table>
+        <table class="table-action" style="*width:97%;">
+            <tr>
+                <td colspan='2'>
+                    <{button id="down1" class="btn-primary" label=$___b2c="开始"|t:'b2c' type="button"}>
+                    <{button id="down2" class="btn-primary" label=$___b2c="下载中"|t:'b2c' type="button" style="display:none;"}>
+                    <{button type="button" class="btn-secondary" id="return-btn" label="关 闭" onclick="javascript:this.getParent('.dialog').retrieve('instance').close();"}></td>
+            </tr>
+        </table>
+    </div>
+</form>
+<script>
+    $('down1').addEvent('click',function(){
+        
+        $E('.btn-close',this.dialog_head).style.display = 'none';
+        var start_time = $('start_time').get('value');
+        var end_time = $('end_time').get('value');
+
+        var sel_H=document.getElementsByName("_DTIME_[H][start_time]")[0];
+        var start_time_h=sel_H.options[sel_H.options.selectedIndex].value;
+
+        var sel_M=document.getElementsByName("_DTIME_[M][start_time]")[0];
+        var start_time_m=sel_M.options[sel_M.options.selectedIndex].value;
+
+        var sel_H_end=document.getElementsByName("_DTIME_[H][end_time]")[0];
+        var end_time_h=sel_H_end.options[sel_H_end.options.selectedIndex].value;
+
+        var sel_M_end=document.getElementsByName("_DTIME_[M][end_time]")[0];
+        var end_time_m=sel_M_end.options[sel_M_end.options.selectedIndex].value;
+
+        start_time = start_time+' '+start_time_h+':'+start_time_m+':00';
+        end_time = end_time+' '+end_time_h+':'+end_time_m+':00';
+
+        var sta_str = new Date(start_time);
+        var end_date = new Date(end_time);
+
+        if(sta_str>end_date){
+            alert('开始时间必须小于结束时间');
+            return false;
+        }
+        if(!start_time||!end_time){
+            alert('请选择开始时间或结束时间');
+            return false;
+        }
+
+        var num = (end_date-sta_str)/(1000*3600*24);
+        var days = parseInt(Math.ceil(num));
+        if(days>7){
+            alert('结束时间与开始时间,必须间隔在七天之内 ');
+            return false;
+        }
+        uploadToTaobao(start_time,end_time,1);
+    });
+    function setProcessBar(id,w){
+        document.getElementById(id).style.width = w;
+    }
+    function uploadToTaobao(start_time,end_time,page_no){
+        if(!page_no) {page_no=1;}
+        var percent = '1%';
+        document.getElementById('return-btn').style.display="none";
+        document.getElementById('down1').style.display="none";
+        document.getElementById('down2').style.display="inline";
+
+        var alipay_order_no = $('alipay_order_no').get('value');
+        var merchant_order_no = $('merchant_order_no').get('value');
+        new Request({
+            url:'index.php?app=finance&ctl=bill&act=do_trade_search',
+            data:'start_time='+start_time+'&end_time='+end_time+'&page_no='+page_no+'&alipay_order_no='+alipay_order_no+'&merchant_order_no='+merchant_order_no,
+            method:'post',
+            onSuccess:function(responseText){
+                var cd = responseText.split('@');
+                setProcessBar('processBar',Math.round(cd[1])+'%');
+                document.getElementById('processPercent').innerHTML = Math.round(cd[1])+'%';
+                if (cd[0] == 'success') {
+                    page_no++;
+                    uploadToTaobao(start_time,end_time,page_no);
+                }else if (cd[0] == 'finish') {
+                        setProcessBar('processBar','100%');
+                        document.getElementById('processPercent').innerHTML = '100%';
+                        document.getElementById('return-btn').style.display="inline";
+                        document.getElementById('down1').style.display="inline";
+                        document.getElementById('down2').style.display="none";
+                }else{
+                    document.getElementById('processPercent').innerHTML = '失败';
+                    document.getElementById('return-btn').style.display="inline";
+                }
+            }
+        }).send();
+    }
+</script>

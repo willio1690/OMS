@@ -1,0 +1,321 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if !$replace}><div id="replace_main"><{/if}>
+    <form action='index.php?app=finance&ctl=bill&act=do_verificate' method="post" id="do_form">
+        <input type="hidden" name="finder_id" value="<{$finder_id}>" />
+        <input type="hidden" id="replace" value="<{$replace}>" />
+        <div class="tableform">
+            <table cellspacing="0" cellpadding="0" border="0" class="orderdetails_basic">
+                <tbody>
+                    <tr>
+                        <td >
+                            <h4>收退款单</h4>
+                            <div class="finder-packet">
+                                <div>
+                                    <ul class="my_clearfix">                    
+                                        <li class="current" onclick="change_current('order_bn')" id="order_bn">
+                                            <a href="javascript:void(0)">
+                                                <span>订单号相同</span>
+                                            </a>
+                                        </li>
+                                        <li onclick="change_current('member')" id="member">
+                                            <a href="javascript:void(0)">
+                                                <span>交易对方相同</span>
+                                            </a>
+                                        </li>
+                                        <li onclick="change_current('all')" id="all">
+                                            <a href="javascript:void(0)">
+                                                <span>全部</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="division">
+                                <div style="height:25px"><{button id="select_bill" label="选择收款单" /}>&nbsp;&nbsp;&nbsp;<div style="float:right" id="pre_select_time"><a href="javascript:void(0)" onclick="select_trade_time()">更改默认核销日期</a></div><span id="select_time" style="display:none;">更改默认核销日期：<{input type="date" name="trade_time" /}></span></div>
+                                <div id="replace_bill">
+                                    <table cellspacing="0" cellpadding="0"  border="0" class='gridlist'>
+                                        <thead>
+                                            <tr>
+                                                <th>选项</th>
+                                                <th>操作</th>
+                                                <th>单据编号</th>
+                                                <th>客户/会员</th>
+                                                <th>订单号</th>
+                                                <th>账单日期</th>
+                                                <th>支付单据号</th>
+                                                <th>费用对象</th>
+                                                <th>费用名称</th>
+                                                <th>实收金额</th>
+                                                <th>已核销金额</th>
+                                                <th>未核销金额</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <{foreach from=$bill_data item=item key=key}>
+                                            <tr id="replace_bill_<{$item.bill_id}>" <{if $item.charge_status == 0}> style="color:red" <{/if}>>
+                                                <td><input name="bill_id[]" type="checkbox" value="<{$item.bill_id}>" /></td>
+                                                <td style="width:200px;"><{if $item.charge_status == 0}><a style="color:red" href="javascript:void(0)" onclick="do_charge(<{$item.bill_id}>,'bill')">记账</a><a style="color:red" href="javascript:void(0)" onclick="do_cancel(<{$item.bill_id}>,'bill')">作废</a><{/if}></td>
+                                                <td><{$item.bill_bn}></td>
+                                                <td><{$item.member}></td>
+                                                <td><{$item.order_bn}></td>
+                                                <td><{$item.trade_time}></td>
+                                                <td><{$item.credential_number}></td>
+                                                <td><{$item.fee_obj}></td>
+                                                <td><{$item.fee_item}></td>
+                                                <td><{$item.money}></td>
+                                                <td><{$item.confirm_money}></td>
+                                                <td><{$item.unconfirm_money}></td>
+                                            </tr>
+                                            <{/foreach}>
+                                        </tbody>    
+                                    </table>
+                                </div>                    
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            <h4>销售应收账单</h4>
+                            <div class="division">
+                                <div style='height:25px'><{button id="select_ar" label="选择应收单" /}></div>
+                                <div id="replace_ar">
+                                    <table cellspacing="0" cellpadding="0"  border="0" class='gridlist'>
+                                        <thead>
+                                            <tr>
+                                                <th>选项</th>
+                                                <th>操作</th>
+                                                <th>单据编号</th>
+                                                <th>客户/会员</th>
+                                                <th>订单号</th>
+                                                <th>账单日期</th>
+                                                <th>支付单据号</th>
+                                                <th>店铺</th>
+                                                <th>类型</th>
+                                                <th>应收金额</th>
+                                                <th>已核销金额</th>
+                                                <th>未核销金额</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <{foreach from=$ar_data item=item key=key}>
+                                            <tr id="replace_ar_<{$item.ar_id}>" <{if $item.charge_status == 0}> style="color:red" <{/if}>>
+                                                <td><input name="ar_id[]" type="checkbox" value="<{$item.ar_id}>" /></td>
+                                                <td><{if $item.charge_status == 0}><a style="color:red" href="javascript:void(0)" onclick="do_charge(<{$item.ar_id}>,'ar')">记账</a><a style="color:red" href="javascript:void(0)" onclick="do_cancel(<{$item.ar_id}>,'ar')">作废</a><{/if}></td>
+                                                <td><{$item.ar_bn}></td>
+                                                <td><{$item.member}></td>
+                                                <td><{$item.order_bn}></td>
+                                                <td><{$item.trade_time}></td>
+                                                <td><{$item.serial_number}></td>
+                                                <td><{$item.channel_name}></td>
+                                                <td><{$item.type}></td>
+                                                <td><{$item.money}></td>
+                                                <td><{$item.confirm_money}></td>
+                                                <td><{$item.unconfirm_money}></td>
+                                            </tr>
+                                            <{/foreach}>
+                                        </tbody>                        
+                                    </table>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div align="center">
+            <{button label="确认核销" class="btn btn-primary" onclick="do_submit()" }>
+            <{button label="查看下一单" class="btn btn-primary" onclick="check_next()" }>
+        </div>
+    </form>
+<{if !$replace}></div><{/if}>
+<script>
+function change_current(e){
+    $$('.my_clearfix li').each(function(el){
+        el.set('class','');
+    });
+    $(e).set('class','current');
+    new Request({
+        url:'index.php?app=finance&ctl=bill&act=sync_verificate',
+        data:'bill_id=<{$bill_id}>&flag='+e,
+        method:'post',
+        onSuccess:function(response){
+            var rs =  JSON.decode(response);
+            var bill = rs['bill_data'];
+            var td='';
+            for(var v=0,len=bill.length;v<len;v++) {
+                td+= '<tr><td><input name="bill_id[]" type="checkbox" value="'+bill[v]['bill_id']+'" /></td><td>'+bill[v]['bill_bn']+'</td><td>'+bill[v]['member']+'</td><td>'+bill[v]['order_bn']+'</td><td>'+bill[v]['trade_time']+'</td><td>'+bill[v]['credential_number']+'</td><td>'+bill[v]['fee_obj']+'</td><td>'+bill[v]['fee_item']+'</td><td>'+bill[v]['money']+'</td><td>'+bill[v]['confirm_money']+'</td><td>'+bill[v]['unconfirm_money']+'</td></tr>';
+            }
+            var left = '<table cellspacing="0" cellpadding="0"  border="0" class="gridlist"><thead><tr><th>选项</th><th>单据编号</th><th>客户/会员</th><th>订单号</th><th>账单日期</th><th>支付单据号</th><th>费用对象</th><th>费用名称</th><th>实收金额</th><th>已核销金额</th><th>未核销金额</th></tr></thead><tbody>';
+            var right = '</tobody></table>';
+            var html = left + td + right;
+            $('replace_bill').set('html',html);
+            var ar = rs['ar_data'];
+            var td='';
+            for(var v=0,lena=ar.length;v<lena;v++) {
+                td+= '<tr><td><input name="ar_id[]" type="checkbox" value="'+ar[v]['ar_id']+'" /></td><td>'+ar[v]['ar_bn']+'</td><td>'+ar[v]['member']+'</td><td>'+ar[v]['order_bn']+'</td><td>'+ar[v]['trade_time']+'</td><td>'+ar[v]['serial_number']+'</td><td>'+ar[v]['channel_name']+'</td><td>'+ar[v]['type']+'</td><td>'+ar[v]['money']+'</td><td>'+ar[v]['confirm_money']+'</td><td>'+ar[v]['unconfirm_money']+'</td></tr>';
+            }
+            var left = '<table cellspacing="0" cellpadding="0"  border="0" class="gridlist"><thead><tr><th>选项</th><th>单据编号</th><th>客户/会员</th><th>订单号</th><th>账单日期</th><th>支付单据号</th><th>店铺</th><th>类型</th><th>实收金额</th><th>已核销金额</th><th>未核销金额</th></tr></thead><tbody>';
+            var right = '</tobody></table>';
+            var html = left + td + right;
+            $('replace_ar').set('html',html);
+        }
+    }).send();
+}
+
+function do_submit(){
+    new Request({
+        url:'index.php?app=finance&ctl=bill&act=sync_do_verificate',
+        data:$('do_form'),
+        method:'post',
+        onSuccess:function(json){
+            rs = JSON.decode(json);
+            if(rs.status == 'fail'){
+                alert(rs.msg);
+                return;
+            }
+            if(window.confirm(rs.msg)){
+                var replace = $('replace').value;
+                if(replace){
+                    new Request({
+                        url:'index.php?app=finance&ctl=bill&act=do_verificate',
+                        data:$('do_form'),
+                        method:'post',
+                        onSuccess:function(json){
+                            finderGroup['<{$finder_id}>'].refresh();
+                        },
+                        onComplete:function(e){
+                            $('do_form').getParent('.dialog').retrieve('instance').close();
+                        }
+                    }).send();
+                }else{
+                    $('do_form').fireEvent('submit',{stop:function(){}});
+                    $('do_form').getParent('.dialog').retrieve('instance').close();
+                }
+            }
+        }
+    }).send();
+}
+
+function select_trade_time(){
+    $('pre_select_time').set('style','display:none');
+    $('select_time').set('style','float:right');
+}
+
+$('select_bill').addEvent('click',function(e){
+    var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=finance&ctl=bill&act=findbill');
+    new finderDialog(url,{params:{url:'index.php?app=finance&ctl=bill&act=getbill',name:'bill_id[]'},width:1000,height:660,
+        onCallback:function(rs){
+            if(!rs)return;
+            bill=JSON.decode(rs);
+            var td='';
+            for(var v=0,len=bill.length;v<len;v++) {
+                td+= '<tr><td><input name="bill_id[]" type="checkbox" value="'+bill[v]['bill_id']+'" /></td><td>'+bill[v]['bill_bn']+'</td><td>'+bill[v]['member']+'</td><td>'+bill[v]['order_bn']+'</td><td>'+bill[v]['trade_time']+'</td><td>'+bill[v]['credential_number']+'</td><td>'+bill[v]['fee_obj']+'</td><td>'+bill[v]['fee_item']+'</td><td>'+bill[v]['money']+'</td><td>'+bill[v]['confirm_money']+'</td><td>'+bill[v]['unconfirm_money']+'</td></tr>';
+            }
+            var left = '<table cellspacing="0" cellpadding="0"  border="0" class="gridlist"><thead><tr><th>选项</th><th>单据编号</th><th>客户/会员</th><th>订单号</th><th>账单日期</th><th>支付单据号</th><th>费用对象</th><th>费用名称</th><th>实收金额</th><th>已核销金额</th><th>未核销金额</th></tr></thead><tbody>';
+            var right = '</tobody></table>';
+            var html = left + td + right;
+            $('replace_bill').set('html',html);
+        }
+    });
+});
+
+$('select_ar').addEvent('click',function(e){
+    var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=finance&ctl=bill&act=findar');
+    new finderDialog(url,{params:{url:'index.php?app=finance&ctl=bill&act=getar',name:'ar_id[]'},width:1000,height:660,
+        onCallback:function(rs){
+            if(!rs)return;
+            ar=JSON.decode(rs);
+            var td='';
+            for(var v=0,lena=ar.length;v<lena;v++) {
+                td+= '<tr><td><input name="ar_id[]" type="checkbox" value="'+ar[v]['ar_id']+'" /></td><td>'+ar[v]['ar_bn']+'</td><td>'+ar[v]['member']+'</td><td>'+ar[v]['order_bn']+'</td><td>'+ar[v]['trade_time']+'</td><td>'+ar[v]['serial_number']+'</td><td>'+ar[v]['channel_name']+'</td><td>'+ar[v]['type']+'</td><td>'+ar[v]['money']+'</td><td>'+ar[v]['confirm_money']+'</td><td>'+ar[v]['unconfirm_money']+'</td></tr>';
+            }
+            var left = '<table cellspacing="0" cellpadding="0"  border="0" class="gridlist"><thead><tr><th>选项</th><th>单据编号</th><th>客户/会员</th><th>订单号</th><th>账单日期</th><th>支付单据号</th><th>店铺</th><th>类型</th><th>实收金额</th><th>已核销金额</th><th>未核销金额</th></tr></thead><tbody>';
+            var right = '</tobody></table>';
+            var html = left + td + right;
+            $('replace_ar').set('html',html);
+        }
+    });
+});
+
+function check_next(){
+    new Request.HTML({
+        url:'index.php?app=finance&ctl=bill&act=verificate&bill_id=<{$next_bill_id}>&flag=replace&finder_id=<{$finder_id}>',
+        method:'get',
+        update:$('replace_main'),
+        onRequest:function(e){
+            return MessageBox.show('正在修改，请稍等...');
+        },
+        onSuccess:function(json){
+            return MessageBox.show('');
+        }
+    }).send();
+}
+function do_charge(e,flag){
+    if(confirm('是否记账')){
+        if(flag == 'bill'){
+            var url = 'index.php?app=finance&ctl=bill&act=sync_do_charge';
+            var data = 'bill_id='+e;
+        }else if (flag == 'ar'){
+            var url = 'index.php?app=finance&ctl=ar_verification&act=sync_do_charge';
+            var data = 'ar_id='+e;
+        }
+        new Request({
+            url:url,
+            data:data,
+            method:'post',
+            onSuccess:function(json){
+                rs = JSON.decode(json);
+                if(rs.status == 'fail'){
+                    alert(rs.msg);
+                    return;
+                }else{
+                    if(flag == 'bill'){
+                        var html = '<td><input name="bill_id[]" type="checkbox" value="'+rs.msg.bill_id+'" /></td><td></td><td>'+rs.msg.bill_bn+'</td><td>'+rs.msg.member+'</td><td>'+rs.msg.order_bn+'</td> <td>'+rs.msg.trade_time+'</td> <td>'+rs.msg.credential_number+'</td> <td>'+rs.msg.fee_obj+'</td> <td>'+rs.msg.fee_item+'</td> <td>'+rs.msg.money+'</td> <td>'+rs.msg.confirm_money+'</td> <td>'+rs.msg.unconfirm_money+'</td>';
+                        $('replace_bill_'+e).set('html',html);
+                        $('replace_bill_'+e).set('style',''); 
+                    }else{
+                        var html = '<td><input name="ar_id[]" type="checkbox" value="'+rs.msg.ar_id+'" /></td><td></td><td>'+rs.msg.ar_bn+'</td><td>'+rs.msg.member+'</td><td>'+rs.msg.order_bn+'</td> <td>'+rs.msg.trade_time+'</td> <td>'+rs.msg.serial_number+'</td> <td>'+rs.msg.channel_name+'</td> <td>'+rs.msg.type+'</td> <td>'+rs.msg.money+'</td> <td>'+rs.msg.confirm_money+'</td> <td>'+rs.msg.unconfirm_money+'</td>';
+                        $('replace_ar_'+e).set('html',html);
+                        $('replace_ar_'+e).set('style',''); 
+                    }      
+                      
+                }
+            }
+        }).send();
+    }
+}
+
+function do_cancel(e,flag){
+    if(confirm('是否作废')){
+        if(flag == 'bill'){
+            var url = 'index.php?app=finance&ctl=bill&act=sync_do_cancel&finder_id=<{$finder_id}>';
+        }else if (flag == 'ar'){
+            var url = 'index.php?app=finance&ctl=ar_verification&act=sync_do_cancel';
+        }
+        new Request({
+            url:url,
+            data:'id='+e,
+            method:'post',
+            onSuccess:function(json){
+                rs = JSON.decode(json);
+                if(rs.status == 'fail'){
+                    alert(rs.msg);
+                    return;
+                }else{
+                    if(flag == 'bill'){
+                        $('replace_bill_'+e).remove();
+                    }else{
+                        $('replace_ar_'+e).remove();
+                    }
+                    var finder_id = rs.finder_id;
+                    eval("finderGroup['"+finder_id+"'].refresh()");
+                }
+            }
+        }).send();
+    }
+}
+</script>

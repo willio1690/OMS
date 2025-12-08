@@ -1,0 +1,77 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+    <table class="gridlist"  style="margin:4px 0;">
+    <thead>
+        <tr>
+           
+            <th></th>
+
+            <th>采购结算数量</th>
+         
+            <th>采购结算金额(含税)</th>
+            
+        </tr>
+    </thead>
+    <tbody id="dataNode">
+       
+        <tr>
+            <th>本期销售</th>
+            <th><{$vopbills.cr_cust_quantity}></th>
+          
+            <th><{$vopbills.cr_cust_amount}></th>
+
+          
+        </tr>
+          <tr>
+            <th>本期客退</th>
+            <th><{$vopbills.dr_cust_quantity}></th>
+          
+            <th><{$vopbills.dr_cust_amount}></th>
+
+          
+        </tr>
+          <tr>
+            <th>本期其他</th>
+            <th><{$vopbills.other_quantity}></th>
+           
+            <th><{$vopbills.other_amount}></th>
+
+          
+        </tr>
+          <tr>
+            <th>活动折扣优惠</th>
+           
+            <th></th>
+            <th><{$discounts.dis_amount}></th>
+
+          
+        </tr>
+        <tr>
+            <th>【开票金额合计】</th>
+           
+            <th><{$total_qty}></th>
+            <th><{$total_amount}></th>
+
+          
+        </tr>
+       
+        
+        <tr>
+            <th>合计金额</th>
+           
+            <th></th>
+            <th><{$summary.sum_total_amount}></th>
+
+          
+        </tr>
+       
+      
+    </tbody>
+    </table>
+</div>
+
+

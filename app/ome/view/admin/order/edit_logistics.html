@@ -1,0 +1,21 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!-- POST需要提交的字段，需要加上class="dailog-batch-ipt" -->
+<table>
+    <tbody>
+        <tr>
+            <th>选择物流公司:</th>
+            <td>
+                <select name="corp_id" class="dailog-batch-ipt">
+                        <option value="">请选择</option>
+                    <{foreach from=$logiList item=item}>
+                        <option value="<{$item.corp_id}>"><{$item.name}>(<{$item.type}>)</option>
+                    <{/foreach}>
+                </select>
+            </td>
+        </tr>
+    </tbody>
+</table>

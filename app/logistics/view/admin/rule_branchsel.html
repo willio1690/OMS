@@ -1,0 +1,43 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="rule-content">
+    <h2>第一步：选择仓库</h2>
+    <div class="tableform" >
+        <div class="division">
+            <table border="0" cellpadding="0" cellspacing="0" class="girdlist">
+                <tbody>
+                    <tr>
+                        <th><em class="c-red">*</em> 仓库：</th>
+                        <td>
+                            <{input type='object' id='branch_id' class='branch_id' name='branch_id' object='branch@ome' filter=array('is_deliv_branch'=>'true','check_permission'=>'false') filter_sql="b_type=1 or (b_type='2' and branch_id in (select branch_id from sdb_o2o_store where is_o2o=1))"}>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-action">
+        <{button type="button" label="下一步" id="rule-step1-btn" }>
+    </div>
+</div>
+
+<script type="text/javascript">
+    (function(){
+        $('rule-step1-btn').addEvent('click',function(){
+            var data = $('rule-content').toQueryString();
+
+            if (data == 'branch_id=') return MessageBox.error('请先选择仓库');
+
+            W.page('index.php?app=logistics&ctl=admin_rule&act=addRule&finder_id=<{$env.get.finder_id}>',{
+                method:'get',
+                data:data,
+                update:$('rule-content'),
+                clearUpdateMap:false
+            });
+        });
+    })();
+</script>

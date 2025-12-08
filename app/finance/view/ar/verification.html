@@ -1,0 +1,246 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if !$replace}><div id="replace_main"><{/if}>
+    <form action='index.php?app=finance&ctl=ar_verification&act=do_verificate' method="post" id="do_form">
+        <input type="hidden" name="finder_id" value="<{$finder_id}>" />
+        <input type="hidden" id="replace" value="<{$replace}>" />
+        <div class="tableform">
+            <table cellspacing="0" cellpadding="0" border="0" class="orderdetails_basic">
+                <tbody>
+                    <tr>
+                        <td >
+                            <h4>正应收单据</h4>
+                            <div class="division">
+                                <div><{button id="select_plus" label="选择正应收单" /}>&nbsp;&nbsp;&nbsp;<div style="float:right" id="pre_select_time"><a href="javascript:void(0)" onclick="select_trade_time()">更改默认核销日期</a></div><span id="select_time" style="display:none;">更改默认核销日期：<{input type="date" name="trade_time" /}></span></div>
+                                <div id="replace_plus">
+                                    <table cellspacing="0" cellpadding="0"  border="0" class='gridlist'>
+                                        <thead>
+                                            <tr>
+                                                <th>选项</th>
+                                                <th>操作</th>
+                                                <th>单据编号</th>
+                                                <th>客户/会员</th>
+                                                <th>订单号</th>
+                                                <th>账单日期</th>
+                                                <th>支付单据号</th>
+                                                <th>店铺</th>
+                                                <th>类型</th>
+                                                <th>应收金额</th>
+                                                <th>已核销金额</th>
+                                                <th>未核销金额</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <{foreach from=$plus item=item key=key}>
+                                            <tr id="replace_ar_<{$item.ar_id}>" <{if $item.charge_status == 0}> style="color:red" <{/if}>>
+                                                <td><input name="plus[]" type="checkbox" value="<{$item.ar_id}>" /></td>
+                                                <td><{if $item.charge_status == 0}><a style="color:red" href="javascript:void(0)" onclick="do_charge(<{$item.ar_id}>,'plus')">记账</a><a style="color:red" href="javascript:void(0)" onclick="do_cancel(<{$item.ar_id}>)">作废</a><{/if}></td>
+                                                <td><{$item.ar_bn}></td>
+                                                <td><{$item.member}></td>
+                                                <td><{$item.order_bn}></td>
+                                                <td><{$item.trade_time|date_format:"%Y-%m-%d"}></td>
+                                                <td><{$item.serial_number}></td>
+                                                <td><{$item.channel_name}></td>
+                                                <td><{$item.type}></td>
+                                                <td><{$item.money}></td>
+                                                <td><{$item.confirm_money}></td>
+                                                <td><{$item.unconfirm_money}></td>
+                                            </tr>
+                                            <{/foreach}>
+                                        </tbody>    
+                                    </table>
+                                </div>           
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            <h4>负应收账单</h4>
+                            <div class="division">
+                                <div style="height:25px"><{button id="select_minus" label="选择负应收单" /}></div>
+                                <div id="replace_minus">
+                                    <table cellspacing="0" cellpadding="0"  border="0" class='gridlist'>
+                                        <thead>
+                                            <tr>
+                                                <th>选项</th>
+                                                <th>操作</th>
+                                                <th>单据编号</th>
+                                                <th>客户/会员</th>
+                                                <th>订单号</th>
+                                                <th>账单日期</th>
+                                                <th>支付单据号</th>
+                                                <th>店铺</th>
+                                                <th>类型</th>
+                                                <th>应收金额</th>
+                                                <th>已核销金额</th>
+                                                <th>未核销金额</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <{foreach from=$minus item=item key=key}>
+                                            <tr id="replace_ar_<{$item.ar_id}>" <{if $item.charge_status == 0}> style="color:red" <{/if}>>
+                                                <td><input name="minus[]" type="checkbox" value="<{$item.ar_id}>" /></td>
+                                                <td><{if $item.charge_status == 0}><a style="color:red" href="javascript:void(0)" onclick="do_charge(<{$item.ar_id}>,'minus')">记账</a><a style="color:red" href="javascript:void(0)" onclick="do_cancel(<{$item.ar_id}>)">作废</a><{/if}></td>
+                                                <td><{$item.ar_bn}></td>
+                                                <td><{$item.member}></td>
+                                                <td><{$item.order_bn}></td>
+                                                <td><{$item.trade_time|date_format:"%Y-%m-%d"}></td>
+                                                <td><{$item.serial_number}></td>
+                                                <td><{$item.channel_name}></td>
+                                                <td><{$item.type}></td>
+                                                <td><{$item.money}></td>
+                                                <td><{$item.confirm_money}></td>
+                                                <td><{$item.unconfirm_money}></td>
+                                            </tr>
+                                            <{/foreach}>
+                                        </tbody>                        
+                                    </table>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div align="center">
+            <{button label="确认对冲" class="btn btn-primary" onclick="do_submit()" }>
+            <{button label="查看下一单" class="btn btn-primary" onclick="check_next()" }>
+        </div>
+    </form>
+<{if !$replace}></div><{/if}>
+<script>
+function do_submit(){
+    new Request({
+        url:'index.php?app=finance&ctl=ar_verification&act=sync_do_verificate',
+        data:$('do_form'),
+        method:'post',
+        onSuccess:function(json){
+            rs = JSON.decode(json);
+            if(rs.status == 'fail'){
+                alert(rs.msg);
+                return;
+            }
+            if(window.confirm(rs.msg)){
+                var replace = $('replace').value;
+                if(replace){
+                    new Request({
+                        url:'index.php?app=finance&ctl=ar_verification&act=do_verificate',
+                        data:$('do_form'),
+                        method:'post',
+                        onSuccess:function(json){
+                            finderGroup['<{$finder_id}>'].refresh();
+                        },
+                        onComplete:function(e){
+                            $('do_form').getParent('.dialog').retrieve('instance').close();
+                        }
+                    }).send();
+                }else{
+                    $('do_form').fireEvent('submit',{stop:function(){}});
+                    $('do_form').getParent('.dialog').retrieve('instance').close();
+                }
+            }
+        }
+    }).send();
+}
+function select_trade_time(){
+    $('pre_select_time').set('style','display:none');
+    $('select_time').set('style','float:right');
+}
+function check_next(){
+    new Request.HTML({
+        url:'index.php?app=finance&ctl=ar_verification&act=verificate&order_bn=<{$next_order_bn}>&time_from=<{$time_from}>&time_to=<{$time_to}>&flag=replace&finder_id=<{$finder_id}>',
+        method:'get',
+        update:$('replace_main'),
+        onRequest:function(e){
+            return MessageBox.show('正在修改，请稍等...');
+        },
+        onSuccess:function(json){
+            return MessageBox.show('');
+        }
+    }).send();
+}
+
+var callback_url = 'index.php?app=finance&ctl=ar_verification&act=getdata';
+$('select_plus').addEvent('click',function(e){
+    var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=finance&ctl=ar_verification&act=findplus');
+    new finderDialog(url,{params:{url:callback_url,name:'ar_id[]'},width:1000,height:660,
+        onCallback:function(rs){
+            if(!rs)return;
+            plus=JSON.decode(rs);
+            var td='';
+            for(var v=0,lena=plus.length;v<lena;v++) {
+                td+= '<tr><td><input name="plus[]" type="checkbox" value="'+plus[v]['ar_id']+'" /></td><td>'+plus[v]['ar_bn']+'</td><td>'+plus[v]['member']+'</td><td>'+plus[v]['order_bn']+'</td><td>'+plus[v]['trade_time']+'</td><td>'+plus[v]['serial_number']+'</td><td>'+plus[v]['channel_name']+'</td><td>'+plus[v]['type']+'</td><td>'+plus[v]['money']+'</td><td>'+plus[v]['confirm_money']+'</td><td>'+plus[v]['unconfirm_money']+'</td></tr>';
+            }
+            var left = '<table cellspacing="0" cellpadding="0"  border="0" class="gridlist"><thead><tr><th>选项</th><th>单据编号</th><th>客户/会员</th><th>订单号</th><th>账单日期</th><th>支付单据号</th><th>店铺</th><th>类型</th><th>实收金额</th><th>已核销金额</th><th>未核销金额</th></tr></thead><tbody>';
+            var right = '</tobody></table>';
+            var html = left + td + right;
+            $('replace_plus').set('html',html);
+        }
+    });
+});
+
+$('select_minus').addEvent('click',function(e){
+    var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=finance&ctl=ar_verification&act=findminus');
+    new finderDialog(url,{params:{url:callback_url,name:'ar_id[]'},width:1000,height:660,
+        onCallback:function(rs){
+            if(!rs)return;
+            minus=JSON.decode(rs);
+            var td='';
+            for(var v=0,lena=minus.length;v<lena;v++) {
+                td+= '<tr><td><input name="minus[]" type="checkbox" value="'+minus[v]['ar_id']+'" /></td><td>'+minus[v]['ar_bn']+'</td><td>'+minus[v]['member']+'</td><td>'+minus[v]['order_bn']+'</td><td>'+minus[v]['trade_time']+'</td><td>'+minus[v]['serial_number']+'</td><td>'+minus[v]['channel_name']+'</td><td>'+minus[v]['type']+'</td><td>'+minus[v]['money']+'</td><td>'+minus[v]['confirm_money']+'</td><td>'+minus[v]['unconfirm_money']+'</td></tr>';
+            }
+            var left = '<table cellspacing="0" cellpadding="0"  border="0" class="gridlist"><thead><tr><th>选项</th><th>单据编号</th><th>客户/会员</th><th>订单号</th><th>账单日期</th><th>支付单据号</th><th>店铺</th><th>类型</th><th>实收金额</th><th>已核销金额</th><th>未核销金额</th></tr></thead><tbody>';
+            var right = '</tobody></table>';
+            var html = left + td + right;
+            $('replace_minus').set('html',html);
+        }
+    });
+});
+
+function do_charge(e,flag){
+    if(confirm('是否记账')){
+        new Request({
+            url:'index.php?app=finance&ctl=ar_verification&act=sync_do_charge',
+            data:'ar_id='+e,
+            method:'post',
+            onSuccess:function(json){
+                rs = JSON.decode(json);
+                if(rs.status == 'fail'){
+                    alert(rs.msg);
+                    return;
+                }else{
+                    if(flag == 'plus'){
+                        var html = '<td><input name="plus[]" type="checkbox" value="'+rs.msg.ar_id+'" /></td><td></td><td>'+rs.msg.ar_bn+'</td><td>'+rs.msg.member+'</td><td>'+rs.msg.order_bn+'</td> <td>'+rs.msg.trade_time+'</td> <td>'+rs.msg.serial_number+'</td> <td>'+rs.msg.channel_name+'</td> <td>'+rs.msg.type+'</td> <td>'+rs.msg.money+'</td> <td>'+rs.msg.confirm_money+'</td> <td>'+rs.msg.unconfirm_money+'</td>';
+                    }else{
+                        var html = '<td><input name="minus[]" type="checkbox" value="'+rs.msg.ar_id+'" /></td><td></td><td>'+rs.msg.ar_bn+'</td><td>'+rs.msg.member+'</td><td>'+rs.msg.order_bn+'</td> <td>'+rs.msg.trade_time+'</td> <td>'+rs.msg.serial_number+'</td> <td>'+rs.msg.channel_name+'</td> <td>'+rs.msg.type+'</td> <td>'+rs.msg.money+'</td> <td>'+rs.msg.confirm_money+'</td> <td>'+rs.msg.unconfirm_money+'</td>';
+                    }      
+                    $('replace_ar_'+e).set('html',html);
+                    $('replace_ar_'+e).set('style','');   
+                }
+            }
+        }).send();
+    }
+}
+
+function do_cancel(e){
+    if(confirm('是否作废')){
+        new Request({
+            url:'index.php?app=finance&ctl=ar_verification&act=sync_do_cancel',
+            data:'id='+e,
+            method:'post',
+            onSuccess:function(json){
+                rs = JSON.decode(json);
+                if(rs.status == 'fail'){
+                    alert(rs.msg);
+                    return;
+                }else{
+                    $('replace_ar_'+e).remove();
+                }
+            }
+        }).send();
+    }
+}
+</script>

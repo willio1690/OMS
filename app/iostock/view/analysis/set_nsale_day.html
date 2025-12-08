@@ -1,0 +1,81 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="data-action" style="padding:5px;">
+	<form action="<{$set_nsale_day_form_action}>" method="post" id="nsale_day_filter_form">
+		<table width="100%" cellpadding="0" cellspacing="0" border="0">
+			<tr>
+		      	<td align="left" nowrap="nowrap">
+					<{$set_nsale_day_title}><{help}><{$set_nsale_day_help_message}><{/help}>:
+					<br />
+					<select name="nsale_day_select" id="nsale_day_select">
+						<{foreach from=$select_data key=key item=item}>
+							<option value="<{$key}>" <{if $selected_value == $key}>selected="selected"<{/if}>><{$item}></option>
+						<{/foreach}>
+					</select>
+					<input type="text" width="30" id="nsale_day_input" name="nsale_day_input" value="<{$nsale_day_byself}>" <{if $part_select_value == 'choose_select'}> style="display:none"<{/if}>>
+					<{button type="submit" class="filterBtn btn-thirdly" label="确定" id="brandSetNsaleDayForm"}>
+		        	<input type="hidden" id="part_select" name="part_select" value="<{$part_select_value}>">
+				</td>
+		    </tr>
+		</table>
+	</form>
+</div>
+
+<script>
+(function(){
+
+	$('nsale_day_select').addEvent("change",function(e){
+		var nsale_day_select_value = $('nsale_day_select').value;
+		if(nsale_day_select_value == 99999){
+			$('nsale_day_input').show();
+			$('part_select').value = 'choose_input';
+		}else{
+			$('nsale_day_input').hide();
+			$('part_select').value = "choose_select";
+		}
+	});
+	
+	$('brandSetNsaleDayForm').addEvent("click",function(e){
+		var current_part_select_value = $('part_select').value;
+		if(current_part_select_value == "choose_input"){
+			var nsale_day_input = $('nsale_day_input').value.trim();
+			if(nsale_day_input == ""){
+				MessageBox.error('请填写自定义天数');
+				e.stop();
+				return;
+			}
+			if(parseInt(nsale_day_input) <= "0"){
+				MessageBox.error('自定义天数必须大于0');
+				e.stop();
+				return;
+			}
+			if(isNaN(nsale_day_input)){
+				MessageBox.error('自定义天数为数字格式');
+				e.stop();
+				return;
+			}
+		}
+		//prevent do 99999 value
+		var nsale_day_select = $('nsale_day_select').value;
+		if(nsale_day_select == "99999" && current_part_select_value == "choose_select"){
+			MessageBox.error('您选择的自定义 请正确填写自定义天数');
+			e.stop();
+			return;
+		}
+		
+		_form = $('nsale_day_filter_form');
+		_form.store('target',{
+			onSuccess:function(){
+				$('brandSetNsaleDayForm').getParent('.dialog').retrieve('instance').close();
+			}
+		});
+		_form.fireEvent('submit',{stop:$empty});
+		
+	});
+	
+})();
+</script>
+

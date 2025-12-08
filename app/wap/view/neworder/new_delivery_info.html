@@ -1,0 +1,135 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="./common.css" />
+  <link rel="stylesheet" type="text/css" href="./new_delivery_info.css" />
+  <script src="./axios.min.js"></script>
+  <script src="./flexible.js"></script>
+</head>
+
+<body>
+  <div class="page flex-col">
+    <!-- heder -->
+    <div class="section_1">
+      <div class="text-wrapper_1 flex-row align-center justify-between">
+        <img src="./icon-back.png" class="icon-back">
+        <span class="text_1">验货退款</span>
+        <img src="./icon-refresh.png" class="icon-refresh">
+      </div>
+    </div>
+    <div class="main flex-col">
+      <div class="delivery-info">
+        <!-- 基本信息卡片 -->
+        <div class="info-card">
+          <div class="info-item flex-row align-center">
+            <span class="label">月结账号：</span>
+            <span class="value">顺丰-9345343466</span>
+          </div>
+          <div class="info-item flex-row align-center">
+            <span class="label">建立日期：</span>
+            <span class="value">2024-12-13 14:14:46</span>
+          </div>
+          <div class="info-item flex-row align-center">
+            <span class="label">物流单号：</span>
+            <span class="value">34345435636567</span>
+          </div>
+          <div class="info-item flex-row align-center">
+            <span class="label">收件人：</span>
+            <span class="value">屏三</span>
+          </div>
+          <div class="info-item flex-row align-center">
+            <span class="label">物流公司：</span>
+            <span class="value">中通快递</span>
+          </div>
+          <div class="info-item flex-row align-center">
+            <span class="label">发货仓库：</span>
+            <span class="value">A-CD-正常-可售</span>
+          </div>
+          <div class="info-item flex-row align-center">
+            <span class="label">打印状态：</span>
+            <span class="value">已打印</span>
+          </div>
+          <div class="info-item flex-row align-center">
+            <span class="label">发货状态：</span>
+            <span class="value">已发货</span>
+          </div>
+        </div>
+
+        <!-- 物流轨迹列表 -->
+        <div class="timeline">
+          <div class="timeline-item active">
+            <div class="content">
+              <div class="text">您的快件已由本人签收，感谢您使用京东物流，期待再次为您服务</div>
+              <div class="time">2021-06-02 18:29:01</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="content">
+              <div class="text">您的快件正在派送中，请您准备签收（快递员：魏建云，联系电话：15261824127）</div>
+              <div class="time">2021-06-02 14:21:55</div>
+            </div>
+          </div>
+          <!-- 更多轨迹项... -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mask" id="mask"></div>
+  <div class="toast" id="toast"></div>
+  <!-- 弹窗组件 -->
+  <!-- 弹窗组件模板 -->
+  <div class="modal" id="commonModal" style="display: none;">
+    <div class="modal-mask"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"></h3>
+        <span class="modal-close">×</span>
+      </div>
+      <div class="modal-content">
+        <!-- 动态内容区域 -->
+      </div>
+      <div class="modal-footer justify-between">
+        <button class="modal-btn modal-cancle">取消</button>
+        <button class="modal-btn modal-confirm">确定</button>
+      </div>
+    </div>
+  </div>
+  <!-- 引入共用的js -->
+  <script src="./common.js"></script>
+  <script>
+    // 初始化弹窗实例
+    // const modal = new Modal();
+    // // API 方法封装
+    // const api = {
+    //   submitRefuse(params) {
+    //     return request.post('/checkorder/refuse', params);
+    //     // 配置 json 格式提交，覆盖common.is 内定义的formdata提交
+    //     // return request({
+    //     //   url: '/checkorder/refuse',
+    //     //   method: 'post',
+    //     //   data: params,
+    //     //   headers: {
+    //     //     'Content-Type': 'application/json'
+    //     //   },
+    //     //   transformRequest: [(data) => JSON.stringify(data)] // 覆盖默认的 transformRequest
+    //     // });
+    //   },
+    //   submitAccept(params) {
+    //     return request.post('/checkorder/accept', params);
+    //   },
+    // };
+
+
+  </script>
+</body>
+
+</html>

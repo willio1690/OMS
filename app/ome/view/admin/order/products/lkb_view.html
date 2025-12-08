@@ -1,0 +1,150 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+   <h4><{t}>福袋组合商品<{/t}></h4>
+      <table width="100%" class="gridlist" border="0" cellspacing="0" cellpadding="0">
+        <thead>
+        <tr>
+          <th><{t}>操作<{/t}></th>
+          <th><{t}>物料编码<{/t}></th>
+          <th><{t}>物料名称<{/t}></th>
+          <th><{t}>规格<{/t}></th>
+          <th><{t}>单位<{/t}></th>
+          <th><{t}>原价<{/t}></th>
+          <th><{t}>销售价<{/t}></th>
+          <th><{t}>优惠额<{/t}></th>
+          <th><{t}>实付金额<{/t}></th>
+          <th><{t}>优惠分摊<{/t}></th>
+          <th><{t}>购买量<{/t}></th>
+          <th><{t}>已发货量<{/t}></th>
+          <th><{t}>已退货量<{/t}></th>
+          <th><{t}>已拆分量<{/t}></th>
+          <{if $is_hold_time}><th><{t}>hold单时限<{/t}></th><{/if}>
+          <{if $is_presale_status}><th><{t}>是否预售<{/t}></th><{/if}>
+          <th><{t}>预选仓<{/t}></th>
+          <th><{t}>子单号<{/t}></th>
+          <th><{t}>关联子单号<{/t}></th>
+          <th><{t}>平台商品ID<{/t}></th>
+          <th><{t}>行号<{/t}></th>
+  
+        </tr>
+      </thead>
+        <{foreach from=$objs item=obj}>
+        <tbody>
+        <tr>
+          <td><a class="arrow-down-all">展开</a> <a class="arrow-left-all">折叠</a></td>
+          <td><strong><{$obj.bn}></strong></td>
+          <td>
+            <{if $obj.is_price_protect == 'true'}><span style="color: red">【价保】</span><{/if}>
+            <{if $obj.s_type=='dx'}><span style="color:#66ccff">【代销】</span><{/if}>
+            <{if $obj.is_sh_ship=='true'}><span style="color:#800002">【禁发】</span><{/if}>
+            <strong><{$obj.name}></strong>
+          </td>
+          <td> - </td>
+          <td> - </td>
+          <td><strong><{$obj.price}></strong></td>
+          <td><strong><{if $obj.quantity}><{$obj.sale_price/$obj.quantity|cur}><{else}>0<{/if}></strong></td>
+          <td><strong><{if $obj.quantity}><{$obj.pmt_price/$obj.quantity|cur}><{else}>0<{/if}></strong></td>
+          <td><{$obj.divide_order_fee|cur}></td>
+          <td><{$obj.part_mjz_discount|cur}></td>
+          <td><strong><{$obj.quantity}></strong></td>
+          <td> - </td>
+          <td> - </td>
+          <td> - </td>
+
+          <{if $is_presale_status}><td><{if $obj.estimate_con_time < 1}>-<{elseif $obj.estimate_con_time == $maxHoldTime}>手工操作<{else}><{$obj.estimate_con_time|cdate}><{/if}></td><{/if}>
+          <{if $is_hold_time}><td><{if $obj.presale_status == 1}>是<{else}>否<{/if}></td><{/if}>
+
+          <td><{$obj.store_code}></td>
+          <td><{$obj.oid}></td>
+          <td><{$obj.main_oid}></td>
+          <td><{$obj.shop_goods_id}></td>
+                    <td><{$obj.sku_uuid}></td>
+  
+        </tr>
+        </tbody>
+        <{foreach from=$obj.order_items item=luckybags}>
+          <tbody class="luckybag" style="cursor: pointer;">
+            <tr>
+              <td colspan="17" style="line-height: 16px;">
+                <span class="arrow arrow-down" style="display: inline-block;  cursor: pointer; height: 16px;width: 16px;vertical-align: middle;margin-right: 5px;"></span><{if $luckybags.combine_bn}><{$luckybags.combine_bn|default:'福袋'}><{/if}>，
+                <span>选中基础物料：<{$luckybags.selected_number}>，</span>
+                <span>包含件数：<{$luckybags.include_number}>，</span>
+                <span>价格贡献比：<{$luckybags.rate}>%，</span>
+                <span>优惠分摊：<{$luckybags.part_mjz_discount}>，</span>
+                <span>实付金额：<{$luckybags.divide_order_fee}></span>
+              </td>
+            </tr>
+          </tbody>
+          <tbody class="order-items" style="overflow: hidden;">
+          <{foreach from=$luckybags.items item=item}>
+            <tr class="ColColorBlue" <{if $item.delete == 'true'}>style="background-color: rgb(216, 216, 216);"<{/if}> >
+              <td></td>
+              <td><{$item.bn}></td>
+              <td><{$item.name}></td>
+              <td><{$item.addon}></td>
+              <td><{if $item.unit == 0}> - <{else}><{$item.unit}><{/if}></td>
+              <td><{$item.price}></td>
+              <td><{if $show_sale_price && $item.quantity}><{$item.sale_price/$item.quantity|cur}><{else}>-<{/if}></td>
+              <td><{if $show_sale_price && $item.quantity}><{$item.pmt_price/$item.quantity|cur}><{else}>-<{/if}></td>
+              <td><{if $show_sale_price}><{$item.divide_order_fee|cur}><{else}>-<{/if}></td>
+              <td><{if $show_sale_price}><{$item.part_mjz_discount|cur}><{else}>-<{/if}></td>
+              <td><{$item.quantity}></td>
+              <td><{$item.sendnum}></td>
+              <td><{$item.return_num}></td>
+              <td><{$item.split_num}></td>
+              <{if $is_hold_time}><td> - </td><{/if}>
+              <{if $is_presale_status}><td> - </td><{/if}>
+              <td> - </td>
+              <td><a href='javascript:void(0);' title='选中比例：<{$item.real_ratio}>%，价格贡献比：<{$item.price_rate}>%' style='text-decoration:none;'> - </a></td>
+              <td> - </td>
+              <td> - </td>
+
+            </tr>
+          <{/foreach}>
+          </tbody>
+        <{/foreach}>
+      <{/foreach}>
+     </table>
+</div>
+
+<script>
+  (function(){
+    // 添加展开/折叠功能
+    if ($defined($$('.luckybag'))) {
+      $$('.luckybag').addEvent('click', function(e){
+        var el = $E('span.arrow',this);
+
+        var itemsEl = this.getNext('tbody.order-items');
+    
+        if(el.hasClass('arrow-down')){
+          el.removeClass('arrow-down').addClass('arrow-left');
+
+          itemsEl.hide();
+        } else {
+          el.removeClass('arrow-left').addClass('arrow-down'); 
+
+          itemsEl.show();
+
+        }
+      });
+    }
+
+    $E('.arrow-down-all').addEvent('click', function(e){  
+      if ($defined($$('.luckybag'))) {
+        $$('.luckybag span.arrow').removeClass('arrow-down').addClass('arrow-left');
+        $$('.luckybag').fireEvent('click');
+      }
+    });
+
+    $E('.arrow-left-all').addEvent('click', function(e){  
+      if ($defined($$('.luckybag'))) {
+        $$('.luckybag span.arrow').removeClass('arrow-left').addClass('arrow-down'); 
+        $$('.luckybag').fireEvent('click');
+      }
+    });
+  })();
+  </script>

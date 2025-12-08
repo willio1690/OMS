@@ -1,0 +1,53 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+    <form method="POST" action="index.php?app=invoice&ctl=admin_content&act=<{$doAction}>" id="form">
+        <table align="center" >
+            <tr>
+                <th>发票内容: </th>
+                <td><input type="text" name="content_name" value="<{$invoice_content.content_name}>"/></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <{button class="btn-primary" type="submit" label="确定" id="submit_btn"}>
+                    <input type="hidden" name="content_id" value="<{$invoice_content.content_id}>" />
+                    <{button type='button' label='关闭' onclick='javascript:window.close();' isCloseDialogBtn="true"}>
+                </td>
+            </tr>
+        </table>
+    </form>
+    </div>
+</div>
+<script>
+    (function(){
+        var _form = $('form');//表单ID
+        var btn   = $('submit_btn');//按钮ID
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+        _form.store('target',{
+            onComplete:function(){
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+                    if(_dialogIns){
+                        finder.refresh();
+                        _dialogIns.close();
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+            _form.fireEvent('submit',{stop:$empty});
+        });
+    })();
+</script>
+

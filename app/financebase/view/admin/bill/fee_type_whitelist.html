@@ -1,0 +1,66 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.shop-name{
+    color:red;font-weight:bold;
+}
+.rules{
+  margin-bottom: 5px;
+}
+.rules select{
+  margin-right: 5px;
+}
+.rule_tr{
+  margin: 10px 0;
+}
+</style>
+<div class="tableform">
+  <h3>设置白名单</h3>
+  <div class="division">
+    <form method="post" action="index.php?app=financebase&ctl=admin_shop_settlement_fee_type&act=saveWhiteList" id="form-rule">
+      <input type="hidden" name="fee_type_id" value="<{$info.fee_type_id}>">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" id="rule-section">
+        <tbody>
+          <tr>
+            <th>会员列表</th>
+            <td>
+              <textarea name="whitelist" style="width:300px;height:200px;"><{$info.whitelist}></textarea>
+              每行一条
+             </td>
+          </tr> 
+
+          </table>
+         
+
+      <div class="table-action">  <{button label="提交" type="submit" name="submit" id="btn-rule"}> &nbsp;&nbsp; <{button label="关闭" onclick="javascript:void(window.close());" class="btn-secondary" type="button"}></div>
+   
+    </form>
+  </div>
+</div>
+<script>
+
+
+
+$('form-rule').store('target',{
+    onRequest:function(){
+       $('btn-rule').set('disabled', 'true');
+       
+    },
+    onComplete:function(jsontext){
+       var json = Json.evaluate(jsontext);
+       if (typeof(json.error) != 'undefined'){
+           $('btn-rule').set('disabled', '');
+       }else{
+           $('btn-rule').set('disabled', 'true');
+           opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,opener.finderGroup['<{$env.get.finder_id}>']);
+           window.close();
+       }
+    }
+});
+
+
+
+</script>

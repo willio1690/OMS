@@ -1,0 +1,87 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=inventorydepth&ctl=shop_skustockset&act=doExportTemplate" id="frm" enctype="multipart/form-data">
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th>OMS商品编码：</th>
+                        <td><{input id='shop_product_bn' type='textarea' style='width:500px;hight:200px;resize:none;' rows="8" placeholder="支持多个, 以换行符分隔" vtype='required' name='shop_product_bn'}><{button type="button" id='search_shop_product_bn' label='查询' }></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+        <table class="gridlist" id="sku_stock_table"  style="margin:4px 0;">
+          <thead>
+            <tr>
+              <th>记录ID</th>
+              <th>OMS商品编码</th>
+              <th>系统仓库ID</th>
+              <th>平台SKUID</th>
+              <th>平台商品ID</th>
+              <th>平台商品名称</th>
+              <th>库存</th>
+              <th>冻结库存</th>
+              <th>可用库存</th>
+            </tr>
+          </thead>
+          <tbody id="sku_stock_data">
+            <tr>
+              <td colspan="9" style="padding:0;"><div class="note" style="margin:0;"> 暂无货品信息 </div></td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+</div>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' label='导出' }>
+                    <{button type="button" id='close_btn' label='关闭' }>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = opener.finderGroup['<{$env.get.finder_id}>'];
+        $('close_btn').addEvent('click', function(){
+            if(finder){
+                setTimeout(finder.refresh(),30000);
+            }
+            setTimeout('window.close()',200);
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+        var tpl='<tr><td>{id}</td><td>{shop_product_bn}</td><td>{branch_bn}</td><td>{shop_sku_id}</td><td>{shop_iid}</td><td>{shop_title}</td><td>{store}</td><td>{store_freeze}</td><td>{valid_stock}</td></tr>';
+        $('search_shop_product_bn').addEvent('click', function(){
+            var oVal = $('shop_product_bn').value;
+            new Request.JSON({
+                url: 'index.php?app=inventorydepth&ctl=shop_skustockset&act=searchSaleStock',
+                data: {shop_product_bn:oVal},
+                onComplete: function(jsp) {
+                    MessageBox.success('查询完成');
+                    pag=new PageData(tpl,jsp.data,{'updateMain':$('sku_stock_data'),'pageNum':20,});
+                }
+            }).send();
+        });
+    })();
+</script>

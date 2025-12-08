@@ -1,0 +1,16 @@
+<desktop>
+	 
+	<permissions>
+		<permission id="org_management_view">管理</permission>
+		<permission id="org_show_view">展示</permission>
+        <permission id="group_item_add">新增组织</permission>
+    </permissions>
+
+	<workground name="基础档案" id="goods_manager"  order="600" icon="icon-jichudangan-01">
+		<menugroup name="门店组织结构" order='1' en="business-organization-structure">
+			<menu controller='admin_management' permission='org_management_view' action='index' display='true' order='5'>管理</menu>
+	        <menu controller='admin_management' action='addGropItem' permission='group_item_add' display='false' order='7'>新增组织</menu>
+		</menugroup>
+	</workground>
+ 
+</desktop>

@@ -1,0 +1,175 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!-- 进度条 -->
+<div class="tableform" id="dailog-batch">
+    <textarea name="GroupList" style="display: none;"><{$GroupList|default:'[]'}></textarea>
+    <input type="hidden" class="dailog-batch-ipt" name="primary_id" value="">
+    <input type="hidden" class="dailog-batch-ipt" name="is_done" value="">
+    <input type="hidden" class="dailog-batch-ipt" name="GroupList" value="">
+    <{foreach from=$input_hidden item=item}>
+        <input type="hidden" class="dailog-batch-ipt" name="<{$item.name}>" value="<{$item.value}>">
+    <{/foreach}>
+
+    <{if $custom_html}><div class="division" id="custom_html"><{$custom_html}></div><{/if}>
+    
+    <div class="division">
+        <div id="information">
+            <h4>当前共<span id="total"><{if $itemCount}><{$itemCount}><{else}><{$GroupList|json_decode|count}><{/if}></span>个</h4>
+            <div style="margin-left: 5px;">
+                已经处理 <span id="iTotal" style="color:#083E96">0</span> 个，
+                <span id="iSucc" style="color:green">0</span> 个成功，<span id="iFail" style="color:red">0</span> 个失败。
+            </div>
+        </div>
+
+        <div id="processBarBg" class="processBarBg">
+            <div class="processBar" id='processBar'>&nbsp;</div>
+        </div>
+
+        <div class="console">
+            <p class="csolinfo"></p>
+        </div>
+    </div>
+
+    <div class="table-action">
+        <{button type="button" label="开始" id='start' class="btn-primary"}>
+        <span id="close-notice" style="color:green;vertical-align:middle;margin-left: 10px;"></span>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+(function(){
+
+  $('start').addEvent('click', function(){
+      var GroupList = JSON.decode($E('#dailog-batch textarea[name=GroupList]').get('value'));
+
+      var _parent = this;
+
+      if (GroupList.length<=0) return MessageBox.error('请选择操作数据项');
+      Ex_Loader('cmdrunner',function(){
+          var tasks = []; var subGroup = []; var itotal = isucc = ifail = 0;
+          var JumpUrl = '';
+          var i=0;var maxNum = "<{$maxNum|default:10}>";
+          GroupList.each(function(item,key){
+              subGroup.push(item); i++;
+
+              if (maxNum == i) {
+                tasks.push(subGroup.join());
+                subGroup = [];
+
+                i = 0;
+              }
+          });
+
+          if (subGroup.length>0){tasks.push(subGroup.join());subGroup = [];}
+
+          var tasker = new taskrunner(tasks.map(function(){return '<{$request_url}>'}), {
+              dataClass:'.dailog-batch-ipt',
+              container:$('dailog-batch'),
+              iframe:new Element('iframe',{src:'about:blank',name:'_TASK_IFRM_<{$ifrm_dom_id}>',style:'display:none;height:100%;width:100%'}),
+              onLoad:function(){
+                  _parent.disabled = true;
+                  _parent.set('html', '<span><span>数据处理中...</span></span>');
+              },
+              onStart:function(){
+                  var taskData = tasks[this.prestep];
+                  $E('#dailog-batch input[name=primary_id]').set('value',taskData);
+                  var taskslength = tasks.length - 1;
+                  if(taskslength == this.prestep){
+                      var redirect_url = "<{$redirect_url}>";
+                      $E('#dailog-batch input[name=is_done]').set('value',redirect_url);
+                  }else{
+                      $E('#dailog-batch input[name=is_done]').set('value','false');
+                  }
+                  // $E('#dailog-batch input[name=GroupList]').set('value',GroupList);
+
+                  if ($defined($$('#dailog-batch #custom_html input','#dailog-batch #custom_html select','#dailog-batch #custom_html textarea'))) {
+                      $$('#dailog-batch #custom_html input','#dailog-batch #custom_html select','#dailog-batch #custom_html textarea').set('disabled','true');
+                  }
+              },
+              onCheck:function(messageText){
+                  if (/(\s*)ok\.(\s*)/.test(messageText.slice(-4))) {
+                      var result = messageText.substr(0,messageText.length-3);
+                      
+                      result = result?JSON.decode(result):[];
+
+                      if (result['isucc']) isucc += result['isucc'];
+                      if (result['ifail']) ifail += result['ifail'];
+                      if (result['itotal']) itotal += result['itotal'];
+                      if (result['url']) JumpUrl = result['url'];
+
+                      $('iSucc').set('html', isucc);
+                      $('iFail').set('html', ifail);
+                      $('iTotal').set('html', itotal);
+
+                      if (result['err_msg']) {
+                          result['err_msg'].each(function(item){
+                              $E('#dailog-batch .console .csolinfo').adopt(new Element('div',{html:item}));
+                          });
+                      }
+                  }
+              },
+              onComplete:function(){
+                  var num=this.step/this.num*100;
+                  $('processBar').setStyle('width',num+'%');
+              },
+              onError:function(text){
+
+                  if (!text) {alert('未捕获到错误信息，可能执行超时');}
+                  if (this.iframe) this.iframe.destroy();
+                  if (this.form) this.form.destroy();
+
+                  $E('#dailog-batch .console .csolinfo').set('text','失败原因：'+text);
+
+                  _parent.set('html', '<span><span>处理终止，3秒后自动刷新！</span></span>');
+
+                  // 判断是否弹框
+                  var dailogEl = _parent.getParent('.dialog')
+                  if ($defined(dailogEl)) {
+                      var dailog = dailogEl.retrieve('instance');
+
+                      dailog.close.delay(3000,dailog);
+
+                      <{if $env.get.finder_id}>
+                          finderGroup['<{$env.get.finder_id}>'].refresh.delay(3000,finderGroup['<{$env.get.finder_id}>']);
+                      <{/if}>
+                  } else {
+                      <{if $redirect_url}>
+                          W.page.delay(3000,W,"<{$redirect_url}>");
+                      <{/if}>
+                  }
+              },
+              onSuccess:function(){
+                  if (this.iframe) this.iframe.destroy();
+                  $('processBar').setStyle('width','100%');
+                  _parent.set('html', '<span><span>处理完成，3秒后自动刷新！</span></span>');
+
+                  // 判断是否弹框
+                  var dailogEl = _parent.getParent('.dialog');
+                  if ($defined(dailogEl)) {
+                      var dailog = dailogEl.retrieve('instance');
+                      dailog.close.delay("<{$autotime|default:3000}>",dailog);
+                  }
+                  // 打印
+                  if(JumpUrl.length){
+                      return W.page.delay(0,W,JumpUrl);
+                  }
+
+                  <{if $env.get.finder_id}>
+                      finderGroup['<{$env.get.finder_id}>'].refresh();
+                  <{elseif $redirect_url}>
+                          W.page.delay("<{$autotime|default:3000}>",W,"<{$redirect_url}>");
+                  <{/if}>
+              }
+          }).run();
+      });
+  });
+
+  <{if $startNow}>
+      $('start').fireEvent('click',{stop:$empty});
+  <{/if}>
+})();
+</script>

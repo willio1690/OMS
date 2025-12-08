@@ -1,0 +1,102 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=dealer&ctl=admin_business&act=save" id="frm">
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th>经销商编码：</th>
+                        <td>
+                            <{input type='text' vtype='required' name='bs_bn' value=$row.bs_bn}>
+                            <{input type='hidden' name='bs_id' value=$row.bs_id}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>经销商名称：</th>
+                        <td><{input type='text' vtype='required' name='name' value=$row.name}></td>
+                    </tr>
+                    <tr>
+                        <th>订单处理费：</th>
+                        <td>
+                            <{input type='text' name='deal_cost' value=$row.deal_cost}>
+                            <{button label="验证" id="checkexp"}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>仓库：</th>
+                        <td>
+                            <{input type='object' object="branch@ome" breakpoint=20 name="branch_id"  cols="name" textcol="name" value=$branch_id filter="type=main&disabled=false&is_deliv_branch=true" required='required' multiple='true'}>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' label='保存' }>
+                    <{button type="button" id='close_btn' label='关闭' }>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = opener.finderGroup['<{$env.get.finder_id}>'];
+        $('close_btn').addEvent('click', function(){
+            if(finder){
+                setTimeout(finder.refresh(),30000);
+            }
+            setTimeout('window.close()',200);
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    if(finder){
+                        setTimeout(finder.refresh(),30000);
+                    }
+                    setTimeout('window.close()',200);
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+
+        $('checkexp').addEvent('click', function(){
+            var btn=this;
+            var ipt=btn.getPrevious('input');
+            var expValue=ipt.getValue();
+            new Dialog('index.php?app=dealer&ctl=admin_business&act=checkExp&expvalue='+encodeURIComponent(expValue), {
+                modal:true,
+                title:'验算订单处理公式'
+            });
+        });
+    })();
+</script>

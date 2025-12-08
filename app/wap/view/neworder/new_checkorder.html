@@ -1,0 +1,235 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="./common.css" />
+  <link rel="stylesheet" type="text/css" href="./new_checkorder.css" />
+  <script src="./axios.min.js"></script>
+  <script src="./flexible.js"></script>
+</head>
+
+<body>
+  <div class="page flex-col">
+    <!-- heder -->
+    <div class="section_1">
+      <div class="text-wrapper_1 flex-row align-center justify-between">
+        <img src="./icon-back.png" class="icon-back">
+        <span class="text_1">验货退款</span>
+        <img src="./icon-refresh.png" class="icon-refresh">
+      </div>
+    </div>
+    <div class="main flex-col">
+      <div class="goods-item flex-row align-center">
+        <label class="checkbox-wrapper">
+          <input type="checkbox" class="checkbox_1">
+        </label>
+        <div class="section_6 flex-row flex-shrink-1 align-center">
+          <img class="image_2" referrerpolicy="no-referrer"
+            src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794" />
+          <div class="text-group_1 flex-col">
+            <div class="status-info"> <span class="text_28 flex-shrink-1">MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span>
+            </div>
+            <span class="text_29">商品货号：787876756454</span>
+            <!-- <span class="text_29">数量：<input type="number" class="input_1" value="1" placeholder="请填写数量"></span> -->
+            <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="goods-item flex-row align-center">
+        <label class="checkbox-wrapper">
+          <input type="checkbox" class="checkbox_1">
+        </label>
+        <div class="section_6 flex-row flex-shrink-1 align-center">
+          <img class="image_2" referrerpolicy="no-referrer"
+            src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794" />
+          <div class="text-group_1 flex-col">
+            <div class="status-info"> <span class="text_28 flex-shrink-1">MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span>
+            </div>
+            <span class="text_29">商品货号：787876756454</span>
+            <!-- <span class="text_29">数量：<input type="number" class="input_1" value="1" placeholder="请填写数量"></span> -->
+            <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+    <div class="footer justify-between">
+      <label class="checkbox-wrapper">
+        <input type="checkbox" class="checkbox_1"> 全选
+      </label>
+      <button class="footer-btn cancle" onclick="submitRefuse()">拒绝退货</button>
+      <button class="footer-btn" onclick="submitAccept()">退货退款</button>
+    </div>
+  </div>
+  <div class="mask" id="mask"></div>
+  <div class="toast" id="toast"></div>
+  <!-- 弹窗组件 -->
+  <!-- 弹窗组件模板 -->
+  <div class="modal" id="commonModal" style="display: none;">
+    <div class="modal-mask"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"></h3>
+        <span class="modal-close">×</span>
+      </div>
+      <div class="modal-content">
+        <!-- 动态内容区域 -->
+      </div>
+      <div class="modal-footer justify-between">
+        <button class="modal-btn modal-cancle">取消</button>
+        <button class="modal-btn modal-confirm">确定</button>
+      </div>
+    </div>
+  </div>
+  <!-- 引入共用的js -->
+  <script src="./common.js"></script>
+  <script>
+    // 初始化弹窗实例
+    const modal = new Modal();
+    // API 方法封装
+    const api = {
+      submitRefuse(params) {
+        return request.post('/checkorder/refuse', params);
+        // 配置 json 格式提交，覆盖common.is 内定义的formdata提交
+        // return request({
+        //   url: '/checkorder/refuse',
+        //   method: 'post',
+        //   data: params,
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   },
+        //   transformRequest: [(data) => JSON.stringify(data)] // 覆盖默认的 transformRequest
+        // });
+      },
+      submitAccept(params) {
+        return request.post('/checkorder/accept', params);
+      },
+    };
+
+    // 全选/取消全选功能
+    const allCheckbox = document.querySelector('.footer .checkbox-wrapper input');
+    allCheckbox.addEventListener('change', function (e) {
+      const isChecked = e.target.checked;
+      document.querySelectorAll('.goods-item .checkbox-wrapper input').forEach(checkbox => {
+        checkbox.checked = isChecked;
+      });
+    });
+
+    // 更新全选状态
+    function updateAllCheckboxStatus() {
+      const checkboxes = document.querySelectorAll('.goods-item .checkbox-wrapper input');
+      const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+      allCheckbox.checked = allChecked;
+    }
+
+    // 为每个商品的复选框添加change事件
+    document.querySelectorAll('.goods-item .checkbox-wrapper input').forEach(checkbox => {
+      checkbox.addEventListener('change', updateAllCheckboxStatus);
+    });
+
+    // 获取选中的订单数据
+    function getSelectedOrders() {
+      const selectedOrders = [];
+      document.querySelectorAll('.goods-item').forEach(item => {
+        const checkbox = item.querySelector('.checkbox-wrapper input');
+        if (checkbox.checked) {
+          const goodsInfo = {
+            goodsNo: item.querySelector('.text_29').textContent.split('：')[1],
+            // quantity: parseInt(item.querySelector('.input_1').value) || 0
+          };
+          selectedOrders.push(goodsInfo);
+        }
+      });
+      return selectedOrders;
+    }
+
+    // 同意
+    function submitAccept() {
+      const selectedOrders = getSelectedOrders();
+
+      if (selectedOrders.length === 0) {
+        showToast('请选择要提交的订单');
+        return;
+      }
+
+      api.submitAccept(selectedOrders).then(res => {
+        if (res.code === 0) {
+          showToast('提交成功');
+          // 可以根据需要添加其他操作，比如跳转页面
+        } else {
+          showToast(res.msg || '提交失败');
+        }
+      }).catch(err => {
+        showToast('提交失败');
+      });
+    }
+
+
+    function submitRefuse() {
+      const selectedOrders = getSelectedOrders();
+
+      // console.log("🚀🚀🚀 ~ file: new_checkorder.html:164 ~ submitRefuse ~ selectedOrders:", selectedOrders)
+
+
+      if (selectedOrders.length === 0) {
+        showToast('请选择要提交的订单');
+        return;
+      }
+      showRefuseModal()
+    }
+
+    // 日期选择
+    function showRefuseModal() {
+      modal.show({
+        title: '售后申请',
+        confirmText: '拒绝',
+        fields: [
+          {
+            type: 'textarea',
+            name: 'refuseResult',
+            label: '拒绝理由',
+            placeholder: '请填写拒绝原因',
+            required: true
+          },
+        ],
+        onConfirm: async (formData) => {
+          const selectedOrders = getSelectedOrders();
+          // 拒绝 
+          // showToast('售后申请拒绝成功');
+          const params = {
+            goodsNo: selectedOrders,
+            refuseResult: formData.refuseResult
+          }
+
+          console.log("🚀🚀🚀 ~ file: new_checkorder.html:205 ~ onConfirm: ~ params:", params)
+
+          api.submitRefuse(params).then(res => {
+            if (res.code === 0) {
+              showToast('提交成功');
+              // 可以根据需要添加其他操作，比如跳转页面
+            } else {
+              showToast(res.msg || '提交失败');
+            }
+          }).catch(err => {
+            showToast('提交失败');
+          });
+          modal.hide();
+
+        }
+      });
+    }
+
+  </script>
+</body>
+
+</html>

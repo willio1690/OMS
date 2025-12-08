@@ -1,0 +1,59 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<script src="https://assets.alicdn.com/s/kissy/1.2.0/kissy-min.js"></script>
+<script src="https://market.m.taobao.com/app/aliww/bc-ww/webww"></script>
+<{/capture}>
+<div class="division" style="background:#fff; height:28px; overflow:hidden;" id="buyer_area">
+    <{if $member}>
+        <table width="100%" cellspacing="0" cellpadding="0" border="0">
+            <tbody>
+            <tr>
+                <{if $member.is_encrypt}><th><a class="data-hide member-sensitive-btn" href="javascript:void(0);" ></a></th><{/if}>
+                <th><{if $member.is_encrypt && $order.shop_type == 'pinduoduo'}><a data-type = 'uname' class="member-sensitive-btn-detail data-hide" style="background-size: 13px 10px;" href="javascript:void(0);"></a><{/if}>会员用户名：</th>
+                <td>
+                    <span sensitive-field="uname">
+                    
+                    <{if $member['wang_wang_html']}>
+                        <{$member.wang_wang_html}>
+                    <{else}>
+                        <{if $order['shop_type'] == 'taobao'}>
+                            <a href='http://amos.im.alisoft.com/msg.aw?v=2&amp;uid=<{$member.shop_member_id}>&amp;site=cntaobao&amp;s=1&amp;charset=utf-8' target='_blank'>
+                                <img border="0" src="http://amos.im.alisoft.com/online.aw?v=2&amp;uid=<{$member.account.uname}>&amp;site=cntaobao&amp;s=2&amp;charset=utf-8" title="点击这给 <{$member.account.uname}>发送消息">
+                            </a>
+                        <{/if}>
+                        <{$member.account.uname|ciphertext:'member','uname',$order.shop_type}>
+                    <{/if}>
+                    </span>
+                </td>
+                <th><{if $member.is_encrypt && $order.shop_type == 'pinduoduo'}><a data-type = 'uname' class="member-sensitive-btn-detail data-hide" style="background-size: 13px 10px;" href="javascript:void(0);"></a><{/if}>姓名：</th>
+                <td><span sensitive-field="name"><{$member.contact.name|ciphertext:'member','name',$order.shop_type}></span></td>
+                <th><{if $member.is_encrypt && $order.shop_type == 'pinduoduo'}><a data-type = 'tel' class="member-sensitive-btn-detail data-hide" style="background-size: 13px 10px;" href="javascript:void(0);"></a><{/if}>联系电话：</th>
+                <td>
+                    <span sensitive-field="tel"><{$member.contact.phone.telephone|ciphertext:'member','tel',$order.shop_type}></span>
+                    <span><{if $member.contact.phone.telephone}>/<{/if}></span>
+                    <span sensitive-field="mobile"><{$member.contact.phone.mobile|ciphertext:'member','mobile',$order.shop_type}></span>
+                </td>
+            </tr>
+            <tr>
+                <th>Email地址：</th>
+                <td><{$member.contact.email}></td>
+                <th>地区：</th>
+                <td><{$member.contact.area|region}></td>
+                <th>地址：</th>
+                <td><{$member.contact.addr}></td>
+            </tr>
+            <tr>
+                <th>邮政编码：</th>
+                <td><{$member.contact.zipcode}></td>
+                <th colspan="4">&nbsp;</th>
+            </tr>
+            </tbody>
+        </table>
+    <{else}>
+        <h3>暂无相关用户信息</h3>
+    <{/if}>
+</div>

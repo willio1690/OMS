@@ -1,0 +1,67 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    #widgets_systemnotice, #widgets_patchinfo {
+        width: 100%;
+    }
+
+    #widgets_systemnotice tr, #widgets_patchinfo tr {
+        height: 30px;
+        line-height: 30px;
+        color: #333
+    }
+
+    #widgets_systemnotice tr th, #widgets_patchinfo tr th {
+        text-align: left;
+        width: 70%;
+    }
+
+    #widgets_systemnotice tr td, #widgets_patchinfo tr td {
+        text-align: right;
+        font-weight: normal;
+        padding-right: 10px;
+    }
+
+    #ome_desktop_widgets_systemnotice .no_infos, #ome_desktop_widgets_patchinfo .no_infos {
+        padding: 10px 0 5px 0;
+    }
+</style>
+<div class="clearfix dashbd-row">
+
+    <{if $info}>
+    <table id="widgets_systemnotice" cellpadding="0" cellspacing="0">
+        <{foreach from=$info item=item}>
+        <tr style="font-weight:bold">
+            <{if $item.status == 'true'}>
+            <th><a href="index.php?app=desktop&ctl=rpcnotify&act=index&action=detail&id=<{$item.id}>&finderview=detail_basic" target="dialog::{width:600,height:350,title:'消息详情'}"><{$item.info}></a></th>
+            <{elseif $item.status == 'false'}>
+            <th><b><a style="color: red;" href="index.php?app=desktop&ctl=rpcnotify&act=index&action=detail&id=<{$item.id}>&finderview=detail_basic" target="dialog::{width:600,height:350,title:'消息详情'}"><{$item.info}></a></b></th>
+            <{else}>
+            <th><a href="<{$item.callback}>"><{$item.info}></a></th>
+            <{/if}>
+            <td><{$item.notifytime}></td>
+        </tr>
+        <{/foreach}>
+    </table>
+    <{else}>
+    <div class="no_infos">暂无任何系统消息......</div>
+    <{/if}>
+</div>
+
+<script>
+    function _get_rpcnotify_num(id) {
+        W.page('index.php?app=desktop&ctl=rpcnotify&act=read',{method:'POST',onComplete:function(){
+                var notify=$E('#topbar .notify_num');
+                if(notify){
+                    var msg=notify.get('text'),n;
+                    n=msg.substring(1,msg.length-1);
+                    n=n-1>0?'('+(n-1)+')':'';
+                    notify.set('text',n);
+                }
+            },data:{id:id,from:'dashboard'}
+        });
+    }
+</script>

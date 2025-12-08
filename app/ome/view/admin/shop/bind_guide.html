@@ -1,0 +1,2461 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="bind-guide-container <{if $step eq 0}>bind-guide-container-integration<{/if}>">
+    <div class="bind-guide-content <{if $step eq 0}>bind-guide-content-integration<{/if}>">
+        <!-- 步骤指示器 -->
+        <div class="steps-indicator">
+            <div class="step-item step-item-0 <{if $step eq 0}>active<{elseif $step_completed[0]}>completed<{/if}>" data-step="0" onclick="goToStep(0); event.stopPropagation();">
+                <div class="step-number">1</div>
+                <div class="step-text">对接方式</div>
+            </div>
+            <div class="step-divider <{if $step_completed[0]}>completed<{/if}>"></div>
+            <{if $adapter ne 'openapi'}>
+            <div class="step-item step-item-1 <{if $step eq 1}>active<{elseif $step_completed[1]}>completed<{/if}>" data-step="1" onclick="goToStep(1); event.stopPropagation();">
+                <div class="step-number">2</div>
+                <div class="step-text">企业认证</div>
+            </div>
+            <div class="step-divider <{if $step_completed[1]}>completed<{/if}>"></div>
+            <{/if}>
+            <{if $is_taobao}>
+                <{if $adapter ne 'openapi'}>
+                <!-- 淘宝店铺：矩阵模式显示奇门授权和店铺绑定 -->
+                <div class="step-item step-item-2 <{if $step eq 2}>active<{elseif $step_completed[2]}>completed<{/if}>" data-step="2" onclick="goToStep(2); event.stopPropagation();">
+                    <div class="step-number">3</div>
+                    <div class="step-text">奇门授权</div>
+                </div>
+                <div class="step-divider <{if $step_completed[2]}>completed<{/if}>"></div>
+                <div class="step-item step-item-3 <{if $step eq 3}>active<{elseif $step_completed[3]}>completed<{/if}>" data-step="3" onclick="goToStep(3); event.stopPropagation();">
+                    <div class="step-number">4</div>
+                    <div class="step-text">店铺绑定</div>
+                </div>
+                <{else}>
+                <!-- 淘宝店铺：商家自研隐藏企业认证与奇门，直接店铺绑定 -->
+                <div class="step-item step-item-3 <{if $step eq 3}>active<{elseif $step_completed[3]}>completed<{/if}>" data-step="3" onclick="goToStep(3); event.stopPropagation();">
+                    <div class="step-number">2</div>
+                    <div class="step-text">店铺绑定</div>
+                </div>
+                <{/if}>
+            <{else}>
+            <!-- 非淘宝店铺：步骤2是店铺绑定 -->
+            <div class="step-item step-item-2 <{if $step eq 2}>active<{elseif $step_completed[2]}>completed<{/if}>" data-step="2" onclick="goToStep(2); event.stopPropagation();">
+                <div class="step-number"><{if $adapter ne 'openapi'}>3<{else}>2<{/if}></div>
+                <div class="step-text">店铺绑定</div>
+            </div>
+            <{/if}>
+        </div>
+        
+        <!-- 步骤内容 -->
+        <div class="step-content <{if $step eq 0}>step-content-integration<{/if}>">
+            <{if $step eq 0}>
+                <!-- 第0步：对接方式 -->
+                <div class="step-section step-section-integration">
+                    <{if $has_node}>
+                    <div class="adapter-locked-notice">
+                        <div class="notice-icon">LOCK</div>
+                        <div class="notice-text">店铺已绑定节点，对接方式不可修改</div>
+                        <div class="current-adapter">
+                            <{foreach from=$adapter_list item=item}>
+                            <{if $adapter eq $item.value}>
+                            <span class="adapter-label">当前对接方式：<{if $item.value eq 'matrixonline'}>商派矩阵对接<{else}>商家自研对接<{/if}></span>
+                            <{/if}>
+                            <{/foreach}>
+                        </div>
+                    </div>
+                    <{else}>
+                    <div class="integration-options">
+                        <{foreach from=$adapter_list item=item}>
+                        <{if $item.value eq 'matrixonline'}>
+                        <div class="integration-option <{if $adapter eq $item.value}>selected<{/if}>" data-type="<{$item.value}>">
+                            <{if $adapter eq $item.value}>
+                            <div class="option-checkmark">✓</div>
+                            <{/if}>
+                            <div class="option-icon">矩阵</div>
+                            <div class="option-title">商派矩阵对接</div>
+                            <div class="option-desc"><{$item.desc}></div>
+                        </div>
+                        <{elseif $item.value eq 'openapi'}>
+                        <div class="integration-option <{if $adapter eq $item.value}>selected<{/if}>" data-type="<{$item.value}>">
+                            <{if $adapter eq $item.value}>
+                            <div class="option-checkmark">✓</div>
+                            <{/if}>
+                            <div class="option-icon">API</div>
+                            <div class="option-title">商家自研对接</div>
+                            <div class="option-desc"><{$item.desc}></div>
+                        </div>
+                        <{/if}>
+                        <{/foreach}>
+                    </div>
+                    <input type="hidden" id="adapter" name="adapter" value="<{$adapter}>">
+                    <{/if}>
+                </div>
+            <{elseif $step eq 1}>
+                <!-- 第一步：企业认证 -->
+                <div class="step-section step-section-iframe">
+                    <div class="section-header">
+                        <p class="qimen-auth-tip">请完成企业认证，以便使用系统的完整功能。认证后您将获得系统节点号，可使用商派矩阵能力。<{if $adapter eq 'openapi'}>当前为商家自研对接，企业认证为可选，可直接跳过进入店铺绑定。<{/if}></p>
+                        <{if !$is_certified}>
+                        <p>认证密钥请到后台“基本信息 &gt; 站点设置”获取。仅超管可见明文，其他账号显示打码，需明文请联系超管。</p>
+                        <{/if}>
+                    </div>
+                    <div class="section-content">
+                        <{if $is_certified}>
+                            <!-- 已认证：显示企业信息（调试阶段，同时显示iframe） -->
+                            <div class="enterprise-authorized-info" style="margin-bottom: 6px;">
+                                <div class="info-row-inline">
+                                    <div class="info-item info-item-inline">
+                                        <div class="info-label">企业ID：</div>
+                                        <div class="info-value"><{$ent_id}></div>
+                                    </div>
+                                    <div class="info-item info-item-inline">
+                                        <div class="info-label">系统节点：</div>
+                                        <div class="info-value"><{$system_node_id|default:'-'}></div>
+                                    </div>
+                                    <div class="info-item info-item-inline">
+                                        <div class="info-label">系统证书：</div>
+                                        <div class="info-value"><{$system_certificate_id|default:'-'}></div>
+                                    </div>
+                                </div>
+                                <{if $ent_email}>
+                                <div class="info-item">
+                                    <div class="info-label">企业邮箱：</div>
+                                    <div class="info-value"><{$ent_email}></div>
+                                </div>
+                                <{/if}>
+                            </div>
+                        <{/if}>
+                        <!-- 显示授权iframe（调试阶段，已认证也显示） -->
+                        <div class="iframe-container" id="auth_iframe_container_1">
+                            <div class="iframe-loading">
+                                <div class="loading-spinner"></div>
+                                <div class="loading-text">正在加载授权页面...</div>
+                            </div>
+                            <iframe id="auth_iframe_1" class="auth-iframe" frameborder="0" src="<{if $bind_url}><{$bind_url}><{/if}>"></iframe>
+                        </div>
+                    </div>
+                </div>
+            <{elseif $step eq 2}>
+                <{if $is_taobao}>
+                <!-- 第二步：奇门授权（仅淘宝店铺） -->
+                <div class="step-section step-section-iframe">
+                    <div class="section-header">
+                        <p class="qimen-auth-tip">请完成<span class="qimen-highlight">奇门的授权绑定</span>，以便实现矩阵与OMS系统的数据同步。授权后您可以获取淘系订单。<{if $adapter eq 'openapi'}>当前为商家自研对接，此步骤可选，直接下一步进入店铺绑定即可。<{/if}></p>
+                    </div>
+                    <div class="section-content">
+                        <{if $is_qimen_binded}>
+                            <!-- 已授权：显示授权信息 -->
+                            <div class="qimen-authorized-info" style="margin-bottom: 8px;">
+                                <div class="info-row-inline">
+                                    <div class="info-item info-item-inline">
+                                        <div class="info-label">App Key：</div>
+                                        <div class="info-value"><{$qimen_channel.app_key}></div>
+                                    </div>
+                                    <div class="info-item info-item-inline">
+                                        <div class="info-label">Secret Key：</div>
+                                        <div class="info-value" id="qimen_secret_view">
+                                            <span><{$secret_key_display}></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <{/if}>
+                        <!-- 始终加载授权iframe，方便已授权后查看或重新授权 -->
+                        <div class="iframe-container" id="auth_iframe_container_2">
+                            <div class="iframe-loading">
+                                <div class="loading-spinner"></div>
+                                <div class="loading-text">正在加载授权页面...</div>
+                            </div>
+                            <iframe id="auth_iframe_2" class="auth-iframe" frameborder="0" src="<{if $bind_url}><{$bind_url}><{/if}>"></iframe>
+                        </div>
+                    </div>
+                </div>
+                <{else}>
+                <!-- 第二步：店铺绑定（非淘宝店铺） -->
+                <div class="step-section step-section-iframe">
+                    <div class="section-header">
+                        <{if !$is_node_binded}>
+                        <p class="qimen-auth-tip">请完成店铺的OAuth登录授权，以便我们能够同步您的店铺数据。绑定后您可以在系统中管理您的店铺订单和库存。</p>
+                        <{/if}>
+                    </div>
+                    <div class="section-content">
+                        <{if $adapter eq 'openapi'}>
+                            <!-- 商家自研对接：无论是否已绑定都加载 bindNodeId 页面 -->
+                            <div id="bind_node_content_2" class="bind-node-content">
+                                <div class="iframe-loading">
+                                    <div class="loading-spinner"></div>
+                                    <div class="loading-text">正在加载绑定页面...</div>
+                                </div>
+                            </div>
+                        <{elseif $is_node_binded}>
+                            <!-- 已有节点（非自研）：显示完成信息 -->
+                            <div class="step-section complete-section">
+                                <div class="complete-wrapper">
+                                    <div class="complete-title-row">
+                                        <h3 class="section-title complete-title">绑定完成！</h3>
+                                        <div class="complete-icon-wrapper">
+                                            <svg class="complete-checkmark" viewBox="0 0 52 52">
+                                                <circle class="complete-checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                                                <path class="complete-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <!-- 显示绑定信息 -->
+                                    <div class="shop-bind-info-card">
+                                        <div class="card-header">
+                                            <div class="card-header-icon"></div>
+                                            <div class="card-header-title">绑定信息</div>
+                                        </div>
+                                        <div class="card-body">
+                                        <div class="unbind-tip">
+                                            如需解绑店铺，请在“查看绑定关系”中操作：<a href="index.php?app=ome&ctl=admin_shop&act=view_bindrelation" target="_blank">前往解绑</a>
+                                        </div>
+                                            <div class="info-grid">
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">节点ID</div>
+                                                    <div class="info-card-value"><{$bind_info.node_id}></div>
+                                                </div>
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">节点类型</div>
+                                                    <div class="info-card-value"><{$bind_info.node_type}></div>
+                                                </div>
+                                                <{if $bind_info.shop_name}>
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">店铺名称</div>
+                                                    <div class="info-card-value"><{$bind_info.shop_name}></div>
+                                                </div>
+                                                <{/if}>
+                                                <{if $bind_info.expire_time}>
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">授权到期时间</div>
+                                                    <div class="info-card-value"><{$bind_info.expire_time}></div>
+                                                </div>
+                                                <{/if}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <{elseif $is_shop_binded}>
+                            <!-- 已绑定且非商家自研对接：显示完成信息（类似步骤4） -->
+                            <div class="step-section complete-section">
+                                <div class="complete-wrapper">
+                                    <div class="complete-title-row">
+                                        <h3 class="section-title complete-title">绑定完成！</h3>
+                                        <div class="complete-icon-wrapper">
+                                            <svg class="complete-checkmark" viewBox="0 0 52 52">
+                                                <circle class="complete-checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                                                <path class="complete-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <!-- 显示绑定信息 -->
+                                    <div class="shop-bind-info-card">
+                                        <div class="card-header">
+                                            <div class="card-header-icon">ℹ</div>
+                                            <div class="card-header-title">绑定信息</div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="info-grid">
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">节点ID</div>
+                                                    <div class="info-card-value"><{$bind_info.node_id}></div>
+                                                </div>
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">节点类型</div>
+                                                    <div class="info-card-value"><{$bind_info.node_type}></div>
+                                                </div>
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">店铺名称</div>
+                                                    <div class="info-card-value"><{$bind_info.shop_name}></div>
+                                                </div>
+                                                <{if $bind_info.expire_time}>
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">授权到期时间</div>
+                                                    <div class="info-card-value"><{$bind_info.expire_time}></div>
+                                                </div>
+                                                <{/if}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <{else}>
+                            <!-- 未绑定且非商家自研对接：使用 iframe -->
+                            <div class="iframe-container" id="auth_iframe_container_2">
+                                <div class="iframe-loading">
+                                    <div class="loading-spinner"></div>
+                                    <div class="loading-text">正在加载授权页面...</div>
+                                </div>
+                                <iframe id="auth_iframe_2" class="auth-iframe" frameborder="0" src="<{if $bind_url}><{$bind_url}><{/if}>"></iframe>
+                            </div>
+                        <{/if}>
+                    </div>
+                </div>
+                <{/if}>
+            <{elseif $step eq 3 && $is_taobao}>
+                <!-- 第三步：店铺绑定（仅淘宝店铺） -->
+                <div class="step-section step-section-iframe">
+                    <div class="section-header">
+                        <p class="qimen-auth-tip">请完成店铺的OAuth登录授权，以便我们能够同步您的店铺数据。绑定后您可以在系统中管理您的店铺订单和库存。</p>
+                    </div>
+                    <div class="section-content">
+                        <{if $adapter eq 'openapi'}>
+                            <!-- 商家自研对接：无论是否已绑定都加载 bindNodeId 页面 -->
+                            <div id="bind_node_content_3" class="bind-node-content">
+                                <div class="iframe-loading">
+                                    <div class="loading-spinner"></div>
+                                    <div class="loading-text">正在加载绑定页面...</div>
+                                </div>
+                            </div>
+                        <{elseif $is_node_binded}>
+                            <!-- 淘宝店铺：已有节点时直接展示完成信息，与其他渠道保持一致 -->
+                            <div class="step-section complete-section" style="margin-top: 0;">
+                                <div class="complete-wrapper">
+                                    <div class="complete-title-row">
+                                        <h3 class="section-title complete-title">绑定完成！</h3>
+                                        <div class="complete-icon-wrapper">
+                                            <svg class="complete-checkmark" viewBox="0 0 52 52">
+                                                <circle class="complete-checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                                                <path class="complete-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="shop-bind-info-card" style="margin-top: 0;">
+                                        <div class="card-header">
+                                            <div class="card-header-icon">ℹ</div>
+                                            <div class="card-header-title">绑定信息</div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="info-grid">
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">节点ID</div>
+                                                    <div class="info-card-value"><{$bind_info.node_id}></div>
+                                                </div>
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">节点类型</div>
+                                                    <div class="info-card-value"><{$bind_info.node_type}></div>
+                                                </div>
+                                                <{if $bind_info.shop_name}>
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">店铺名称</div>
+                                                    <div class="info-card-value"><{$bind_info.shop_name}></div>
+                                                </div>
+                                                <{/if}>
+                                                <{if $bind_info.expire_time}>
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">授权到期时间</div>
+                                                    <div class="info-card-value"><{$bind_info.expire_time}></div>
+                                                </div>
+                                                <{/if}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <{elseif $is_shop_binded}>
+                            <!-- 已绑定且非商家自研对接：显示完成信息（类似步骤4） -->
+                            <div class="step-section complete-section">
+                                <div class="complete-wrapper">
+                                    <div class="complete-title-row">
+                                        <h3 class="section-title complete-title">绑定完成！</h3>
+                                        <div class="complete-icon-wrapper">
+                                            <svg class="complete-checkmark" viewBox="0 0 52 52">
+                                                <circle class="complete-checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                                                <path class="complete-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <!-- 显示绑定信息 -->
+                                    <div class="shop-bind-info-card">
+                                        <div class="card-header">
+                                            <div class="card-header-icon">ℹ</div>
+                                            <div class="card-header-title">绑定信息</div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="info-grid">
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">节点ID</div>
+                                                    <div class="info-card-value"><{$bind_info.node_id}></div>
+                                                </div>
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">节点类型</div>
+                                                    <div class="info-card-value"><{$bind_info.node_type}></div>
+                                                </div>
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">店铺名称</div>
+                                                    <div class="info-card-value"><{$bind_info.shop_name}></div>
+                                                </div>
+                                                <{if $bind_info.expire_time}>
+                                                <div class="info-card-item">
+                                                    <div class="info-card-label">授权到期时间</div>
+                                                    <div class="info-card-value"><{$bind_info.expire_time}></div>
+                                                </div>
+                                                <{/if}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <{else}>
+                            <!-- 未绑定且非商家自研对接：使用 iframe -->
+                            <div class="iframe-container" id="auth_iframe_container_3">
+                                <div class="iframe-loading">
+                                    <div class="loading-spinner"></div>
+                                    <div class="loading-text">正在加载授权页面...</div>
+                                </div>
+                                <iframe id="auth_iframe_3" class="auth-iframe" frameborder="0" src="<{if $bind_url}><{$bind_url}><{/if}>"></iframe>
+                            </div>
+                        <{/if}>
+                    </div>
+                </div>
+            <{elseif $step eq 4}>
+                <!-- 完成页面 -->
+                <div class="step-section complete-section">
+                    <div class="complete-wrapper">
+                        <{if !empty($incomplete_steps)}>
+                        <!-- 有未完成的步骤 -->
+                        <div class="complete-icon-wrapper">
+                            <svg class="complete-warning" viewBox="0 0 52 52">
+                                <circle class="complete-warning-circle" cx="26" cy="26" r="25" fill="none"/>
+                                <path class="complete-warning-icon" fill="none" d="M26 16 L26 30 M26 34 L26 36"/>
+                            </svg>
+                        </div>
+                        <h3 class="section-title complete-title">绑定未完成</h3>
+                        <div>
+                            <p class="complete-message">您的店铺节点已绑定，但仍有以下步骤未完成：</p>
+                            <div class="incomplete-steps-list">
+                                <{foreach from=$incomplete_steps item=incomplete}>
+                                <div class="incomplete-step-item">
+                                    <span class="incomplete-step-name"><{$incomplete.name}></span>
+                                    <a href="javascript:void(0);" onclick="goToStep(<{$incomplete.step}>);" class="incomplete-step-link">去完成</a>
+                                </div>
+                                <{/foreach}>
+                            </div>
+                            <p class="complete-submessage">请完成所有步骤后，才能使用系统的完整功能</p>
+                        </div>
+                        <{else}>
+                        <!-- 所有步骤都已完成 -->
+                        <div class="complete-title-row">
+                            <h3 class="section-title complete-title">绑定完成！</h3>
+                            <div class="complete-icon-wrapper">
+                                <svg class="complete-checkmark" viewBox="0 0 52 52">
+                                    <circle class="complete-checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                                    <path class="complete-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                                </svg>
+                            </div>
+                        </div>
+                        
+                        <{/if}>
+                        <{if $is_node_binded}>
+                        <!-- 显示绑定信息（如果有节点，即使奇门未授权也显示） -->
+                        <div class="shop-bind-info-card">
+                            <div class="card-header">
+                                <div class="card-header-icon">ℹ</div>
+                                <div class="card-header-title">绑定信息</div>
+                            </div>
+                            <div class="card-body">
+                                <{if $is_node_binded}>
+                                <div class="unbind-tip">
+                                    如需解绑店铺，请在“查看绑定关系”中操作：<a href="index.php?app=ome&ctl=admin_shop&act=view_bindrelation" target="_blank">前往解绑</a>
+                                </div>
+                                <{/if}>
+                                <div class="info-grid">
+                                    <div class="info-card-item">
+                                        <div class="info-card-label">节点ID</div>
+                                        <div class="info-card-value"><{$bind_info.node_id}></div>
+                                    </div>
+                                    <div class="info-card-item">
+                                        <div class="info-card-label">节点类型</div>
+                                        <div class="info-card-value"><{$bind_info.node_type}></div>
+                                    </div>
+                                    <{if $bind_info.shop_name}>
+                                    <div class="info-card-item">
+                                        <div class="info-card-label">店铺名称</div>
+                                        <div class="info-card-value"><{$bind_info.shop_name}></div>
+                                    </div>
+                                    <{/if}>
+                                    <{if $bind_info.expire_time}>
+                                    <div class="info-card-item">
+                                        <div class="info-card-label">授权到期时间</div>
+                                        <div class="info-card-value"><{$bind_info.expire_time}></div>
+                                    </div>
+                                    <{/if}>
+                                </div>
+                            </div>
+                        </div>
+                        <{/if}>
+                    </div>
+                    <div class="section-action">
+                        <!-- 完成按钮已移至页脚 -->
+                    </div>
+                </div>
+            <{/if}>
+        </div>
+    </div>
+    
+    <{area inject='.mainFoot'}>
+    <div class="bind-guide-footer">
+        <div class="footer-actions">
+            <{if $step eq 4}>
+                <{if empty($incomplete_steps)}>
+                <!-- 第4步且所有步骤已完成：显示完成按钮 -->
+                <button class="btn btn-primary" onclick="completeBind()">完成</button>
+                <{else}>
+                <!-- 第4步但有未完成的步骤：不显示完成按钮，显示提示 -->
+                <span class="footer-tip">请完成所有步骤后才能完成绑定</span>
+                <{/if}>
+            <{elseif $is_completed}>
+                <!-- 所有步骤已完成：显示完成按钮 -->
+                <button class="btn btn-primary" onclick="completeBind()">完成</button>
+            <{else}>
+                <!-- 其他步骤：显示上一步和下一步按钮 -->
+                <{if $step gt 0}>
+                    <button class="btn btn-default" onclick="previousStep()">上一步</button>
+                <{/if}>
+                <{if $step lt 4}>
+                    <{if $is_taobao}>
+                        <!-- 淘宝店铺：步骤2和步骤3都显示下一步按钮 -->
+                        <button class="btn btn-primary" onclick="nextStep()">下一步</button>
+                    <{else}>
+                        <!-- 非淘宝店铺：步骤2显示下一步按钮，步骤3不存在 -->
+                        <{if $step neq 3}>
+                            <button class="btn btn-primary" onclick="nextStep()">下一步</button>
+                        <{/if}>
+                    <{/if}>
+                <{/if}>
+            <{/if}>
+            <{button label="取消" class="btn-link" isCloseDialogBtn="true"}>
+        </div>
+    </div>
+    <{/area}>
+</div>
+
+<style>
+/* 页面整体样式 */
+.bind-guide-container {
+    width: 100%;
+    height: 100%;
+    max-height: 95vh;
+    max-width: 100%;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* 对接方式选择步骤的容器 - 不强制高度，根据内容自适应 */
+.bind-guide-container-integration {
+    height: auto !important;
+    max-height: none !important;
+}
+
+/* 主内容区 */
+.bind-guide-content {
+    padding: 8px 16px 4px 16px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* 隐藏滚动条但保持功能 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* 对接方式选择步骤的主内容区 - 不拉伸，根据内容自适应 */
+.bind-guide-content-integration {
+    flex: none !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+}
+
+/* 隐藏主内容区滚动条 */
+.bind-guide-content::-webkit-scrollbar {
+    display: none;
+}
+
+
+/* 步骤指示器 */
+.steps-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 1px;
+    border-radius: 4px;
+}
+
+.step-item:hover {
+    background: rgba(24, 144, 255, 0.05);
+}
+
+.step-number {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #f5f5f5;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 3px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    pointer-events: none; /* 让点击事件传递到父元素 */
+}
+
+.step-text {
+    font-size: 10px;
+    color: #999;
+    transition: color 0.3s ease;
+    line-height: 1.2;
+    pointer-events: none; /* 让点击事件传递到父元素 */
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.step-optional {
+    font-size: 10px;
+    color: #8c8c8c;
+}
+
+.step-divider {
+    height: 1px;
+    background: #f0f0f0;
+    flex: 1;
+    margin: 0 6px;
+    transition: background 0.3s ease;
+    pointer-events: none; /* 防止点击divider时触发事件 */
+}
+
+/* 激活和完成状态 */
+.step-item.active .step-number {
+    background: #fff;
+    color: #1890ff;
+    border: 2px solid #1890ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+    font-weight: 600;
+    font-size: 13px;
+    width: 26px;
+    height: 26px;
+}
+
+.step-item.active .step-text {
+    color: #1890ff;
+    font-weight: 500;
+}
+
+.step-item.completed .step-number {
+    background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(82, 196, 26, 0.3);
+    position: relative;
+    font-size: 0;
+}
+
+.step-item.completed .step-number::after {
+    content: '✓';
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.step-item.completed .step-text {
+    color: #52c41a;
+    font-weight: 600;
+}
+
+.step-divider.completed {
+    background: linear-gradient(90deg, #52c41a 0%, #73d13d 100%);
+    height: 2px;
+    box-shadow: 0 1px 3px rgba(82, 196, 26, 0.2);
+}
+
+/* 步骤内容 */
+.step-content {
+    margin-top: 0;
+    margin-bottom: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: visible;
+}
+
+/* 对接方式选择步骤的内容区域 - 不拉伸，根据内容自适应 */
+.step-content-integration {
+    flex: none !important;
+    min-height: auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+.step-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: visible;
+    padding-top: 0;
+}
+
+/* 对接方式选择步骤特殊布局 - 不拉伸，根据内容自适应 */
+.step-section-integration {
+    flex: none !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    align-items: stretch;
+}
+
+/* iframe步骤统一布局（企业认证、店铺绑定、奇门授权） */
+.step-section-iframe {
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+
+.section-header {
+    flex-shrink: 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 6px;
+    margin-top: 0;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #262626;
+    margin-bottom: 3px;
+    text-align: left;
+}
+
+.section-header p {
+    margin: 2px 0;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+}
+.qimen-auth-tip {
+    text-align: center;
+}
+.qimen-highlight {
+    color: #fa541c;
+    font-weight: 700;
+}
+
+.section-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: visible;
+}
+
+.section-action {
+    flex-shrink: 0;
+    margin-top: 16px;
+    text-align: center;
+}
+
+/* iframe容器 */
+.iframe-container {
+    flex: 1;
+    position: relative;
+    min-height: 700px;
+    max-height: calc(100vh - 140px);
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    background: #fafafa;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: block;
+}
+
+/* 隐藏iframe容器滚动条 */
+.iframe-container::-webkit-scrollbar {
+    display: none;
+}
+
+.auth-iframe {
+    width: 100%;
+    min-height: 700px;
+    border: none;
+    display: block;
+}
+
+/* 隐藏WebKit浏览器的滚动条 */
+.auth-iframe::-webkit-scrollbar {
+    display: none;
+}
+.auth-iframe::-webkit-scrollbar {
+    display: none;
+}
+
+/* 加载状态 */
+.iframe-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    z-index: 1;
+    padding: 0;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #1890ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: #666;
+    font-size: 14px;
+}
+
+/* 完成页面 */
+.complete-section {
+    padding: 8px 8px;
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 120px;
+}
+
+.complete-wrapper {
+    width: 100%;
+    max-width: 620px;
+    text-align: center;
+    animation: fadeInUp 0.4s ease-out;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.complete-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.complete-title {
+    display: block;
+    margin: 0;
+}
+
+.complete-icon-wrapper {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.complete-checkmark {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 2.5;
+    stroke: #52c41a;
+    stroke-miterlimit: 10;
+    box-shadow: 0 0 0 rgba(82, 196, 26, 0.35);
+    animation: scaleIn 0.4s ease-out, pulse 1.6s ease-in-out infinite;
+    animation-delay: 0.15s, 0.8s;
+}
+
+.complete-checkmark-circle {
+    stroke-dasharray: 140;
+    stroke-dashoffset: 140;
+    stroke-width: 2.5;
+    stroke-miterlimit: 10;
+    stroke: #52c41a;
+    fill: #f6ffed;
+    animation: stroke 0.5s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.complete-checkmark-check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    animation: stroke 0.25s cubic-bezier(0.65, 0, 0.45, 1) 0.7s forwards;
+}
+
+@keyframes stroke {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+    }
+    to {
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(82, 196, 26, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(82, 196, 26, 0);
+    }
+}
+
+.complete-title {
+    color: #262626;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+}
+
+.complete-message {
+    font-size: 15px;
+    color: #595959;
+    font-weight: 500;
+}
+
+.complete-submessage {
+    font-size: 13px;
+    color: #8c8c8c;
+}
+
+/* 未完成步骤列表 */
+.incomplete-steps-list {
+    margin: 24px 0;
+    text-align: left;
+    display: inline-block;
+    min-width: 300px;
+}
+
+.incomplete-step-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: #fff7e6;
+    border: 1px solid #ffd591;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.incomplete-step-item:hover {
+    background: #fffbe6;
+    border-color: #ffc53d;
+    box-shadow: 0 2px 8px rgba(255, 197, 61, 0.2);
+}
+
+.incomplete-step-name {
+    font-size: 14px;
+    color: #262626;
+    font-weight: 500;
+}
+
+.incomplete-step-link {
+    font-size: 14px;
+    color: #1890ff;
+    text-decoration: none;
+    padding: 4px 12px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.incomplete-step-link:hover {
+    background: #e6f7ff;
+    color: #40a9ff;
+}
+
+/* 警告图标样式 */
+.complete-warning {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 3;
+    stroke: #faad14;
+    stroke-miterlimit: 10;
+    box-shadow: 0 0 0 rgba(250, 173, 20, 0.4);
+    animation: scaleIn 0.5s ease-out, pulseWarning 2s ease-in-out infinite;
+    animation-delay: 0.2s, 1s;
+}
+
+.complete-warning-circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 3;
+    stroke-miterlimit: 10;
+    stroke: #faad14;
+    fill: #fffbe6;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.complete-warning-icon {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 20;
+    stroke-dashoffset: 20;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes pulseWarning {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(250, 173, 20, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(250, 173, 20, 0);
+    }
+}
+
+
+/* 对接方式选择 */
+.integration-options {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: stretch;
+    flex: none;
+    min-height: auto;
+    max-height: none;
+    padding: 0;
+    margin-top: 0;
+    width: 100%;
+}
+
+.integration-option {
+    flex: 1;
+    max-width: 300px;
+    min-width: 240px;
+    padding: 16px 16px;
+    border: 2px solid #e8e8e8;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
+}
+
+.integration-option:hover {
+    border-color: #1890ff;
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.12);
+    transform: translateY(-1px);
+}
+
+.integration-option.selected {
+    border-color: #1890ff;
+    background: #f0f9ff;
+    box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+/* 选中标记（右上角小勾） */
+.option-checkmark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 26px;
+    height: 26px;
+    background: #52c41a;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-shadow: 0 2px 6px rgba(82, 196, 26, 0.4);
+    z-index: 1;
+}
+
+.option-icon {
+    font-size: 36px;
+    font-weight: 600;
+    color: #1890ff;
+    margin-bottom: 8px;
+}
+
+.option-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #262626;
+    margin-bottom: 6px;
+}
+
+.option-desc {
+    font-size: 13px;
+    color: #666;
+    line-height: 1.6;
+    flex: 1;
+    display: block;
+    padding-top: 4px;
+    white-space: normal;
+    text-align: left;
+}
+
+/* 数值高亮 */
+.highlight-number {
+    color: #fa541c;
+    font-weight: 700;
+}
+
+/* 富文本描述样式 */
+.option-desc ul {
+    margin: 6px 0 0 0;
+    padding-left: 20px;
+    list-style: disc !important;
+    list-style-type: disc !important;
+    list-style-position: outside;
+}
+
+.option-desc li {
+    margin-bottom: 6px;
+    line-height: 1.6;
+    list-style: inherit !important;
+    display: list-item;
+}
+
+.option-desc strong {
+    color: #fa541c;
+    font-weight: 700;
+}
+
+.option-desc .openapi-desc {
+    max-height: 360px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.option-desc .openapi-desc::-webkit-scrollbar {
+    width: 6px;
+}
+
+.option-desc .openapi-desc::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 3px;
+}
+
+.option-desc .openapi-desc ul {
+    margin-top: 4px;
+}
+.option-desc .openapi-platform-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    padding-left: 0;
+    margin: 6px 0 0 0;
+    list-style: none;
+    list-style-type: none;
+}
+.option-desc .openapi-platform-links li {
+    list-style: none;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+.option-desc .openapi-desc-primary {
+    margin: 6px 0 0 0;
+    padding-left: 20px;
+    list-style: disc;
+}
+.option-desc .openapi-desc-primary li {
+    list-style: disc;
+    list-style-type: disc;
+    list-style-position: outside;
+    margin: 0 0 6px 0;
+    padding: 0;
+    display: list-item;
+}
+.option-desc .openapi-platform-list {
+    margin: 8px 0 0 0;
+    padding: 0;
+    list-style: none;
+    list-style-type: none;
+}
+.option-desc .openapi-platform-list .platform-label {
+    font-weight: 600;
+    margin: 0 0 6px 0;
+    list-style: none;
+}
+.option-desc .openapi-platform-list .platform-links {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    list-style: none;
+}
+.option-desc .openapi-platform-list .platform-links span {
+    display: inline-block;
+}
+.option-desc .openapi-desc-primary {
+    margin: 6px 0 0 0;
+    padding-left: 20px;
+    list-style: disc;
+}
+.option-desc .openapi-desc-primary li {
+    list-style: disc;
+    list-style-type: disc;
+    list-style-position: outside;
+    margin: 0 0 6px 0;
+    padding: 0;
+    display: list-item;
+}
+.option-desc .openapi-platform-list {
+    margin: 8px 0 0 0;
+    padding: 0;
+}
+.option-desc .openapi-platform-list dt {
+    font-weight: 600;
+    margin: 0 0 6px 0;
+}
+.option-desc .openapi-platform-list dd {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+}
+.option-desc .openapi-platform-list dd span {
+    display: inline-block;
+}
+.option-desc li::marker {
+    color: #1890ff;
+    font-size: 12px;
+}
+
+/* 奇门授权信息显示 */
+.qimen-authorized-info {
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    border: 1px solid #e8e8e8;
+}
+
+.qimen-secret-form {
+    margin-top: 10px;
+}
+
+.secret-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.secret-input {
+    flex: 1;
+    min-width: 180px;
+    padding: 6px 8px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: #1890ff;
+    padding: 0 4px;
+}
+
+/* 奇门授权信息显示，样式对齐 enterprise-authorized-info */
+.qimen-authorized-info {
+    padding: 4px 8px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    border: 1px solid #e8e8e8;
+}
+.qimen-authorized-info .info-item {
+    margin-bottom: 4px;
+}
+.qimen-authorized-info .info-item:last-child {
+    margin-bottom: 0;
+}
+.qimen-authorized-info .info-label {
+    font-size: 12px;
+    min-width: 72px;
+}
+.qimen-authorized-info .info-value {
+    font-size: 13px;
+}
+
+.qimen-authorized-info .btn-edit-secret,
+.qimen-authorized-info .secret-input-row .btn,
+.qimen-authorized-info .secret-input-row .btn-link {
+    height: 30px !important;
+    line-height: 18px !important;
+    padding: 4px 10px !important;
+    font-size: 12px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    min-width: 64px;
+}
+
+.qimen-authorized-info .btn-edit-secret {
+    margin-left: 8px;
+}
+
+.qimen-authorized-info .secret-input-row .btn-default {
+    background: #1890ff;
+    color: #fff;
+    border: 1px solid #1890ff;
+}
+
+.qimen-authorized-info .secret-input-row .btn-link {
+    margin-left: 4px;
+}
+
+/* 企业认证信息显示 */
+.enterprise-authorized-info {
+    padding: 4px 8px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    border: 1px solid #e8e8e8;
+}
+.enterprise-authorized-info .info-item {
+    margin-bottom: 4px;
+}
+.enterprise-authorized-info .info-item:last-child {
+    margin-bottom: 0;
+}
+.enterprise-authorized-info .info-label {
+    font-size: 12px;
+    min-width: 72px;
+}
+.enterprise-authorized-info .info-value {
+    font-size: 13px;
+}
+
+/* 店铺绑定信息显示 */
+.shop-bind-info {
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    border: 1px solid #e8e8e8;
+    margin-top: 16px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.info-item:last-child {
+    margin-bottom: 0;
+}
+
+.info-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #262626;
+    min-width: 100px;
+    margin-right: 12px;
+}
+
+.info-value {
+    font-size: 14px;
+    color: #595959;
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+    flex: 1;
+}
+
+/* 横向排列的系统信息 */
+.info-row-inline {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+.info-item-inline {
+    flex: 1 1 240px;
+    margin-bottom: 8px;
+}
+
+/* 新的绑定信息卡片样式（用于完成页面） */
+.shop-bind-info-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e8e8e8;
+    overflow: hidden;
+    margin-top: 18px;
+    animation: slideInUp 0.4s ease-out 0.2s both;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-header {
+    background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+}
+
+.card-header-icon {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.card-header-title {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.card-body {
+    padding: 18px;
+}
+
+.info-grid {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+.info-card-item {
+    flex: 1 1 240px;
+    min-width: 220px;
+}
+
+.info-card-item {
+    padding: 16px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.info-card-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, #52c41a 0%, #73d13d 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.info-card-item:hover {
+    border-color: #52c41a;
+    box-shadow: 0 4px 12px rgba(82, 196, 26, 0.15);
+    transform: translateY(-2px);
+}
+
+.info-card-item:hover::before {
+    opacity: 1;
+}
+
+.info-card-label {
+    font-size: 12px;
+    color: #8c8c8c;
+    margin-bottom: 8px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-card-value {
+    font-size: 16px;
+    color: #262626;
+    font-weight: 600;
+    word-break: break-all;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* 对接方式锁定提示 */
+.adapter-locked-notice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    min-height: auto;
+    padding: 8px 20px;
+    text-align: center;
+    margin-top: 0;
+    width: 100%;
+}
+
+.notice-icon {
+    font-size: 40px;
+    color: #999;
+    margin-bottom: 8px;
+}
+
+.notice-text {
+    font-size: 15px;
+    color: #666;
+    margin-bottom: 12px;
+    line-height: 1.6;
+}
+
+.current-adapter {
+    font-size: 14px;
+    color: #1890ff;
+    font-weight: 500;
+    padding: 8px 16px;
+    background: #e6f7ff;
+    border-radius: 4px;
+}
+
+/* 页脚 */
+.bind-guide-footer {
+    padding: 8px 16px;
+    border-top: 1px solid #e8e8e8;
+    background: #fafafa;
+    flex-shrink: 0;
+}
+
+.footer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* 按钮样式 */
+.btn {
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.btn-primary {
+    background: #1890ff;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #40a9ff;
+}
+
+.btn-default {
+    background: #fff;
+    color: #666;
+    border-color: #d9d9d9;
+}
+
+.btn-default:hover {
+    background: #f5f5f5;
+}
+
+.btn-link {
+    background: none;
+    color: #1890ff;
+    padding: 6px 0;
+}
+
+.btn-link:hover {
+    color: #40a9ff;
+}
+
+.footer-tip {
+    font-size: 14px;
+    color: #faad14;
+    padding: 6px 16px;
+    background: #fffbe6;
+    border: 1px solid #ffd591;
+    border-radius: 4px;
+}
+
+
+/* iframe步骤的内容区域统一样式 */
+.step-section-iframe .section-content {
+    min-height: 600px;
+    max-height: calc(100vh - 180px);
+    flex: 1;
+    overflow: hidden;
+}
+
+/* 响应式布局 */
+@media (max-width: 1200px) {
+    .iframe-container {
+        min-height: 300px;
+    }
+    
+    .auth-iframe {
+        min-height: 300px;
+    }
+}
+</style>
+
+<script>
+(function() {
+    // 切换奇门 Secret Key 编辑态
+    window.toggleQimenSecretEdit = function(show) {
+        var view = document.getElementById('qimen_secret_view');
+        var edit = document.getElementById('qimen_secret_edit');
+        if (!view || !edit) return;
+        if (show) {
+            view.style.display = 'none';
+            edit.style.display = 'flex';
+        } else {
+            view.style.display = '';
+            edit.style.display = 'none';
+        }
+    };
+
+    // 获取店铺是否有节点（从PHP传递）
+    var HAS_NODE = <{if $has_node}>1<{else}>0<{/if}> == 1;
+    
+    // 获取企业认证状态（从PHP传递）
+    var IS_CERTIFIED = <{if $step_completed[1]}>1<{else}>0<{/if}> == 1;
+    // 是否淘宝店铺（全局使用）
+    var IS_TAOBAO = <{if $is_taobao}>true<{else}>false<{/if}>;
+    
+    // 获取dialog body容器
+    function getDialogBody() {
+        // 方法1: 通过bind-guide-container查找父dialog_body
+        var container = document.querySelector('.bind-guide-container');
+        if (container) {
+            container = $(container);
+            // 查找父dialog_body
+            var dialogBody = container.getParent('.dialog_body');
+            if (dialogBody) {
+                return dialogBody;
+            }
+            // 如果没有找到dialog_body，尝试查找父dialog并获取实例
+            var dialog = container.getParent('.dialog');
+            if (dialog) {
+                var instance = dialog.retrieve('instance');
+                if (instance && instance.dialog_body) {
+                    return $(instance.dialog_body);
+                }
+            }
+            // 如果找不到dialog_body，返回container的父容器（通常是dialog_body）
+            var parent = container.getParent();
+            if (parent) {
+                return parent;
+            }
+        }
+        
+        // 方法2: 直接查找dialog_body
+        var dialogBodies = $$('.dialog_body');
+        if (dialogBodies.length > 0) {
+            return dialogBodies[0];
+        }
+        
+        // 方法3: 查找当前页面的body或main容器
+        var body = document.body;
+        if (body) {
+            return $(body);
+        }
+        
+        return null;
+    }
+    
+    // 确保只注册一次消息监听，避免重复刷新
+    var bindGuideMessageListenerAttached = false;
+    function ensureBindGuideMessageListener() {
+        if (bindGuideMessageListenerAttached) {
+            return;
+        }
+        bindGuideMessageListenerAttached = true;
+        window.addEventListener('message', function(event) {
+            if (!event || !event.data) {
+                return;
+            }
+            if (event.data.type === 'bind_complete' || event.data.success) {
+                loadStep(<{$step}>);
+            }
+        });
+    }
+    ensureBindGuideMessageListener();
+    
+    function loadStep(step) {
+        // 确保step是数字类型
+        step = parseInt(step);
+        
+        // 调试日志
+        console.log('loadStep: 加载步骤', step, 'URL参数step=' + step);
+        
+        var dialogBody = getDialogBody();
+        var finderId = '<{$finder_id}>';
+        var url = 'index.php?app=ome&ctl=admin_shop&act=bind_guide&shop_id=<{$shop_id}>&step=' + step;
+        if (finderId) {
+            url += '&finder_id=' + finderId;
+        }
+        
+        // 调试日志：输出完整URL
+        console.log('loadStep: 完整URL', url);
+        
+        var options = {
+            update: dialogBody,
+            clearUpdateMap: false,
+            onComplete: function() {
+                // 页面更新后，重新绑定取消按钮
+                setTimeout(function() {
+                    bindCancelButton();
+                }, 100);
+            }
+        };
+        
+        if (dialogBody) {
+            // 使用W.page更新dialog内容
+            W.page(url, options);
+        } else {
+            // 如果找不到容器，直接使用W.page，让它自动找到更新目标
+            delete options.update;
+            W.page(url, options);
+        }
+    }
+    
+    window.nextStep = function() {
+        var currentStep = <{$step}>;
+        var needEnterpriseAuth = <{if $need_enterprise_auth}>true<{else}>false<{/if}>;
+        var adapter = '<{$adapter}>';
+        var isTaobao = <{if $is_taobao}>true<{else}>false<{/if}>;
+        
+        // 获取步骤完成状态（从PHP传递）
+        var stepCompleted = {
+            0: <{if $step_completed[0]}>true<{else}>false<{/if}>,
+            1: <{if $step_completed[1]}>true<{else}>false<{/if}>,
+            2: <{if $step_completed[2]}>true<{else}>false<{/if}>,
+            3: <{if $step_completed[3]}>true<{else}>false<{/if}>
+        };
+        
+        // 第4步是最后一步，不应该有下一步
+        if (currentStep >= 4) {
+            return;
+        }
+        
+        // 第0步：需要先选择对接方式
+        if (currentStep == 0) {
+            // 检查是否已有节点，如果有节点则不允许修改
+            if (HAS_NODE) {
+                // 已绑定节点但未修改对接方式，直接跳转后续步骤
+                var currentAdapter = '<{$adapter}>';
+                var targetStep = 1;
+                if (currentAdapter == 'openapi') {
+                    targetStep = isTaobao ? 3 : 2;
+                }
+                loadStep(targetStep);
+                return;
+            }
+            
+            var adapterValue = $('adapter') ? $('adapter').value : '';
+            if (!adapterValue) {
+                MessageBox.error('请先选择对接方式');
+                return;
+            }
+            // 保存对接方式，保存成功后再跳转
+            saveIntegrationType(adapterValue, function() {
+                // 根据对接方式决定跳转步骤
+                // 商家自研：所有店铺直接跳到店铺绑定（淘宝=步骤3，其他=步骤2）
+                var targetStep = 1;
+                if (adapterValue == 'openapi') {
+                    targetStep = isTaobao ? 3 : 2;
+                }
+                loadStep(targetStep);
+            });
+            return;
+        }
+        
+        // 第1步：企业认证
+        if (currentStep == 1) {
+            // 强制检查：步骤0必须完成
+            if (!stepCompleted[0]) {
+                MessageBox.error('请先完成对接方式（步骤1）');
+                return;
+            }
+            // 强制检查：步骤1必须完成才能进入下一步
+            if (needEnterpriseAuth && !stepCompleted[1]) {
+                MessageBox.error('请先完成企业认证（步骤2）');
+                return;
+            }
+            // 如果是商家自研对接（openapi），不需要企业认证，直接跳到步骤2
+            if (!needEnterpriseAuth && adapter == 'openapi') {
+                loadStep(isTaobao ? 3 : 2);
+            } else {
+                // 其他情况，正常跳到下一步（步骤2）
+                loadStep(2);
+            }
+            return;
+        }
+        
+        // 第2步：根据是否是淘宝店铺显示不同内容
+        if (currentStep == 2) {
+            // 强制检查：步骤0和步骤1必须完成
+            if (!stepCompleted[0]) {
+                MessageBox.error('请先完成对接方式（步骤1）');
+                return;
+            }
+            if (needEnterpriseAuth && !stepCompleted[1]) {
+                MessageBox.error('请先完成企业认证（步骤2）');
+                return;
+            }
+            
+            if (isTaobao) {
+                // 商家自研对接（openapi）直接跳到店铺绑定
+                if (adapter == 'openapi') {
+                    loadStep(3);
+                    return;
+                }
+                // 淘宝店铺：步骤2是奇门授权
+                // 强制检查：步骤2必须完成才能进入步骤3
+                if (!stepCompleted[2]) {
+                    MessageBox.error('请先完成奇门授权（步骤3）');
+                    return;
+                }
+                // 完成后跳到步骤3（店铺绑定）
+                loadStep(3);
+            } else {
+                // 非淘宝店铺：步骤2是店铺绑定
+                // 强制检查：步骤2必须完成才能进入步骤4
+                if (!stepCompleted[2]) {
+                    MessageBox.error('请先完成店铺绑定（步骤3）');
+                    return;
+                }
+                // 完成后跳到步骤4（完成）
+                loadStep(4);
+            }
+            return;
+        }
+        
+        // 第3步：店铺绑定（仅淘宝店铺）
+        if (currentStep == 3) {
+            // 强制检查：步骤0、1、2必须完成
+            if (!stepCompleted[0]) {
+                MessageBox.error('请先完成对接方式（步骤1）');
+                return;
+            }
+            if (needEnterpriseAuth && !stepCompleted[1]) {
+                MessageBox.error('请先完成企业认证（步骤2）');
+                return;
+            }
+            if (adapter != 'openapi' && !stepCompleted[2]) {
+                MessageBox.error('请先完成奇门授权（步骤3）');
+                return;
+            }
+            // 强制检查：步骤3必须完成才能进入步骤4
+            if (!stepCompleted[3]) {
+                MessageBox.error('请先完成店铺绑定（步骤4）');
+                return;
+            }
+            // 完成后跳到步骤4（完成）
+            loadStep(4);
+            return;
+        }
+        
+        // 默认：跳转到下一步
+        loadStep(currentStep + 1);
+    };
+    
+    // 保存对接方式
+    function saveIntegrationType(adapter, callback) {
+        new Request.JSON({
+            url: 'index.php?app=ome&ctl=admin_shop&act=save_integration_type',
+            method: 'post',
+            data: {
+                shop_id: '<{$shop_id}>',
+                adapter: adapter
+            },
+            onSuccess: function(response) {
+                if (response.success) {
+                    // 保存成功，更新步骤0的显示状态为completed
+                    var step0 = $$('.step-item-0')[0];
+                    if (step0) {
+                        step0.removeClass('active');
+                        step0.addClass('completed');
+                        // 更新步骤0的圆圈颜色
+                        var stepNumber = step0.getElement('.step-number');
+                        if (stepNumber) {
+                            stepNumber.setStyle('background', '#52c41a');
+                            stepNumber.setStyle('color', '#fff');
+                        }
+                        // 更新步骤0的文字颜色
+                        var stepText = step0.getElement('.step-text');
+                        if (stepText) {
+                            stepText.setStyle('color', '#52c41a');
+                        }
+                        // 更新连接线
+                        var divider = step0.getNext('.step-divider');
+                        if (divider) {
+                            divider.addClass('completed');
+                            divider.setStyle('background', '#52c41a');
+                        }
+                    }
+                    // 执行回调函数
+                    if (callback && typeof callback === 'function') {
+                        callback();
+                    }
+                } else {
+                    MessageBox.error(response.msg || '保存失败');
+                }
+            },
+            onFailure: function() {
+                MessageBox.error('保存失败，请重试');
+            }
+        }).send();
+    }
+    
+    // 对接方式选择
+    (function() {
+        if (HAS_NODE) {
+            // 如果已有节点，不绑定点击事件
+            return;
+        }
+        
+        var options = $$('.integration-option');
+        if (options.length > 0) {
+            options.each(function(option) {
+                option.addEvent('click', function() {
+                    // 移除其他选中状态和勾选标记
+                    options.each(function(opt) {
+                        opt.removeClass('selected');
+                        var checkmark = opt.getElement('.option-checkmark');
+                        if (checkmark) {
+                            checkmark.remove();
+                        }
+                    });
+                    // 添加选中状态
+                    this.addClass('selected');
+                    // 添加勾选标记
+                    if (!this.getElement('.option-checkmark')) {
+                        var checkmark = new Element('div', {
+                            'class': 'option-checkmark',
+                            'text': '✓'
+                        });
+                        this.grab(checkmark, 'top');
+                    }
+                    // 更新隐藏字段
+                    var adapter = this.get('data-type');
+                    if ($('adapter')) {
+                        $('adapter').value = adapter;
+                    }
+                    // 保存对接方式后，根据选择刷新到对应起始步骤，确保显示正确的步骤指示
+                    saveIntegrationType(adapter, function() {
+                        var targetStep = 1;
+                        if (adapter == 'openapi') {
+                            targetStep = IS_TAOBAO ? 3 : 2;
+                        }
+                        loadStep(targetStep);
+                    });
+                });
+            });
+        }
+    })();
+    
+    // 高亮矩阵方案中的关键数值
+    (function() {
+        var matrixDesc = document.querySelector('.integration-option[data-type="matrixonline"] .option-desc');
+        if (!matrixDesc) {
+            return;
+        }
+        var html = matrixDesc.innerHTML;
+        var highlightRegex = /(500条订单流量|500条|500|3个店铺|3个|350元\/店铺)/g;
+        matrixDesc.innerHTML = html.replace(highlightRegex, function(match) {
+            return '<span class="highlight-number">' + match + '</span>';
+        });
+    })();
+    
+    // 初始化iframe加载
+    (function() {
+        var currentStep = <{$step}>;
+        var bindUrl = '<{$bind_url}>';
+        var isQimenBinded = <{if $is_qimen_binded}>true<{else}>false<{/if}>;
+        var isCertified = <{if $is_certified}>true<{else}>false<{/if}>;
+        var isShopBinded = <{if $is_shop_binded}>true<{else}>false<{/if}>; // 对于淘宝店铺需要同时满足 node_id 和奇门授权
+        var isNodeBinded = <{if $is_node_binded}>true<{else}>false<{/if}>; // 只检查 node_id
+        var adapter = '<{$adapter}>';
+        
+        // 调试日志
+        console.log('初始化iframe加载:', {
+            currentStep: currentStep,
+            bindUrl: bindUrl,
+            adapter: adapter,
+            isShopBinded: isShopBinded,
+            isNodeBinded: isNodeBinded
+        });
+        
+        var isTaobao = <{if $is_taobao}>true<{else}>false<{/if}>;
+        
+        // 步骤1：企业认证，如果有bind_url，初始化iframe
+        if (currentStep == 1 && bindUrl) {
+            initAuthIframe(currentStep);
+            return;
+        }
+        
+        // 步骤2：根据是否是淘宝店铺显示不同内容
+        if (currentStep == 2) {
+            if (isTaobao) {
+                // 淘宝店铺：步骤2是奇门授权，已授权也加载iframe便于复查/重授权
+                if (bindUrl) {
+                    initAuthIframe(currentStep, isQimenBinded);
+                }
+            } else {
+                // 非淘宝店铺：步骤2是店铺绑定（只检查 node_id）
+                if (adapter == 'openapi') {
+                    // 商家自研对接：无论是否已有节点，都加载 bindNodeId 页面
+                    var urlToLoad = resolveBindUrl(bindUrl, '<{$shop_id}>', 2);
+                    if (urlToLoad) {
+                        initBindNodeContent(2, urlToLoad);
+                    }
+                } else if (isNodeBinded) {
+                    // 非商家自研且已有节点：显示完成信息，不加载
+                    return;
+                } else if (bindUrl) {
+                    // 非商家自研对接，使用 iframe
+                    initAuthIframe(currentStep, false);
+                }
+            }
+            return;
+        }
+        
+        // 步骤3：店铺绑定（仅淘宝店铺，只检查 node_id，不依赖奇门授权）
+        if (currentStep == 3 && isTaobao) {
+            if (adapter == 'openapi') {
+                // 商家自研对接：无论是否已有节点，都加载 bindNodeId 页面
+                var urlToLoad = resolveBindUrl(bindUrl, '<{$shop_id}>', 3);
+                if (urlToLoad) {
+                    initBindNodeContent(3, urlToLoad);
+                }
+            } else if (isNodeBinded) {
+                // 非商家自研且已有节点：显示完成信息，不加载
+                return;
+            } else if (bindUrl) {
+                // 非商家自研对接，使用 iframe
+                initAuthIframe(currentStep);
+            }
+            return;
+        }
+        
+        // 步骤4：完成页面，不需要加载任何iframe
+        if (currentStep == 4) {
+            // 步骤4是完成页面，不需要加载任何内容
+            return;
+        }
+    })();
+    
+    // 生成绑定地址（openapi 场景复用）
+    function resolveBindUrl(existingUrl, shopId, stepLabel) {
+        if (existingUrl && existingUrl.trim() !== '') {
+            console.log('步骤' + stepLabel + '使用bindUrl:', existingUrl);
+            return existingUrl;
+        }
+        if (!shopId) {
+            console.error('步骤' + stepLabel + '无法生成bindUrl，shopId为空');
+            return '';
+        }
+        var fallback = 'index.php?app=ome&ctl=admin_shop&act=bindNodeId&p[0]=' + shopId + '&p[1]=bind';
+        console.log('步骤' + stepLabel + '缺少bindUrl，生成URL:', fallback);
+        return fallback;
+    }
+    
+    // 初始化商家自研对接的绑定页面内容（不使用 iframe）
+    function initBindNodeContent(step, url) {
+        var container = $('bind_node_content_' + step);
+        if (!container) {
+            return;
+        }
+        
+        // 使用 W.page 加载页面内容（自动处理 JavaScript 执行）
+        W.page(url, {
+            update: container,
+            clearUpdateMap: false,
+            onComplete: function() {
+                // 隐藏加载提示
+                var loading = container.getElement('.iframe-loading');
+                if (loading) {
+                    loading.setStyle('display', 'none');
+                }
+            },
+            onFailure: function() {
+                // 隐藏加载提示
+                var loading = container.getElement('.iframe-loading');
+                if (loading) {
+                    loading.setStyle('display', 'none');
+                }
+                // 显示错误信息
+                container.set('html', '<div style="padding: 20px; color: #f5222d;">加载失败，请重试</div>');
+            }
+        });
+    }
+    
+    // 初始化授权iframe
+    function initAuthIframe(step, isAlreadyBinded) {
+        var container = $('auth_iframe_container_' + step);
+        var iframe = $('auth_iframe_' + step);
+        
+        if (!container || !iframe) {
+            return;
+        }
+        
+        // 先设置一个合理的默认高度
+        // iframe.setStyle('height', '600px');
+        iframe.setStyle('min-height', '600px');
+        
+        var loading = container.getElement('.iframe-loading');
+        var src = iframe.get('src');
+
+        // 如果没有可加载的地址，直接结束loading，避免一直转圈
+        if (!src) {
+            if (loading) {
+                loading.setStyle('display', 'none');
+            }
+            container.setStyle('overflow-y', 'auto');
+            container.setStyle('overflow-x', 'hidden');
+            return;
+        }
+
+        // 已授权时，先隐藏loading，后续若有内容加载则再显示结果
+        if (isAlreadyBinded && loading) {
+            loading.setStyle('display', 'none');
+            container.setStyle('overflow-y', 'auto');
+            container.setStyle('overflow-x', 'hidden');
+        }
+
+        // 超时兜底，8s 后隐藏 loading，避免长时间转圈
+        var loadingTimeout = setTimeout(function() {
+            if (loading) {
+                loading.setStyle('display', 'none');
+            }
+            container.setStyle('overflow-y', 'auto');
+            container.setStyle('overflow-x', 'hidden');
+        }, 8000);
+
+        // 监听iframe加载完成
+        iframe.addEvent('load', function() {
+            clearTimeout(loadingTimeout);
+            if (loading) {
+                loading.setStyle('display', 'none');
+            }
+            
+            // 立即调整iframe高度
+            adjustIframeHeight(iframe);
+            
+        });
+        
+        // 监听iframe加载错误，兜底关闭loading，允许滚动查看错误内容
+        iframe.addEvent('error', function() {
+            clearTimeout(loadingTimeout);
+            if (loading) {
+                loading.setStyle('display', 'none');
+            }
+            container.setStyle('overflow-y', 'auto');
+            container.setStyle('overflow-x', 'hidden');
+        });
+        
+        // 如果iframe已经有src，触发load事件
+        if (iframe.get('src')) {
+            iframe.fireEvent('load');
+        }
+    }
+    
+    // 调整iframe高度
+    function adjustIframeHeight(iframe) {
+        if (!iframe) return;
+        
+        var container = iframe.getParent('.iframe-container');
+        if (!container) return;
+        
+        try {
+            // 尝试获取iframe内容高度
+            var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            if (iframeDoc && iframeDoc.body) {
+                // 获取实际内容高度
+                var bodyHeight = Math.max(
+                    iframeDoc.body.scrollHeight,
+                    iframeDoc.body.offsetHeight
+                );
+                var docHeight = Math.max(
+                    iframeDoc.documentElement.scrollHeight,
+                    iframeDoc.documentElement.offsetHeight,
+                    iframeDoc.documentElement.clientHeight
+                );
+                var height = Math.max(bodyHeight, docHeight);
+                
+                // 添加适量额外空间确保底部内容可见（30px）
+                height = height + 60;
+ 
+                // 设置iframe高度为内容高度
+                // iframe.setStyle('height', height + 'px');
+                // iframe.setStyle('min-height', height + 'px');
+                iframe.setStyle('max-height', 'none');
+                
+                // 如果内容高度超过容器最大高度，允许滚动
+                var containerMaxHeight = container.getStyle('max-height');
+                if (containerMaxHeight && containerMaxHeight !== 'none') {
+                    var maxHeightValue = parseInt(containerMaxHeight);
+                    if (height > maxHeightValue) {
+                        container.setStyle('overflow-y', 'auto');
+                    } else {
+                        container.setStyle('overflow-y', 'hidden');
+                    }
+                } else {
+                    container.setStyle('overflow-y', 'hidden');
+                }
+                container.setStyle('overflow-x', 'hidden');
+            }
+        } catch (e) {
+            // 跨域限制，使用合理的默认高度
+            var defaultHeight = 1000;
+            // iframe.setStyle('height', defaultHeight + 'px');
+            // iframe.setStyle('min-height', defaultHeight + 'px');
+            // 允许滚动以确保内容可见
+            container.setStyle('overflow-y', 'auto');
+            container.setStyle('overflow-x', 'hidden');
+        }
+    }
+    
+    window.previousStep = function() {
+        var currentStep = <{$step}>;
+        if (currentStep > 0) {
+            loadStep(currentStep - 1);
+        }
+    };
+    
+    // 跳转到指定步骤
+    window.goToStep = function(step) {
+        // 确保step是数字类型
+        step = parseInt(step);
+        
+        // 调试：检查传入的step值
+        if (isNaN(step)) {
+            console.error('goToStep: step参数不是数字', step);
+            return;
+        }
+        
+        var currentStep = <{$step}>;
+        var needEnterpriseAuth = <{if $need_enterprise_auth}>true<{else}>false<{/if}>;
+        var isTaobao = <{if $is_taobao}>true<{else}>false<{/if}>;
+        var adapter = '<{$adapter}>';
+        
+        // 获取步骤完成状态（从PHP传递）
+        var stepCompleted = {
+            0: <{if $step_completed[0]}>true<{else}>false<{/if}>,
+            1: <{if $step_completed[1]}>true<{else}>false<{/if}>,
+            2: <{if $step_completed[2]}>true<{else}>false<{/if}>,
+            3: <{if $step_completed[3]}>true<{else}>false<{/if}>
+        };
+        
+        // 调试日志
+        console.log('goToStep: 点击步骤', step, '当前步骤', currentStep, '是否淘宝店铺', isTaobao);
+        
+        // 如果点击的是当前步骤，不做任何操作
+        if (step == currentStep) {
+            return;
+        }
+        
+        // 如果点击的是已完成的步骤，允许跳转
+        if (step < currentStep) {
+            console.log('goToStep: 跳转到已完成的步骤', step);
+            loadStep(step);
+            return;
+        }
+        
+        // 强制限制：必须完成前置步骤才能进入下一步（只提示，不强制跳转）
+        // 步骤0（对接方式）是前提，必须完成才能进行其他步骤
+        if (step != 0 && !stepCompleted[0]) {
+            MessageBox.error('请先完成对接方式（步骤1）');
+            return;
+        }
+        
+        // 步骤1：需要步骤0完成
+        if (step == 1 && !stepCompleted[0]) {
+            MessageBox.error('请先完成对接方式（步骤1）');
+            return;
+        }
+        
+        // 步骤2：需要步骤1完成（如果不需要企业认证，则跳过检查）
+        if (step == 2) {
+            if (needEnterpriseAuth && !stepCompleted[1]) {
+                MessageBox.error('请先完成企业认证（步骤2）');
+                return;
+            }
+        }
+        
+        // 步骤3：需要步骤2完成（仅淘宝店铺）
+        if (step == 3 && isTaobao) {
+            if (adapter != 'openapi' && !stepCompleted[2]) {
+                MessageBox.error('请先完成奇门授权（步骤3）');
+                return;
+            }
+        }
+        
+        // 步骤4：需要所有前置步骤完成
+        if (step == 4) {
+            if (!stepCompleted[0]) {
+                MessageBox.error('请先完成对接方式（步骤1）');
+                return;
+            }
+            if (needEnterpriseAuth && !stepCompleted[1]) {
+                MessageBox.error('请先完成企业认证（步骤2）');
+                return;
+            }
+            if (isTaobao) {
+                if (adapter != 'openapi' && !stepCompleted[2]) {
+                    MessageBox.error('请先完成奇门授权（步骤3）');
+                    return;
+                }
+                if (!stepCompleted[3]) {
+                    MessageBox.error('请先完成店铺绑定（步骤4）');
+                    return;
+                }
+            } else {
+                if (!stepCompleted[2]) {
+                    MessageBox.error('请先完成店铺绑定（步骤3）');
+                    return;
+                }
+            }
+        }
+        
+        // 所有检查通过，允许跳转
+        console.log('goToStep: 跳转到步骤', step);
+        loadStep(step);
+    };
+    
+    // 完成绑定，关闭对话框并刷新finder
+    window.completeBind = function() {
+        try {
+            // 获取dialog实例
+            var container = document.querySelector('.bind-guide-container');
+            var dialog = container ? $(container).getParent('.dialog') : null;
+            var dialogInstance = dialog ? dialog.retrieve('instance') : null;
+            
+            if (dialogInstance) {
+                // 关闭对话框（会自动触发onClose回调刷新finder）
+                dialogInstance.close();
+            } else {
+                // 如果找不到dialog实例，尝试直接关闭
+                var finderId = '<{$finder_id}>';
+                if (finderId && window.finderGroup && window.finderGroup[finderId]) {
+                    window.finderGroup[finderId].refresh();
+                }
+                // 尝试关闭所有dialog
+                var dialogs = $$('.dialog');
+                if (dialogs.length > 0) {
+                    var lastDialog = dialogs[dialogs.length - 1];
+                    var instance = lastDialog.retrieve('instance');
+                    if (instance) {
+                        instance.close();
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('关闭对话框失败:', e);
+            // 如果出错，至少刷新finder
+            var finderId = '<{$finder_id}>';
+            if (finderId && window.finderGroup && window.finderGroup[finderId]) {
+                window.finderGroup[finderId].refresh();
+            }
+        }
+    };
+    
+    // 绑定取消按钮事件
+    function bindCancelButton() {
+        var closeBtn = $$('*[isCloseDialogBtn]');
+        if (closeBtn && closeBtn.length > 0) {
+            closeBtn.each(function(btn) {
+                // 移除旧的事件监听器（如果有）
+                btn.removeEvents('click');
+                // 添加新的事件监听器
+                btn.addEvent('click', function() {
+                    var dialog = this.getParent('.dialog');
+                    if (dialog) {
+                        var instance = dialog.retrieve('instance');
+                        if (instance && instance.close) {
+                            instance.close();
+                        } else {
+                            // 如果找不到实例，尝试直接关闭
+                            dialog.style.display = 'none';
+                            dialog.remove();
+                        }
+                    }
+                });
+            });
+        }
+    }
+    
+    // 页面加载时绑定取消按钮
+    bindCancelButton();
+})();
+</script>
+</script>

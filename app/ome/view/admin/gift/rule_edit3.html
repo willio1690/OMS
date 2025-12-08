@@ -1,0 +1,131 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform" style="display:;background:#FFF;">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" >
+        <tr>
+            <td>
+                商家编码：<{input type="text" id="s_gift_bn" value="" }>
+                商品名称：<{input type="text" id="s_gift_name" value="" }>
+                <{button id="giftFilterBtn" class="filterBtn btn-thirdly" label=$___eccommon="查询"|t:'eccommon'}>
+                <font color="#5779BD">* 库存为0的赠品不显示</font>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table id="gift_list" class="gridlist">
+                    <thead>
+                    <tr>
+                        <th>选择</th>
+                        <th>序号</th>
+                        <th>商家编码</th>
+                        <th>商品名称</th>
+                        <th>成本价</th>
+                        <th>赠送数量</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr style="display:;">
+                        <td><{input onclick='set_bg_color($(this));' type="checkbox" name="gift_id[]" value="<!--gift_id-->" }></td>
+                        <td><!--gift_no--></td>
+                        <td><!--gift_bn--></td>
+                        <td><!--gift_name--></td>
+                        <td><!--gift_price--></td>
+                        <td>
+                            <{input type="text" name="gift_num[<!--gift_id-->]" value=1 size=4 onblur="chk_num(this)" }>
+                        </td>
+                    </tr>
+                    <{foreach from=$gifts item=data key=k}>
+                    <tr style="display:;background:#FFFFCC;">
+                        <td><{input onclick='set_bg_color($(this));' checked="checked" type="checkbox" name="gift_id[]" value=$data.gift_id }></td>
+                        <td><{$k+1}></td>
+                        <td><{$data.gift_bn}></td>
+                        <td><{$data.gift_name}></td>
+                        <td><{$data.gift_price}></td>
+                        <td>
+                            <{input type="text" name="gift_num[{$data.gift_id}]" value=$data.num size=4 onblur="chk_num(this)"}>
+                        </td>
+                    </tr>
+                    <{/foreach}>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <th style="text-align:left;width:50px">赠送方式：</th>
+            <td style="padding:7px 0px;">
+                <input type="radio" name="filter_arr[handling][type]" value='1' onclick="change_gift_handling_type(this.value);" <{if $rule.filter_arr.handling.type != 2}>checked<{/if}>/>全部
+                <input type="radio" name="filter_arr[handling][type]" value='2' onclick="change_gift_handling_type(this.value);" <{if $rule.filter_arr.handling.type == '2'}>checked<{/if}>/>选择
+                &nbsp;<{help}><{t}>以勾选的赠送商品为准，默认“全部”。<br />“选择”的输入框填写说明：“|”表示“或”；“#”表示“和”。例：A|B#C表示送A或B和C(必须包含“|”且前后必须有值)。前者赠送不成功（如库存不足）则送后者。A、B、C均为商家编码。<{/t}><{/help}>
+                <div id="select_handing" <{if $rule.filter_arr.handling.type != 2}>style="display:none;"<{/if}>>
+                    <input type="text" class="x-input" size="85" id="gift_handling_content" value="<{$rule.filter_arr.handling.content}>" name="filter_arr[handling][content]" onchange="change_gift_handling_content(this.value);" />
+                    <span style="color:#5779BD;" id="gift_handling_content_description"></span>
+                </div>
+                <input type="hidden" value="<{$rule.filter_arr.handling.type}>" id="gift_handling_type_value">
+            </td>
+        </tr> 
+    </table>
+</div>
+<script>
+
+(function(){
+	if($('gift_handling_type_value').getValue() == 2){
+		$('gift_handling_content_description').innerHTML = get_gift_handling_content_description($('gift_handling_content').getValue());
+	}
+})();
+
+function change_gift_handling_type(type_value){
+	$("select_handing").hide();
+	if(type_value == 2){
+		$("select_handing").show();
+		get_gift_handling_default();
+	}
+	$('gift_handling_type_value').value = type_value;
+}
+
+function change_gift_handling_content(content_value){
+	$('gift_handling_content_description').innerHTML = get_gift_handling_content_description(content_value);
+}
+
+function get_gift_handling_default(){
+	if($$('#gift_list input:checked').length > 1 && !$('gift_handling_content').getValue()){
+		var content = "";
+		$$('#gift_list input:checked').each(function(ele){
+	        if(content == ""){
+	            content = ele.getParent().getNext().getNext().get('text');
+	        }else{
+	            content += "|"+ele.getParent().getNext().getNext().get('text');
+	        }
+	    });
+	    $('gift_handling_content').value = content;
+	    $('gift_handling_content_description').innerHTML = get_gift_handling_content_description(content);
+	}
+}
+
+function get_gift_handling_content_description(content){
+	var content_str = "";
+	if(content.indexOf("|")>0){
+		var content_arr_or = content.split("|");
+		content_str = content_arr_or[0];
+		for (var i=1; i<content_arr_or.length; i++) {
+			content_str += " 或 "+content_arr_or[i];
+		}
+		if(content_str.indexOf("#")>0){
+			var content_arr_and = content_str.split("#");
+			content_str = content_arr_and[0];
+			for (var i=1; i<content_arr_and.length; i++) {
+	            content_str += "和"+content_arr_and[i];
+	        }
+		}
+	}
+	if(content_str != ""){
+		content_str = "送：" + content_str;
+	}
+	return content_str;
+}
+
+</script>

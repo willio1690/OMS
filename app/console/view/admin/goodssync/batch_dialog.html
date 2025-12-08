@@ -1,0 +1,16 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $branchopts}>
+<div class="tableform">
+    <div>
+        <label>仓库：</label>
+        <{input class="dailog-batch-ipt" type='select' name='branch_bn' options=$branchopts required="required"}>
+        <span class="notice-inline">商品主数据无要求关联到指定仓库，可使用默认第一个仓就行</span>
+    </div>
+</div>
+<{else}>
+<h2 style="color:red;">请先建立仓库与仓储的绑定关系</h2>
+<{/if}>

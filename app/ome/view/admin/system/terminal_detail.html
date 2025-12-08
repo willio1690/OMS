@@ -1,0 +1,53 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform" style="width: 90%;">
+<div class="division">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+
+        <tbody>
+        <tr>
+          <td>店铺编码：</td>
+          <td colspan="2"><{$shop.shop_bn}></td>
+        </tr>
+        <tr><td width="26%">名称：</td>
+          <td colspan="2"><{$shop.name}>
+          </td>
+        </tr>
+		<tr>
+		  <td width="26%">店铺类型：</td>
+          <td colspan="2"><label>
+          <{$shop_type[$shop.shop_type]}>
+          </label></td>
+		</tr>
+        <tr>
+          <td>地区：</td>
+          <td width="25%"><{$shop.area|region}></td>
+          <td width="49%">&nbsp;</td>
+        </tr>
+        <tr>
+          <td>地址：</td>
+          <td colspan="2"><{$shop.addr}></td>
+        </tr>
+        <tr>
+          <td>发件人：</td>
+          <td colspan="2"><{$shop.default_sender}></td>
+        </tr>
+		<tr>
+          <td>邮编：</td>
+          <td colspan="2"><{$shop.zip}></td>
+        </tr>
+		 <tr>
+          <td>电话：</td>
+          <td colspan="2"><{$shop.tel}></td>
+        </tr>
+        <tr>
+          <td>手机：</td>
+          <td colspan="2"><{$shop.mobile}></td>
+        </tr>
+        </tbody>
+      </table>
+   </div>
+</div>

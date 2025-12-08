@@ -1,0 +1,98 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<h3>快递信息<span style="color:red;font-weight: normal;"><{if $recommendLogiStr}>（<{$recommendLogiStr}>）<{/if}></span></h3>
+<div class="finder-detail">
+    <table class="nosplit gridlist clear" width="100%" cellspacing="0" cellpadding="0" border="0">
+        <tbody>
+            <tr>
+                <td>选择快递公司</td>
+                <td><div id="c_corpList"><select name="logi_id" id="logi_id"></select></div></td>
+                <td>商品总重量:</td>
+                <td>
+                    <span id="order_weight">
+                        <{if $weight=='0'}>
+                            商品未设置重量<br>默认使用首重
+                        <{else}>
+                            <{$weight}> g
+                        <{/if}>
+                    </span>
+                </td>
+                <td>填写快递单备注</td>
+                <td><textarea id="delivery_remark" name="delivery_remark" style="width:99%; height:30px;"></textarea></td>
+                <td><div style="margin-left:5px;" align="left">此项可在快递单中打印</div></td>
+            </tr>
+        </tbody>
+    </table>
+    <!-- 温馨提示 BEGIN-->
+    <{if $assign_express_code || $order.isSHSM || $recLogi || ($order.shipping.shipping_name && $order.shipping.shipping_name != '快递') || ($order.cpup_service && is_array($order.cpup_service))}>
+    <div class="finder-detail" style="border:2px solid #FC0; background:#ffffcc;">
+        <div style="color:red; font-weight:bold; margin-bottom: 8px;">ℹ 温馨提示</div>
+        
+        <!-- 承运商限制 -->
+        <{if $assign_express_code}>
+            <div style="margin-bottom: 5px;">
+                您只能选择以下承运商配送：<span style="color:red; font-weight: bold;"><{$assign_express_code}></span>。否则影响履约
+            </div>
+        <{/if}>
+        
+        <!-- 中小件提示 -->
+        <{if $order.isSHSM}>
+            <div style="margin-bottom: 5px;">
+                订单为中小件送货上门，需要快递公司支持
+            </div>
+        <{/if}>
+        
+        <!-- 指定快递 -->
+        <{if $order.shipping.shipping_name && $order.shipping.shipping_name != '快递'}>
+            <div style="margin-bottom: 5px;">
+                买家要求指定快递：<span style="color:red; font-weight: bold;"><{$order.shipping.shipping_name}></span>。
+            </div>
+        <{/if}>
+        
+        <!-- 时效订单 -->
+        <{if $order.cpup_service && is_array($order.cpup_service) }>
+            <div style="margin-bottom: 5px;">
+                该笔订单为天猫时效订单：
+                <{if $order.promise_service}>
+                    <span style="color: #e74c3c; font-weight: bold; margin-left: 5px;"><{$order.promise_service}>。</span>
+                <{else}>
+                    <{if in_array('201',$order.cpup_service)}>
+                        <span style="color: #27ae60; font-weight: bold; margin-left: 5px;">承诺按需配送。</span>
+                    <{/if}>
+                    <{if in_array('202',$order.cpup_service)}>
+                        <span style="color: #3498db; font-weight: bold; margin-left: 5px;">承诺顺丰配送。</span>
+                    <{/if}>
+                    <{if in_array('203',$order.cpup_service)}>
+                        <span style="color: #9b59b6; font-weight: bold; margin-left: 5px;">承诺发货。</span>
+                    <{/if}>
+                    <{if in_array('204',$order.cpup_service)}>
+                        <span style="color: #f39c12; font-weight: bold; margin-left: 5px;">承诺送达。</span>
+                    <{/if}>
+                    <{if in_array('210',$order.cpup_service)}>
+                        <span style="color: #1abc9c; font-weight: bold; margin-left: 5px;">极速上门。</span>
+                    <{/if}>
+                <{/if}>
+                <span style="color: #8b4513; font-weight: bold; margin-bottom: 5px;">
+                    如果修改平台建议仓配，可能导致时效无法达成，请商家谨慎修改！
+                </span>
+            </div>
+
+        <{/if}>
+        
+        <!-- 推荐快递 -->
+        <{if $recLogi}>
+            <div style="color: #8b4513; font-weight: bold; margin-bottom: 5px;">
+                如您常用快递停运，可使用<{$recLogi}>发货
+            </div>
+            <div style="margin-left: 10px; font-size: 12px;">
+                <div>1. 平台为您查询到与该订单物流线路相似的包裹，刚刚已通过上述快递成功发出</div>
+                <div>2. 未在承诺发货时间内发货，将受平台处罚，请及时发货</div>
+            </div>
+        <{/if}>
+    </div>
+    <{/if}>
+    <!-- 温馨提示 END-->
+</div>

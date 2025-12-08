@@ -1,0 +1,20 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form  enctype="multipart/form-data" action="index.php?app=wms&ctl=admin_inventory&act=index&action=to_export&flt=<{$env.get.flt}>" method="post">
+    <input type="hidden" name="_io_type" value="csv">
+    <input type="hidden" name="app" value="wms" />
+    <input type="hidden" name="model" value="inventory" />
+    <input type="hidden" name="inventory_id" value="<{$data.inventory_id}>" />
+    <input type="hidden" name="branch_id" value="<{$data.branch_id}>" />
+    <input type="hidden" name="inventory_name" value="<{$data.inventory_name}>" />
+    <input type="hidden" name="inventory_checker" value="<{$data.inventory_checker}>" />
+    <input type="hidden" name="second_checker" value="<{$data.second_checker}>" />
+    <input type="hidden" name="finance_dept" value="<{$data.finance_dept}>" />
+    <input type="hidden" name="warehousing_dept" value="<{$data.warehousing_dept}>" />
+    <input type="hidden" name="inventory_type" value="<{$data.inventory_type}>" />
+    <input type="hidden" name="export_type" value="1" />
+    <{button label="导出" type="submit"}>
+</form>

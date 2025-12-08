@@ -1,0 +1,214 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app='omeauto' src="style.css"}>
+<{/capture}>
+<style>
+#content div a {color: blue; font-size: 14px; }
+#content div  span {float: right;}
+#content ul li {height:25px; background: #EEEEEE; margin: 1px; padding-left: 10px; padding-top: 8px;}
+#content ul li span {float:right; margin-right: 10px;}
+#content ul li span a {color:blue; text-decoration: underline;}
+#content ul li div {width:450px; overflow: hidden; height: 16px; float:left;}
+
+#label_content div a {color: blue; font-size: 14px; }
+#label_content ul li {height:25px; background: #EEEEEE; margin: 1px; padding-left: 10px; padding-top: 8px;}
+#label_content ul li div {width:450px; overflow: hidden; height: 30px; float:left;}
+#label_content ul li span a {color:blue; text-decoration: underline;}
+</style>
+<div class="tableform">
+    <div class="division">
+        <form action="" method="post" id="form_id"> 
+        <input type="hidden" name="id" id="rule_id" value="<{$data.id}>">
+            <table width="100%" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc"><span style="color:red;">*</span>规则名称：</label> </th>
+                        <td><{input type="text&&required" name="name" id='t_name' size="30" value=$data.name}>&nbsp;&nbsp;&nbsp;&nbsp;(请使用通俗易懂的名称，如：小额订单、华东区订单)</td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc">简单说明：</label> </th>
+                        <td><{input type="textarea" cols="100" rows="4" name="memo" id='t_memo' value=$data.memo}><br/>(对此规则的简单描述)</td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc"><span style="color:red;">*</span>选择运营组织：</label> </th>
+                        <td>
+                            <select name='org_id' id="chose_org">
+                            <{foreach from=$orgs item=item}>
+                            <option value="<{$item.org_id}>" <{if $data.org_id == $item.org_id}>selected<{/if}> ><{$item.name}></option>
+                            <{/foreach}>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><hr/></td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc"><span style="color:red;">*</span>归类规则：</label> </th>
+                        <td id="content">
+                            <div><a href="javascript:void(0);" id='addrole'>增加规则</a> <span></span></div>
+                            <ul id="roleList">
+                            <{foreach from=$data.config item=role key=uid}>
+                            <li id="m_item_<{$uid}>"><div title="<{$role.attr.caption}>"><{$role.attr.caption}> </div><span><a ref='<{$role.json}>' class="edit" href="javascript:void(0);">编辑</a>&nbsp;<a class="del" href="javascript:void(0);">删除</a></span></li>
+                            <{/foreach }>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" height='5'>
+                            <hr/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc"><span style="color:red;">*</span>所属标签：</label> </th>
+                        <td id="label_content">
+                            <div><a href="javascript:void(0);" id='addLabel'>选择标签</a><span></span></div>
+                            <ul id="selLabelList">
+                                <{if $selectLabel}>
+                                <{foreach from=$selectLabel item=labelItem key=labelKey}>
+                                <li id="sel_label_id_<{$labelItem.label_id}>">
+                                    <div><input name="label_id" type="radio" id="label_id_<{$labelItem.label_id}>" value="<{$labelItem.label_id}>" checked="checked"> <{$labelItem.label_name}>
+                                    &nbsp;<span style="background-color:<{$labelItem.label_color}>;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+                                    <span><a class="label_del" href="javascript:void(0);">删除</a></span>
+                                </li>
+                                <{/foreach}>
+                                <{/if}>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" height='5'>
+                            <hr/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc">权重：</label> </th>
+                        <td><{input type="number&&required" size="5" name="weight" id='weight' value=$data.weight onkeyup="value=value.replace(/[^\d]/g,'')" }><span>&nbsp;&nbsp;&nbsp;&nbsp;(数值越大表示优先级越高。如不填写,默认为0)</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div> 
+</div>
+
+<{area inject='.mainFoot'}>
+    <div class="table-action">
+        <table width="100%" cellspacing="0" cellpadding="0">
+            <tbody>
+                <tr>
+                    <td align="center">
+                        <{button class="btn-primary" label="确定" type="button" id="msaveBtn"}>
+                        <{button class="btn-secondary" label="取消" type="button" id="mcancelBtn"}>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+<{/area}>
+<script> 
+(function() {
+    var rule_id = "<{$data.id}>";
+    
+    //关闭按钮
+    $('mcancelBtn').addEvent('click', function(){
+        $('mcancelBtn').getParent('.dialog').retrieve('instance').close();
+    });
+    
+    //规则事件
+    $$('#roleList .del').addEvent("click",function(){
+        if (confirm("你确定要删除当前指定规则吗？")) {
+            this.getParent().getParent().destroy();
+        }
+    });
+
+    $('addrole').addEvent("click",function(){
+        var org_id = $('chose_org').value;
+        new Dialog('index.php?app=omeauto&ctl=order_labelrule&act=addrole',{width:720,height:420,title:'规则设定',ajaxoptions:{data:{org_id:org_id},method:'post'}});
+    });
+
+    $$('#roleList .edit').addEvent("click",function(){
+        var role = this.get('ref');
+        var uid = this.getParent().getParent().id;
+        var org_id = $('chose_org').value;
+        new Dialog('index.php?app=omeauto&ctl=order_labelrule&act=addrole',{width:720,height:420,title:'规则设定',ajaxoptions:{data:{role:role,uid:uid,org_id:org_id},method:'post'}});
+    });
+    
+    //选择标签
+    $('addLabel').addEvent("click",function(){
+        var org_id = $('chose_org').value;
+        var rule_id = $('rule_id').value;
+        new Dialog('index.php?app=omeauto&ctl=order_labelrule&act=add_label',{width:600,height:400,title:'规则设定',ajaxoptions:{data:{org_id:org_id},method:'post'}});
+    });
+    
+    $$('#selLabelList .label_del').addEvent("click",function(){
+        if (confirm("你确定要删除当前的标签吗？")) {
+            this.getParent().getParent().destroy();
+        }
+    });
+    
+    //保存按钮
+    $('msaveBtn').addEvent('click', function()
+    {
+        var roles = '';
+        var label_id = '';
+        
+        $$('#roleList li').each(function(item) {
+            if (roles == '') {
+                roles = item.getElement('.edit').get('ref');
+            } else {
+                roles = roles  + "|||" + item.getElement('.edit').get('ref') ;
+            }
+        });
+        
+        $ES("input[name^='label_id']").each(function(item){
+            if(item.checked){
+                label_id = item.value;
+            }
+        });
+        
+        if(roles == ""){
+            alert("请选择归类规则");
+            return false;
+        }
+        
+        if(label_id == ""){
+            alert("请选择所属标签");
+            return false;
+        }
+        
+        new Request ({
+            url:'index.php?app=omeauto&ctl=order_labelrule&act=save&id='+rule_id,
+            method:'post',
+            data:{'name':$('t_name').value, 'memo':$('t_memo').value, 'weight':$('weight').value, 'roles':roles, 'label_id':label_id,'org_id':$('chose_org').value},
+            onRequest: function () {
+                $('msaveBtn').set('disabled', 'true');
+                $('mcancelBtn').set('disabled', 'true');
+            },
+            onSuccess: function(result) {
+                json = JSON.decode(result);
+                if (json.res == 'succ') {
+                    finderGroup["<{$env.get.finder_id}>"].refresh.delay(400,finderGroup["<{$env.get.finder_id}>"]);
+                    
+                    $('msaveBtn').getParent('.dialog').retrieve('instance').close();
+                } else {
+                    $('msaveBtn').set('disabled', '');
+                    $('mcancelBtn').set('disabled', '');
+                    
+                    //提示信息
+                    alert(json.error_msg);
+                }
+            }
+        }).send();
+    }); 
+})();
+
+uniqueID = (function () { 
+    var id = 1000; 
+    return function () { 
+        return id++; 
+    }; 
+})();
+</script>

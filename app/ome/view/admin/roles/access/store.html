@@ -1,0 +1,50 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="clearfix" style="white-space:normal;">
+<div></div>
+<span>
+<!-- <{input type='organization' app='organization' name="selected_org" value=$selected_org show="onlytree" "effect"="organization_stores_list"}> -->
+</span>
+<span style="margin-left: 10px;">
+    <select name="store_id[]" id="store-sel" multiple></select>
+</span>
+</div>
+<script>
+var storeSel = tail.select("#store-sel", {
+    multiContainer: true,
+    // multiple: true,
+    // width: 150,
+    height: 660,
+    searchMinLength: 0,
+    openAbove: true,
+    multiSelectAll: true,
+    placeholder:'请选择门店',
+    search:true
+    // multiShowLimit:true
+});
+
+window.addEvent('domready', function(){
+
+    var items = {}
+    
+    $H(<{$storeList|json_encode}>).each(function(v,k){
+        // console.log(v)
+        // var item = {key:v.store_id,value:v.name}
+
+        // console.log(typeof items[v.store_mode])
+        if (typeof items[v.store_mode] == 'undefined') {
+            items[v.store_id] = {}
+        }
+
+        items[v.store_id] = {key:v.store_id,value:v.name,group:v.store_mode,selected:v.selected}
+
+        // storeSel.add(v.store_id,v.name,'#')
+    });
+
+
+    storeSel.config('items', items, true)
+});
+</script>

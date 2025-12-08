@@ -1,0 +1,88 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style type="text/css">
+.finder-detail{
+	background:#eee;
+	margin:5px 0;
+}
+.finder-detail td{
+	background:#fff;
+
+}
+.gridlist tr.waring, .gridlist td.waring {
+	background:none repeat scroll 0 0 #9999ff;
+	color:#333333;
+}
+.gridlist tr.masterorder, .gridlist tr.masterorder td, .gridlist td.masterorder {
+	color: #000000;
+	font-weight: 700;
+	font-size : 12px;
+	background:#f0f6fe
+}
+.gridlist tr.memberorder, .gridlist tr.memberorder td, .gridlist td.memberorder tr.addressorder, .gridlist tr.addressorder td, .gridlist td.addressorder {
+	background: none repeat scroll 0 0 #e2effe;
+	color: #000000;
+	font-weight: 400;
+	font-size : 12px;
+}
+.strong { font-weight:bold; }
+</style>
+<div id='selectStorageLife'>
+<div id="nosplitarea">
+
+	<div class="finder-detail">
+            <div id="presentList">
+                <table class="nosplit gridlist clear" width="100%" cellspacing="0" cellpadding="0" border="0" >
+            		<thead>
+                        <tr>
+                            <th>序 号</th>
+                            <th>保质期批次号</th>
+                            <th>账面数量</th>
+                            <th align="center">盘点数量</th>
+              			</tr>
+                  </thead>
+                    <tbody id="dataNode">
+                    	<{if $storage_life_list}>
+                            <{foreach from=$storage_life_list key=key item=val}>
+                            <tr>
+                                <td>&nbsp;<{$key+1}></td>
+                                <td><{$val.expire_bn}></td>
+                                <td><{$val.account_num}></td>
+                                <td align="center"><{$val.in_num}></td>
+                            </tr>
+                            <{/foreach}>
+                        <{else}>
+                            <tr>
+                            	<td height="50" colspan="4" align="center">没有相关记录。。。</td>
+                            </tr>
+                        <{/if}>
+                    </tbody>
+                </table>
+                
+                <table border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                        <div class="table-action" style="margin:0px; padding:0px; border:none;">
+                        <{button label="关闭" id="cancelBtn" class="btn btn-secondary" isCloseDialogBtn='true'}>
+                        </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+</div>
+</div>
+<script language="javascript">
+
+$('cancelBtn').removeEvents('click').addEvent('click', function(e)
+{
+	$('cancelBtn').getParent('.dialog').retrieve('instance').close();
+});
+</script>

@@ -1,0 +1,54 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="large">
+    <div class="ColColorOrange clearfix">
+         <div class="span-auto" title="" info="账单日期"> 	
+	        <span class="f-12">账单日期：</span><strong class="f-18" id="monthly-date"></strong>
+	     </div>
+
+	     <div class="span-auto" title="" info="所属店铺"> 	
+	        <span class="f-12">所属店铺：</span><strong class="f-18" id="shop-name"></strong>
+	     </div>
+
+	     <div class="span-auto" title="" info="实收金额"> 	
+	        <span class="f-12">实收金额：</span><strong class="f-18" id="bill-in-amount"></strong>
+	     </div>
+
+	     <div class="span-auto" title="" info="应收金额"> 	
+	        <span class="f-12">应收金额：</span><strong class="f-18" id="ar-in-amount"></strong>
+	     </div>
+
+	     <div class="span-auto" title="" info="实退金额"> 	
+	        <span class="f-12">实退金额：</span><strong class="f-18" id="bill-out-amount"></strong>
+	     </div>
+
+	     <div class="span-auto" title="" info="应退金额"> 	
+	        <span class="f-12">应退金额：</span><strong class="f-18" id="ar-out-amount"></strong>
+	     </div>
+
+ 	</div>
+</div>
+
+<script>
+(function(){
+
+	if(Cookie.read('MONTHEND_REPORT'))
+	{
+		var monthend_report = JSON.decode(Cookie.read('MONTHEND_REPORT'));
+
+		if(monthend_report)
+		{
+			$('monthly-date').setHTML(monthend_report.monthly_date);
+			$('shop-name').setHTML(monthend_report.shop_name);
+			$('bill-in-amount').setHTML(monthend_report.bill_in_amount || 0);
+			$('bill-out-amount').setHTML(monthend_report.bill_out_amount || 0);
+			$('ar-in-amount').setHTML(monthend_report.ar_in_amount || 0);
+			$('ar-out-amount').setHTML(monthend_report.ar_out_amount || 0);
+		}
+	}
+
+})();
+</script>

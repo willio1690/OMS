@@ -1,0 +1,76 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=o2o&ctl=admin_delivery_pending&act=doRefuse" id="frm">
+            <{input type="hidden" name="delivery_id" value=$delivery_id}>
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th>拒绝原因：</th>
+                        <td><{input type=select vtype=required name=refuse_reason_id rows=$refuse_reasons valueColumn="reason_id" labelColumn="reason_name"}></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' label='保存' }>
+                    <{button type="button" id='close_btn' label='关闭' }>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<{/area}>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        $('close_btn').addEvent('click', function(){
+            try{
+                var _dialogIns = this.getParent('.dialog').retrieve('instance');
+            }catch(e){}
+
+            if(_dialogIns){
+                window.location.reload();
+                _dialogIns.close();
+            }
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+
+                    if(_dialogIns){
+                        window.location.reload();
+                        _dialogIns.close();
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+    })();
+</script>

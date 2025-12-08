@@ -1,0 +1,14 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<span>
+<select type="select" name="material_type" id="material_type" required="true" class=" x-input-select inputstyle">
+<{if $type_list}>
+<{foreach from=$type_list key=keyVal item=itemVal}>
+<option value="<{$keyVal}>"><{$itemVal}></option>
+<{/foreach}>
+<{/if}>
+</select>
+</span>

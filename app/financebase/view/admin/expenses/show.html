@@ -1,0 +1,115 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="data-action" id="dataAction">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td colspan="5">
+                <label>账单日期:&nbsp;</label>
+                <{input type="date" vtype="date" name="time_from" id="time_from" style="width:66px; font-family:arial;" value=$time_from}>&nbsp;&nbsp;至&nbsp;&nbsp;
+                <{input type="date" vtype="date" name="time_to" id="time_to" style="width:66px; font-family:arial;" value=$time_to}>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <label>选择店铺:</label>
+                <select name="shop_id" id="shop_id">
+                    <option value="">全部</option>
+                    <{foreach from=$shopdata item=val}>
+                    <option value="<{$val.shop_id}>" <{if $shop_id == $val.shop_id}>selected="selected"<{/if}> ><{$val.name}></option>
+                    <{/foreach}>
+                </select>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <label>具体类别:</label>
+                <select name="bill_category" id="bill_category">
+                    <option value="">全部</option>
+                    <{foreach from=$billCategory item=val}>
+                    <option value="<{$val.bill_category}>" <{if $bill_category == $val.bill_category}>selected="selected"<{/if}> ><{$val.bill_category}></option>
+                    <{/foreach}>
+                </select>
+                <{input type="hidden" name="operation" value="1"}>
+               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <{button class="filterBtn btn-thirdly" label='查询'}>&nbsp;
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="large">
+    <{include file="analysis/detail.html" app="eccommon"}>
+</div>
+
+<script type="text/javascript">
+(function () {
+    var _finder = finderGroup['<{$name}>'],
+    dataAction= $('dataAction'),
+    data_ipt=$$(dataAction.getElements('input[name^=time_]'),dataAction.getElements('input[name=operation]'),dataAction.getElements('select'));
+
+    if(_finder&&_finder.form){
+        fdoc = document.createDocumentFragment();
+        data_ipt.each(function(ipt){
+            fdoc.appendChild(new Element('input[type=hidden]', {'name': ipt.name, value: ipt.value}));
+        });
+        _finder.form.appendChild(fdoc);
+    }
+
+    data_ipt.addEvent('change',function(e){
+        if(_finder&&_finder.form){
+            var ipt=$E('input[name='+this.name+']',_finder.form);
+            if(ipt)ipt.value=this.value;
+        }
+    });
+
+    function setChartData(flag,e){
+        var from=dataAction.getElement('input[name=time_from]'),
+        to=dataAction.getElement('input[name=time_to]');
+        if(!check_data(from,to))return;
+        var params=dataAction.toQueryString(),
+        itemcur=$E('.chart-view .chart-item-cur');
+        dataAction.store('_data',params);
+        if(flag&&itemcur&&$E('iframe',itemcur)) $E('iframe',itemcur).src+='&'+params;
+        if(flag) url='index.php?app=<{$env.get.app}>&ctl=<{$env.get.ctl}>&act=<{$env.get.act}>';
+        else url=e.target.href||e.target.getParent().href;
+        W.page(url, {data:params, method:'post',
+            onRequest:function(){
+                dataAction.getElement('.filterBtn').setProperty('disabled', 'disabled');
+            },
+            onComplete:function(){
+                dataAction.getElement('.filterBtn').removeProperty('disabled');
+                if(_finder) _finder.filter.value=params;
+            }
+        });
+    }
+    dataAction.getElement('.filterBtn').addEvent('click',function(e){setChartData(true);});
+
+    function check_data(from,to){
+        var data=[],
+        _return=[from,to].every(function(el){
+            if(!/^(19|20)[0-9]{2}-([1-9]|0[1-9]|1[012])-([1-9]|0[1-9]|[12][0-9]|3[01])+$/.test(el.value)){
+                new MessageBox('请录入日期格式yyyy-mm-dd',{type:'error',autohide:true});
+                el.focus();
+                return false;
+            }
+            data.push(Date.parse(el.value.replace(/-/gi,"/")));
+            return true;
+        });
+
+        if(!_return)return null;
+        if(data[1]<data[0]){
+            return MessageBox.error('选择开始时间必须早于结束时间');
+        }
+        return _return;
+    }
+    if($E('.finder-action .export')) $E('.finder-action .export').addEvent('click',function(e){
+        e.stop();
+        var options = {width:500,height:200,title:'导出'};
+        new Dialog(this.get('href'),$extend({
+            ajaxoptions:{
+                data:$('dataAction').toQueryString(),
+                method: 'post'
+            },
+            onClose:function(){
+                if((_finder=finderGroup['<{$name}>'])) _finder.refresh();
+            }
+        },options));
+    });
+})();
+</script>

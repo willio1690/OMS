@@ -1,0 +1,55 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<script>
+function getmemo(){
+    if($('memo_id').getSelected()){
+        $('memo').value = $('memo_id').getSelected().get('text');
+    }
+}
+</script>
+<div class="tableform">  
+    <form method="post" action="index.php?app=tgkpi&ctl=admin_pick&act=setCheckFail" id="tgkpi_memo">
+    <input name="delivery_id" type="hidden" value="<{$delivery_id}>" />
+    <input name="memo" id="memo" type="hidden" value="" />
+    <div class="division">
+        <table cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <th><{t}>失败原因：<{/t}></th>
+                <td>
+                    <select id="memo_id" name="memo_id" onchange="getmemo();">
+                    <{foreach from=$reasonInfos item=item}>
+                        <option value="<{$item.reason_id}>"><{$item.reason_memo}></option>
+                    <{/foreach}>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>&nbsp;</th>
+                <td>
+                    <button type="button" id="memo_save_btn">保存</button> <span id="status"></span>
+                </td>
+            </tr>
+            
+        </table>
+    </div>
+    </form>
+</div>
+
+<script>
+window.addEvent('domready', function(){
+    var form = $('tgkpi_memo');
+    var url = '<{$url}>';
+    $('memo_save_btn').addEvent('click',function(){
+    new Request({url:form.action,method:'post',data:form.toQueryString(),
+        onComplete:function(){
+          form.getParent('.dialog').retrieve('instance').close();
+          window.location = url;
+        }
+      }).send();
+    });
+    getmemo();
+});
+</script>

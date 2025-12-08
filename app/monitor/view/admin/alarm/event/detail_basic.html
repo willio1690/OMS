@@ -1,0 +1,31 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform" id="template-info-<{$templateInfo.template_id}>">
+    <div class="division">
+        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <th><{t}>发送内容：<{/t}></th>
+                <td>
+                    <{$detail.send_content}>
+                </td>
+            </tr>
+            <{if $detail.status != 0}>
+                <tr>
+                    <th><{t}>发送结果：<{/t}></th>
+                    <td>
+                        <{$detail.send_result}>
+                    </td>
+                </tr>
+                <tr>
+                    <th><{t}>收件人：<{/t}></th>
+                    <td>
+                        <{$detail.mailing_address}>
+                    </td>
+                </tr>
+            <{/if}>
+        </table>
+    </div>
+</div>

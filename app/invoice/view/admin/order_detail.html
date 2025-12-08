@@ -1,0 +1,274 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+  <tbody>
+    <tr>
+      <td >
+        <div class="tableform">
+          <table cellspacing="0" cellpadding="0" border="0" class="orderdetails_basic">
+            <tbody>
+              <tr>
+                <td valign="top" >
+                  <h4>发票信息</h4>
+                  <div class="division">
+                    <table cellspacing="0" cellpadding="0"  border="0">
+                      <tbody>
+                        <tr>
+                          <th >开票方式：</th>
+                          <td><b><{$invoice_order.mode}></b></td>
+                        </tr>
+                        <tr>
+                          <th >开票金额：</th>
+                          <td><span class="red"><{$invoice_order.amount|cur}></span></td>
+                        </tr>
+                        <tr>
+                          <th >税金：</th>
+                          <td><span class="red"><{$invoice_order.cost_tax|cur}></span></td>
+                        </tr>
+                        <tr>
+                          <th >开票状态：</th>
+                          <td><{$invoice_order.is_status}></td>
+                        </tr>
+                        <{if $invoice_order.dateline}>
+                         <tr>
+                          <th >开票时间：</th>
+                          <td><{$invoice_order.dateline|cdate}></td>
+                        </tr> 
+                       <{/if}>
+                      </tbody>
+                    </table>
+                    </div>
+                  </td>
+                  <td valign="top" >
+                  <h4>订单信息</h4>
+                  <div class="division">
+                    <table cellspacing="0" cellpadding="0"  border="0">
+                      <tbody>
+                        <tr>
+                          <th >订单号：</th>
+                          <td><b><{$invoice_order.order_bn}></b></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    </div>
+                  </td>
+                <td valign="top" ><h4>发票详情</h4>
+                  <div class="division">
+                    <table cellspacing="0" cellpadding="0"  border="0">
+                      <tbody>
+                        <tr>
+                          <th width="80" nowrap="nowrap" >发票抬头：</th>
+                          <td><{$invoice_order.title}></td>
+                        </tr>
+                        <tr>
+                          <th >发票号：</th>
+                          <td><span><{$invoice_order.invoice_no}></span></td>
+                        </tr>
+                        <tr>
+                          <th >发票内容：</th>
+                          <td><{$invoice_order.content}></td>
+                        </tr>
+                        <tr>
+                          <th >发票备注：</th>
+                          <td><{$invoice_order.remarks}></td>
+                        </tr>
+                        <tr>
+                          <th >操作人：</th>
+                          <td><{$invoice_order.operator}></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                </div></td>
+                <td valign="top" >
+                  <h4><{if $invoice_order.is_encrypt}><a class="invoice-sensitive-btn data-hide" href="javascript:void(0);"></a><{/if}>客户信息</h4>
+                  <div class="division" >
+                    <table id="invoiceinfo" cellspacing="0" cellpadding="0"  border="0" class="data-hide">
+                      <tbody>
+                        <tr>
+                          <th >开户银行：</th>
+                          <td><{$invoice_order.ship_bank}></td>
+                        </tr>
+                        <tr>
+                          <th >银行账号：</th>
+                          <td><span sensitive-field="ship_bank_no"><{$invoice_order.ship_bank_no|ciphertext:'invoice','ship_bank_no',$invoice_order.shop_type}></span></td>
+                        </tr>
+                       <tr>
+                          <th >客户税号：</th>
+                          <td><{$invoice_order.ship_tax}></td>
+                        </tr>
+                        <tr>
+                          <th >注册电话：</th>
+                          <td><{$invoice_order.ship_company_tel}></td>
+                        </tr>
+                        <tr>
+                          <th>注册地址：</th>
+                          <td><{$invoice_order.ship_company_addr}></td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <a class="consignee-sensitive-btn data-hide" href="javascript:void(0);" style="display: none;"></a>
+                    <table id="consigneeinfo" cellspacing="0" cellpadding="0"  border="0">
+                      <tbody>
+                      <tr>
+                          <th width="80" nowrap="nowrap" >收票人姓名：</th>
+                          <td><span sensitive-field="ship_name"><{$invoice_order.tax_company|ciphertext:'invoice','tax_company',$invoice_order.shop_type}></span></td>
+                      </tr>
+                        <tr>
+                          <th >收票人电话：</th>
+                          <td><span sensitive-field="ship_mobile"><{$invoice_order.ship_tel|ciphertext:'invoice','ship_tel',$invoice_order.shop_type}></span></td>
+                        </tr>
+<!--                        <tr>-->
+<!--                          <th >收票邮箱：</th>-->
+<!--                          <td><span sensitive-field="ship_email"><{$invoice_order.ship_email|ciphertext:'invoice','ship_email',$invoice_order.shop_type}></span></td>-->
+<!--                        </tr>-->
+                        <!--
+                        <tr>
+                          <th >收票地区：</th>
+                          <td><{$invoice_order.ship_area}></td>
+                        </tr>-->
+                        <tr>
+                          <th >收票人地址：</th>
+                          <td><span sensitive-field="ship_addr"><{$invoice_order.ship_addr|ciphertext:'order','ship_addr',$invoice_order.shop_type}></span></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </td>          
+          </tr>
+      </tbody></table>
+      </div> 
+      <{if $electronic_items}>
+        <div class="division">
+            <table cellspacing="0" class="gridlist" cellpadding="0" border="0"
+                width="100%">
+                <thead>
+                    <tr>
+                        <th>发票代码</th>
+                        <th>发票号码</th>
+                        <th>开票流水号</th>
+                        <th>开票类型</th>
+                        <th>物流单号</th>
+                        <th>物流公司</th>
+                        <th>开票日期</th>
+                        <th>开票状态</th>
+                        <th>红字确认单号</th>
+                        <th>红字确认UUID</th>
+                        <th>红字确认状态</th>
+                        <th>上传状态</th>
+                        <{if $invoice_order.mode == '电子发票'}>
+                            <th>点击预览</th>
+                        <{/if}>
+                    </tr>
+                </thead>
+                <tbody>
+                    <{foreach from=$electronic_items item=val}>
+                        <tr>
+                            <td><{$val.invoice_code}></td>
+                            <td><{$val.invoice_no}></td>
+                            <td><{$val.serial_no}></td>
+                            <td><{$val.billing_type_text}></td>
+                            <td><{$val.logi_no}></td>
+                            <td><{$val.logi_name}></td>
+                            <td><{$val.create_time}></td>
+                            <td><{$val.invoice_status_text}></td>
+                            <td><{$val.red_confirm_no}></td>
+                            <td><{$val.red_confirm_uuid}></td>
+                            <td><{$val.red_confirm_status_text}></td>
+                            <td><{$val.upload_tmall_status_text}></td>
+                            <{if $invoice_order.mode == '电子发票'}>
+                                <td>
+                                   <a href="<{$val.preview_url}>" target="_blank" style="color:#3367ac;margin:0px;padding:0px">预览</a>
+<!--                                   <a href="index.php?app=invoice&ctl=admin_order&act=regenResult&p[0]=<{$val.item_id}>&finder_id=<{$env.get.finder_id}>"  style="color:#3367ac;margin-left:5px;padding:0px">重新生成</a>-->
+                                </td>
+                            <{/if}>
+                        </tr>
+                    <{/foreach}> 
+                </tbody>
+            </table>
+        </div> 
+    <{/if}>
+          <{if $order_items}>
+              <div class="division">
+                  <h4>开票商品明细</h4>
+                  <table width="100%" class="gridlist" border="0" cellspacing="0" cellpadding="0">
+                      <thead>
+                      <tr>
+                          <th><{t}>物料编码<{/t}></th>
+                          <th><{t}>商品名称<{/t}></th>
+                          <th><{t}>规格<{/t}></th>
+                          <th><{t}>单位<{/t}></th>
+                          <th><{t}>开票金额<{/t}></th>
+                          <th><{t}>税金<{/t}></th>
+                          <th><{t}>税率<{/t}></th>
+                          <th><{t}>开票编码<{/t}></th>
+                          <th><{t}>数量<{/t}></th>
+                          <th><{t}>状态<{/t}></th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <{foreach from=$order_items item=item}>
+                      <tr>
+                          <td><{t}><{$item.bn}><{/t}></td>
+                          <td> <{t}><{$item.item_name}><{/t}></td>
+                          <td> <{t}><{$item.specification}><{/t}></td>
+                          <td> <{t}><{$item.unit}><{/t}></td>
+                          <td> <{t}><{$item.amount}><{/t}></td>
+                          <td> <{t}><{$item.cost_tax}><{/t}></td>
+                          <td> <{t}><{$item.tax_rate}>%<{/t}></td>
+                          <td> <{t}><{$item.tax_code}><{/t}></td>
+                          <td><{$item.quantity}></td>
+                          <td><{if $item.is_delete == 'true'}>删除<{else}>正常<{/if}></td>
+                      </tr>
+                      <{/foreach}>
+                      </tbody>
+                  </table>
+              </div>
+          <{/if}>
+                <form method="POST" action="index.php?app=invoice&&ctl=admin_order&act=saveReturnLogi">
+                <div class="tableform">
+                    <input type="hidden" name="id" value="<{$invoice_order.id}>">
+                    <h4>回寄物流</h4>
+                    <div class="division">
+                    <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                        <tbody>
+                            <tr>
+                                <th>回寄物流公司：</th>
+                                <td>
+                                  <{input type="text" name="return_logi_name" value=$invoice_order.return_logi_name}>
+                                </td>
+                                <th>回寄物流单号：</th>
+                                <td>
+                                  <{input type="text" name="return_logi_no" value=$invoice_order.return_logi_no}>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                <div class="table-action">
+                  <{button type="submit" class="btn-primary" label="保存"}>
+                </div>
+                </div>
+
+                </form>
+
+            </td></tr>
+</tbody>
+</table>
+<style type="text/css">
+.finder-detail .tableform table td { vertical-align:top; }
+.finder-detail .tableform th { width:70px; }
+</style>
+<script type="text/javascript">
+  // 敏感数据处理
+    if ($defined($E('.invoice-sensitive-btn')))
+        $E('.invoice-sensitive-btn').addEvent('click',function(e){
+            Ex_Loader('security',function(){
+                new Security({url:'index.php?app=invoice&ctl=admin_order&act=showSensitiveData&p[0]=<{$invoice_order.id}>',clickElement:$E('.consignee-sensitive-btn')}).desHtml($E('.orderdetails_basic #consigneeinfo'));
+                new Security({url:'index.php?app=invoice&ctl=admin_order&act=showSensitiveData&p[0]=<{$invoice_order.id}>&p[1]=invoice',clickElement:$E('.orderdetails_basic #invoiceinfo')}).desHtml($E('.orderdetails_basic #invoiceinfo'));
+            });
+        });
+</script>

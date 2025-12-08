@@ -1,0 +1,57 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform" style="width: 90%;">
+
+    <div class="division">
+        <form method="POST" action="index.php?app=ome&ctl=admin_shop&act=saveConfig&finder_id=<{$env.get.finder_id}>&p[0]=<{$shop.shop_id}>">
+            <table>
+                <tr>
+                    <th>是否收单：</th>
+                    <td><{input type="select" id="order_receive" name="config[order_receive]" options=["no"=>"否","yes"=>"是","appoint"=>"指定会员收单"]  value=$shop.config.order_receive}></td>
+                </tr>
+                <tr id="order-buyer-tr">
+                    <th>指定购买人：</th>
+                    <td><textarea class="x-input" id="order-buyer" name="config[order_buyer]" style="height: 80px;" placeholder="多个购买人请用回车符"><{$shop.config.order_buyer}></textarea></td>
+                </tr>
+
+                <{if $shop.node_type != 'vop'}>
+                <tr>
+                    <th>减掉唯品会购物车预占：</label></th>
+                    <td>
+                        <select input="select" type="select" title="减掉唯品会购物车预占：" name="config[vop_cart_stock_freeze]" default="yes" required="1" helpinfo=" &nbsp;&nbsp;开启后，回写平台库存时会减掉【唯品会店铺】购物车的库存占用数量!" id="dom_el_1d5ac11" class=" x-input-select inputstyle">
+                            <option value="no" <{if $shop.config.vop_cart_stock_freeze != 'yes'}>selected="selected"<{/if}> >关闭</option>
+                            <option value="yes" <{if $shop.config.vop_cart_stock_freeze == 'no'}>selected="selected"<{/if}> >开启</option>
+                        </select>
+                        <label class="help"> &nbsp;&nbsp;<em class="red">*</em><label for="dom_el_1d5ac11">开启后，回写平台库存时会减掉【唯品会店铺】购物车的库存占用数量!</label>
+                    </td>
+                </tr>
+                <{/if}>
+            </table>
+            <{if in_array($shop.shop_type, ["360buy","congminggou","luban","kuaishou","taobao","weimobv","vop","meituan4sg"])}>
+                <{include file="admin/finder/shop/addon/{$shop.shop_type}.html" app="ome"}>
+            <{/if}>
+            <div class="table-action">
+                <{button label="确定" class="btn-primary" type="submit"}>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+(function(){
+    $("order_receive").addEvent("change", function(){
+        var val = this.value;
+        if (val == "appoint"){
+            $("order-buyer-tr").show();
+        } else {
+            $("order-buyer-tr").hide();
+        }
+    });
+
+    $("order_receive").fireEvent("change");
+
+})();
+</script>

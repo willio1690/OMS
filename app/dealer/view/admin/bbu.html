@@ -1,0 +1,97 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <h5><{if $history}><em class='c-red'>《快照》</em>公司业务组织编辑<{/if}></h5>
+    <div class="division">
+        <form method="post" action="index.php?app=dealer&ctl=admin_bbu&act=save" id="frm">
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <input type="hidden" name="bbu_id" value="<{$bbu_id}>">
+                <tbody>
+                    <tr>
+                        <th><em class='c-red'>*</em>公司业务组织编码：</th>
+                        <td>
+                            <{if $bbu_id}>
+                                <{input type="text" name="bbu_code" value=$bbu_code title=$bbu_code readonly='readonly' }><em class='c-red'> *添加后不可编辑</em>
+                            <{else}>
+                                <{input type="text" name="bbu_code" value=$bbu_code title=$bbu_code vtype="alphaint&&required" placeholder="英文字母或数字"}><em class='c-red'> *添加后不可编辑</em>
+                            <{/if}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><em class='c-red'>*</em>公司业务组织名称：</th>
+                        <td>
+                            <{if $history}>
+                                <{input type="text" name="bbu_name" value=$bbu_name  title=$bbu_name required='required' readonly='readonly'}>
+                            <{else}>
+                                <{input type="text" name="bbu_name" value=$bbu_name title=$bbu_name required='required'}>
+                            <{/if}>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<{area inject=".mainFoot"}>
+
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{if !$history}>
+                    <{button class="btn-primary" type="button" id='submit_btn' label='确定' }>
+                    <{button class="btn-secondary" type="button" id='close_btn' label='关闭' }>
+                    <{/if}>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<{/area}>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+        $('close_btn').addEvent('click', function(){
+            try{
+                var _dialogIns = this.getParent('.dialog').retrieve('instance');
+            }catch(e){}
+
+            if(_dialogIns){
+                // setTimeout(finder.refresh(),30000);
+                _dialogIns.close();
+            }
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+
+                    if(_dialogIns){
+                        setTimeout(finder.refresh(),30000);
+                        _dialogIns.close();
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+    })();
+</script>

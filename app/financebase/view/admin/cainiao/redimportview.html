@@ -1,0 +1,31 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <select id="redimport">
+            <option></option>
+            <option value="order">按单号导入</option>
+            <option value="sku">按SKU明细导入</option>
+            <option value="sale">按销售周期导入</option>
+        </select>
+    </div>
+</div>
+<div class="division" id="importview"></div>
+<script type="text/javascript">
+    (function () {
+        $('redimport').addEvent('change', function(){
+            var type = this.value;
+            if(!type) {
+                $('importview').empty();
+                return;
+            }
+            W.page('index.php?app=financebase&ctl=admin_shop_settlement_cainiao&act=importview&type='+type,{
+                update:$('importview'),
+                clearUpdateMap:false
+            });
+        });
+    })();
+</script>

@@ -1,0 +1,30 @@
+<?php
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+class erpapi_shop_matrix_pos_dms_result extends erpapi_result
+{
+    /**
+     * 设置_response
+     * @param mixed $response response
+     * @param mixed $format format
+     * @return mixed 返回操作结果
+     */
+    public function set_response($response, $format)
+    {
+
+        $response = kernel::single('erpapi_format_' . $format)->data_decode($response);
+
+        $this->response = [
+            'msg_id'  => '',
+            'rsp'     => $response['code'] == '0' ? 'succ' : 'fail',
+            'data'    => $response['data'],
+            'res'     => '',
+            'err_msg' => $response['msg'],
+        ];
+
+        return $this;
+    }
+}

@@ -1,0 +1,148 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+﻿<textarea id="template_data" name="template_data" style="display:none">
+<{if $printTmpl.template_data}>
+<{$printTmpl.template_data}>
+<{/if}>
+</textarea>
+<textarea id="jsondata_newdata" style="display:none">
+<{$jsondata}>
+</textarea>
+<textarea id="is_logo" style="display:none">
+<{$printTmpl.is_logo}>
+</textarea>
+<script>
+    var CNPrint=getCaiNiaoPrint(document.getElementById('CaiNiaoPrint_OB'),document.getElementById('CaiNiaoPrint_EM')); 
+    var AppKey='10011902';
+    var template_select = <{$printTmpl.template_select}>;
+    var template_data = $("template_data").getValue();
+    var is_logo = ($("is_logo").getValue()=='true') ? 0 : 1;
+    var jsondata_newdatas =JSON.decode( $('jsondata_newdata').value);
+    var Seller_ID =jsondata_newdatas[0]['seller_id'];
+
+    function CainiaoInita(){
+        CNPrint.PRINT_INITA(0,0,400,800,"菜鸟面单打印");
+        CNPrint.SET_PRINT_IDENTITY("AppKey="+AppKey+"&Seller_ID="+Seller_ID);
+    }
+
+    function CainiaoData(jsondata_newdata){
+        var ship_mobile = jsondata_newdata.ship_mobile ? jsondata_newdata.ship_mobile : jsondata_newdata.ship_tel;
+        CNPrint.SET_PRINT_MODE("CAINIAOPRINT_MODE","CP_CODE="+jsondata_newdata.cp_code+"&CONFIG="+jsondata_newdata.print_config);
+        CNPrint.ADD_PRINT_DATA("ProgramData",template_data);//自定义区域内容
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_cp_logo_up","PreviewOnly",is_logo);//物流公司logo
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_cp_logo_down","PreviewOnly",is_logo);//物流公司logo
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_product_type","CONTENT","");//单据类型
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_short_address","CONTENT",jsondata_newdata.mailno_position);//大头笔
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_package_center_name","CONTENT",jsondata_newdata.package_wdjc);//集散地名称
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_package_center_code","CONTENT",jsondata_newdata.package_wdjc);//集散地条码
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_cod_amount","CONTENT","");//服务
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_waybill_code","CONTENT",jsondata_newdata.logi_no);//面单号
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_consignee_name","CONTENT",jsondata_newdata.ship_name);//收件人姓名
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_consignee_phone","CONTENT",ship_mobile);//收件人电话
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_consignee_address","CONTENT",jsondata_newdata.ship_detailaddr);//收件人地址
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_send_name","CONTENT",jsondata_newdata.dly_name);//寄件人姓名
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_send_phone","CONTENT",jsondata_newdata.dly_mobile);//寄件人电话
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_shipping_address","CONTENT",jsondata_newdata.dly_detailaddr);//寄件人地址
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_shipping_branch_name ","CONTENT",'');//发件网点名称
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_shipping_branch_code ","CONTENT",'');//发件网点代码
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_ext_send_date","CONTENT",CNPrint.FORMAT("TIME:mm/dd/yyyy","now"));//中通要求的发件日期
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_shipping_address_city","CONTENT",jsondata_newdata.dly_area_1);//中国邮政要求的发件城市
+        CNPrint.SET_PRINT_STYLEA("ali_waybill_ext_sf_biz_type ","CONTENT",'');//顺丰要求的业务类型
+        //对自定义打印项进行赋值
+        if(template_select){
+            template_select.each(function(e){
+                CNPrint.SET_PRINT_STYLEA(e,"CONTENT",jsondata_newdata[e]);
+            });
+        }
+       
+        CNPrint. NEWPAGEA ();
+    }
+    function CainiaoPreview(){
+        CainiaoInita();
+        jsondata_newdatas.each(
+            function(jsondata_newdata){
+         
+                CainiaoData(jsondata_newdata);
+            }
+        );
+        CNPrint.SET_SHOW_MODE("HIDE_PBUTTIN_PREVIEW",1);//隐藏预览页面上的打印按钮
+        CNPrint.SET_SHOW_MODE("PREVIEW_IN_BROWSE",1);
+        CNPrint.PREVIEW();
+    }
+    CainiaoPreview();
+    $('printPreview_close').addEvent('click', function(){
+        window.close();
+    });
+    if($('onlyprint_btn')) {
+        $('onlyprint_btn').addEvent('click', function(){
+            CNPrint.PRINT();            
+        });
+    }
+    
+    var hasprintlist=[];
+    if($('doprint_btn')) {
+        $('doprint_btn').addEvent('click', function(){
+            
+            new Dialog(new Element("div.tableform",{html:'<div id="pause" class="division">正在提交...<{img app="desktop" src="loading.gif"}></div><div class="table-action"><{button label="关闭" onclick="re_finder();"}></div>'}),{
+                title:'提示',
+                width:230,
+                height:130,
+                modal:true,
+                resizeable:false}
+            );
+            if ($('printname')) {
+                var printname= $('printname').value;
+            } else {
+                var printname= '';
+                <{if $vid}>
+                printname= '<{$vid}>';
+                <{/if}>
+            }
+            if (hasprintlist.length>0)
+            {
+                for(i=0;i<hasprintlist.length;i++){
+
+                if(hasprintlist[i] ==printname )
+                    if(confirm('您的选择含有已打印快递单，你确定要重复打印吗？')==false) {
+		    		    window.close();
+                    }
+                }
+            }
+            hasprintlist.push(printname);
+            new Request({url:'index.php?app=wms&ctl=admin_receipts_print&act=setPrintStatus',method:'post',data:'type=express&str='+printname,
+                onSuccess:function(json){
+                    if (json == 'true'){
+
+                        $('pause').getParent('.dialog').retrieve('instance').close();
+                        
+                        CNPrint.PRINT();
+                       
+                    }else {
+                        $('pause').set('text',json);
+                    }
+                }
+            }).send();
+        });
+    }
+   
+
+    <{ if $errIds }>
+    var alertMsg = '';
+    <{ foreach from=$errIds item=cid }>
+    alertMsg = alertMsg + "<{$errBns[$cid]}>：" + "<{$errInfo[$cid]}> <br/>" ;
+    alertMsg = alertMsg + '';
+    <{/foreach}>
+
+    alertMsg = alertMsg + '<br/>以上发货单在本次打印列表中已被剔除，请在处理后重新打印。';
+
+    $('information').style.display='';
+    if ($('information').innerHTML != '') {
+        $('information').innerHTML = $('information').innerHTML + alertMsg;
+    } else {
+        $('information').innerHTML = alertMsg;
+    }
+    <{ /if }>
+</script>

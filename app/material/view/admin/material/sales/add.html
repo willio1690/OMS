@@ -1,0 +1,1149 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<style>
+    .notice-inline.error  {background-image:none;margin-left:25px}
+    .luckybag_hr {height:12px;margin-top:10px}
+    .luckybag_title {height:30px;line-height:30px}
+    .luckybag_title_name {float:left}
+    .luckybag_title_del {float:left;cursor:pointer;color:blue;margin-left:6px}
+    .luckybag_title_material {float:right}
+    .luckybag_table {margin:4px 0;}
+    .luckybag_table_operation_th {width:50px;}
+    .luckybag_rule {height:30px}
+</style>
+<div class="form-layout">
+<form method="post" id="sales_material_form" action="index.php?app=material&ctl=admin_material_sales&act=toAdd">
+    <div class="form-layout-block">
+        <h3>新建销售物料基本信息</h3>
+        <div class="form-layout-fields form-layout-fields-column">
+            <div class="form-field">
+                <span class="form-field-label">销售物料名称：</span>
+                <input class="form-input" placeholder="请输入物料名称" type="text" name="sales_material_name" vtype="required" /><span style="color:red;">*</span>
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">销售物料编码：</span>
+                <input class="form-input" placeholder="请输入物料编码" type="text" name="sales_material_bn" vtype="required" onkeyup="value=value.replace(/[^A-Za-z0-9_-\/]/ig,'')" /><span style="color:red;">*</span>
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">物料类型：</span>
+                <div class="form-radios">
+                    <input id="type1" type="radio" name="sales_material_type" value="1" checked="checked"/>
+                    <label for="type1">普通</label>
+                    <input id="type2" type="radio" name="sales_material_type" value="2" />
+                    <label for="type2">组合</label>
+                    <input id="type3" type="radio" name="sales_material_type" value="3" />
+                    <label for="type3">赠品</label>
+<!--                    <input id="type4" type="radio" name="sales_material_type" value="4" />-->
+<!--                    <label for="type4">福袋</label>-->
+                    <input id="type5" type="radio" name="sales_material_type" value="5" />
+                    <label for="type5">多选一</label>
+                    <input id="type6" type="radio" name="sales_material_type" value="6" />
+                    <label for="type6">礼盒</label>
+                    <input id="type7" type="radio" name="sales_material_type" value="7" />
+                    <label for="type7">福袋组合</label>
+                </div>
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">所属店铺：</span>
+                <select class="form-input"  id="shop_id" name="shop_id">
+                    <{foreach from=$shops item=shop}>
+                    <option value="<{$shop.shop_id}>" ><{$shop.name}></option>
+                    <{/foreach}>
+                </select>
+                <span id="shop_text" style="display:none;">全部店铺</span>
+            </div>
+            <div class="form-field"  id="bind_brand" style="display:none;">
+                <span class="form-field-label">品牌：</span>
+                <select class="form-input" id="brand" name="brand_id"> </select>
+            </div>
+            <div class="form-field" id="bind_category" style="display:none;">
+                <span class="form-field-label">物料分类：</span>
+                <{input class='form-input' vtype="required" type="category" name="cat_id" value=""}>
+            </div>
+            <div class="form-field" id="bind_basic_material">
+                <span class="form-field-label">关联基础物料：</span>
+                <{input class='form-input' type='material_object' object='basic_material@material' breakpoint='0' name='bm_id' textcol='material_name' value=$data.pgid callback='material_object_callback' replacehtml=$replacehtml emptytext='选取基础物料' style='float:left;width:200px;' filter='visibled=1' }>
+            </div>
+            <div class="form-field" id="bind_basic_giftmaterial" style="display:none">
+                <span class="form-field-label">关联礼盒：</span>
+                <{input class='form-input' type='material_object' object='basic_material@material' breakpoint='0' name='box_id' textcol='material_name' value=$data.pgid callback='material_object_callback' replacehtml=$replacehtml emptytext='选取礼盒' style='float:left;width:200px;' filter='visibled=1&type=4' }>
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">销售状态：</span>
+                <div class="form-radios">
+                    <input id="type8" type="radio" name="visibled" value="1" checked="checked" />
+                    <label for="type8">启售</label>
+                    <input id="type9" type="radio" name="visibled" value="0" />
+                    <label for="type9">停售</label>
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">客户分类：</span>
+                    <select class="form-input" placeholder="请选择" name="class_id">
+                        <option value="0">--请选择客户分类--</option>
+                        <{foreach from=$classList item=classVal}>
+                        <option value="<{$classVal.class_id}>"><{$classVal.class_name}></option>
+                        <{/foreach}>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-layout-block" id="promotion_items" style="margin-top:10px;display:none">
+        <h3>组合关联基础物料</h3>
+        <div class="form-layout-fields form-layout-fields-column">
+            <div class="form-field"><{button label="物料库频道" id="material-find-btn" }></div>
+            <table class="gridlist" id="material_table"  style="margin:4px 0;">
+                <thead>
+                <tr>
+                                    <th>编码</th>
+                <th style="width:240px;">名称</th>
+                <th><{$price_label}></th>
+                <th>数量</th>
+                <th>组合价格贡献占比(1-100数值)</th>
+                <th style="width:30px;">删除</th>
+                </tr>
+                </thead>
+                <tbody id="dataNode">
+                <tr>
+                    <td colspan="6" style="padding:0;"><div class="note" style="margin:0;"> 暂无物料信息 </div></td>
+                </tr>
+                </tbody>
+            </table>
+            <div align="right">
+                <{button type="button" id="material-compute-rate" label="按{$price_label}计算贡献比" }>&nbsp;&nbsp;<{button type="button" id="material-delall-btn" label="全部删除" }>
+            </div>
+        </div>
+    </div>
+    <div class="form-layout-block" id="gift_items" style="margin-top:10px;display:none">
+        <h3>赠品关联基础物料</h3>
+        <div class="form-layout-fields form-layout-fields-column">
+            <div class="form-field"><{button label="基础物料列表" id="gift-material-find-btn" }></div>
+            <table class="gridlist" id="material_table" style="margin:4px 0;">
+                <thead>
+                <tr>
+                    <th>编码</th>
+                    <th style="width:240px;">名称</th>
+                    <th>零售价</th>
+                    <th>数量</th>
+                    <th style="width:30px;">删除</th>
+                </tr>
+                </thead>
+                <tbody id="gift_dataNode">
+                <tr>
+                    <td colspan="6" style="padding:0;">
+                        <div class="note" style="margin:0;"> 暂无物料信息</div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div align="right">
+                &nbsp;&nbsp;<{button type="button" id="gift-material-delall-btn" label="全部删除" }>
+            </div>
+        </div>
+    </div>
+    <div class="form-layout-block" id="luckybag_rules" style="margin-top:10px;display:none">
+        <h3>福袋商品规则</h3>
+        <div class="form-layout-fields form-layout-fields-column">
+            <div class="gridlist" style="padding:10px;">
+                <input type="hidden" id="current_part_number" value="1" />
+                <div style="height:30px"><button id="add_luckybag_rule" class="btn" type="button"><span><span>新增组合</span></span></button></div>
+                <div class="luckybag_hr"><hr /></div>
+                <div id="luckybag_rules_content"></div>
+            </div>
+        </div>
+    </div>
+    <div class="form-layout-block" id="pickone_items" style="margin-top:10px;display:none">
+        <h3>多选一关联基础物料</h3>
+        <div class="form-layout-fields form-layout-fields-column">
+            <div class="form-field">
+                <span class="form-field-label">选择方式：</span>
+                <div class="form-radios">
+                    <input id="pickone_select_type1" type="radio"  name="pickone_select_type" value="1" checked="checked" />
+                    <label for="pickone_select_type1">随机</label>
+                    <input id="pickone_select_type2" type="radio" name="pickone_select_type" value="2" />
+                    <label for="pickone_select_type2">排序</label>
+                </div>
+                <span class="form-remark">正序排序数值从小到大（不包括0）表格中排序值不填默认为0且优先级最低 如排序值相同则这部分做随机处理</span>
+            </div>
+            <div class="form-field">
+                <{button label="基础物料列表" id="basic_material_find_btn" }>
+                <table class="gridlist" style="margin:4px 0;">
+                    <thead>
+                    <tr><th style="width:30%">编码</th><th style="width:35%">名称</th><th style="width:20%"><span class="sort_column" style="display:none">排序值</span></th><th style="width:15%">删除</th></tr>
+                    </thead>
+                    <tbody id="pickone_dataNode">
+                    <tr><td colspan="4" style="padding:0;"><div class="note" style="margin:0;"> 暂无基础物料信息 </div></td></tr>
+                    </tbody>
+                </table>
+                <div align="right">
+                    <{button type="button" id="basic_material_delall_btn" label="全部删除" }>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-layout-block" id="fukubukuro_items" style="margin-top:10px;display:none">
+        <h3>福袋组合规则</h3>
+        <div class="form-layout-fields form-layout-fields-column">
+            <div class="form-field"><{button label="选择福袋组合" id="fukubukuro-find-btn" }></div>
+            <table class="gridlist" id="fukubukuro_table"  style="margin:4px 0;">
+                <thead>
+                    <tr>
+                        <th>福袋组合编码</th>
+                        <th style="width:240px;">福袋组合名称</th>
+                        <th>福袋区间价</th>
+                        <th>组合贡献价</th>
+                        <th>组合价格贡献占比(%)</th>
+                        <th style="width:30px;">删除</th>
+                    </tr>
+                </thead>
+                <tbody id="fudaiDataNode">
+                    <tr>
+                        <td colspan="6" style="padding:0;"><div class="note" style="margin:0;"> 暂无福袋组合信息 </div></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div align="right">
+                <{button type="button" id="fukubukuro-compute-rate" label="按零售价计算贡献占比" }>&nbsp;&nbsp;<{button type="button" id="fukubukuro-delall-btn" label="全部删除" }>
+            </div>
+
+            <div class="form-field">
+                <span style="color:red;">*选中比例默认随机，可填数字，不允许负数、空白。比例相加不可大于100，如有数字和随机同时出现，则随机与数字之和也不大于100。</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-layout-block">
+        <h3>发票信息</h3>
+        <div class="form-layout-fields">
+            <div class="form-field">
+                <span class="form-field-label">开票税率：</span>
+                <input class="form-input" placeholder="请输入开票税率%" type="text" vtype='unsigned'  name='tax_rate' />
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">开票名称：</span>
+                <input class="form-input" placeholder="请输入开票名称" type="text" name="tax_name" />
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">发票分类编码：</span>
+                <input class="form-input" placeholder="请输入发票分类编码" type="text" name="tax_code" />
+                <span style = "color:red;">&nbsp;&nbsp;(建议设置，开电子发票时，必要参数)</span>
+            </div>
+        </div>
+    </div>
+    <div class="form-layout-block">
+        <h3>扩展信息</h3>
+        <div class="form-layout-fields form-layout-fields-column">
+            <div class="form-field">
+                <span class="form-field-label">零售价：</span>
+                <input class="form-input" placeholder="请输入零售价" id="retail_price" name="retail_price" value="" />
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">最低售价：</span>
+                <input class="form-input" placeholder="请输入最低售价" id="lowest_price" name="lowest_price" value="<{$material_info.lowest_price}>" />
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">包装单位：</span>
+                <input class="form-input" placeholder="请输入包装单位" name="unit" value="" />
+                <span class="form-remark"> 建议填写此单位 开电子发票必要参数</span>
+            </div>
+        </div>
+        <div id="cc" class="form-actions">
+            <button class="btn-primary" id="material-save-btn">保存</button>
+            <{button type="button" class="btn-secondary" id="return-btn" label="返 回" onclick="location.href=window.frameElement.src;"}>
+        </div>
+    </div>
+</form>
+</div>
+<script>
+
+// 价格配置变量
+var priceRate = '<{$price_rate|default:"retail_price"}>';
+var priceField = '<{$price_field|default:"retail_price"}>';
+var priceLabel = '<{$price_label|default:"零售价"}>';
+
+(function(){
+    window.addEvent('domready', function() {
+        $ES('input[name=sales_material_type]').each(function(item){
+            item.addEvent('click',function(e){
+                $('luckybag_rules').setStyle('display','none');
+                $('promotion_items').setStyle('display','none');
+                $('gift_items').setStyle('display','none');
+                $('bind_brand').setStyle('display','none');
+                $('bind_category').setStyle('display','none');
+
+                $('pickone_items').setStyle('display','none');
+                $('fukubukuro_items').setStyle('display','none');
+
+                if(this.value == '1' || this.value == '6'){ //普通 礼盒
+                    $('bind_basic_material').setStyle('display','table-row');
+                    if (this.value == '6') {
+                        $('bind_basic_material').setStyle('display', 'none');
+                        $('bind_basic_giftmaterial').setStyle('display', 'table-row');
+                    } else {
+                        $('bind_basic_giftmaterial').setStyle('display', 'none');
+                    }
+                    $('shop_id').setStyle('display', 'block');
+                    $('retail_price').set('readonly', false);
+                    $('shop_text').setStyle('display', 'none');
+                 
+                }else{ //组合 福袋 多选一 赠品
+                    $('retail_price').set('readonly', false);
+                    if(this.value == '4'){ //福袋
+                        $('luckybag_rules').setStyle('display','block');
+                    }else if(this.value == '5'){ //多选一
+                        $('pickone_items').setStyle('display','block');
+                    } else if (this.value == '3') { //赠品
+                        // 赠品关联基础物料div打开
+                        $('gift_items').setStyle('display', 'block');
+                        // 零售价只读 默认为0
+                        $('retail_price').set('readonly', true);
+                        $('retail_price').set('value', '0.00');
+                    } else if (this.value == '7') {
+                        //福袋组合
+                        $('fukubukuro_items').setStyle('display','block');
+                    }else{ //促销
+                        $('promotion_items').setStyle('display','block');
+                        $('bind_brand').setStyle('display','table-row');
+                        $('bind_category').setStyle('display','flex');
+                    }
+                    
+                    $('bind_basic_material').setStyle('display','none');
+                    $('bind_basic_giftmaterial').setStyle('display','none');
+                    $('shop_id').setStyle('display','block');
+                    $('shop_text').setStyle('display','none');
+                }
+            })
+        });
+        var material_type = $$('input[name=sales_material_type]:checked').get('value');
+
+        var callurl='index.php?app=material&ctl=admin_material_basic&act=getMaterial',store=[],bmStore=[],giftStore=[];
+        var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=material&ctl=admin_material_basic&act=findMaterial');
+        //组合
+        var tpl='<tr key="{bm_id}" id="bm_{bm_id}" title="点击选取/反选此条记录">'
+            +'  <td>{material_bn}</td><td class="material-name">{material_name}</td><td>{' + (priceField || 'retail_price') + '}</td>'
+            +'  <td><input type="text" value="{num}" key="num" vtype="number&amp;&amp;required" tname="at[_PRIMARY_]" size="6"></td>'
+            +'  <td><input type="text" vtype="number&amp;&amp;required" tname="pr[_PRIMARY_]" key="rate" value="{rate}" id="rate_{bm_id}" size="5"></td>'
+            +'  <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>'
+            +'</tr>';
+
+        var gift_tpl = '<tr key="{bm_id}" id="bm_{bm_id}" title="点击选取/反选此条记录">' +
+            '<td>{material_bn}</td>' +
+            '<td class="material-name">{material_name}</td>' +
+            '<td>{retail_price}</td>' +
+            '<td><input type="text" value="{num}" key="num" vtype="number&amp;&amp;required" tname="at[_PRIMARY_]" size="6"></td>' +
+            '<td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>' + 
+            '</tr>';
+
+        $('material-find-btn').addEvent('click',function(e){
+            new finderDialog(url,{params:{url:callurl,name:'bm_id[]'},width:1000,height:660,
+                onCallback:function(rs){
+                    if(!rs)return;
+                    rs=JSON.decode(rs);
+                    init(rs);
+                }
+            });
+        });
+
+        //多选一
+        $('basic_material_find_btn').addEvent('click',function(e){
+           new finderDialog(url,{params:{url:callurl,name:'bm_id[]'},width:1000,height:660,
+               onCallback:function(rs){
+                   if(!rs)return;
+                   rs = JSON.decode(rs);
+                   tmparr = findProduct(rs,'bm_id');
+                   store.unshift.apply(store,tmparr.reverse());
+                   createProduct_pickone(store);
+               }
+           });
+       });
+        function createProduct_pickone(data){
+            var show_style = 'style="display:none"'; //默认随机
+            var pickone_select_type = $E("input[name=pickone_select_type]:checked").value;
+            if(pickone_select_type == "2"){ //排序
+                show_style = 'style="display:block"';
+            }
+            var tpl_pickone ='<tr key="{bm_id}">'
+                +'  <td>{material_bn}</td><td class="material-name">{material_name}</td>'
+                +'  <td><input type="text" class="sort_column" '+ show_style +' vtype="number" value="{sort}" key="sort" name="sort[{bm_id}]" size="6"></td>'
+                +'  <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>'
+                +'</tr>'; //多选一createProduct_pickone方法用
+            pag=new PageData(tpl_pickone,data,{'updateMain':$('pickone_dataNode'),'pageNum':10,PRIMARY_ID:'bm_id',
+                'onShow':function(){
+                     var _this=this;
+                     $$('#pickone_dataNode input[type]').addEvent('change',function(e){
+                         var pid=this.getParent('tr').get('key'),value=this.value;
+                        _this.editData(pid,[this.get('key'),value]);
+                    });
+                    rows=$ES('#pickone_dataNode tr');
+                    var row_length = rows.length;
+                    rows.each(function(item,i){
+                        item.getElement('.btn-delete-item').addEvent('click',function(e){
+                            if(_this.selectData(item.get('key')) && confirm('确定要删除 '+ _this.selectData(item.get('key'))['material_name'] +' 吗？')) _this.delData(item.get('key'));
+                            if(!$E('#pickone_dataNode tr')){
+                                pickone_emptyData();
+                            }
+                        });
+                    });
+                }});
+        }
+        function pickone_emptyData(){
+            var noData='<tr><td colspan="4" style="padding:0;"><div class="note" style="margin:0;"> 暂无基础物料信息 </div></td></tr>';
+            $('pickone_dataNode').set('html',noData);
+        }
+        $('basic_material_delall_btn').addEvent('click',function(e){
+            if(!pag||!pag.data)return;
+            var delarr=[];
+            pag.data.each(function(d){
+                delarr.push(d['bm_id']);
+            });
+            if(confirm('确认删除全部基础物料吗？')){
+                delProduct(pag,delarr);
+                pickone_emptyData();
+            }
+        });
+        $ES("input[name=pickone_select_type]").addEvent("change",function(e){
+            if(this.value == "2"){ //排序
+                $$(".sort_column").setStyle('display','block');
+            }else{ //随机
+                $$(".sort_column").setStyle('display','none');
+            }
+        });
+
+        var pag,rows,giftPag;
+        function emptyData(){
+            var noData='<tr>'
+                +'<td colspan="8" style="padding:0;"><div class="note" style="margin:0;"> 暂无物料信息 </div></td>'
+                +'</tr>';
+            $('dataNode').set('html',noData);
+        }
+
+        function createProduct(data){
+            pag=new PageData(tpl,data,{'updateMain':$('dataNode'),'pageNum':100,PRIMARY_ID:'bm_id',
+            'onShow':function(){
+                 var _this=this;
+                 $$('#dataNode input[type]').addEvent('change',function(e){
+                     var pid=this.getParent('tr').get('key'),value=this.value;
+
+                    _this.editData(pid,[this.get('key'),value]);
+                });
+
+                rows=$ES('#dataNode tr');
+                rows.each(function(item,i){
+                    item.addEvent('click',function(e){
+                        this.toggleClass('selected');
+                    });
+                    item.getElement('.btn-delete-item').addEvent('click',function(e){
+                        if(_this.selectData(item.get('key')) && confirm('确定要删除 '+ _this.selectData(item.get('key'))['material_name'] +' 吗？')) _this.delData(item.get('key'));
+                        if(!$E('#dataNode tr')) emptyData();
+                    });
+                    item.getElement('input[tname^=at]').addEvent('keypress',function(e){
+                        if(e.code==13) $E('#pfba input').focus();
+                    });
+                });
+
+                if(this.data.length) rows[0].getElement('input[key^=num]').focus();
+
+               $ES('.material-name').removeEvent('mouseover').addEvent('mouseover',function(e){
+                if (this.get('visibility')=='false')
+                {
+                 var e  = new Event(e), el = e.target;
+                 visiTips.attach(el);
+                 el.addEvent('mouseleave',function(){
+                  this.removeClass('active');
+                 });
+                 el.fireEvent('mouseenter',e);
+                }
+                });
+            }
+            });
+        }
+
+        // 赠品按钮点击触发
+        $('gift-material-find-btn').addEvent('click', function (e) {
+            new finderDialog(url, {
+                params: {url: callurl, name: 'bm_id[]'}, width: 1000, height: 660,
+                onCallback: function (rs) {
+                    if (!rs) return;
+                    rs = JSON.decode(rs);
+                    init(rs,'gift');
+                }
+            });
+        });
+        function createGiftProduct(data) {
+            giftPag = new PageData(gift_tpl, data, {
+                'updateMain': $('gift_dataNode'), 'pageNum': 100, PRIMARY_ID: 'bm_id',
+                'onShow': function () {
+                    var _this = this;
+
+
+                    $$('#gift_dataNode input[type]').addEvent('change', function (e) {
+                        var pid = this.getParent('tr').get('key'), value = this.value;
+
+                        _this.editData(pid, [this.get('key'), value]);
+                    });
+
+                    rows = $ES('#gift_dataNode tr');
+                    rows.each(function (item, i) {
+                        item.addEvent('click', function (e) {
+                            this.toggleClass('selected');
+                        });
+                        item.getElement('.btn-delete-item').addEvent('click', function (e) {
+                            if (_this.selectData(item.get('key')) && confirm('确定要删除 ' + _this.selectData(item.get('key'))['material_name'] + ' 吗？')) _this.delData(item.get('key'));
+                            compute(item);
+                            if (!$E('#gift_dataNode tr')) emptyGiftData();
+                        });
+                        item.getElement('input[tname^=at]').addEvent('keypress', function (e) {
+                            if (e.code == 13) $E('#pfba input').focus();
+                        });
+                    });
+
+                    if (this.data.length) rows[0].getElement('input[key^=num]').focus();
+
+                    $ES('.material-name').removeEvent('mouseover').addEvent('mouseover', function (e) {
+                        if (this.get('visibility') == 'false') {
+                            var e = new Event(e), el = e.target;
+                            visiTips.attach(el);
+                            el.addEvent('mouseleave', function () {
+                                this.removeClass('active');
+                            });
+                            el.fireEvent('mouseenter', e);
+                        }
+                    });
+                }
+            });
+        }
+
+        // 赠品全部删除
+        if ($('gift-material-delall-btn')) {
+            $('gift-material-delall-btn').addEvent('click', function (e) {
+                if (!giftPag || !giftPag.data) return;
+                var delarr = [];
+                giftPag.data.each(function (d) {
+                    delarr.push(d['bm_id']);
+                });
+                if (confirm('确认删除全部物料吗？')) {
+                    delProduct(giftPag, delarr);
+                    emptyGiftData();
+                }
+            });
+        }
+
+        // 赠品关联物料清空时显示
+        function emptyGiftData() {
+            var noData = '<tr>'
+                + '<td colspan="8" style="padding:0;"><div class="note" style="margin:0;"> 暂无物料信息 </div></td>'
+                + '</tr>';
+            $('gift_dataNode').set('html', noData);
+        }
+        
+        // 基础物料选择初始化函数
+        function init(rs,sm_type = 'pkg'){
+            // 根据销售物料类型,对全局变量store的内容做调整
+            if (sm_type == 'gift') {
+                store = giftStore;
+            }else{
+                store = bmStore;
+            }
+            
+            // 同已有bm对比,进行去重
+            var tmparr=findProduct(rs,'bm_id');
+             store.unshift.apply(store,tmparr.reverse());
+             var brandHtml = '';
+             store.each(function(item) {
+                if(item.brand_name) {
+                  brandHtml += '<option value="'+item.brand_id+'">'+item.brand_name+'</option>';
+                }
+                
+                //选择分类
+                if(item.cat_id) {
+                    document.getElementsByName("cat_id")[0].value = item.cat_id;
+                }
+             });
+             if(brandHtml) {
+               $('brand').setHTML(brandHtml);
+             }
+             
+             // 不同的销售物料类型调用不同的函数,并保存store数据至类型变量
+             if(sm_type == 'gift'){
+                 createGiftProduct(store);
+                 giftStore = store;
+             }else{
+                 createProduct(store);
+                 bmStore = store;
+             }
+             
+        }
+
+        function findProduct(arr,PRIMARY){
+            if(!store.length)return arr;
+            store.each(function(a){
+                arr.each(function(b){
+                    if(a[PRIMARY]==b[PRIMARY])arr.erase(b);
+                });
+            });
+            return arr;
+        }
+
+        function delProduct(obj,arr){
+            arr.each(function(d){obj.delData(d);});
+        }
+
+        if($('material-delall-btn')){
+            $('material-delall-btn').addEvent('click',function(e){
+                if(!pag||!pag.data)return;
+                var delarr=[];
+                pag.data.each(function(d){
+                     delarr.push(d['bm_id']);
+                });
+                if(confirm('确认删除全部物料吗？')){
+                    delProduct(pag,delarr);
+                    emptyData();
+                }
+            });
+        }
+
+        if($('material-compute-rate')){
+            $('material-compute-rate').addEvent('click',function(e){
+                if(!pag||!pag.data)return;
+
+                var item_count = 0;
+                var num = 0;
+                var is_error = false;
+                var price_total = 0;
+
+                pag.data.each(function(d){
+                    num = parseInt(d['num']);
+                    if(num <= 0 || isNaN(num)){
+                        is_error = true;
+                    }else{
+                        price_total += Number(d[priceField || 'retail_price']) * num;
+                    }
+                    if(d[priceField || 'retail_price'] > 0) {
+                        item_count++;
+                    }
+                });
+
+                if(is_error){
+                    alert("请正确填写数量!");
+                    return false;
+                }
+
+                if(price_total <= 0){
+                    alert("都是0元货品,请手工输入贡献占比!");
+                    return false;
+                }
+
+                var sum_rate = 0;
+                var item_rate = 0;
+                var item_price = 0;
+                var line_i = 0;
+                pag.data.each(function(d){
+                    if(d[priceField || 'retail_price'] <= 0) {
+                        return;
+                    }
+                    bm_id = d['bm_id'];
+                    num = parseInt(d['num']);
+                    item_price = Number(d[priceField || 'retail_price']) * num;
+
+                    line_i++;
+
+                    if(line_i == item_count){
+                        item_rate = 100 - sum_rate;
+                    }else{
+                        item_rate = Math.round(item_price / price_total * 100 * 100) / 100;
+
+                        sum_rate += item_rate;
+
+                        //兼容
+                        if(sum_rate > 100){
+                            sum_rate -= item_rate;
+
+                            item_rate = 100 - sum_rate;
+                            sum_rate += item_rate;
+                        }
+                    }
+
+                    //兼容
+                    if(item_rate < 0){
+                        item_rate = 0;
+                    }
+
+                    if($("rate_" + bm_id)){
+                        $("rate_" + bm_id).set('value', item_rate.toFixed(2));
+                    }
+
+                    rows=$ES('#dataNode tr');
+                    rows.each(function(item,i)
+                    {
+                        if(bm_id == item.get('key')){
+                            var pid = item.get('key');
+                            pag.editData(pid, ['rate', item_rate]);
+                        }
+                    });
+                });
+            });
+        }
+
+
+        $('material-save-btn').addEvent('click',function(e){
+            var _this=this;
+            var form=this.getParent('form');
+            
+            // 明细绑定页面dom的ID
+            let dataNodeDomName = 'dataNode';
+            // 关联基础物料列表数组
+            let dataItemList;
+            let salesMaterialType = $E("input[name=sales_material_type]:checked").value;
+
+            // 根据销售类型切换判断变量
+            if (salesMaterialType == '3') {
+                // 赠品切换明细dom节点
+                dataNodeDomName = 'gift_dataNode';
+                // 关联基础物料列表数组确定
+                dataItemList = giftPag;
+            }else{
+                // 关联基础物料列表数组确定
+                dataItemList = pag;
+            }
+
+            // 存在关联多物料明细的情况
+            if(dataItemList){
+                var data= dataItemList.toHideInput($(dataNodeDomName).getElement('tr'));
+          
+                form.store('target',{extraData:data,
+                    onRequest:function(){
+                        _this.disabled=true;
+                    },
+                    onComplete:function(jsontext){
+                        try{
+                            var json = JSON.decode(jsontext);
+                            if (typeof(json.error)!='undefined'){
+                                _this.disabled=false;
+                            }else{
+                                _this.disabled=true;
+                                if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                                setTimeout('window.close()',200);
+                            }
+                        }catch(e){}
+                    }
+                });
+            }else{
+                  form.store('target',{
+                      onRequest:function(){
+                          _this.disabled=true;
+                      },
+                      onComplete:function(jsontext){
+                          try{
+                              var json = JSON.decode(jsontext);
+                              if (typeof(json.error)!='undefined'){
+                                  _this.disabled=false;
+                              }else{
+                                  _this.disabled=true;
+                                  if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                                  setTimeout('window.close()',200);
+                              }
+                          }catch(e){}
+                      }
+                  });
+            }
+            form.fireEvent('submit',e);
+        });
+
+        //福袋组合规则
+        var fudai_url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=material&ctl=admin_fukubukuro_combine&act=findFukubukuro');
+        var fudai_callurl='index.php?app=material&ctl=admin_fukubukuro_combine&act=getFukubukuro', fudai_store=[];
+        $('fukubukuro-find-btn').addEvent('click', function(e)
+        {
+            new finderDialog(fudai_url, {params:{url:fudai_callurl, name:'combine_id[]'}, width:1000,height:660,
+                onCallback:function(rs)
+                {
+                    if(!rs)return;
+
+                    rs = JSON.decode(rs);
+
+                    tmparr = findFukubukuroList(rs, 'combine_id');
+                    fudai_store.unshift.apply(fudai_store, tmparr.reverse());
+
+                    createFukubukuroProduct(fudai_store);
+                }
+            });
+        });
+
+        //去除已经选择的福袋组合
+        function findFukubukuroList(arr, PRIMARY)
+        {
+            if(!fudai_store.length)return arr;
+
+            fudai_store.each(function(a)
+            {
+                arr.each(function(b){
+                    if(a[PRIMARY]==b[PRIMARY])arr.erase(b);
+                });
+            });
+
+            return arr;
+        }
+
+        var fudai_tpl='<tr key="{combine_id}" id="combineIds_{combine_id}" title="点击选取/反选此条记录">'
+            +'  <td>{combine_bn}</td><td class="combine-name">{combine_name}</td>'
+            +'  <td>{combine_price}</td>'
+            +'  <td><input type="text" key="rate_price" id="rate_price_{combine_id}" name="rate_price[{combine_id}]" value="{lowest_price}" size="8" onkeyup="value=value.replace(/[^\\d\\.]/ig,\'\')" ></td>'
+            +'  <td><input type="text" vtype="number&amp;&amp;required" tname="pr[_PRIMARY_]" key="rate" id="rate_{combine_id}" name="fudai_rate[{combine_id}]" value="{rate}" size="5"></td>'
+            +'  <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer fudai-btn-delete"}></td>'
+            +'</tr>';
+
+        function createFukubukuroProduct(data)
+        {
+            pag = new PageData(fudai_tpl, data, {'updateMain':$('fudaiDataNode'), 'pageNum':100, PRIMARY_ID:'combine_id',
+                'onShow':function(){
+                    var _this = this;
+                    $$('#fudaiDataNode input[key=rate]').addEvent('change', function(e){
+                        var pid = this.getParent('tr').get('key'),value=this.value;
+
+                        if(value == "0"){
+                            alert("组合价格贡献占比,不能填写数字：0");
+                            return false;
+                        }
+
+                        _this.editData(pid,[this.get('key'),value]);
+                    });
+
+                    //rate_price click
+                    $$('#fudaiDataNode input[key=rate_price]').addEvent('change', function(e){
+                        var value = this.value;
+
+                        //check
+                        if(value == ''){
+                            alert("请填写组合贡献价");
+                            return false;
+                        }
+
+                        value = Number(value);
+                        if(value < 0){
+                            alert("请正确填写组合贡献价");
+                            return false;
+                        }
+
+                        $('fukubukuro-compute-rate').fireEvent('click', {stop:$empty});
+                    });
+
+                    rows = $ES('#fudaiDataNode tr');
+                    rows.each(function(item,i){
+                        item.addEvent('click',function(e){
+                            this.toggleClass('selected');
+                        });
+
+                        //delete button
+                        item.getElement('.fudai-btn-delete').addEvent('click',function(e){
+                            if(_this.selectData(item.get('key')) && confirm('确定要删除 '+ _this.selectData(item.get('key'))['combine_name'] +' 吗？')) _this.delData(item.get('key'));
+                            if(!$E('#fudaiDataNode tr')) emptyData();
+                        });
+                    });
+
+                    //delete
+                    $ES('.combine-name').removeEvent('mouseover').addEvent('mouseover', function(e)
+                    {
+                        if (this.get('visibility')=='false'){
+                            var e  = new Event(e), el = e.target;
+
+                            visiTips.attach(el);
+
+                            el.addEvent('mouseleave', function(){
+                                this.removeClass('active');
+                            });
+
+                            el.fireEvent('mouseenter',e);
+                        }
+                    });
+                }
+            });
+        }
+
+        //按销售价计算贡献占比
+        if($('fukubukuro-compute-rate')){
+            $('fukubukuro-compute-rate').addEvent('click',function(e)
+            {
+                if(!pag||!pag.data)return;
+
+                //rate_price
+                var item_count = 0;
+                var selling_price_total = 0;
+                rows = $ES('#fudaiDataNode tr');
+                rows.each(function(item, i){
+                    combine_id = item.get('key');
+                    rate_price = $("rate_price_"+combine_id).getValue();
+                    rate_price = Number(rate_price);
+
+                    //check
+                    if(rate_price < 0){
+                        alert("福袋组合贡献价不能小于0元");
+                        return false;
+                    }
+
+                    if(rate_price > 0){
+                        item_count++;
+                    }
+
+                    selling_price_total += rate_price;
+                });
+
+                if(selling_price_total <= 0){
+                    alert("福袋组合贡献价都是0元,请手工输入贡献占比!");
+                    return false;
+                }
+
+                var sum_rate = 0;
+                var item_rate = 0;
+                var item_price = 0;
+                var line_i = 0;
+                pag.data.each(function(d){
+                    if(d['lowest_price'] <= 0) {
+                        return;
+                    }
+
+                    combine_id = d['combine_id'];
+
+                    //get rate_price
+                    rate_price = $("rate_price_"+combine_id).getValue();
+                    item_price = Number(rate_price);
+
+                    //check
+                    if(item_price <= 0) {
+                        //支持小数
+                        $("rate_" + combine_id).set('value', 0);
+
+                        return;
+                    }
+
+                    line_i++;
+
+                    if(line_i == item_count){
+                        item_rate = 100 - sum_rate;
+                    }else{
+                        item_rate = Math.round(item_price / selling_price_total * 100 * 100) / 100;
+
+                        //格式为正整数
+                        //item_rate = Math.ceil(item_rate);
+
+                        sum_rate += item_rate;
+
+                        //兼容
+                        if(sum_rate > 100){
+                            sum_rate -= item_rate;
+
+                            item_rate = 100 - sum_rate;
+                            sum_rate += item_rate;
+                        }
+                    }
+
+                    //兼容
+                    if(item_rate < 0){
+                        item_rate = 0;
+                    }
+
+                    if($("rate_" + combine_id)){
+                        //正整数
+                        //$("rate_" + combine_id).set('value', item_rate);
+
+                        //支持小数
+                        $("rate_" + combine_id).set('value', item_rate.toFixed(2));
+                    }
+
+                    rows = $ES('#fudaiDataNode tr');
+                    rows.each(function(item,i)
+                    {
+                        if(combine_id == item.get('key')){
+                            var pid = item.get('key');
+                            pag.editData(pid, ['rate', item_rate]);
+                        }
+                    });
+                });
+            });
+        }
+
+        //删除全部福袋组合
+        if($('fukubukuro-delall-btn')){
+            $('fukubukuro-delall-btn').addEvent('click',function(e){
+                if(!pag||!pag.data)return;
+
+                var delarr=[];
+                pag.data.each(function(d){
+                    delarr.push(d['combine_id']);
+                });
+
+                if(confirm('确认删除全部福袋组合吗？')){
+                    delProduct(pag, delarr);
+                    emptyData();
+                }
+            });
+        }
+    });
+
+    //福袋
+    //var load_part_number = $("current_part_number").getValue();
+    //load_luckybag_div(load_part_number);
+    //load_auto_luckybag_tr(load_part_number);
+
+    // $('add_luckybag_rule').addEvent('click',function(e){
+    //     var load_part_number = $("current_part_number").getValue();
+    //     load_luckybag_div(load_part_number);
+    //     $ES(".luckybag_rules_content_div").each(function(item_div){
+    //         load_auto_luckybag_tr(item_div.get("luckybag_key"));
+    //     });
+    // });
+
+})();
+
+        function material_object_callback(rs,handle){
+            var p_node = handle.getParent('div');
+            var html = '已选择了1个物料,'+"<a href='javascript:void(0);' onclick='material_selected_show();'>查看关联的物料.</a>";
+            if ($defined($('hand-selected-product')))
+            {
+                $('hand-selected-product').setHTML(html);
+            } else {
+                var div = new Element('div',{'html':html,'id':'hand-selected-product'});
+                div.injectAfter(p_node);
+            }
+        }
+
+        function material_selected_show(){
+            new Dialog('index.php?app=material&ctl=admin_material_sales&act=showMaterials',{
+                ajaxoptions:{data:$('hand-selected-product').getPrevious('div'),method:'post'}
+            });
+        }
+
+        function load_luckybag_div(load_part_number){
+            var current_div_html = '<div class="luckybag_title">'
+                +'<div class="luckybag_title_name"><b>组合名称</b> <input name="lbr['+load_part_number+'][name]" type="text" class="x-input"></div><div class="luckybag_title_del" onclick="delete_luckybag_div(this);">删除本组</div>'
+                +'<div class="luckybag_title_material">'
+                +'<span id="lbba_bn_'+load_part_number+'"><label>基础物料编码：</label><input name="bn_'+load_part_number+'" type="text" class="x-input"/></span> '
+                +'<span id="lbba_name_'+load_part_number+'"><label>基础物料名称：</label><input name="name_'+load_part_number+'" type="text" class="x-input"/></span>'
+                +'</div>'
+                +'</div>'
+                +'<table class="gridlist luckybag_table">'
+                +'<thead>'
+                +'<tr>'
+                +'<th>基础物料编码</th>'
+                +'<th>基础物料名称</th>'
+                +'<th>成本价</th>'
+                +'<th class="luckybag_table_operation_th">操作</th>'
+                +'</tr>'
+                +'</thead>'
+                +'<tbody id="dataNode_luckybag_'+load_part_number+'">'
+                +'</tbody>'
+                +'</table>'
+                +'<div class="luckybag_rule">组合规则：随机选 <input class="x-input" id="lkb_retail_price_sku'+load_part_number+'" onchange="get_auto_lkb_retail_price('+load_part_number+');" type="text" size="5" name="lbr['+load_part_number+'][sku_num]"> 个sku，'
+                +'分别送 <input class="x-input" id="lkb_retail_price_sendnum'+load_part_number+'" onchange="get_auto_lkb_retail_price('+load_part_number+');" type="text" size="5" name="lbr['+load_part_number+'][send_num]"> 件，'
+                +'单品售价 <input class="x-input" id="lkb_retail_price_price'+load_part_number+'" onchange="get_auto_lkb_retail_price('+load_part_number+');" type="text" size="5" name="lbr['+load_part_number+'][single_price]"> 元</div>'
+                +'<input class="lkb_retail_price" type="hidden" id="lkb_current_retail_price'+load_part_number+'" value="0">'
+                +'<div class="luckybag_hr"><hr /></div>';
+            ;
+            new Element('div', {class:'luckybag_rules_content_div',luckybag_key:load_part_number,html:current_div_html}).inject($E('#luckybag_rules_content'));
+            $("current_part_number").value = parseInt(load_part_number) + 1;
+        }
+
+        function load_auto_luckybag_tr(part_num){
+            var callurl_luckybag = 'index.php?app=console&ctl=admin_purchase&act=getProducts';
+            var options={
+                'getVar':'bn',
+                'fxOptions':false,
+                callJSON:function(){return window.autocompleter_json;},
+                injectChoice:function(json){
+                    var choice = new Element('li', {'html': this.markQueryValue(json[this.options.getVar])});
+                    choice.store('_data',json);
+                    choice.inputValue = json[this.options.getVar];
+                    this.addChoiceEvents(choice).inject(this.choices);
+                },
+                onHide:function(){
+                    if(!this.selected)return;
+                    var json=this.selected.retrieve('_data');
+                    json=$splat(json);
+                    json.each(function(i){
+                        var could_add = true;
+                        var bm_id = i.product_id;
+                        /*
+                        if($ES("#dataNode_luckybag_"+part_num+" tr")){
+                            $ES("#dataNode_luckybag_"+part_num+" tr").each(function(c_i){
+                                if(bm_id == c_i.get('oid')){
+                                    alert("这组已有此货品："+i.name);
+                                    could_add = false;
+                                }
+                            });
+                        }
+                        */
+                        if($ES("#luckybag_rules_content table tbody tr")){
+                            $ES("#luckybag_rules_content table tbody tr").each(function(c_i){
+                                if(bm_id == c_i.get('oid')){
+                                    alert("组合中已有此货品："+i.name);
+                                    could_add = false;
+                                }
+                            });
+                        }
+                        if(could_add){
+                            var current_html = '<td>'+i.bn+'<input type="hidden" name="lbr['+part_num+'][bm_ids][]" value="'+bm_id+'"></td>'
+                            +'  <td>'+i.name+'</td>'
+                            +'  <td>'+i.cost+'</td>'
+                            +'  <td><{img src="bundle/delecate.gif" class="pointer" app="desktop" key="state" onclick="delete_luckybag_tr(this);"}></td>';
+                            new Element('tr', {id:'tr_luckybag_'+bm_id,oid:bm_id,html:current_html}).inject($E('#dataNode_luckybag_'+part_num));
+                            MessageBox.success('加载商品成功!!');
+                        }
+                    });
+                },
+                onFocus:function(ipt){
+                    ipt.value='';
+                }
+            };
+            new Autocompleter.script($E('#lbba_bn_'+part_num+' input'),callurl_luckybag,options);
+            new Autocompleter.script($E('#lbba_name_'+part_num+' input'),callurl_luckybag,$merge(options,{'getVar':'name'}));
+        }
+
+        function delete_luckybag_tr(obj){
+            obj.getParent('tr').remove();
+        }
+
+        function delete_luckybag_div(obj){
+            obj.getParent('.luckybag_rules_content_div').remove();
+            get_lkb_retail_price();
+        }
+
+        function get_auto_lkb_retail_price(load_part_number){
+            var lkb_load_part_number_sku = parseFloat($("lkb_retail_price_sku"+load_part_number).getValue());
+            var lkb_load_part_number_sendnum = parseFloat($("lkb_retail_price_sendnum"+load_part_number).getValue());
+            var lkb_load_part_number_price = parseFloat($("lkb_retail_price_price"+load_part_number).getValue());
+            var current_lkb_retail_price = 0;
+            if(lkb_load_part_number_sku > 0 && lkb_load_part_number_sendnum > 0 && lkb_load_part_number_price >= 0){
+                current_lkb_retail_price = lkb_load_part_number_sku * lkb_load_part_number_sendnum * lkb_load_part_number_price;
+            }else{
+                return;
+            }
+            $('lkb_current_retail_price'+load_part_number).value = current_lkb_retail_price;
+            get_lkb_retail_price();
+        }
+
+        function get_lkb_retail_price(){
+            var retail_price = 0;
+            $$(".lkb_retail_price").each(function(item,i){
+                retail_price = parseFloat(retail_price) + parseFloat(item.getValue());
+            });
+            $('retail_price').value = retail_price;
+        }
+
+</script>
+<style>
+    .object-select {
+        width: auto!important;
+    }
+</style>

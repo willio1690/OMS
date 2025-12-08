@@ -1,0 +1,34 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+    <{if $shop_result.succ}>
+        <div>订阅成功的店铺：</div>
+        <div>
+            <{foreach from=$shop_result.succ item=item}>
+                <{$item}>&nbsp;&nbsp;
+            <{/foreach}>
+        </div>
+        <br/>
+    <{/if}>
+    <{if $shop_result.fail}>
+        <div>订阅失败的店铺：</div>
+        <div>
+            <{foreach from=$shop_result.fail item=item}>
+                <{$item.name}>：<{$item.msg}><br/>
+            <{/foreach}>
+        </div>
+        <br/>
+    <{/if}>
+    <{if $shop_result.none}>
+        <div>无需订阅的店铺：</div>
+        <div>
+            <{foreach from=$shop_result.none item=item}>
+                <{$item}>&nbsp;&nbsp;
+            <{/foreach}>
+        </div>
+    <{/if}>
+</div>
+<div class="notice">只有淘宝店铺需要进行发票订阅</div>

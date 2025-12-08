@@ -1,0 +1,26 @@
+<desktop>
+    <permissions>
+        <permission id="dchain_branch">外部优仓</permission>
+        <permission id="dchain_foreign_sku">优仓商品分配</permission>
+        <permission id="aoxiang_branch">翱象仓库分配</permission>
+        <permission id="aoxiang_logistics">翱象物流分配</permission>
+        <permission id="aoxiang_product">翱象商品分配</permission>
+        <permission id="aoxiang_pkgproduct">翱象捆绑商品分配</permission>
+        <permission id="aoxiang_delivery">翱象发货单分配</permission>
+    </permissions>
+
+    <workground name="系统集成" id="channel_center" order="1400" icon="icon-xitongjicheng-01">
+        <menugroup name="第三方应用管理" en="thirdparty-application-management" >
+            <menu controller='admin_branch' action='index' permission='dchain_branch' display='true' order='9006001'>外部优仓</menu>
+            <menu controller='admin_foreign_sku' action='index' permission='dchain_foreign_sku' display='true' order='9006002'>优仓商品分配</menu>
+        </menugroup>
+        
+        <menugroup name="翱象应用管理" en="aoxiang-application-management">
+            <menu controller='admin_aoxiang_branch' action='index' permission='aoxiang_branch' display='true' order='9009001'>仓库分配</menu>
+            <menu controller='admin_aoxiang_logistics' action='index' permission='aoxiang_logistics' display='true' order='9009002'>物流公司分配</menu>
+            <menu controller='admin_aoxiang_product' action='index' permission='aoxiang_product' display='true' order='9009003'>商品分配</menu>
+            <menu controller='admin_aoxiang_pkgproduct' action='index' permission='aoxiang_pkgproduct' display='true' order='9009004'>捆绑商品分配</menu>
+            <menu controller='admin_aoxiang_delivery' action='index' permission='aoxiang_delivery' display='true' order='9009004'>发货单分配</menu>
+        </menugroup>
+    </workground>
+</desktop>

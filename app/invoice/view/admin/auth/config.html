@@ -1,0 +1,17 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $configs}>
+<table width="100%" cellpadding="0" cellspacing="0">
+    <tbody>
+        <{foreach from=$configs item=item}>
+        <tr>
+            <th><{$item.label}>：</th>
+            <td><{$item.inputer}> <{if $item.required}><font color="red"> * 必填 </font> <{/if}></td>
+        </tr>
+        <{/foreach}>
+    </tbody>
+</table>
+<{/if}>

@@ -1,0 +1,79 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="post" action="index.php?app=console&ctl=admin_email&act=save" class="tableform" id="report_mail_edit">
+  <div class="tableform">
+    <div class="division" id='email_config'>
+      <table cellspacing="0" cellpadding="0" width="100%">
+        <tbody>
+          <tr>
+            <th><em class="red">*</em><label><{t}>smtp 主机地址 ：<{/t}></label></th>
+            <td><input type="text" vtype="required" size="32" name="mail[smtp_server]" class="x-input" autocomplete="off" value='<{$data.smtp_server}>'/></td>
+          </tr>
+          <tr>
+            <th><em class="red">*</em><label><{t}>smtp 主机端口：<{/t}></label></th>
+            <td><input type="text" vtype="required" size="32" name="mail[smtp_port]" class="x-input" autocomplete="off" value='<{$data.smtp_port}>'/></td>
+          </tr>
+          <tr>
+            <th><em class="red">*</em><label><{t}>是否启用SSL方式：<{/t}></label></th>
+            <td>
+              <input type="radio" name="mail[smtp_ssl]" autocomplete="off" <{if $data.smtp_ssl == '1'}>checked="checked"<{/if}> value='1' />是
+              <input type="radio" name="mail[smtp_ssl]" autocomplete="off" <{if $data.smtp_ssl == '2'}>checked="checked"<{/if}> value='2' />否
+            </td>
+          </tr>
+          <tr>
+            <th><em class="red">*</em><label><{t}>发件邮箱：<{/t}></label></th>
+            <td><input type="text" vtype="required" size="32" name="mail[email]" class="x-input" autocomplete="off" value='<{$data.email}>'/></td>
+          </tr>
+          <tr>
+            <th><em class="red">*</em><label><{t}>发件名称：<{/t}></label></th>
+            <td><input type="text" vtype="required" size="32" name="mail[name]" class="x-input" autocomplete="off" value='<{$data.name}>'/></td>
+          </tr>
+          <tr>
+            <th><em class="red">*</em><label><{t}>发件密码：<{/t}></label></th>
+            <td><input type="password" vtype="required" size="32" name="mail[psw]" class="x-input" autocomplete="off" value='<{$data.psw}>'/></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</form>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td><{button class="btn-primary" id="report-mail-form-submit" type="submit" label="确定" }></td>
+        <td><{button label=$___desktop="测试配置"|t:'desktop' onclick="new Dialog('index.php?app=console&ctl=admin_email&act=testEmail&'+$('report_mail_edit').toQueryString(),{width:590,ajaksable:false})"}></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<{/area}>
+<script>
+(function(){
+    var _form = $('report_mail_edit');
+    var btn =$('report-mail-form-submit');
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    _form.store('target',{
+      onComplete:function(){
+      },
+      onSuccess:function(response){
+        var hash_res_obj = JSON.decode(response);
+        if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+          try{
+            var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+          }catch(e){}
+          if(_dialogIns){
+            _dialogIns.close();
+          }
+        }
+      }
+    });
+    btn.addEvent('click',function(){
+      _form.fireEvent('submit',{stop:$empty});
+    });
+})();
+</script>

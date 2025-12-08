@@ -1,0 +1,561 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if isset($max_images) && $max_images > 1}>
+<!-- 多图片模式 -->
+<div id="multi-image-upload-container-<{$domid}>" class="multi-image-upload-container">
+    <!-- 图片列表容器 -->
+    <div id="image-list-<{$domid}>" class="image-list">
+        <{if isset($existing_images) && $existing_images}>
+            <{foreach from=$existing_images item=image key=index}>
+            <div class="image-item" data-image-id="<{$image.image_id}>" data-index="<{$index}>">
+                <div class="image-preview" style="
+                    width: <{$display_width}>px; 
+                    height: <{$display_height}>px; 
+                    border: <{$border_style}>; 
+                    border-radius: <{$border_radius}>;
+                    position: relative;
+                    background-color: #fafafa;
+                    cursor: <{$cursor_style}>;
+                    display: inline-block;
+                    margin-right: 10px;
+                    margin-bottom: 10px;
+                    vertical-align: top;
+                ">
+                    <img src="<{$image.url}>" 
+                         alt="图片<{$index+1}>" 
+                         style="width: <{$display_width}>px; height: <{$display_height}>px; object-fit: cover; border-radius: <{$border_radius}>;"
+                         class="<{$magnifier_class}>"
+                         ref="<{$image.full_url}>"
+                         data-tips="false"
+                         onmouseover="showImageMagnifier(event, this)"
+                         onmousemove="updateImageMagnifierPosition(event)"
+                         onmouseleave="hideImageMagnifier()" />
+                    
+                    <!-- 删除按钮 -->
+                    <{if !isset($readonly) || !$readonly}>
+                    <div class="image-delete-btn" title="删除图片" onclick="removeImage('<{$domid}>', <{$index}>)">×</div>
+                    <{/if}>
+                </div>
+                
+                <!-- 隐藏字段存储图片ID -->
+                <input type="hidden" name="<{$input_name}>[]" value="<{$image.image_id}>" />
+            </div>
+            <{/foreach}>
+        <{/if}>
+        
+        <!-- 添加图片按钮 -->
+        <{if (!isset($readonly) || !$readonly) && (!isset($existing_images) || $existing_images|@count < $max_images)}>
+        <div class="image-item add-image-item" onclick="addImage('<{$domid}>')" style="
+            width: <{$display_width}>px; 
+            height: <{$display_height}>px; 
+            border: <{$border_style}>; 
+            border-radius: <{$border_radius}>;
+            background-color: #fafafa;
+            cursor: pointer;
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            vertical-align: top;
+            text-align: center;
+            line-height: <{$display_height}>px;
+            color: #999;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        ">
+            + 添加图片
+        </div>
+        <{/if}>
+    </div>
+    
+    <!-- 隐藏的文件输入框 -->
+    <input type="file" id="image-file-input-<{$domid}>" accept="image/*" style="display: none;" multiple />
+    
+    <!-- 图片数量提示 -->
+    <div class="image-count-tip" style="margin-top: 10px; color: #666; font-size: 12px;">
+        已上传 <span id="current-count-<{$domid}>"><{if isset($existing_images) && $existing_images}><{$existing_images|count}><{else}>0<{/if}></span> / <{$max_images}> 张图片
+    </div>
+</div>
+
+<style>
+/* 多图片上传容器样式 */
+.multi-image-upload-container {
+    display: block;
+    width: 100%;
+}
+
+/* 图片列表样式 */
+.image-list {
+    display: block;
+    width: 100%;
+}
+
+/* 图片项样式 */
+.image-item {
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+/* 图片预览区域样式 */
+.image-preview {
+    position: relative;
+    background-color: #fafafa;
+    transition: border-color 0.3s ease;
+}
+
+.image-preview:hover {
+    border-color: #999 !important;
+}
+
+.image-preview img {
+    border-radius: 4px;
+}
+
+/* 添加图片按钮样式 */
+.add-image-item:hover {
+    border-color: #4CAF50 !important;
+    color: #4CAF50 !important;
+}
+
+/* 删除按钮样式 */
+.image-delete-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    background-color: rgba(220, 53, 69, 0.8);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transform: translate(50%, -50%);
+    border: 2px solid white;
+}
+
+.image-delete-btn:hover {
+    background-color: rgba(220, 53, 69, 1);
+    box-shadow: 0 3px 10px rgba(220, 53, 69, 0.5) !important;
+}
+
+/* 图片数量提示样式 */
+.image-count-tip {
+    clear: both;
+    padding-top: 10px;
+}
+
+/* 响应式布局支持 */
+@media (max-width: 768px) {
+    .image-item {
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+    
+    .image-preview,
+    .add-image-item {
+        width: 80px !important;
+        height: 80px !important;
+    }
+}
+</style>
+
+<script>
+// 添加图片
+function addImage(domid) {
+    var fileInput = document.getElementById('image-file-input-' + domid);
+    fileInput.click();
+}
+
+// 文件选择处理
+document.getElementById("image-file-input-<{$domid}>").addEventListener("change", function() {
+    var files = this.files;
+    var maxImages = <{$max_images}>;
+    var currentCount = document.getElementById('current-count-<{$domid}>').textContent;
+    var remainingSlots = maxImages - currentCount;
+    
+    if (files.length > remainingSlots) {
+        alert('最多只能上传 ' + maxImages + ' 张图片，当前已上传 ' + currentCount + ' 张');
+        this.value = '';
+        return;
+    }
+    
+    for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        if (file && file.type.match("image.*")) {
+            processImageFile(file, '<{$domid}>');
+        } else if (file) {
+            alert('请选择图片文件！');
+        }
+    }
+    
+    // 清空文件输入
+    this.value = '';
+});
+
+// 处理图片文件
+function processImageFile(file, domid) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var imageSrc = e.target.result;
+        var imageList = document.getElementById('image-list-' + domid);
+        var addButton = imageList.querySelector('.add-image-item');
+        
+        // 创建新的图片项
+        var imageItem = document.createElement('div');
+        imageItem.className = 'image-item';
+        imageItem.setAttribute('data-index', Date.now()); // 使用时间戳作为临时索引
+        
+        var imagePreview = document.createElement('div');
+        imagePreview.className = 'image-preview';
+        imagePreview.style = 'width: <{$display_width}>px; height: <{$display_height}>px; border: <{$border_style}>; border-radius: <{$border_radius}>; position: relative; background-color: #fafafa; cursor: <{$cursor_style}>; display: inline-block; margin-right: 10px; margin-bottom: 10px; vertical-align: top;';
+        
+        var img = document.createElement('img');
+        img.src = imageSrc;
+        img.alt = '新图片';
+        img.style = 'width: <{$display_width}>px; height: <{$display_height}>px; object-fit: cover; border-radius: <{$border_radius}>;';
+        img.className = '<{$magnifier_class}>';
+        img.setAttribute('ref', imageSrc);
+        img.setAttribute('data-tips', 'false');
+        img.setAttribute('onmouseover', 'showImageMagnifier(event, this)');
+        img.setAttribute('onmousemove', 'updateImageMagnifierPosition(event)');
+        img.setAttribute('onmouseleave', 'hideImageMagnifier()');
+        
+        var deleteBtn = document.createElement('div');
+        deleteBtn.className = 'image-delete-btn';
+        deleteBtn.title = '删除图片';
+        deleteBtn.textContent = '×';
+        deleteBtn.onclick = function() {
+            removeImage(domid, imageItem.getAttribute('data-index'));
+        };
+        
+        var hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = '<{$input_name}>[]';
+        hiddenInput.value = 'temp_' + Date.now(); // 临时ID，上传后会被替换
+        
+        imagePreview.appendChild(img);
+        imagePreview.appendChild(deleteBtn);
+        imageItem.appendChild(imagePreview);
+        imageItem.appendChild(hiddenInput);
+        
+        // 在添加按钮前插入新图片
+        imageList.insertBefore(imageItem, addButton);
+        
+        // 更新计数
+        updateImageCount(domid);
+        
+        // 检查是否需要隐藏添加按钮
+        checkAddButtonVisibility(domid);
+    };
+    reader.readAsDataURL(file);
+}
+
+// 删除图片
+function removeImage(domid, index) {
+    var imageList = document.getElementById('image-list-' + domid);
+    var imageItem = imageList.querySelector('[data-index="' + index + '"]');
+    
+    if (imageItem) {
+        imageItem.remove();
+        updateImageCount(domid);
+        checkAddButtonVisibility(domid);
+    }
+}
+
+// 更新图片计数
+function updateImageCount(domid) {
+    var imageList = document.getElementById('image-list-' + domid);
+    var imageItems = imageList.querySelectorAll('.image-item:not(.add-image-item)');
+    var countElement = document.getElementById('current-count-' + domid);
+    
+    if (countElement) {
+        countElement.textContent = imageItems.length;
+    }
+}
+
+// 检查添加按钮可见性
+function checkAddButtonVisibility(domid) {
+    var imageList = document.getElementById('image-list-' + domid);
+    var imageItems = imageList.querySelectorAll('.image-item:not(.add-image-item)');
+    var addButton = imageList.querySelector('.add-image-item');
+    var maxImages = <{$max_images}>;
+    
+    if (addButton) {
+        if (imageItems.length >= maxImages) {
+            addButton.style.display = 'none';
+        } else {
+            addButton.style.display = 'inline-block';
+        }
+    }
+}
+
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', function() {
+    updateImageCount('<{$domid}>');
+    checkAddButtonVisibility('<{$domid}>');
+});
+</script>
+
+<{else}>
+<!-- 单图片模式 -->
+<div id="image-upload-container-<{$domid}>" style="display: inline-block; vertical-align: top;">
+    <!-- 图片预览区域 -->
+    <div id="image-preview-<{$domid}>" class="image-preview" style="
+        width: <{$display_width}>px; 
+        height: <{$display_height}>px; 
+        border: <{$border_style}>; 
+        display: inline-block; 
+        text-align: center; 
+        vertical-align: top; 
+        margin-right: 15px;
+        position: relative;
+        background-color: #fafafa;
+        cursor: <{$cursor_style}>;
+        border-radius: <{$border_radius}>;
+        transition: border-color 0.3s ease;
+    ">
+        <{if isset($image_src) && $image_src && $image_src != $transparent_gif}>
+        <img src="<{$image_src}>" 
+             alt="图片" 
+             style="width: <{$display_width}>px; height: <{$display_height}>px; object-fit: cover; border-radius: <{$border_radius}>;"
+             class="<{$magnifier_class}>"
+             ref="<{$magnifier_src}>"
+             data-tips="false"
+             onmouseover="showImageMagnifier(event, this)"
+                             onmousemove="updateImageMagnifierPosition(event)"
+                             onmouseleave="hideImageMagnifier()" />
+        
+        <!-- 删除按钮 - 有图片时显示 -->
+        <{if !isset($readonly) || !$readonly}>
+        <div id="image-delete-overlay-<{$domid}>" class="image-delete-btn show" title="删除图片">×</div>
+        <{/if}>
+        <{else}>
+        <{if !isset($readonly) || !$readonly}>
+        <div class="upload-placeholder" style="line-height: <{$display_height}>px; color: #999; font-size: 14px; user-select: none;">点击上传图片</div>
+        
+        <!-- 删除按钮 - 无图片时隐藏 -->
+        <div id="image-delete-overlay-<{$domid}>" class="image-delete-btn hide" title="删除图片">×</div>
+        <{else}>
+        <div class="upload-placeholder" style="line-height: <{$display_height}>px; color: #999; font-size: 14px; user-select: none; color: #999;">暂无图片</div>
+        <{/if}>
+        <{/if}>
+    </div>
+    
+    <!-- 隐藏的文件输入框 -->
+    <{if !isset($readonly) || !$readonly}>
+    <input type="file" id="image-file-input-<{$domid}>" name="<{$input_name}>" accept="image/*" style="display: none;" />
+    <{/if}>
+    
+    <!-- 隐藏字段存储当前图片ID -->
+    <input type="hidden" id="current-image-id-<{$domid}>" name="current_image_id" value="<{$input_value}>" />
+
+</div>
+
+<style>
+/* 图片上传容器样式 */
+#image-upload-container-<{$domid}> {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+}
+
+/* 图片预览区域样式 */
+.image-preview {
+    position: relative;
+    background-color: #fafafa;
+    transition: border-color 0.3s ease;
+}
+
+.image-preview:hover {
+    border-color: #999 !important;
+}
+
+.image-preview.has-image {
+    border-color: #4CAF50 !important;
+    border-style: solid !important;
+    cursor: zoom-in !important;
+}
+
+.image-preview img {
+    border-radius: 4px;
+}
+
+/* 删除按钮样式 */
+.image-delete-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 24px;
+    height: 24px;
+    background-color: rgba(220, 53, 69, 0.8);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transform: translate(50%, -50%);
+    border: 2px solid white;
+}
+
+.image-delete-btn.show {
+    display: flex;
+}
+
+.image-delete-btn.hide {
+    display: none;
+}
+
+.image-delete-btn:hover {
+    background-color: rgba(220, 53, 69, 1);
+    box-shadow: 0 3px 10px rgba(220, 53, 69, 0.5) !important;
+}
+
+/* 上传提示样式 */
+.upload-placeholder {
+    pointer-events: none;
+    user-select: none;
+}
+
+/* 图片容器相对定位 */
+.image-preview.has-image {
+    position: relative !important;
+}
+
+/* 响应式布局支持 */
+.form-layout .form-layout-fields-column {
+    flex-direction: column;
+}
+
+.form-layout .form-layout-fields-column .form-field {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.form-layout .form-layout-fields-column .form-remark {
+    font-size: 12px;
+    color: #999999;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 206px;
+    margin-top: 8px;
+}
+
+.form-layout .form-layout-fields-column .form-field .form-field-label {
+    width: 200px;
+    text-align: right;
+    margin-bottom: 0;
+    margin-right: 10px;
+}
+
+.form-layout .form-layout-fields-column .form-field .form-input {
+    width: 35%;
+}
+</style>
+
+<script>
+<{if !isset($readonly) || !$readonly}>
+// 点击预览区域触发文件选择
+document.getElementById("image-preview-<{$domid}>").addEventListener("click", function() {
+    if (!this.querySelector("img")) {
+        document.getElementById("image-file-input-<{$domid}>").click();
+    }
+});
+
+// 文件选择处理
+document.getElementById("image-file-input-<{$domid}>").addEventListener("change", function() {
+    var file = this.files[0];
+    if (file && file.type.match("image.*")) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var imageSrc = e.target.result;
+            var preview = document.getElementById("image-preview-<{$domid}>");
+            var placeholder = preview.querySelector(".upload-placeholder");
+            
+            if (placeholder) {
+                placeholder.remove();
+            }
+            
+            var img = document.createElement("img");
+            img.src = imageSrc;
+            img.alt = "图片";
+            img.style = "width: <{$display_width}>px; height: <{$display_height}>px; object-fit: cover; border-radius: <{$border_radius}>;";
+            img.className = "<{$magnifier_class}>";
+            img.setAttribute("ref", imageSrc);
+            img.setAttribute("data-tips", "false");
+            img.setAttribute("onmouseover", "showImageMagnifier(event, this)");
+            img.setAttribute("onmousemove", "updateImageMagnifierPosition(event)");
+            img.setAttribute("onmouseleave", "hideImageMagnifier()");
+            
+            preview.appendChild(img);
+            
+            // 显示删除按钮
+            var deleteBtn = document.getElementById("image-delete-overlay-<{$domid}>");
+            if (deleteBtn) {
+                deleteBtn.className = "image-delete-btn show";
+            }
+            
+            // 更新隐藏输入值
+            document.getElementById("current-image-id-<{$domid}>").value = imageSrc;
+            
+
+        };
+        reader.readAsDataURL(file);
+    } else if (file) {
+        alert("请选择图片文件！");
+        this.value = "";
+    }
+});
+
+// 删除图片
+document.getElementById("image-delete-overlay-<{$domid}>").addEventListener("click", function(e) {
+    e.stopPropagation();
+    
+    var preview = document.getElementById("image-preview-<{$domid}>");
+    var img = preview.querySelector("img");
+    var deleteBtn = this;
+    
+    if (img) {
+        img.remove();
+    }
+    
+    // 隐藏删除按钮
+    deleteBtn.className = "image-delete-btn hide";
+    
+    // 添加占位符
+    var placeholder = document.createElement("div");
+    placeholder.className = "upload-placeholder";
+    placeholder.style = "line-height: <{$display_height}>px; color: #999; font-size: 14px; user-select: none;";
+    placeholder.textContent = "点击上传图片";
+    preview.appendChild(placeholder);
+    
+    // 清空文件输入
+    document.getElementById("image-file-input-<{$domid}>").value = "";
+    
+    // 清空隐藏输入值
+    document.getElementById("current-image-id-<{$domid}>").value = "";
+    
+
+});
+<{/if}>
+</script>
+<{/if}>

@@ -1,0 +1,58 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta name="author" content="tyler chao">
+  <meta name="keywords" content="keywords">
+  <meta name="description" content="description">
+  <title>设置</title>
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/mobile.min.css">
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/main.min.css">
+</head>
+<body>
+<{if $show_header}>
+<header class="fixed">
+  <div class="top-bar" data-topbar>
+    <div class="pos-left">
+      <a href="javascript:history.back();" class="icon-arrow-back"></a>
+    </div>
+    <h1>设置</h1>
+    <div class="pos-right"><a href="" class="icon-refresh"></a></div>
+  </div>
+</header>
+<{/if}>
+
+<main id="main" class="mine container no-margin">
+  <div class="banner"><img src="<{$env.app.res_url}>/img/head.jpg"></div>
+  <h2 class="title text-center"><i class="icon-man text-info"></i> <{$userInfo.name}> 管理员：<{$userInfo.op_name}></h2>
+  <div class="split-line has-top"></div>
+
+  <ul class="table-list has-icon">
+    <!--
+    <li class="item"><a href="<{$delivery_link.info}>" class="nav-right icon"><i class="icon-info"></i> 基本信息</a></li>
+    -->
+    <li class="item"><a href="<{$delivery_link.passwd}>" class="nav-right icon"><i class="icon-password"></i> 修改密码</a></li>
+    <!--
+    <li class="item"><a href="<{$delivery_link.statistics}>" class="nav-right icon"><i class="icon-package"></i> 店铺数据</a></li>
+    -->
+  </ul>
+  <div class="split-line has-top"></div>
+
+  <{if $logout}>
+    <div class="container blank">
+      <a href="<{$delivery_link.logout}>" class="btn alert expand">退出当前账户</a>
+  </div>
+  <{/if}>
+</main>
+
+<{include file="store/footer.html"}>
+</body>
+</html>

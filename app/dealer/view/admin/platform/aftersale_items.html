@@ -1,0 +1,113 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../app/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<div class="tableform">
+     <h4>售后单详情:</h4>
+    <div class="division">
+    <table border="0" cellspacing="0" class="gridlist" cellpadding="0">
+       
+            <tr>
+             
+                <td>平台订单号</td>
+                <td><{$platform_aftersale.plat_order_bn}></td>
+                <td>售后申请单号</td>
+                <td><{$platform_aftersale.plat_aftersale_bn}></td>
+                <td>OME订单号</td>
+                <td><{$platform_aftersale.erp_order_bn}></td>
+                <td></td>
+                <td></td>
+                 <td></td>
+                <td></td>
+            </tr>
+       
+          
+    </table>
+    <h4>退货明细:</h4>
+    <div class="division">
+    <table border="0" cellspacing="0" class="gridlist" cellpadding="0">
+        <thead>
+            <tr>
+                <th>销售物料编码</th>
+                <th>基础物料编码</th>
+                <th>基础物料名称</th>
+                <th>erp数量</th>
+                <th>erp价格</th>
+                <th>数量</th>
+                <th>价格</th>
+                <th>平台子订单oid</th>
+                <th>平台子订单id</th>
+                <th>OME订单号</th>
+                <th>转换状态</th>
+                <th>转换失败原因</th>
+            </tr>
+        </thead>
+        <tbody>
+            <{foreach from=$objects item=obj}>
+            <tr>
+                <td><{$obj.outer_id}></td>
+                 <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><{$obj.num}></td>
+                <td><{$obj.price}></td>
+                <td><{$obj.oid}></td>   
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            
+           <{foreach from=$obj.items item=item}>
+
+            <tr class="ColColorBlue">
+                <td><{$item.shop_goods_bn}></td>
+                <td><{$item.bn}></td>
+                <td><{$item.name}></td>
+                 <td><{$item.erp_num}></td>
+                <td><{$item.erp_price}></td>
+                <td><{$item.num}></td>
+                <td><{$item.price}></td>
+                <td><{$item.oid}></td>   
+                <td><{$item.plat_obj_id}></td>
+                <td><{$item.erp_order_bn}></td>
+                <td><{$item.sync_status_value}></td>
+                <td><{$item.sync_msg}></td>
+            </tr>
+            <{/foreach}>
+           <{/foreach}>
+        </tbody>
+    </table>
+    </div>
+     
+     <h4>操作日志:</h4>
+<div class="division">
+<table border="0" cellspacing="0" class="gridlist" cellpadding="0">
+    <thead>
+    <tr>
+        <th >操作时间</th>
+        <th >操作员</th>
+        <th >操作类型</th>
+        <th >操作内容</th>
+    </tr>
+    </thead>
+    <tbody>
+    <{foreach from=$logList item=item}>
+    <tr>
+        <td ><{$item.operate_time}></td>
+        <td ><{$item.op_name}></td>
+        <td ><{$item.operation}></td>
+        <td ><{$item.memo}></td>
+        </tr>
+    <{/foreach}>
+    </tbody>
+</table>
+</div>
+</div>
+

@@ -1,0 +1,23 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout">
+<form method="post" action="index.php?app=monitor&ctl=admin_setting&act=save" class="tableform">
+<{tabber}>
+    <{tab name="邮箱" }>
+        <{include file="admin/setting/email.html"}>
+    <{/tab}>
+    <{tab name="企微ROBOT" }>
+        <{include file="admin/setting/workwx.html"}>
+    <{/tab}>
+    <{tab name="钉钉ROBOT" }>
+        <{include file="admin/setting/dingding.html"}>
+    <{/tab}>
+<{/tabber}>
+<div class="table-action">
+    <{button label="提交" type="submit" name="button"}>
+</div>
+</form>
+</div>

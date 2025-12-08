@@ -1,0 +1,37 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=financebase&ctl=admin_expenses_splititem&act=doImportReconciled" id="import_form" enctype="multipart/form-data">
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th>选择文件：</th>
+                    <td>
+                        <input type="file" name="import_file" accept=".csv" />
+                        <span class="notice-inline">请选择CSV格式文件</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>&nbsp;</th>
+                    <td>
+                        <div style="margin: 10px 0;">
+                            <strong>说明：</strong><br>
+                            1. 请先导出数据，然后修改"是否对账"列的值（填写"是"或"否"）<br>
+                            2. 导入文件必须包含"id"和"是否对账"两列<br>
+                            3. 其他列可以保留但不会被处理
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <input type="button" value="确定" class="btn btn-primary" onclick="$('import_form').fireEvent('submit')" />
+    <input type="button" value="取消" class="btn btn-secondary" onclick="if(window.finderGroup)finderGroup['<{$env.get.finder_id}>'].refresh()" />
+</div>
+<{/area}>

@@ -1,0 +1,257 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style type="text/css">
+.setting-notice{color:red;padding-left: 20px;}
+#system-setting .nt2{color:#D73535;padding-left: 20px;}
+#system-setting em{color:red;}
+#system-setting .on-off {float: left;cursor:pointer;}
+#system-setting .on-off .on{
+    background: url("<{$env.BASE_URL}>/app/desktop/statics/images/setting/on.png") no-repeat;
+    background-size: 50px 26px;
+    width: 50px;
+    height:26px;
+    display:block;
+}
+#system-setting .on-off .off{
+    background: url("<{$env.BASE_URL}>/app/desktop/statics/images/setting/off.png") no-repeat;
+    background-size: 50px 26px;
+    width: 50px;
+    height:26px;
+    display:block;
+}
+#system-setting .subpart{
+    background-color:#DCE6F1;
+    margin-top: 8px;
+    width:70%;
+}
+#system-setting .subtitle{
+    color: #7493D4;
+    font-size:20px;
+    text-align: left;
+}
+#system-setting .ssubtitle{
+    color: #7493D4;
+    font-size:15px;
+    /*text-align: left;*/
+}
+#system-setting .subblock{
+    background-color: #FAFAFA;
+    margin-bottom: 20px;
+}
+#system-setting table{
+    margin-bottom: 10px;
+}
+#system-setting table th{
+    width: 20%;
+}
+#system-setting .subpart table th{
+    width:120px;
+}
+#system-setting .subblock ul li {
+    padding: 10px 5px 5px 10px;
+    background-color: #DCE6F1;
+    width: 70%;
+}
+#system-setting ul li label{
+    width: 150px;
+    display:inline-block;
+    text-align: right;
+}
+</style>
+
+<h3>系统设置</h3>
+<div class="form-layout">
+    <form method="post" action="index.php?app=ome&ctl=admin_setting&act=index" id="form-setting" >
+        <div  id="system-setting" class="tableform tableform-tabs">
+            <{tabber}>
+                <{foreach from=$settingTabs item=item key=key}>
+                    <{tab name=$item.name url=$item.url}>
+                        <{include file=$item.file_name app=$item.app}>
+
+                        <{if !$item.hidden_default_button}>
+                        <div class="table-action">
+                            <{button label="提交" type="submit" name="button" id="btn-setting-{$key}"}>
+                        </div>
+                        <{/if}>
+                    <{/tab}>
+                <{/foreach}>
+            <{/tabber}>
+        </div>
+    </form>
+</div>
+<script>
+window.addEvent('domready',function(){
+    console.log(87555665)
+   
+    function validIntervalTime(){
+        if(this.value.length==1){
+            this.value=this.value.replace(/[^1-9]/g,'')
+        }else{
+            this.value=this.value.replace(/\D/g,'')
+        };
+        var FirstChar=this.value.substr(0,1);
+        if(FirstChar=="0")
+        {
+           this.value=2; 
+        }
+        if(this.value<2){
+            this.value=2; 
+        }        
+    }
+
+    $$('#getOrder','#groupCalibration','#groupCalibration').addEvents({
+        'keyup':function(e){
+            var _fun = validIntervalTime.bind(this);
+            _fun();
+        },
+        'afterpaste':function(e){
+            var _fun = validIntervalTime.bind(this);
+            _fun();
+        },
+        'blur':function(e){
+            var _fun = validIntervalTime.bind(this);
+            _fun();
+        }
+    });
+
+    function check(status){
+        if(status == 1){
+            if($$('input[name=set[ome.product.serial.merge]]:checked').get('value') == 'true'){
+                $('serial_separate').show();
+            }else{
+                $('serial_separate').hide();
+            }
+        }
+    }
+    check(1);
+    $$('input[name=set[ome.product.serial.merge]]').addEvent('click',function(e){
+        check(1);
+    });
+
+   /* function check_baidumap_set(status){
+        if(status == 1){
+            if($$('input[name=set[o2o.baidumap.show]]:checked').get('value') == 'true'){
+                $('baidumap_ak').show();
+            }else{
+                $('baidumap_ak').hide();
+            }
+        }
+    }
+
+    //check_baidumap_set(1);
+    $$('input[name=set[o2o.baidumap.show]]').addEvent('click',function(e){
+    	check_baidumap_set(1);
+    });*/
+
+
+    function delivery_weight(setting) {
+        if(setting=='on') {
+            $E('.weight_on').setStyle('display','');
+            // $$('.weightwarn_on').setStyle('display','');
+            //如果开启称重，则隐藏校验后即发货
+            $E('.check_delevery').setStyle('display','none');
+        } else {
+            $E('.weight_on').setStyle('display','none');
+            // $$('.weightwarn_on').setStyle('display','none');
+            //关闭称重，则显示校验完即发货
+            $E('.check_delevery').setStyle('display','');
+        }
+    }
+
+
+    $$('.combine_setting').addEvent('click',function(e){
+        var value = this.value;
+        var checked=this.checked;
+        combine_setting(value,checked)
+    });
+
+    function combine_setting(combine_value,setting){
+        if(combine_value=='member_id'){
+            if(setting==false){
+                $E('.omeauto_memberidconf').setStyle('display','flex');
+                $E('.omeauto_memberidconf_remark').setStyle('display','flex');
+                $('ome_combine_member_id').set('value',1);
+            }else{
+                $E('.omeauto_memberidconf').setStyle('display','none');
+                $E('.omeauto_memberidconf_remark').setStyle('display','none');
+                $('ome_combine_member_id').set('value',0);
+            }
+        }
+        if(combine_value=='shop_id'){
+            if(setting==false){
+                $('ome_combine_shop_id').set('value',1);
+            }else{
+                $('ome_combine_shop_id').set('value',0);
+            }
+        }
+    }
+    var arrive_value = $$('input[name=set[ome.logi.arrived]]:checked').get('value');
+    arrived_setting(arrive_value);
+    $$('.arrive_setting').addEvent('click',function(e){
+     var value = this.value;
+
+     arrived_setting(value);
+    
+    });
+    function arrived_setting(arriveauto_value){
+     if (arriveauto_value == '1')
+     {
+         $('arriveauto').setStyle('display','');
+     }else{
+        $('arriveauto').setStyle('display','none');
+     }
+    }
+        
+    $ES('.on-off').addEvent('click',function(){
+        var negation = {
+            'on':'off','off':'on',
+            'true':'false','false':'true',
+            '0':'1','1':'0',
+            'last':'all','all':'last',
+        };
+        var _this = this;
+        var input = this.getNext('input');
+        var data = input.get('name')+'='+negation[input.get('value')];
+
+        var i = this.getElement('i');
+
+        i.className=i.className=='on'?'off':'on';
+
+        if (negation[input.get('value')] == 'undefined') return MessageBox.error('异常操作');
+
+        input.set('value',negation[input.get('value')]);
+
+        if ($defined(_this.getNext('.subpart'))) {
+            Ex_Loader('FX_Slide',function(){
+                var ph;
+                _this.getNext('.subpart table').set('slide', {onComplete:function(){
+                    if ($defined(_this.getParent('.subpart'))) {
+                        _this.getParent('.subpart div').setStyle('height','auto');
+                    };                                
+                }});
+                _this.getNext('.subpart table').slide(i.className=='on'?'in':'out');
+
+
+            });
+        };
+
+    });
+
+    // $ES('.on-off').each(function(item){
+    //     if (item.getElement('i').className=='off' && $defined(item.getNext('.subpart'))) {
+    //         Ex_Loader('FX_Slide',function(){
+    //             item.getNext('.subpart table').slide('out');
+    //             item.getNext('.subpart table').getParent('div').setStyle('height','0px');
+    //         });
+    //     };
+    // });
+
+
+
+});
+</script>
+
+

@@ -1,0 +1,39 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <table  class="gridlist" width="300px" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+            <td width="70px">本地作废：</td>
+            <td>
+                <span class="show_list" channel_id="<{$channel_id}>" billtype="recycle" ><a href="javascript:;"><{$waybill_count[2]|default:0}></a></span>
+            </td>
+        </tr>
+        <tr>
+            <td>本地已用：</td>
+            <td>
+                <span class="show_list" channel_id="<{$channel_id}>" billtype="used" ><a href="javascript:;"><{$waybill_count[1]|default:0}></a></span>
+            </td>
+        </tr>
+        <tr>
+            <td>本地可用：</td>
+            <td>
+                <span class="show_list" channel_id="<{$channel_id}>" billtype="active" ><a href="javascript:;"><{$waybill_count[0]|default:0}></a></span>
+            </td>
+        </tr>
+    </table>
+</div>
+<script>
+    $$(".show_list").addEvent('click',function(e){
+        var billtype = this.get('billtype');
+        var channel_id = this.get('channel_id');
+        var t_url ='index.php?app=logisticsmanager&ctl=admin_waybill&act=findwaybill&channel_id='+channel_id+'&billtype='+billtype;
+        var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent(t_url);
+        Ex_Loader('modedialog',function() {
+            new finderDialog(url,{width:1000,height:660});
+        });
+    });
+
+</script>

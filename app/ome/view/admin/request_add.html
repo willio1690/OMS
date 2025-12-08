@@ -1,0 +1,172 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .processBarBg {
+        border: 1px solid #999999;
+        width: 98%;
+        margin: 5px;
+        height: 25px;
+        line-height: 25px;
+        padding: 1px;
+        background: #EEEEEE;
+    }
+    .processBar {
+        background: #3366cc;
+        width: 0px;
+        padding-bottom: 1px;
+        overflow: hidden;
+    }
+</style>
+<{$custom_html}>
+<div class="division">
+    <h4>当前共<{$count}>个<{$billName}></h4>
+    <div class="division" style="display:none;" id="information">
+        已经处理 <span id="iTotal" style="color:#083E96"></span> 个，
+        <span id="iSucc" style="color:green"></span> 个操作成功，
+        <span id="iFail" style="color:red"></span> 个操作失败，
+    </div>
+    <div id="processBarBg" class="processBarBg">
+        <div id="processBar" class="processBar">
+            &nbsp;
+        </div>
+    </div>
+    <div class="table-action">
+        <{button label="开始" class="btn-primary" name="Start" id="btn-run"}>
+        <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true" }>
+    </div>
+    <div id="showError"></div>
+</div>
+
+<{if $notice}><div class="notice"><{$notice}></div><{/if}>
+
+<script>
+    (function(){
+        $('btn-run').addEvent('click', function(){
+            doRun();
+        });
+        var MaxProcessNum = '<{$maxProcessNum|default:10}>'.toInt();
+        var closeDialog = '<{$close|default:true}>';
+        var arrId = <{$arrId}>;
+        var total = '<{$count}>';
+        var queueNum = '<{$queueNum|default:1}>'.toInt();;
+        var finishQueueNum = 0;
+        var arrQueue = new Array();
+        var doTotal, doSucc, doFail;
+        function doRun(){
+            initOptQueue();
+            if (arrQueue.length == 0) {
+                return ;
+            }
+            //禁用开始按钮
+            doTotal = doSucc = doFail = 0;
+            displayProcessInfo();
+            $('information').style.display ='';
+            $('btn-run').disabled = true;
+            $('btn-run').set('html', '<span><span>数据处理中，请稍候！</span></span>');
+            for(var i = 1; i <= queueNum; i++) {
+                doAjaxProcess(i);
+            }
+        }
+        function initOptQueue() {
+            var sHash = '';
+            var iNum = 0;
+            var sKey = '';
+            if (arrId == '') {
+                return;
+            }
+            var LeaveProcessNum = total;
+            if (MaxProcessNum > LeaveProcessNum) {
+                MaxProcessNum = LeaveProcessNum;
+            }
+            var groupNum = arrId.length;
+            for (var i=0;i<groupNum;i++) {
+                if (sHash == '')
+                    sHash = arrId[i];
+                else
+                    sHash = sHash + ';' + arrId[i];
+                iNum ++;
+                if (iNum >= MaxProcessNum) {
+                    arrQueue.push(sHash);
+                    iNum =0;
+                    sHash = '';
+                    LeaveProcessNum = LeaveProcessNum - MaxProcessNum;
+                    if (MaxProcessNum > LeaveProcessNum) {
+                        MaxProcessNum = LeaveProcessNum;
+                    }
+                }
+            }
+            if (sHash != '') {
+                arrQueue.push(sHash);
+            }
+        }
+
+        /**
+         * 执行一次AJAX调用
+         */
+        function doAjaxProcess(idx) {
+            if (idx > arrQueue.length || doTotal >= total) {
+                finishQueueNum++;
+                if(finishQueueNum<queueNum) {
+                    return;
+                }
+                $('processBar').setStyle('width', '100%');
+                if (closeDialog) {
+                    $('btn-run').set('html', '<span><span>处理已完成，本窗口将在3秒后自动关闭！</span></span>');
+                    setTimeout("$('btn-run').getParent('.dialog').retrieve('instance').close();finderGroup['<{$env.get.finder_id}>'].refresh();", 2000);
+                } else {
+                    $('btn-run').set('html', '<span><span>处理已完成</span></span>');
+                }
+            } else {
+                var params = {ajaxParams: arrQueue[idx-1]};
+                var iptData=$ES('.dailog-batch-ipt');
+                if(iptData&&iptData.length) {
+                    iptData.each(function(ipt,k){
+                        var n=ipt.name,v=ipt.value;
+                        params[n] = v;
+                    });
+                }
+                new Request({url:'<{$request_url}>',method:'post',data:params,
+                    onComplete:function(result){
+                        if(!result) {
+                            var oHtml = $('showError').getHTML();
+                            oHtml += '<br/>返回结果为空，可能超时了，请重试';
+                            $('showError').setHTML(oHtml);
+                            return;
+                        }
+                        var ret = JSON.decode(result);
+                        doTotal += ret['total'];
+                        doSucc += ret['succ'];
+                        doFail += ret['fail'];
+                        displayProcessInfo();
+                        if( typeof(ret['fail_msg']) == 'object') {
+                            var oHtml = $('showError').getHTML();
+                            ret['fail_msg'].each(function(fail) {
+                                var msg = fail['msg'] ? fail['msg'] : '操作失败';
+                                if(fail['obj_bn']) {
+                                    oHtml += '<br/><{$billName}>单号：' + fail['obj_bn'] + '：' + msg;
+                                } else {
+                                    oHtml += '<br/>第'+idx+'请求失败：' + msg;
+                                }
+                            });
+                            $('showError').setHTML(oHtml);
+                        }
+                        $('processBar').setStyle('width', (doTotal*100/(total)) + '%');
+                        doAjaxProcess(idx+queueNum);
+                    }
+                }).send();
+            }
+        }
+
+        /**
+         * 显示信息进度
+         */
+        function displayProcessInfo() {
+            $('iTotal').set('html', doTotal);
+            $('iSucc').set('html', doSucc);
+            $('iFail').set('html', doFail);
+        }
+    }());
+</script>

@@ -1,0 +1,204 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<div class="tableform">
+    <form method="post" action="index.php?app=console&ctl=admin_material_package&act=save" id="frm">
+        <div class="division">
+            <h4>基本信息</h4>
+            <{input type="hidden" name="id" value=$main.id}>
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th>加工单名称：</th>
+                        <td><{input type='text' vtype='required' name='mp_name' value=$main.mp_name}></td>
+                    </tr>
+                    <tr>
+                        <th>加工或拆分：</th>
+                        <td><{input type='select' required='true' options=array("1"=>"仓内组合加工","2"=>"仓内组合拆分") name='service_type' value=$main.service_type}></td>
+                    </tr>
+                    <tr>
+                        <th>仓库：</th>
+                        <td><{input type='object' object="branch@ome" value=$main.branch_id filter=array("b_type"=>"1","type"=>"main") breakpoint="20" name="branch_id"}></td>
+                    </tr>
+                    <tr>
+                        <th>备注：</th>
+                        <td colspan="3"><textarea name="memo" cols=150 rows=5><{$main.memo}></textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="division" style="display: none;"><span id="iMsg" style="color: red;"></span></div>
+        <{button type="button" label="礼盒物料" id="jhwl"}>
+        <span id='pfba3'>
+            <label>按条形码索引：</label>
+            <input type="text" name="barcode" />
+        </span>
+        <span id='pfba'>
+            <label>按基础物料编码索引：</label>
+            <input type="text" name="material_bn" />
+        </span>
+        <span id='pfba2'>
+            <label>按基础物料名称索引：</label>
+            <input name="material_name" type="text" size="35" />
+        </span>
+        <div class="tableform">
+            <table class="gridlist" border="0" cellspacing="0" cellpadding="0" >
+                <tbody id="dataNode">
+                    <tr>
+                        <th>物料类型</th>
+                        <th>物料编码</th>
+                        <th>物料名称</th>
+                        <th>数量</th>
+                        <th>操作</th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' class="btn-primary"  label='保存' }>
+                    <{button type="button" id='close_btn' class="btn-secondary" label='关闭' }>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = opener.finderGroup['<{$env.get.finder_id}>'];
+        $('close_btn').addEvent('click', function(){
+            if(finder){
+                setTimeout(finder.refresh(),3000);
+            }
+            setTimeout('window.close()',200);
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    if(finder){
+                        setTimeout(finder.refresh(),3000);
+                    }
+                    setTimeout('window.close()',200);
+                } else if (hash_res_obj.error) {
+                    $('iMsg').getParent('DIV').style.display = '';
+                    $('iMsg').setHTML(hash_res_obj.error);
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+        var lhTpl='<td>礼盒</td>\
+                <td>{material_bn}</td>\
+                <td>{material_name}</td>\
+                <td><input bm-id="{bm_id}" type="text" value="{number}" key="num" vtype="number&amp;&amp;required" name="number[{bm_id}]" size="10"></td>\
+                <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>';
+        var jcTpl='<td>基础</td>\
+                <td>{material_bn}</td>\
+                <td>{material_name}</td>\
+                <td class="lh-{pbm_id}" lh-number={material_num}>{number}</td>\
+                <td></td>';
+        
+        $('jhwl').addEvent('click',function(e){
+            var callurl='index.php?app=console&ctl=admin_material_package&act=getProducts';
+            var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=console&ctl=admin_purchase&act=findMaterial&type=4&singleselect=1');
+            Ex_Loader('modedialog',function() {
+                new finderDialog(url,{params:{url:callurl,name:'bm_id[]'},width:1000,height:660,
+                    onCallback:function(rs){
+                        if(!rs)return;
+                        rs=JSON.decode(rs);
+                        initProduct(rs);
+                    }
+                });
+            });
+        });
+
+        var items = JSON.decode('<{$items}>');
+        if(items) {
+            initProduct(items);
+        }
+        var callurl='index.php?app=console&ctl=admin_material_package&act=getProductsByBn';
+        var options={
+            'getVar':'material_bn',
+            'fxOptions':false,
+            callJSON:function(){return window.autocompleter_json;},
+            injectChoice:function(json){
+                var choice = new Element('li', {'html': this.markQueryValue(json[this.options.getVar])});
+                choice.store('_data',json);
+                choice.inputValue = json[this.options.getVar];
+                this.addChoiceEvents(choice).inject(this.choices);
+            },
+            onHide:function(ipt){
+                if(!this.selected || ipt.value=='')return;
+                var json=this.selected.retrieve('_data');
+                json=$splat(json);
+                initProduct(json);
+                MessageBox.success('加载商品成功!!');
+            },
+            onFocus:function(ipt){
+                ipt.value='';
+            }
+        };
+        new Autocompleter.script($E('#pfba input'),callurl, options);
+        new Autocompleter.script($E('#pfba2 input'),callurl,$merge(options,{'getVar':'material_name'}));
+        new Autocompleter.script($E('#pfba3 input'),callurl,$merge(options,{'getVar':'barcode'}));
+
+        function initProduct(rs) {
+            Object.each(rs, function(item){
+                console.log(item);
+                var oCls = 'product_'+item.bm_id;
+                if($$('.'+oCls).length) {
+                    return;
+                }
+                item.number = item.number ? item.number : 1;
+                var oTr = new Element('tr', {class:oCls, html: lhTpl.substitute(item)});
+                $E('.btn-delete-item',oTr).addEvent('click',function(){
+                    Object.each($$('.'+oTr.getAttribute('class')), function(ov) {
+                        if(typeof ov == 'object') {
+                            ov.remove();
+                        }
+                    });
+                });
+                oTr.getElement("input").addEvent('change', function(){
+                    var oVal = this.value;
+                    var bmId = this.getAttribute('bm-id');
+                    Object.each($$('.lh-'+bmId+']'), function(ov) {
+                        if(typeof ov == 'object') {
+                            var oMN = (ov.getAttribute('lh-number') * oVal).toInt();
+                            ov.setHTML(oMN);
+                        }
+                    });
+                });
+                $('dataNode').adopt(oTr);
+                item.items.each(function(v) {
+                    var oTr = new Element('tr', {class:oCls, html: jcTpl.substitute(v)});
+                    $('dataNode').adopt(oTr);
+                });
+            });
+        }
+    })();
+</script>

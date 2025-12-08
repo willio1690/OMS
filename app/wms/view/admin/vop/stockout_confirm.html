@@ -1,0 +1,166 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+
+<form id="fm1" name="form1" action="index.php?app=wms&ctl=admin_vopstockout&act=doConfirm" method="POST">
+<input type="hidden" name="stockout_id" id="stockout_id" value="<{$data.stockout_id}>" />
+<div class="tableform">
+    <h3>确认出库</h3>
+    <div class="division">
+        <h5>基础信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+            <tr>
+                <td align="right">出库单号：</td>
+                <td width="40%"><{$data.stockout_no}></td>
+                <td align="right">拣货单号：</td>
+                <td><{$pickInfo.pick_no}></td>
+            </tr>
+            <tr>
+                <td width="10%" align="right">出库数量：</td>
+                <td><{$data.pick_num}></td>
+                <td align="right" nowrap="nowrap">入库单号：</td>
+                <td><{$data.storage_no}></td>
+            </tr>
+            <tr>
+                <td align="right">出库仓：</td>
+                <td width="40%"><{$data.branch_name}></td>
+                <td align="right">入库仓：</td>
+                <td><{$pickInfo.to_branch_bn}></td>
+            </tr>
+            <tr>
+                <td align="right">配送方式：</td>
+                <td width="40%"><{$data.dly_mode}></td>
+                <td align="right">承运商：</td>
+                <td><{$data.carrier_code}></td>
+            </tr>
+            <tr>
+                <td align="right">要求到货时间：</td>
+                <td><{$data.arrival_time}> </td>
+                <td align="right" nowrap="nowrap">运单号：</td>
+                <td><input type="text" name="delivery_no" id="delivery_no" value="<{$data.delivery_no}>" /></td>
+              </tr>
+            </thead>
+        </table>
+    </div>
+
+    <div class="division">
+      <h5>出库单明细</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+                <tr>
+                    <th style='text-align:left;padding-left:5px;'>采购单号</th>
+                    <th style='text-align:left;padding-left:5px;'>拣货单号</th>
+                    <th style='text-align:left;padding-left:5px;'>货号</th>
+                    <th style='text-align:left;padding-left:5px;'>条形码</th>
+                    <th style='text-align:left;padding-left:5px;'>货品名称</th>
+                    <th style='text-align:left;padding-left:5px;'>尺寸</th>
+                    <th style='text-align:left;padding-left:5px;'>申请数量</th>
+                    <th style='text-align:left;padding-left:5px;'>实际数量</th>
+                    <th style='text-align:left;padding-left:5px;'>成本价</th>
+                    <th style='text-align:left;padding-left:5px;'>市场价</th>
+                    <th style="text-align:center;">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <{foreach from=$dataList key=key item=item}>
+                <tr>
+                    <td style='text-align:left;padding-left:5px;'><{$item.po_bn}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.pick_no}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.bn}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.barcode}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.product_name}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.size}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.num}></td>
+                    <td style='text-align:left;padding-left:5px;'><span id="num_<{$item.bill_id}>_<{$item.bn}>" style="font-weight:bold; color:red;" class="set_num_vals"><{$item.actual_num}></span></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.price}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.market_price}></td>
+                    
+                    <{if $key == 0}>
+                    <td <{if $detaiCount > 1}>rowspan="<{$detaiCount}>"<{/if}> style='text-align:center;'>
+                        <a class="outstock_sl" id="expire_stock_<{$data.stockout_id}>" out_stock_id="<{$data.stockout_id}>" expire_box_info='' style="display:block; color:#0066cc; width:100%; height:<{$tdHeight}>px; line-height:<{$tdHeight}>px;">装箱信息</a><input name="out_status" id="out_status" type="hidden" value="" />
+                    </td>
+                    <{/if}>
+                </tr>
+                <{/foreach}>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="cc" class="noprint table-action"> <{button type="button" class="btn" id="purchase-save-btn" label="确认出库"}> &nbsp; <{button type="button" class="btn" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}></div>
+</div>
+</form>
+<script>
+(function(){
+    var pag;
+    
+    $('purchase-save-btn').addEvent('click',function(e)
+    {
+        var _this=this;
+        var form=this.getParent('form');
+        
+        var delivery_no = $("delivery_no").value;
+        if(delivery_no == "")
+        {
+            alert("请填写运单号");
+            return false;
+        }
+        
+        var stockout_id  = $('stockout_id').value;
+        var outstock_sl  = $('expire_stock_' + stockout_id);
+        var has_box_info = outstock_sl.get('expire_box_info');
+        
+        if(has_box_info == "" || has_box_info == null)
+        {
+            alert("请录入装箱信息");
+            return false;
+        }
+        
+        var out_status = $("out_status").value;
+        if(out_status == '2')
+        {
+            if(!confirm("录入的装箱信息为部分货品，请确认是否部分出库？"))
+            {
+                return false;
+            }
+        }
+        
+        new Element('input[type=hidden]', {'name': 'expire_box_info', value: has_box_info}).inject(outstock_sl.getParent('td'));
+        
+        form.store('target',{
+            onRequest:function(){
+                _this.disabled=true;
+            },
+            onComplete:function(jsontext){
+                try{
+                    var json = JSON.decode(jsontext);
+                    if (typeof(json.error)!='undefined'){
+                        _this.disabled=false;
+                    }else{
+                        _this.disabled=true;
+                        if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                        setTimeout('window.close()',200);
+                    }
+                }catch(e){}
+            }
+        });
+        
+        form.fireEvent('submit',e);
+    });
+})();
+
+$$('.outstock_sl').addEvent("click",function(){
+        var stockout_id  = $('stockout_id').value;
+        var has_box_info = this.get('expire_box_info');
+        
+        new Dialog('index.php?app=wms&ctl=admin_vopstockout&act=storage_life_box',{width:1000,height:500,title:'关联装箱信息',ajaxoptions:{data:{stockout_id:stockout_id,has_box_info:has_box_info},method:'post'}});
+});
+</script>

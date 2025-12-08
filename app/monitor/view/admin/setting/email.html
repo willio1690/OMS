@@ -1,0 +1,37 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout-block">
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field oidc-content">
+            <span class="form-field-label">smtp 主机地址：</span>
+            <{input type='text' class='form-input' placeholder='请输入smtp 主机地址' name='email[smtpserver]' value=$email.smtpserver size=60}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">smtp 主机端口：</span>
+            <{input type='text' class='form-input' placeholder='请输入smtp 主机端口' name='email[smtpport]' value=$email.smtpport size=60}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">是否启用SSL方式：</span>
+            <div class="form-radios">
+                <input type="radio" name="email[smtpssl]" <{if $email.smtpssl == '1'}>checked="checked"<{/if}> value='1' />是
+              <input type="radio" name="email[smtpssl]" <{if $email.smtpssl == '2'}>checked="checked"<{/if}> value='2' />否
+            </div>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">发件邮箱：</span>
+            <{input type='text' class='form-input' placeholder='请输入发件邮箱' name='email[usermail]' value=$email.usermail size=60}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">发件名称：</span>
+            <{input type='text' class='form-input' placeholder='请输入发件名称' name='email[fromname]' value=$email.fromname size=60}>
+        </div>
+        <div class="form-field oidc-content">
+            <span class="form-field-label">发件密码：</span>
+            <{input type='password' class='form-input' placeholder='请输入邮箱密码，如已提交密码不显示' name='email[smtppasswd]'  size=60}>
+        </div>
+    </div>
+</div>
+

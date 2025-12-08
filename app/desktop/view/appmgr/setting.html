@@ -1,0 +1,14 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table>
+	<{foreach from=$app_setting key=key item=item}>
+	<tr>
+		<th><{$item.title}></th>
+		<td><{input params=$item name="setting[{$key}]"}></td>
+	</tr>
+	<{/foreach}>
+</tr>
+</table>

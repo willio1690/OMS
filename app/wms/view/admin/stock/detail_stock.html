@@ -1,0 +1,116 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+<h4>商品信息</h4>
+<table width="100%" border="0" class="gridlist">
+<thead>
+  <tr>
+    <th><t>基础物料编码</t></th>
+    <th><t>基础物料名称</t></th>
+    <th><t>库存</t></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td><{$pro_detail.bn}></td>
+    <td><{$pro_detail.name}></td>
+    <td><{$pro_detail.store|default:"0"}></td>
+  </tr>
+  </tbody>
+</table>
+
+<h4>仓库信息</h4>
+<form name="form1" id="stock_form" action="index.php?<{$env.server.QUERY_STRING}>" method="post">
+<table width="100%" border="0" class="gridlist">
+<thead>
+  <tr>
+    <th>仓库名称</th>
+    <th>库存量</th>
+    <th>冻结库存</th>
+    <th>在途库存</th>
+    <th  style="display:none">相关货位</th>
+    <th>安全库存</th>
+    <th>安全库存锁定</th>
+    <th>临期库存</th>
+    <th>预警库存</th>
+  </tr>
+  </thead>
+  <tbody>
+  <{foreach from=$pro_detail.branch_product key=key item=product}>
+  <tr>
+    <td><{$product.branch_name}></td>
+    <td><{$product.store}></td>
+    <td><{$product.store_freeze}></td>
+    <td><{$product.arrive_store}></td>
+    <td  style="display:none"><{$product.store_position|default:'-'}></td>
+    <td>
+    <input type="hidden" name="branch_id[]" value="<{$product.branch_id}>" />
+    <input type="hidden" name="product_id[]" value="<{$product.product_id}>" />
+    <input type="text" class="x-input" name="safe_store[]" size=8 value="<{$product.safe_store}>" autocomplete="off" />
+    </td>
+    <td>
+        <input type="checkbox" name="is_locked[<{$key}>]" value="1" id="is_locked" <{if $product.is_locked==1}>checked<{/if}> />          
+    </td>
+    <td style="font-weight:bold;">
+    	&nbsp;&nbsp;<{if $product.balance_num}><a class="show_instock_page" bm_id="<{$product.product_id}>" branch_id="<{$product.branch_id}>"><{$product.balance_num}></a><{else}>-&nbsp;&nbsp;<{/if}>
+    </td>
+    <td style="font-weight:bold;">
+    	&nbsp;&nbsp;<{if $product.warn_num}><a class="show_instock_warn_page" bm_id="<{$product.product_id}>" branch_id="<{$product.branch_id}>"><{$product.warn_num}></a><{else}>-&nbsp;&nbsp;<{/if}>
+    </td>
+  </tr>
+  <{/foreach}>
+  </tbody>
+</table>
+
+<div class="table-action"><{button type="submit" label=$___b2c="保存"|t:'b2c' id="btn_do_submit"}> <span class="status"></span></div>
+<{$result}>
+</form>
+<!--<h4>货位信息</h4>
+<table width="100%" border="0" class="gridlist">
+<thead>
+  <tr>
+    <th>仓库</th>
+	<th>货位</th>
+    <th>库存量</th>
+     </tr>
+  </thead>
+    <tbody><{foreach from=$pro_detail.items item=items}>
+  <tr>
+    <td><{$items.name|default:"-"}></td>
+	<td><{$items.store_position|default:"-"}></td>
+    <td><{$items.store|default:"0"}></td>
+    </tr>
+<{/foreach}>
+</tbody>
+</table>-->
+</div>
+<script>
+$$('.show_instock_page').addEvent("click",function()
+{
+	var bm_id = this.get('bm_id');
+	var branch_id = this.get('branch_id');
+	
+	if(bm_id == '' || branch_id == '')
+	{
+		alert('无效操作');
+		return false;
+	}
+	new Dialog('index.php?app=wms&ctl=admin_stock&act=show_storage_life',{width:700,height:500,title:'关联保质期批次',ajaxoptions:{data:{branch_id:branch_id,bm_id:bm_id},method:'post'}});
+});
+
+$$('.show_instock_warn_page').addEvent("click",function()
+{
+	var bm_id = this.get('bm_id');
+	var branch_id = this.get('branch_id');
+	
+	if(bm_id == '' || branch_id == '')
+	{
+		alert('无效操作');
+		return false;
+	}
+	new Dialog('index.php?app=wms&ctl=admin_stock&act=show_warn_storage_life',{width:700,height:500,title:'关联保质期批次',ajaxoptions:{data:{branch_id:branch_id,bm_id:bm_id},method:'post'}});
+});
+</script>

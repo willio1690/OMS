@@ -1,0 +1,160 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.shop-name{
+    color:red;font-weight:bold;
+}
+.rules{
+  margin-bottom: 5px;
+}
+.rules select{
+  margin-right: 5px;
+}
+.rule_tr{
+  margin: 10px 0;
+}
+</style>
+<div class="tableform">
+  <h3><{$title}></h3>
+  <div class="division">
+    <form method="post" action="index.php?app=financebase&ctl=admin_shop_settlement_rules&act=saveRule" id="form-rule">
+      <input type="hidden" name="rule_id" value="<{$rule_info.rule_id}>">
+      <input type="hidden" name="platform_type" value="<{$platform_type}>">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" id="rule-section">
+        <tbody>
+          <{if $platform_type == "alipay"}>
+          <tr>
+            <th>业务归属:</th>
+            <td><select name="business_type">
+              <option value=""></option>
+              <option value="cainiao" <{if $rule_info.business_type == "cainiao"}> selected="selected"<{/if}> >菜鸟</option>
+            </select></td>
+          </tr>
+          <{/if}>
+          <tr>
+            <th><{button onclick="addRuleFilter()" label="添加规则" type="button" name="button" id="btn-notice"}></th>
+            <td style="color: red">对于特殊字符* ( ) 在包含规则和不包含规则中需要前面添加 \ 而等于规则中不需要特殊处理
+                <{if $platform_type == "wechatpay"}> （手续费配置参考格式：SUCCESS-手续费/REFUND-手续费） <{/if}>
+            </td>
+          </tr>
+
+    
+         
+    
+              <{foreach from=$rule_info.rule_content key=rule_key item=rules}>
+                  
+                     <tr class="rule_tr" >
+                      <th>第 <{$rule_key+1}> 条规则</th>
+                      <td id="rule-list-<{$rule_key}>">
+                          <{foreach from=$rules key=key item=item}>
+                              <div class="rules">
+                              <select name="rule_type[<{$rule_key}>][]">
+                                <option <{if $item.rule_type == 'trade_type'}> selected <{/if}> value="trade_type">业务类型</option>
+                                <option <{if $item.rule_type == 'member'}> selected <{/if}> value="member">对方账号</option>
+                                <option <{if $item.rule_type == 'remarks'}> selected <{/if}> value="remarks">备注</option>
+                              </select> <select name="rule_op[<{$rule_key}>][]" style="display:none;">
+                                <option <{if $item.rule_op == 'and'}> selected <{/if}> value="and">并且</option>
+                                <option <{if $item.rule_op == 'or'}> selected <{/if}> value="or">或者</option>
+                              </select><select name="rule_filter[<{$rule_key}>][]">
+                                <option <{if $item.rule_filter == 'contain'}> selected <{/if}> value="contain">包含</option>
+                                <option <{if $item.rule_filter == 'nocontain'}> selected <{/if}> value="nocontain">不包含</option>
+                                <option <{if $item.rule_filter == 'equal'}> selected <{/if}> value="equal">等于</option>
+                              </select><input type="text" name="rule_value[<{$rule_key}>][]" value="<{$item.rule_value}>" vtype="required">
+                              <{if $key ==  0}>
+                                <a href="javascript:void(0);" onclick="addRule(<{$rule_key}>);">[&nbsp;+&nbsp;]</a>
+                              <{/if}>
+                              <{if $rule_key == 0 and $key ==  0}>
+                              <{else}>
+                                <a href="javascript:void(0);" onclick="removeRule(this);">[&nbsp;-&nbsp;]</a>
+                              <{/if}>
+                            </div>
+                          <{/foreach}>
+                      </td>
+                    </tr>
+                    
+                <{/foreach}>
+               
+       <div>
+          
+          </table>
+         
+
+      <div class="table-action">  <{button label="提交" type="submit" name="submit" id="btn-rule"}> &nbsp;&nbsp; <{button label="关闭" onclick="javascript:void(window.close());" class="btn-secondary" type="button"}></div>
+   
+    </form>
+  </div>
+</div>
+<script>
+
+var rule_key = <{$rule_num}>;
+
+
+$('form-rule').store('target',{
+    onRequest:function(){
+       $('btn-rule').set('disabled', 'true');
+       
+    },
+    onComplete:function(jsontext){
+       var json = Json.evaluate(jsontext);
+       if (typeof(json.error) != 'undefined'){
+           $('btn-rule').set('disabled', '');
+       }else{
+           $('btn-rule').set('disabled', 'true');
+           opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,opener.finderGroup['<{$env.get.finder_id}>']);
+           window.close();
+       }
+    }
+});
+
+function addRule(rule_key)
+{
+  var divRule=document.createElement("div");  // 以 DOM 创建新元素
+  divRule.className = 'rules';
+  divRule.innerHTML=getRuleContent(rule_key,0,1);
+  $('rule-list-'+rule_key).append(divRule);
+}
+
+function addRuleFilter()
+{
+
+  rule_key = rule_key + 1;
+  var tr=document.createElement("tr"); 
+  tr.innerHTML = '<th>第 '+rule_key+' 条规则</th><td id="rule-list-'+rule_key+'"><div class="rules">'+getRuleContent(rule_key,1,1)+'</div></td>';
+  $('rule-section').append(tr);
+}
+
+
+function getRuleContent(rule_key,allow_plus,allow_reduce)
+{
+  var rule_filter_content = '<select name="rule_type['+rule_key+'][]"><option value="trade_type">业务类型</option><option value="member">对方账号</option><option value="remarks">备注</option></select>&nbsp;<select style="display:none;" name="rule_op['+rule_key+'][]"><option value="and">并且</option><option value="or">或者</option></select>&nbsp;<select name="rule_filter['+rule_key+'][]"><option value="contain">包含</option><option value="nocontain">不包含</option><option value="equal">等于</option></select>&nbsp;<input type="text" name="rule_value['+rule_key+'][]" value="" vtype="required">';
+
+    if(allow_plus){
+      rule_filter_content += '<a href="javascript:void(0);" onclick="addRule('+rule_key+');">[&nbsp;+&nbsp;]</a>'; 
+    }
+
+    if(allow_reduce){
+      rule_filter_content += '<a href="javascript:void(0);" onclick="removeRule(this);">[&nbsp;-&nbsp;]</a>'; 
+    }
+    return rule_filter_content;
+}
+
+function removeRule(o)
+{
+  var obj = $(o).getParent('.rules');
+  if(1== obj.getParent('td').getChildren().length)
+  {
+    obj.getParent('tr').remove();
+  }
+  else
+  {
+    obj.remove();
+  }
+  
+ 
+}
+
+
+</script>

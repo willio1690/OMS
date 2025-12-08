@@ -1,0 +1,49 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+    <h4>批量更新打印批次号</h4>
+    
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+       <tbody>
+       <tr>
+          <td height="100" colspan="5" align="center">
+            <{if $data.count}>
+            	<{$data.msg}>，<a href="<{$data.link}>">如果您的浏览器没有自动跳转，请点击此链接...<span id="info">&nbsp;</span></a>
+                <script type="text/javascript">
+                var time	= 3;
+                function clock()
+                {	
+                    time--;	
+                    document.getElementById("info").innerHTML = time+"秒";
+                    if(time==0)
+                    {
+                        window.location.href	= "<{$data.link}>";
+                    }
+                } 
+                setInterval("clock();", 1000);
+                </script>
+            <{else}>
+                <{$data.msg}>，<a href="/index.php?app=invoice&ctl=admin_order&act=index">进入发票列表...<span id="info">&nbsp;</span></a>
+                <script type="text/javascript">
+                var time	= 10;
+                function clock()
+                {	
+                    time--;	
+                    document.getElementById("info").innerHTML = time+"秒";
+                    if(time==0)
+                    {
+                        window.location.href	= "/index.php?app=invoice&ctl=admin_order&act=index";
+                    }
+                } 
+                setInterval("clock();", 1000);
+                </script>
+            <{/if}>
+         </td>
+      </tr>
+        </tbody>
+    </table>
+</div>
+

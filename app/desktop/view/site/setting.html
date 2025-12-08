@@ -1,0 +1,341 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="post" action="index.php?app=desktop&ctl=system&act=siteSetSave" enctype="multipart/form-data" >
+    <div class="tableform tableform-tabs">
+        <div class="division">
+            <table>
+                <tbody>
+                <tr>
+                    <th>企业信息：</th>
+                    <td>
+                        <{if $enterprise.ent_id}>
+                            <div class="enterprise-info">
+                                <div style="margin-bottom: 8px;"><strong>企业账号：</strong><{$enterprise.ent_id}> <a href="javascript:void(0);" onclick="openAuthIframe()" class="register-link" style="background-color: #1890ff;">查看认证</a></div>
+                                <div style="margin-bottom: 8px;"><strong>企业密码：</strong><{$enterprise.ent_ac}></div>
+                                <div style="margin-bottom: 8px;"><strong>企业邮件：</strong><{$enterprise.ent_email}></div>
+                            </div>
+                        <{else}>
+                            <div class="enterprise-info">
+                                <div style="margin-bottom: 8px;"><strong>企业账号：</strong><span style="color: #999;">未认证</span> <a href="javascript:void(0);" onclick="openAuthIframe()" class="register-link">去认证</a></div>
+                                <div style="margin-bottom: 8px;"><strong>企业密码：</strong><span style="color: #999;">-</span></div>
+                                <div style="margin-bottom: 8px;"><strong>企业邮件：</strong><span style="color: #999;">-</span></div>
+                            </div>
+                        <{/if}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>认证密钥：</th>
+                    <td>
+                        <{if $auth_key_display}>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px; max-width: 800px;">
+                                <input type="text" value="<{$auth_key_display}>" readonly style="flex: 1; max-width: 700px; padding: 8px 12px; border: 1px solid #d0d0d0; border-radius: 4px; background-color: #fafafa; cursor: text; font-family: 'Courier New', monospace; font-size: 13px; color: #333; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);" id="auth-key-input">
+                                <{if $auth_key}>
+                                    <input type="hidden" id="auth-key-full" value="<{$auth_key}>">
+                                    <input type="hidden" id="auth-key-display" value="<{$auth_key_display}>">
+                                    <button type="button" onclick="toggleAuthKey()" style="padding: 8px 16px; background-color: #52c41a; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.3s; white-space: nowrap; height: 36px; display: flex; align-items: center; justify-content: center;" id="view-auth-key-btn" onmouseover="this.style.backgroundColor='#73d13d'" onmouseout="this.style.backgroundColor='#52c41a'">查看</button>
+                                    <button type="button" onclick="copyAuthKey()" style="padding: 8px 16px; background-color: #1890ff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.3s; white-space: nowrap; height: 36px; display: none; align-items: center; justify-content: center;" id="copy-auth-key-btn" onmouseover="this.style.backgroundColor='#40a9ff'" onmouseout="this.style.backgroundColor='#1890ff'">复制</button>
+                                <{/if}>
+                            </div>
+                            <div style="font-size: 12px; color: #8c8c8c; line-height: 1.5;">
+                                <span style="color: #ff4d4f;">*</span> 此密钥用于企业认证回调验证<{if $auth_key}>，可查看和复制但不可修改<{/if}>
+                            </div>
+                        <{else}>
+                            <div style="color: #8c8c8c; padding: 8px 12px; background-color: #fafafa; border: 1px dashed #d9d9d9; border-radius: 4px; display: inline-block;">
+                                <span style="color: #ff9800;">⚠</span> 请先完成企业用户中心APP安装
+                            </div>
+                        <{/if}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>LOGO：</th>
+                    <td>
+                        <div class="logo-upload-setting" style="margin-bottom: 10px">
+                            <{input type="radio" name="siteInfo[logoSet]" options=['0'=>'系统默认','1'=>'自定义']  value=$siteInfo.logoSet separator=" "}>
+                        </div>
+                        <div class="logo-upload-container">
+                            <div id="logo-preview" style = "background-image:url(<{if $siteInfo.logoUrl}><{$siteInfo.logoUrl}><{else}><{$env.app.res_url}>/logo.png<{/if}>)" ></div>
+                            <label for="logo-upload" class="custom-logo-upload-button">点击选择图片</label>
+                            <input type="file" name="logo" id="logo-upload" accept="image/*" style="display: none;">
+                        </div>
+                        <div class="notice-inline" style="margin-top: 8px;">*注：推荐使用190*84像素的图片</div>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-action">
+            <{button label="提交" type="submit" name="submit"}>
+        </div>
+    </div>
+</form>
+<style>
+    .logo-upload-container {
+        position: relative;
+        width: 190px;
+        height: 84px;
+        background-color: #f9f9f9;
+        border: 1px dashed #ddd;
+        border-radius: 5px;
+        overflow: hidden;
+        cursor: pointer;
+    }
+    .custom-logo-upload-button {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 6px 9px;
+        background-color: white;
+        /*color: white;*/
+        cursor: pointer;
+        border-radius: 4px;
+        text-align: center;
+        opacity: 0;
+    }
+    .logo-upload-container:hover .custom-logo-upload-button {
+        opacity: 1;
+    }
+    #logo-preview {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+    }
+    .register-link {
+        display: inline-block;
+        padding: 4px 12px;
+        margin-left: 10px;
+        background-color: #ff6600;
+        color: #fff !important;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 12px;
+    }
+    .register-link:hover {
+        background-color: #ff8533;
+        color: #fff !important;
+        text-decoration: none;
+    }
+    .register-link[style*="background-color: #1890ff"]:hover {
+        background-color: #40a9ff !important;
+    }
+    #callback-url-input:focus,
+    #auth-key-input:focus {
+        outline: none;
+        border-color: #1890ff;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.05), 0 0 0 2px rgba(24,144,255,0.2);
+    }
+    #copy-callback-btn:active,
+    #copy-auth-key-btn:active {
+        transform: scale(0.98);
+        background-color: #096dd9 !important;
+    }
+    /* 隐藏 dialog 中的滚动条 */
+    .dialog {
+        overflow: hidden !important;
+    }
+    .dialog-box {
+        overflow: hidden !important;
+    }
+    .dialog-content-body {
+        overflow: hidden !important;
+    }
+    .dialog-content-body iframe,
+    .dialog-frame-body {
+        overflow: hidden !important;
+    }
+    /* 隐藏 webkit 浏览器的滚动条 */
+    .dialog::-webkit-scrollbar,
+    .dialog-box::-webkit-scrollbar,
+    .dialog-content-body::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+    /* 隐藏 Firefox 的滚动条 */
+    .dialog,
+    .dialog-box,
+    .dialog-content-body {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+</style>
+<script>
+    $E('.logo-upload-container #logo-upload').addEvent('click', function() {
+        if ($E('.logo-upload-setting input[type="radio"]:checked').value == 0){
+            MessageBox.error('系统默认LOGO不能修改')
+
+            return false
+        }
+    })
+
+    $E('.logo-upload-container #logo-upload').addEvent('change', function() {
+
+
+        var file = this.files[0];
+        var preview = document.getElementById('logo-preview');
+
+        if (file) {
+            var reader = new FileReader();
+
+            reader.onload = function(event) {
+                // 直接设置背景图片，并利用CSS的background-size: cover属性
+                preview.style.backgroundImage = `url('${event.target.result}')`;
+                preview.style.display = 'block';
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            // preview.style.backgroundImage = '';
+            // preview.style.display = 'none';
+        }
+    });
+
+    $defaultLogo = "<{$env.app.res_url}>/logo.png";
+    $customeLogo = "<{$siteInfo.logoUrl}>";
+    $ES('.logo-upload-setting input[type="radio"]').addEvent('click', function(e){
+        var preview = document.getElementById('logo-preview');
+
+        var c = this.value == 0 ? $defaultLogo : $customeLogo;
+
+        preview.style.backgroundImage = `url('${c}')`;
+        preview.style.display = 'block';
+    })
+    
+    // 切换认证密钥显示（查看/隐藏）
+    function toggleAuthKey() {
+        var input = document.getElementById('auth-key-input');
+        var fullKeyInput = document.getElementById('auth-key-full');
+        var displayKeyInput = document.getElementById('auth-key-display');
+        var viewBtn = document.getElementById('view-auth-key-btn');
+        var copyBtn = document.getElementById('copy-auth-key-btn');
+        
+        if (input && fullKeyInput && displayKeyInput) {
+            var currentValue = input.value;
+            var fullValue = fullKeyInput.value;
+            var displayValue = displayKeyInput.value;
+            
+            if (currentValue === displayValue) {
+                // 当前显示打码版本，切换到明文
+                input.value = fullValue;
+                if (viewBtn) {
+                    viewBtn.innerHTML = '隐藏';
+                    viewBtn.style.backgroundColor = '#ff4d4f';
+                    viewBtn.onmouseover = function() { this.style.backgroundColor = '#ff7875'; };
+                    viewBtn.onmouseout = function() { this.style.backgroundColor = '#ff4d4f'; };
+                }
+                if (copyBtn) {
+                    copyBtn.style.display = 'flex';
+                }
+            } else {
+                // 当前显示明文，切换回打码版本
+                input.value = displayValue;
+                if (viewBtn) {
+                    viewBtn.innerHTML = '查看';
+                    viewBtn.style.backgroundColor = '#52c41a';
+                    viewBtn.onmouseover = function() { this.style.backgroundColor = '#73d13d'; };
+                    viewBtn.onmouseout = function() { this.style.backgroundColor = '#52c41a'; };
+                }
+                if (copyBtn) {
+                    copyBtn.style.display = 'none';
+                }
+            }
+        }
+    }
+    
+    // 复制认证密钥
+    function copyAuthKey() {
+        var fullKeyInput = document.getElementById('auth-key-full');
+        var btn = document.getElementById('copy-auth-key-btn');
+        if (fullKeyInput) {
+            // 创建临时输入框用于复制完整密钥
+            var tempInput = document.createElement('input');
+            tempInput.style.position = 'fixed';
+            tempInput.style.opacity = '0';
+            tempInput.value = fullKeyInput.value;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999); // 兼容移动设备
+            try {
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                // 按钮反馈效果
+                if (btn) {
+                    var originalText = btn.innerHTML;
+                    btn.innerHTML = '已复制';
+                    btn.style.backgroundColor = '#52c41a';
+                    setTimeout(function() {
+                        btn.innerHTML = originalText;
+                        btn.style.backgroundColor = '#1890ff';
+                    }, 2000);
+                }
+                MessageBox.success('认证密钥已复制到剪贴板');
+            } catch (err) {
+                document.body.removeChild(tempInput);
+                MessageBox.error('复制失败，请手动复制');
+            }
+        }
+    }
+    
+    // 打开企业认证iframe（在Dialog中嵌套iframe）
+    function openAuthIframe() {
+        // 检查 Dialog 类是否已加载
+        if (typeof Dialog === 'undefined') {
+            MessageBox.error('Dialog 类未加载，请刷新页面重试');
+            return;
+        }
+        
+        var authUrl = '<{$auth_url}>';
+        
+        try {
+            var dialogInstance = new Dialog(authUrl, {
+                width: 1000,
+                height: 700,
+                title: '企业认证',
+                iframe: true,
+                modal: true,
+                onShow: function() {
+                    try {
+                        // 隐藏滚动条 - 设置 dialog 容器
+                        if (this.dialog) {
+                            this.dialog.setStyle('overflow', 'hidden');
+                            var dialogBox = this.dialog.getElement('.dialog-box');
+                            if (dialogBox) {
+                                dialogBox.setStyle('overflow', 'hidden');
+                            }
+                        }
+                        // 隐藏滚动条 - 设置 iframe（在 iframe 模式下，dialog_body 就是 iframe 元素）
+                        var iframe = this.dialog_body;
+                        if (iframe && iframe.tagName && iframe.tagName.toLowerCase() === 'iframe') {
+                            iframe.set('scrolling', 'no');
+                            iframe.setStyle('overflow', 'hidden');
+                            // iframe 加载完成后再次设置
+                            iframe.addEvent('load', function() {
+                                iframe.set('scrolling', 'no');
+                                iframe.setStyle('overflow', 'hidden');
+                            });
+                        }
+                    } catch (e) {
+                        console.error('Error setting dialog styles:', e);
+                    }
+                }
+            });
+            
+            // 确保 Dialog 实例被保存，以便后续操作
+            window.authDialog = dialogInstance;
+        } catch (e) {
+            MessageBox.error('打开认证窗口失败：' + e.message);
+            console.error('Dialog error:', e);
+        }
+    }
+</script>

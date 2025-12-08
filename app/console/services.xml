@@ -1,0 +1,191 @@
+<services>
+    <service id="desktop_finder.purchase_mdl_po">
+        <class>console_finder_po</class>
+    </service>
+
+    <service id="extend_filter_purchase_mdl_po">
+        <class>console_finder_extend_filter_po</class>
+    </service>
+    <service id="desktop_finder.purchase_mdl_returned_purchase">
+        <class>console_finder_returned_purchase</class>
+    </service>
+    <service id="desktop_finder.console_mdl_foreign_sku">
+        <class>console_finder_foreign_sku</class>
+    </service>
+    
+    <service id="desktop_finder.console_mdl_inventory_apply">
+        <class>console_finder_inventory_apply</class>
+    </service>
+    <service id="desktop_finder.console_mdl_difference">
+        <class>console_finder_difference</class>
+    </service>
+    <service id="desktop_finder.console_mdl_material_package">
+        <class>console_finder_material_package</class>
+    </service>
+    <service id="desktop_finder.taoguaniostockorder_mdl_iso">
+        <class>console_finder_iso</class>
+    </service>
+    <service id="desktop_finder.console_mdl_stockdump">
+        <class>console_finder_stockdump</class>
+    </service>
+    <service id="desktop_finder.console_mdl_dailyinventory.wmsdinv">
+        <class>console_finder_dailyinventory_wmsdinv</class>
+    </service>
+    <service id="desktop_finder.console_mdl_dailyinventory_items.wmsdinv">
+        <class>console_finder_dailyinventory_items_wmsdinv</class>
+    </service>
+    <service id="desktop_finder.console_mdl_dailyinventory.storedinv">
+        <class>console_finder_dailyinventory_storedinv</class>
+    </service>
+    <service id="desktop_finder.console_mdl_dailyinventory_items.storedinv">
+        <class>console_finder_dailyinventory_items_storedinv</class>
+    </service>
+    <service id="desktop_finder.console_mdl_wms_reship">
+        <class>console_finder_wms_reship</class>
+    </service>
+    <service id="desktop_finder.console_mdl_wms_delivery">
+        <class>console_finder_wms_delivery</class>
+    </service>
+    <service id="desktop_finder.console_mdl_wms_stockin">
+        <class>console_finder_wms_stockin</class>
+    </service>
+    <service id="desktop_finder.console_mdl_wms_stockout">
+        <class>console_finder_wms_stockout</class>
+    </service>
+    <service id="desktop_finder.console_mdl_wms_transferorder">
+        <class>console_finder_wms_transferorder</class>
+    </service>
+    <service id="desktop_finder.console_mdl_wms_storeprocess">
+        <class>console_finder_wms_storeprocess</class>
+    </service>
+     <service id="desktop_finder.taoguanallocate_mdl_appropriation">
+        <class>console_finder_appropriation</class>
+    </service>
+    <service id="desktop_finder.console_mdl_basic_material">
+        <class>console_finder_basic_material</class>
+    </service>
+    <service id="desktop_finder.console_mdl_branch_product">
+        <class>console_finder_branch_product</class>
+    </service>
+    <service id="desktop_finder.console_mdl_delivery">
+        <class>console_finder_delivery</class>
+    </service>
+    <service id="extend_filter_console_mdl_delivery">
+        <class>console_finder_extend_filter_delivery</class>
+    </service>
+     <service id="desktop_finder.console_mdl_interface_iostocksearchs">
+        <class>console_finder_iostock</class>
+    </service>
+    <service id="extend_filter_console_mdl_interface_iostocksearchs">
+        <class>console_finder_extend_filter_interface_iostocksearchs</class>
+    </service>
+    <service id="desktop_finder.console_mdl_order">
+        <class>console_finder_vopurchase</class>
+    </service>
+    <service id="desktop_finder.console_mdl_pick_bills">
+        <class>console_finder_vopick</class>
+    </service>
+    <service id="extend_filter_console_mdl_pick_bills">
+        <class>console_finder_extend_filter_vopick</class>
+    </service>
+    <service id="desktop_finder.console_mdl_pick_stockout_bills">
+        <class>console_finder_vopstockout</class>
+    </service>
+    <service id="extend_filter_console_mdl_pick_stockout_bills">
+        <class>console_finder_extend_filter_vopstockout</class>
+    </service>
+    <service id="desktop_finder.console_mdl_vopsetting">
+        <class>console_finder_vopsetting</class>
+    </service>
+    <service id="desktop_finder.console_mdl_warehouse">
+        <class>console_finder_warehouse</class>
+    </service>
+    <service id="desktop_finder.console_mdl_carrier">
+        <class>console_finder_carrier</class>
+    </service>
+    <service id="desktop_finder.console_mdl_basic_material_stock_freeze">
+        <class>console_finder_basic_material_stock_freeze</class>
+    </service>
+    <service id="extend_filter_console_mdl_basic_material_stock_freeze">
+        <class>console_finder_extend_filter_basic_material_stock_freeze</class>
+    </service>
+    <service id="desktop_finder.console_mdl_basic_material_stock_artificial_freeze">
+        <class>console_finder_basic_material_stock_artificial_freeze</class>
+    </service>
+    <service id="extend_filter_console_mdl_basic_material_stock_artificial_freeze">
+        <class>console_finder_extend_filter_basic_material_stock_artificial_freeze</class>
+    </service>
+    <service id="html_input">
+        <class>console_view_input</class>
+    </service>
+    <service id="desktop_finder.console_mdl_map_goods">
+        <class>console_finder_map_goods</class>
+    </service>
+    <service id="operation_log">
+        <class>console_operation_log</class>
+    </service>
+    
+    <service id="desktop_finder.console_mdl_delivery_package">
+        <class>console_finder_delivery_package</class>
+    </service>
+    <service id="extend_filter_console_mdl_delivery_package">
+        <class>console_finder_extend_filter_delivery_package</class>
+    </service>
+    <service id="desktop_finder.console_mdl_delivery_bill">
+        <class>console_finder_delivery_bill</class>
+    </service>
+    <service id="desktop_finder.console_mdl_branch_product_extend">
+        <class>console_finder_branch_product_extend</class>
+    </service>
+
+    <service id="desktop_finder.console_mdl_cpfr">
+        <class>console_finder_cpfr</class>
+    </service>
+    
+    <service id="desktop_finder.console_mdl_replenish_suggest">
+        <class>console_finder_replenish_suggest</class>
+    </service>
+    <service id="desktop_finder.console_mdl_replenish_task">
+        <class>console_finder_replenish_task</class>
+    </service>
+    <service id="desktop_finder.console_mdl_replenish_diff">
+        <class>console_finder_replenish_diff</class>
+    </service>
+
+    <service id="extend_filter_console_mdl_basic_material">
+        <class>console_finder_extend_filter_basic_material</class>
+     </service>
+    <service id="desktop_finder.console_mdl_vopreturn">
+        <class>console_finder_vopreturn</class>
+    </service>
+     <service id="desktop_finder.console_mdl_vopbill">
+        <class>console_finder_vopbill</class>
+
+    </service>
+    <service id="desktop_finder.console_mdl_inventory_snapshot">
+        <class>console_finder_inventory_snapshot</class>
+    </service>
+    <service id="desktop_finder.console_mdl_adjust">
+        <class>console_finder_adjust</class>
+
+    </service>
+    <service id="extend_filter_console_mdl_adjust">
+        <class>console_finder_extend_filter_adjust</class>
+    </service>
+    <!--  店铺收货差异  -->
+    <service id="desktop_finder.console_mdl_difference_receiving_inventory">
+        <class>console_finder_difference_receiving_inventory</class>
+    </service>
+    <service id="desktop_finder.console_mdl_difference_receiving_inventory_items">
+        <class>console_finder_difference_receiving_inventory_items</class>
+    </service>
+    <service id="extend_filter_console_mdl_branch_product">
+        <class>ome_finder_extend_filter_branch_product</class>
+    </service>
+    <service id="desktop_finder.console_mdl_inventory_orders">
+        <class>console_finder_inventory_orders</class>
+    </service>
+    <service id="desktop_finder.console_mdl_dailyinventory_items">
+        <class>console_finder_dailyinventory_items</class>
+    </service>
+</services>

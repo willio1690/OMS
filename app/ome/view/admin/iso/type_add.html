@@ -1,0 +1,90 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=ome&ctl=admin_iso_type&act=save" id="frm">
+            <{input type="hidden" name="id" value=$data.id}>
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th>类型名称：</th>
+                        <td>
+                            <{if $data.id}>
+                            <{$data.type_name}>
+                            <{else}>
+                            <{input type="select" required="required" name="type_id" value=$data.type_id options=$iso_type }>
+                            <{/if}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>业务类型编码：</th>
+                        <td>
+                            <{if $data.id}>
+                            <{$data.bill_type}>
+                            <{else}>
+                            <{input type="text" vtype="required" name="bill_type" value=$data.bill_type }>
+                            <{/if}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>业务类型名称：</th>
+                        <td>
+                            <{input type="text" vtype="required" name="bill_type_name" value=$data.bill_type_name }>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' class="btn-primary" label='保存' }>
+                    <{button type="button" id='close_btn' class="btn-secondary" label='关闭' isCloseDialogBtn="true"}>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<{/area}>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+
+                    if(_dialogIns){
+                        setTimeout(finder.refresh(),30000);
+                        _dialogIns.close();
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+    })();
+</script>

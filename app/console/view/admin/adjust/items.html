@@ -1,0 +1,38 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<link href="../app/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<div class="tableform">
+    <div class="division">
+        <table class="gridlist" border="0" cellspacing="0" cellpadding="0" >
+            <thead>
+                <tr>
+                    <th>基础物料编码</th>
+                    <th>基础物料名称</th>
+                    <th>调整前数量</th>
+                    <th>调整数量</th>
+                    <th>调整后数量</th>
+                    <th>调整状态</th>
+                </tr>
+            </thead>
+            <tbody>
+                <{foreach from=$items item=item}>
+                <tr>
+                    <td><{$item.bm_bn}></td>
+                    <td><{$item.bm_name}></td>
+                    <td><{$item.origin_number}></td>
+                    <td><{$item.number}></td>
+                    <td><{$item.final_number}></td>
+                    <td><{if $item.adjust_status == '0'}>未调整<{else}>调整完成<{/if}></td>
+                </tr>
+                <{/foreach}>
+            </tbody>
+        </table>
+        <{$pager}>
+    </div>
+</div>

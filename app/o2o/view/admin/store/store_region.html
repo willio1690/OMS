@@ -1,0 +1,76 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=o2o&ctl=admin_store&act=saveRange&finder_id=<{$finder_id}>" method="post" id="store_region_form" class="tableform">
+<div class="division">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" >
+        <tbody>
+            <tr>
+                <th>门店编码:</th> 
+                <td>
+                   <{$store.store_bn}>
+                </td>
+            </tr>
+            <tr>
+                <th>门店名称:</th> 
+                <td>
+                   <{$store.name}>
+                </td>
+            </tr>
+
+            <tr>
+                <th>
+                   门店覆盖范围:
+                </th> 
+                <td>
+                <{if $warehouse.region_ids}>
+                <{input type="china" id='p_region_id' name="p_region_id" data=$warehouse.region_ids }>
+                <{else}>
+                <{input type="china" id='p_region_id' name="p_region_id" data='' }>
+                <{/if}>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
+
+<div class="table-action">
+      <{button label="确定" class="btn-primary" type='submit' id='save_store_region'}> &nbsp; &nbsp;
+      <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+<input type='hidden' id='finder_id' name='finder_id' value='<{$finder_id}>'>
+<input type='hidden' name='branch_id' value='<{$store.branch_id}>'>
+<input type='hidden' name='b_type' value='2'>
+<input type='hidden' name='id' value='<{$warehouse.id}>'>
+<input type='hidden' name='store_bn' value='<{$store.store_bn}>'>
+</form>
+
+<script>
+function regionSelect(el) {
+    new Dialog('index.php?app=logisticsmanager&ctl=admin_warehouse&act=showRegionList&region_id=' + $('p_region_id').value, {
+        width: 600, height: 600, title: '选择地区', onClose: function () {}
+    });
+}
+
+$('save_store_region').addEvent('click',function(e){
+    var form=this.getParent('form');
+    var _this=this;
+    if($('p_region_id').value==''){
+        return MessageBox.error('<{t}>请选择区域<{/t}>');
+    }
+    form.store('target',{
+        onComplete:function(jsontext){
+            var json = Json.evaluate(jsontext);
+            if (typeof(json.error) != 'undefined'){
+                this.disabled=false;
+            }else{
+                finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+                $('store_region_form').getParent('.dialog').retrieve('instance').close();
+            }
+        }
+    });
+    form.fireEvent('submit',e);
+});
+</script>

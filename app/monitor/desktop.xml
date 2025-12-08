@@ -1,0 +1,30 @@
+<desktop>
+    <permissions>
+        <!-- <permission id="order_monitor">订单作业状况</permission> -->
+        <permission id="alarm_template">预警模板</permission>
+        <permission id="alarm_receiver">收件人配置</permission>
+        <permission id="alarm_group">邮件组配置</permission>
+        <permission id="alarm_notify">通知日志</permission>
+        <permission id="performance">端口配置</permission>
+        <permission id="monitor_alarm_queue">队列监控</permission>
+    </permissions>
+
+    <!-- <workground name="单据报表" id="invoice_center"  order="1200" icon="icon-danjubaobiao-01">
+        <menugroup name="分析报表">
+            <menu controller='admin_order' action='index' permission='order_monitor' display='true' order='6000600'>订单作业状况</menu>
+        </menugroup>
+    </workground> -->
+
+    <workground name="日志管理" id="monitor_center"  order="1820" icon="icon-caozuorizhi-01">
+        <menugroup name="监控日志" en="iptables">
+            <menu controller='admin_alarm_template' action='index' permission='alarm_template' display='true' order='10000200'>预警模板</menu>
+            <menu controller='admin_alarm_group' action='index' permission='alarm_group' display='true' order='10000201'>邮件组配置</menu>
+            <menu controller='admin_alarm_receiver' action='index' permission='alarm_receiver' display='true' order='10000201'>收件人配置</menu>
+            <menu controller='admin_alarm_notify' action='index' permission='alarm_notify' display='true' order='10000202'>通知日志</menu>
+            <menu controller="admin_setting" action="index" permission="performance" display='true'  order='10000203'>端口配置</menu>
+        </menugroup>
+        <menugroup name="监控队列" en="monitoring-queue">
+            <menu controller='admin_alarm_queue' action='index' permission='monitor_alarm_queue' display='true' order='10000301'>队列监控</menu>
+        </menugroup>
+    </workground>
+</desktop>

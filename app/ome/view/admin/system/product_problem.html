@@ -1,0 +1,84 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css src="ome.css" app="ome"}>
+<{/capture}>
+
+<div class="tableform">
+  <div class="division">
+    <form method="post" action="index.php?app=ome&ctl=admin_setting&act=addproblem" id='form'>
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+          <tr>
+            <th>售后原因：</th>
+            <td><input type="text" name="problem_name" value="<{$problem.problem_name}>" vtype="required" style="width:230px;" /></td>
+          </tr>
+          <tr>
+            <th>屏蔽状态：</th>
+            <td><{input type="radio" name="disabled" value=$problem.disabled options=$disabled_type separator="&nbsp;"}></td>
+          </tr>
+          <{if $shopReasonList}>
+          <tr>
+            <th>关联店铺售后原因：</th>
+            <td>
+            <select name="wms_reason_id" id="wms_reason_id">
+                <option value="">请选择</option>
+                <{foreach from=$shopReasonList item=itemVal key=itemKey}>
+                <option value="<{$itemKey}>" <{if $problem.rel_reason_id==$itemKey}>selected="selected"<{/if}> >(<{$itemKey}>)<{$itemVal}></option>
+                <{/foreach}>
+            </select>
+            </td>
+          </tr>
+          <{/if}>
+        </tbody>
+      </table>
+      <{if $problem.problem_id}>
+      <input type="hidden" name="problem_id" value="<{$problem.problem_id}>">
+      <{/if}>
+    </form>
+  </div>
+</div>
+
+<{area inject=".mainFoot"}>
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td><button class="btn btn-primary" id="submit_btn" ><span><span><{t}>提交<{/t}></span></span></button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<{/area}>
+<script>
+(function(){
+    var _form = $('form');//表单ID 
+    var btn   = $('submit_btn');//按钮ID
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    _form.store('target',{
+        onComplete:function(){
+        },
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+
+                if(_dialogIns){
+                    finder.refresh();
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+
+    btn.addEvent('click',function(){
+        _form.fireEvent('submit',{stop:$empty});
+    });
+})();
+</script>
+

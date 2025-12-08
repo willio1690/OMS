@@ -1,0 +1,412 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $order.process_status neq 'is_retrial'}>
+    <{if $operate && (($order.ship_status neq '1' && $order.ship_status neq '3' && $order.ship_status neq '4'&& $order.shipping.is_cod eq 'false') || ($order.pay_status neq '1' && $order.ship_status neq '3' && $order.ship_status neq '4'&& $order.shipping.is_cod eq 'true') || ($order.pay_status neq '1' && $order.ship_status neq '3' && $order.ship_status neq '4'&& $use_before_payed eq 'true') || ($order.process_status eq 'splitting' && $order.ship_status eq '3'))}>
+    <{include file="admin/order/order_button.html"}>
+    <{/if}>
+<{/if}>
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+  <tbody>
+    <tr>
+      <td >
+        <div class="tableform">
+        <form method='post' action='index.php?<{$env.server.QUERY_STRING}>'>
+        <input type="hidden" value="<{$order.order_id}>" name="order_id"/>
+        <input type="hidden" name="is_flag" value="1">
+          <table cellspacing="0" cellpadding="0" border="0" class="orderdetails_basic">
+            <tbody>
+              <tr>
+                <td style="vertical-align:top;">
+                  <h4>物料价格</h4>
+                  <div class="division">
+                    <table cellspacing="0" cellpadding="0"  border="0">
+                      <tbody>
+                        <tr>
+                          <th >物料总额：</th>
+                          <td><{if $show_sale_price}><{$order.cost_item|cur}><{else}>-<{/if}></td>
+                        </tr>
+                        <tr>
+                          <th >配送费用：</th>
+                          <td><{$order.shipping.cost_shipping|cur}></td>
+                        </tr>
+                        <{if $order.shipping.cost_protect}>
+                        <tr>
+                          <th >保价费用：</th>
+                          <td><{$order.shipping.cost_protect|cur}></td>
+                        </tr>
+                        <{/if}>
+                        <tr>
+                          <th >税金：</th>
+                          <td><{$order.cost_tax|cur}></td>
+                        </tr>
+                        <tr>
+                          <th >折扣：</th>
+                          <td><{$order.discount|cur}></td>
+                        </tr>
+                        <tr>
+                          <th >商品促销优惠：</th>
+                          <td><{if $show_sale_price}><{$order.pmt_goods|cur}><{else}>-<{/if}></td>
+                        </tr>
+                        <tr>
+                          <th >订单促销优惠：</th>
+                          <td><{if $show_sale_price}><{$order.pmt_order|cur}><{else}>-<{/if}></td>
+                        </tr>
+                        <tr>
+                          <th >服务订单费：</th>
+                          <td><{$order.service_price|cur}></td>
+                        </tr>
+                        <tr>
+                          <th >价保退款：</th>
+                          <td><{$order.refund_money|cur}></td>
+                        </tr>
+                        <tr>
+                          <th >订单总额：</th>
+                          <td><span class="amount"><{if $show_sale_price}><{$order.total_amount|cur}><{else}>-<{/if}></span></td>
+                        </tr>
+                        <{if $order.shipping.is_cod eq 'true'}>
+                        <tr>
+                          <th >应收金额：</th>
+                          <td><span class="amount"><{$order.receivable|cur}></span></td>
+                        </tr>
+                        <{/if}>
+                        <tr>
+                          <th >已支付金额：</th>
+                          <td><{if $show_sale_price}><{$order.payed|cur}><{else}>-<{/if}></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    </div>
+                  </td>
+                  <td style="vertical-align:top;">
+                    <h4>订单其他信息</h4>
+                    <div class="division">
+                       <table cellspacing="0" cellpadding="0" border="0">
+                         <tbody>
+                         <tr>
+                           <th >配送方式：</th>
+                           <td><{$order.shipping.shipping_name}></td>
+                         </tr>
+                         <tr>
+                           <th >配送保价：</th>
+                           <td><{if $order.shipping.is_protect=='true'}>是 <{else}>否<{/if}>
+
+                           </td>
+                         </tr>
+                         <tr>
+                           <th >商品重量：</th>
+                           <td><{$order.weight}> g</td>
+                         </tr>
+                         <tr>
+                           <th >支付方式：</th>
+                           <td><{$order.payinfo.pay_name}></td>
+                         </tr>
+                         <tr>
+                           <th >支付费用：</th>
+                           <td><{$order.payinfo.cost_payment|cur}></td>
+                         </tr>
+                         <tr>
+                           <th >可得积分：</th>
+                           <td><{$order.score_g}></td>
+                         </tr>
+                         <tr>
+                           <th>是否开票：</th>
+                           <td>
+                                <input type="radio" name="is_tax" value='true' <{if $order.is_tax == 'true'}>checked<{/if}> />是
+                                <input type="radio" name="is_tax" value='false' <{if $order.is_tax == 'false'}>checked<{/if}> />否
+                           </td>
+                        </tr>
+                        <{if $invoice_app_install}>
+                          <{if $order.add_invoice}>
+                           <tr>
+                             <th>开票方式：</th>
+                             <td>
+                                 <input type="radio" name="invoice_mode" value='2' <{if $order.invoice_kind != '1'}> checked <{/if}> /><{t}>电子专票<{/t}>
+                                      <input type="radio" name="invoice_mode" value='1'  <{if $order.invoice_kind == '1'}> checked <{/if}> /><{t}>电子普票<{/t}>
+                             </td>
+                          </tr>
+                          <{/if}>
+                          <{if $order.has_invoice}>
+                           <tr>
+                             <th>发票状态：</th>
+                             <td><{$order.invoice_status_text}></td>
+                          </tr>
+                           <tr>
+                             <th>发票类型：</th>
+                             <td><{$order.invoice_mode_text}></td>
+                          </tr>
+                          <{/if}>
+                      <{else}>
+                         <tr>
+                             <th>订单发票号：</th>
+                             <td><{if ($env.get.flt eq 'myown') || ($env.get.act eq 'index') || ($env.get.act eq 'active')||($env.get.act eq 'confirm' && $env.get.flt eq 'unmyown')}><input type='text' value="<{$order.tax_no}>" name="tax_no"><{else}><{$order.tax_no}><{/if}></td>
+                           </tr>
+                           <tr>
+                             <th>发票抬头：</th>
+                             <td><input type="text" name="tax_title" value="<{$order.tax_title}>"> </td>
+                           </tr>
+                        <{/if}>
+                        
+                        <{if $assign_express_name}>
+                        <tr>
+                            <th>买家指定快递：</th>
+                            <td style="color:red; font-weight:bold;"><{$assign_express_name}></td>
+                        </tr>
+                        <{/if}>
+                        
+                        <{if $order.order_bool_type_text}>
+                         <tr>
+                           <th>订单标识：</th>
+                           <td style="color:red; font-weight:bold;"><{$order.order_bool_type_text}> </td>
+                         </tr>
+                         <{/if}>
+                         
+                         <{if $order.extra_info}>
+                         <tr>
+                           <th>交易分类编码：</th>
+                           <td><{$order.extra_info}> </td>
+                         </tr>
+                         <{/if}>
+                        </tbody>
+                     </table>
+                 </div>
+               </td>
+               <td style="vertical-align:top;">
+                <h4><{if $member.is_encrypt}><a class="member-sensitive-btn data-hide" href="javascript:void(0);"></a><{/if}>购买人信息</h4>
+                <div class="division">
+                  <table cellspacing="0" cellpadding="0" border="0" id="memberinfo">
+
+                    <tbody><tr>
+
+                      <th><{if $member.is_encrypt && $order.shop_type == 'pinduoduo'}><a data-type = 'uname' class="member-sensitive-btn-detail data-hide" style="background-size: 13px 10px;" href="javascript:void(0);"></a><{/if}>用户名：</th>
+                      <td>
+                        <span sensitive-field="uname"><{$member.account.uname|ciphertext:'member','uname',$order.shop_type}></span></td>
+                      </tr>
+                      <tr>
+                        <th><{if $member.is_encrypt  && $order.shop_type == 'pinduoduo'}><a data-type = 'name' class="member-sensitive-btn-detail data-hide"  style="background-size: 13px 10px;" href="javascript:void(0);"></a><{/if}>姓名：</th>
+                        <td><span sensitive-field="name"><{$member.contact.name|ciphertext:'member','name',$order.shop_type}></span></td>
+                      </tr>
+                      <tr>
+                        <th><{if $member.is_encrypt  && $order.shop_type == 'pinduoduo'}><a data-type = 'tel' class="member-sensitive-btn-detail data-hide"  style="background-size: 13px 10px;" href="javascript:void(0);"></a><{/if}>电话：</th>
+                        <td><span sensitive-field="tel"><{$member.contact.phone.telephone|ciphertext:'member','tel',$order.shop_type}></span></td>
+                      </tr>
+                      <tr>
+                        <th><{if $member.is_encrypt  && $order.shop_type == 'pinduoduo'}><a data-type = 'mobile' class="member-sensitive-btn-detail data-hide" style="background-size: 13px 10px;"  href="javascript:void(0);"></a><{/if}>手机：</th>
+                        <td><span sensitive-field="mobile"><{$member.contact.phone.mobile|ciphertext:'member','mobile',$order.shop_type}></span></td>
+                      </tr>
+                      <tr>
+                        <th><{if $member.is_encrypt  && $order.shop_type == 'pinduoduo'}><a data-type = 'address' class="member-sensitive-btn-detail data-hide" style="background-size: 13px 10px;"  href="javascript:void(0);"></a><{/if}>地区：</th>
+                        <td><{$member.contact.area|region}></td>
+                      </tr>
+                      <tr>
+                        <th >Email：</th>
+                        <td><a href="mailto:<{$member.contact.email}>" target="_self"><span sensitive-field="email"><{$member.contact.email|ciphertext:'member','email',$order.shop_type}></span></a></td>
+                      </tr>
+                  </tbody>
+              </table>
+            </div>
+          </td>
+          <td style="vertical-align:top;">
+            <h4>
+              <span><{if $order.is_encrypt}><a class="order-sensitive-btn data-hide" href="javascript:void(0);"></a><{/if}><{t}>收货人信息<{/t}></span>
+            </h4>
+              <div class="division">
+                <table cellspacing="0" cellpadding="0" border="0" id="consigneeinfo">
+
+                  <tbody><tr>
+                    <th >要求到货时间：</th>
+                    <td><{$order.consignee.r_time}></td>
+                  </tr>
+                  <tr>
+                    <th ><{if $member.is_encrypt && $order.shop_type == 'pinduoduo'}><a data-type = 'uname' class="order-sensitive-btn-detail data-hide" style="background-size: 13px 10px;" href="javascript:void(0);"></a><{/if}>姓名：</th>
+                    <td><span sensitive-field="ship_name" data-order="2"><{$order.consignee.name|ciphertext:'order','ship_name',$order.shop_type}></span></td>
+                  </tr>
+                  <tr>
+                    <th><{if $member.is_encrypt && $order.shop_type == 'pinduoduo'}><a data-type = 'tel' class="order-sensitive-btn-detail data-hide" style="background-size: 13px 10px;" href="javascript:void(0);"></a><{/if}>电话：</th>
+                    <td><span sensitive-field="ship_tel" data-order="3"><{$order.consignee.telephone|ciphertext:'order','ship_tel',$order.shop_type}></span></td>
+                  </tr>
+                  <tr>
+                    <th><{if $member.is_encrypt && $order.shop_type == 'pinduoduo'}><a data-type = 'mobile' class="order-sensitive-btn-detail data-hide" style="background-size: 13px 10px;" href="javascript:void(0);"></a><{/if}>手机：</th>
+                    <td><span sensitive-field="ship_mobile" data-order="4"><{$order.consignee.mobile|ciphertext:'order','ship_mobile',$order.shop_type}></span></td>
+                  </tr>
+                  <tr>
+                    <th><{if $member.is_encrypt  && $order.shop_type == 'pinduoduo'}><a data-type = 'address' class="order-sensitive-btn-detail data-hide" style="background-size: 13px 10px;"  href="javascript:void(0);"></a><{/if}>地区：</th>
+                    <td><{$order.consignee.area|region}></td>
+                  </tr>
+                  <tr>
+                    <th><{if $member.is_encrypt  && $order.shop_type == 'pinduoduo'}><a data-type = 'receiver_address' class="order-sensitive-btn-detail data-hide" style="background-size: 13px 10px;"  href="javascript:void(0);"></a><{/if}>地址：</th>
+                    <td style="white-space: normal; line-height: 18px;"><span sensitive-field="ship_addr" data-order="1"><{$order.consignee.addr|escape:'html'|ciphertext:'order','ship_addr',$order.shop_type}></span></td>
+                  </tr>
+                  <tr>
+                    <th >邮编：</th>
+                    <td><{$order.consignee.zip|escape:'html'}></td>
+                  </tr>
+                  <tr>
+                    <th >身份证：</th>
+                    <td><{$order.cert_id}></td>
+                  </tr>
+                </tbody></table>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        </table>
+          
+          <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td><div class="table-action" style="border-top: 1px solid #e0e0e0;"><{button label="提交" type="submit"}></div></td>
+              </tr>
+          </table>
+      </form>
+      </div>
+      </td>
+      </tr>
+      <tr>
+        <td>
+
+     <{if $sellagent}>
+     <div class="tableform">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" class="finderInform">
+        <tbody>
+         <tr>
+          <td colspan="5"><strong>代销人信息：</strong></td>
+        </tr>
+        <tr>
+          <td>用户名：<{$sellagent.member_info.uname}></td>
+          <td>姓名：<{$sellagent.member_info.name}></td>
+          <td>性别：<{if $sellagent.member_info.sex == 'male'}>男<{else}>女<{/if}></td>
+          <td>出生日期：<{$sellagent.member_info.birthday}></td>
+          <td>E-mail：<{$sellagent.member_info.email}>  QQ:<{$sellagent.member_info.qq}></td>
+        </tr>
+        <tr>
+          <td>地区：<{$sellagent.member_info.area|region}></td>
+          <td>详情地址：<{$sellagent.member_info.addr}></td>
+          <td>邮编：<{$sellagent.member_info.zip}></td>
+          <td>手机：<{$sellagent.member_info.mobile}></td>
+          <td>固定电话：<{$sellagent.member_info.tel}></td>
+        </tr>
+        <tr>
+          <td>网站名称：<{$sellagent.website.name}></td>
+          <td>网站域名：<{$sellagent.website.domain}></td>
+          <td colspan="3">网站LOGO：<{if $sellagent.website.logo}><a href="<{$sellagent.website.logo}>" target="_blank">查看</a><{/if}></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <{/if}>
+
+  <div class="tableform">
+
+    <table width="100%" cellspacing="0" cellpadding="0" border="0" class="finderInform">
+
+      <tbody>
+       <tr><th><strong>客户备注：</strong></th><td>
+         <{foreach from=$order.custom_mark item=items}>
+         <div id="memo_show">
+          <b><{$items.op_content|escape:"HTML"}></b> <{$items.op_time}> by <{$items.op_name}>
+        </div>
+        <{/foreach}>
+      </td></tr>
+      <tr><th><strong>商家备注：</strong></th><td>
+        <{if $order.mark_text}>
+        <{foreach from=$order.mark_text item=items}>
+        <div id="memo_show">
+        <b><{$items.op_content|escape:"HTML"}></b> <{$items.op_time}> by <{$items.op_name}>
+      </div>
+      <{/foreach}>
+      <{/if}>
+    </td></tr>
+    
+    <{if $labelList}>
+    <tr>
+        <th><strong>订单标记：</strong></th>
+        <td>
+          <div style="overflow: auto;word-break: break-word;white-space: normal;width: 100%;flex-wrap: wrap;display: flex;">
+            <{foreach from=$labelList item=items}>
+              <span title='<{$items.label_name}>' style='filter: brightness(0.9) contrast(0.9);border:1px solid <{$items.label_color}>; color:<{$items.label_color}>;margin: 2px;padding: 0px 2px;border-radius: 5px;white-space: nowrap;'><{$items.label_name}></span>
+            <{/foreach}>
+          </div>
+        </td>
+    </tr>
+    <{/if}>
+    
+  </tbody>
+</table>
+</div>
+<{if $service_list}>
+<div class="tableform">
+  <h4>服务列表</h4>
+  <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+    <thead>
+    <tr>
+        <th>名称</th>
+        <th>数量</th>
+        <th>总费用</th>
+    </tr>
+    </thead>
+    <tbody>
+    <{foreach from=$service_list item=service}>
+      <tr>
+  
+        <td><{$service.title}></td>
+        <td><{$service.num}></td>
+        <td><{$service.total_fee}></td>
+      </tr>
+    <{/foreach}>
+    </tbody>
+  </table>
+</div>
+<{/if}>
+</td>
+
+</tr>
+</tbody>
+</table>
+
+<script>
+(function(){
+
+    // 敏感数据处理
+    if ($defined($E('.order-sensitive-btn')))
+        $E('.order-sensitive-btn').addEvent('click',function(e){
+            Ex_Loader('security',function(){
+                new Security({url:'index.php?app=ome&ctl=admin_order&act=showSensitiveData&p[0]=<{$order.order_id}>',clickElement:$(e.target)}).desHtml($E('#consigneeinfo'));
+            });
+        });
+    // 敏感数据处理
+    if ($defined($E('.member-sensitive-btn')))
+        $E('.member-sensitive-btn').addEvent('click',function(e){
+            Ex_Loader('security',function(){
+                new Security({url:'index.php?app=ome&ctl=admin_member&act=showSensitiveData&p[0]=<{$order.order_id}>',clickElement:$(e.target)}).desHtml($E('#memberinfo '));
+            });
+        });
+
+
+    //敏感数据处理 拼多多
+    if ($defined($E('.order-sensitive-btn-detail')))
+      $ES('.order-sensitive-btn-detail').addEvent('click',function(e){
+          var type = this.get('data-type');
+          console.log('type',type)
+          var tr = this.getParent('tr');
+          Ex_Loader('security',function(){
+              new Security({url:'index.php?app=ome&ctl=admin_order&act=showSensitiveData&p[0]=<{$order.order_id}>&p[1]='+type,clickElement:$(e.target)}).desHtml(tr);
+          });
+      });
+    //敏感数据处理 拼多多
+    if ($defined($E('.member-sensitive-btn-detail')))
+      $ES('.member-sensitive-btn-detail').addEvent('click',function(e){
+          var type = this.get('data-type');
+          var tr = this.getParent('tr');
+          Ex_Loader('security',function(){
+              new Security({url:'index.php?app=ome&ctl=admin_member&act=showSensitiveData&p[0]=<{$order.order_id}>&p[1]='+type,clickElement:$(e.target)}).desHtml(tr);
+          });
+      });
+
+
+
+
+  })();
+</script>

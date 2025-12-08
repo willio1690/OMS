@@ -1,0 +1,55 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table border="0" cellpadding="0" cellspacing="0"><tbody>
+	<tr><th>发票设备类型：</th>
+		<td>
+			<{input type="select" name="item[eqpttype]" value=$item.eqpttype|default:"0" options=array('0'=>'税控服务','1'=>'税控盘') required="true" separator=" "}><em class="c-red">&nbsp;*</em>
+		</td>
+	</tr>
+</tbody></table>
+<table border="0" cellpadding="0" cellspacing="0" id="skpdata-config" style="display: none;"><tbody>
+	<tr><th>税控盘编号：</th>
+		<td><{input  vtype="required" type="text" name="item[skpdata][skpbh]"  value=$item.skpdata.skpbh }><em class="c-red">&nbsp;*</em></td>
+	</tr>
+	<tr><th>税控盘口令：</th>
+		<td><{input type="text" name="item[skpdata][skpkl]"  value=$item.skpdata.skpkl }></td>
+	</tr>
+	<tr><th>税务数字证书密码：</th>
+		<td><{input type="text" name="item[skpdata][keypwd]"  value=$item.skpdata.keypwd }></td>
+	</tr>
+</tbody></table>
+<table border="0" cellpadding="0" cellspacing="0"><tbody>
+	<tr><th>开票点代码：</th>
+		<td><{input  vtype="required" type="text" name="item[kpddm]"  value=$item.kpddm }><em class="c-red">&nbsp;*</em></td>
+	</tr>
+	<tr><th>含税标志：</th>
+		<td>
+			<{input type="radio" name="item[hsbz]" value=$item.hsbz|default:"1" options=array('1'=>'含税','0'=>'不含税') separator=" "}>
+		</td>
+	</tr>
+	<tr><th>是否使用优惠政策：</th>
+	<td>
+		<{input required="true" type="select" name="item[yhzcbs]" value=$item.yhzcbs|default:"0" options=array('0'=>'未使用','1'=>'使用') separator=" "}>
+		&nbsp;&nbsp;&nbsp;&nbsp;
+		增值税特殊管理：<{input type="text" name="item[zzstsgl]"  value=$item.zzstsgl }>
+		<{help}><{t}>百望渠道电子发票，如果使用优惠政策时，增值税特殊管理填写请参考百望《商品和服务税收分类与编码》.xls中的增值税特殊管理列 <{/t}><{/help}>
+	</td>
+	</tr>
+	<tr><th>零税率标识：</th>
+	<td>
+		<{input required="true" type="select" name="item[lslbs]" value=$item.lslbs|default:"0" options=array('0'=>'无','1'=>'出口免税和其他免税优惠政策','2'=>'不征增值税','3'=>'普通零税率') }>
+	</td>
+	</tr>
+</tbody></table>
+<script type="text/javascript">
+	(function(){
+		$E('select[name=item[eqpttype]]').addEvent('change',function(){
+			return this.value=="0" ? $('skpdata-config').hide() : $('skpdata-config').show();
+		});
+
+		$E('select[name=item[eqpttype]]').fireEvent('change');
+	})();
+</script>

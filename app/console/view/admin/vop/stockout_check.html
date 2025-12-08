@@ -1,0 +1,127 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+
+<form id="fm1" name="form1" action="index.php?app=console&ctl=admin_vopstockout&act=doCheck" method="POST">
+<input type="hidden" name="stockout_id" value="<{$data.stockout_id}>" />
+<div class="tableform">
+    <h3>审核出库单</h3>
+    <div class="division">
+        <h5>基础信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+            <tr>
+                <td align="right">出库单号：</td>
+                <td width="40%"><{$data.stockout_no}></td>
+                <td align="right">拣货单号：</td>
+                <td><{$pickInfo.pick_no}></td>
+            </tr>
+            <tr>
+                <td width="10%" align="right">出库数量：</td>
+                <td><{$data.pick_num}></td>
+                <td align="right" nowrap="nowrap">&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td align="right">出库仓：</td>
+                <td width="40%"><{$data.branch_name}></td>
+                <td align="right">入库仓：</td>
+                <td><{$pickInfo.to_branch_name}></td>
+            </tr>
+            <tr>
+                <td align="right">配送方式：</td>
+                <td width="40%"><{$data.dly_mode}></td>
+                <td align="right">承运商：</td>
+                <td><{$data.carrier_code}></td>
+            </tr>
+            <tr>
+                <td align="right">送货批次：</td>
+                <td><{$data.delivery_time}></td>
+                <td align="right" nowrap="nowrap">要求到货时间：</td>
+                <td><{$data.arrival_time}></td>
+              </tr>
+            </thead>
+        </table>
+    </div>
+
+    <div class="division">
+        <h5>出库单明细</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+                <tr>
+                    <th style='text-align:left;padding-left:5px;'>采购单号</th>
+                    <th style='text-align:left;padding-left:5px;'>拣货单号</th>
+                    <th style='text-align:left;padding-left:5px;'>货号</th>
+                    <th style='text-align:left;padding-left:5px;'>条形码</th>
+                    <th style='text-align:left;padding-left:5px;'>货品名称</th>
+                    <th style='text-align:left;padding-left:5px;'>尺寸</th>
+                    <th style='text-align:left;padding-left:5px;'>申请数量</th>
+                    <th style='text-align:left;padding-left:5px;'>可用库存</th>
+                    <th style='text-align:left;padding-left:5px;'>成本价</th>
+                    <th style='text-align:left;padding-left:5px;'>市场价</th>
+                    <th style='text-align:left;padding-left:5px;'>标记</th>
+                </tr>
+            </thead>
+            <tbody>
+                <{foreach from=$dataiList item=item}>
+                <tr>
+                    <td style='text-align:left;padding-left:5px;'><{$item.po_bn}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.pick_no}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.bn}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.barcode}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.product_name}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.size}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.num}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.store}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.price}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.market_price}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.order_label}></td>
+                </tr>
+                <{/foreach}>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="cc" class="noprint table-action"> <{button type="button" class="btn" id="purchase-save-btn" label="审 核"}> &nbsp; <{button type="button" class="btn" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}></div>
+
+</div>
+</form>
+<script>
+(function(){
+    var pag;
+    
+    $('purchase-save-btn').addEvent('click',function(e)
+    {
+        var _this=this;
+        var form=this.getParent('form');
+        
+        form.store('target',{
+            onRequest:function(){
+                _this.disabled=true;
+            },
+            onComplete:function(jsontext){
+                try{
+                    var json = JSON.decode(jsontext);
+                    if (typeof(json.error)!='undefined'){
+                        _this.disabled=false;
+                    }else{
+                        _this.disabled=true;
+                        if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                        setTimeout('window.close()',200);
+                    }
+                }catch(e){}
+            }
+        });
+        
+        form.fireEvent('submit',e);
+    });
+})();
+</script>

@@ -1,0 +1,54 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">
+  <{script src="coms/autocompleter.js" app="desktop"}>
+  <{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+
+<div class="tableform">
+    <h4>补货建议单明细</h4>
+    <div class="division">
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+                <tr>
+                   
+                    <th style='text-align:left;padding-left:5px;'>基础物料编码</th>
+                    <th style='text-align:left;padding-left:5px;'>申请补货数量</th>
+                    <th style='text-align:left;padding-left:5px;'>实际补货数量</th>
+                    <th style='text-align:left;padding-left:5px;'>价格</th>
+                </tr>
+            </thead>
+            <tbody id="dataNode">
+                <tr>
+                  <td colspan="8" style="text-align:center;"><div class="note" style="margin:0;"> 没有记录... </div></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+var tpl = '<tr>' + 
+        '<td style="text-align:left;padding-left:5px;">{material_bn}</td>' + 
+        '<td style="text-align:left;padding-left:5px;">{apply_nums}</td>' + 
+        '<td style="text-align:left;padding-left:5px;">{reple_nums}</td>' + 
+        '<td style="text-align:left;padding-left:5px;">{price}</td>' + 
+        '</tr>';
+
+var store=[],pag;
+new Request({url:'index.php?app=console&ctl=admin_replenish_suggest&act=getItems&p[0]=<{$suggests.sug_id}>',
+onComplete:function(rs){
+    rs = JSON.decode(rs);
+	
+    store.combine(rs);
+	
+    createProduct(store);
+}}).send();
+
+function createProduct(data){
+    pag = new PageData(tpl,data,{'updateMain':$('dataNode'),'pageNum':20});
+}
+</script>

@@ -1,0 +1,68 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform" id="baseDataSync">
+    <div class="division">
+        <div style="margin: 15px 0px 15px;color:red">本次初始化店铺、物流公司、供应商，其中<br/>没有店铺-noshopcode 指其他出库没有店铺使用编码noshopcode<br/>未选物流-other 指没有选择物流时使用编码other<br/>没有供应商-nosuppliercode 指其他入库没有供应商时使用编码nosuppliercode</div>
+        <div>正在初始化：<span id="runningName">未开始</span></div>
+        <div id="processBarBg" class="processBarBg">
+            <div id="processBar" class="processBar">
+                &nbsp;
+            </div>
+        </div>
+        <div>
+            <p class="showMsg"></p>
+        </div>
+    </div>
+    <input type="hidden" class="baseData" name="wms_id" value="<{$wms_id}>">
+    <input type="hidden" class="baseData" name="type" value="0">
+    <input type="hidden" class="baseData" name="id" value="0">
+    <div class="table-action">
+        <{button  type="button" class="btn" id="sync_btn" label="开始初始化"}>
+    </div>
+</div>
+<script>
+
+    (function(){
+        var baseData = JSON.decode('<{$base_data|json_encode}>');
+        $('sync_btn').addEvent('click', function() {
+            var _parent=this;
+            Ex_Loader('cmdrunner',function(){
+                new taskrunner(baseData.map(function(){return 'index.php?app=wmsmgr&ctl=admin_wms&act=doSyncBase'}), {
+                    container: $('baseDataSync'),
+                    dataClass: '.baseData',
+                    onLoad: function() {
+                        _parent.disabled = true;
+                        _parent.set('html', '<span><span>初始化...</span></span>');
+                    },
+                    onStart: function() {
+                        var rowData = baseData[this.prestep];
+                        $E('#baseDataSync input[name=type]').set('value', rowData.type);
+                        $E('#baseDataSync input[name=id]').set('value', rowData.id);
+                        $('runningName').set('html', rowData.name);
+                    },
+                    onComplete:function() {
+                        var num=this.step/this.num*100;
+                        $('processBar').setStyle('width',num+'%');
+                        $E('#baseDataSync .showMsg').set('text',$('runningName').getHTML() + ' 初始化完成');
+                    },
+                    onError:function(text) {
+                        if (!text) {alert('未捕获到错误信息，可能执行超时');}
+                        $E('#baseDataSync .showMsg').set('text','失败原因：'+text);
+                        _parent.set('html', '<span><span>初始化失败</span></span>');
+                        _parent.disabled = false;
+                        if (this.iframe) this.iframe.destroy();
+                        if (this.form) this.form.destroy();
+                    },
+                    onSuccess:function() {
+                        if (this.iframe) this.iframe.destroy();
+                        _parent.set('html', '<span><span>处理已完成，本窗口将在3秒后自动关闭！</span></span>');
+                        setTimeout("$('sync_btn').getParent('.dialog').retrieve('instance').close();finderGroup['<{$env.get.finder_id}>'].refresh();", 2000);
+                    }
+                }).run();
+            });
+        });
+    }());
+</script>

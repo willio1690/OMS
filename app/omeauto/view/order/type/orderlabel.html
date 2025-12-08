@@ -1,0 +1,31 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<select name="label_id[]" id="label_id" required="true" multiple="true" style="width: 300px; height: 120px;">
+<{foreach from=$label_types item=label}>
+<option value="<{$label.label_id}>" <{if $init.content.label_id && in_array($label.label_id, $init.content.label_id)}>selected<{/if}>><{$label.label}></option>
+<{/foreach}>
+</select>
+
+<script>
+    (function(){
+        // 订单标记类型选择器的事件处理
+        $('label_id').addEvent('change', function(){
+            // 可以在这里添加标记类型改变时的逻辑
+            console.log('选择的标记类型:', this.value);
+        });
+        
+        // 初始化tail.select功能，处理大量选项
+        if (typeof tail !== 'undefined') {
+            tail.select('#label_id', {
+                search: true,
+                width: 300,
+                height: 300,
+                searchMinLength: 0,
+                multiContainer: true
+            });
+        }
+    })();
+</script>

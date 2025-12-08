@@ -1,0 +1,81 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<h3>京东包裹配送状态列表：</h3>
+<br />
+<table cellpadding="0" cellspacing="0" border="0" class="gridlist">
+<thead>
+    <tr>
+        <th>包裹单号</th>
+        <th>查询状态</th>
+        <th style="padding-left:8px;">配送状态</th>
+    </tr>
+</thead>
+    <{foreach from=$dataList key=package_bn item=item}>
+    <tr>
+    <td><{$package_bn}></td>
+    <td><{$item.rsp}></td>
+    <td style="font-weight:bold; color:red; padding-left:8px;"><{if $item.rsp=='succ'}><{$item.data.orderStatus}>(<{$item.data.status_str}>)<{else}><{$item.msg}><{/if}></td>
+    </tr>
+    <{/foreach}>
+</table>
+<br />
+<{if $show_cancel}>
+<p><span style="color:red; font-weight:bold;">温馨提示：</span>京东包裹只有用户签收、拒收、拦截取消成功，才能继续申请退货业务。</p>
+<div style='margin-top:10px;text-align:center;'>
+<{button class="btn-primary" type="button" id="but_select" label="点击拦截京东包裹"}>
+&nbsp;&nbsp;<{button label="取消" class="btn-secondary" isCloseDialogBtn="true" onclick="this.getParent('.dialog').retrieve('instance').close();"}>
+</div>
+
+<script language="javascript" type="text/javascript">
+var reship_id = parseInt("<{$reship_id}>");
+
+$('but_select').addEvent('click',function(e)
+{
+    select_delivery_status(reship_id);
+})
+
+function select_delivery_status(reship_id)
+{
+    if(reship_id == '')
+    {
+        alert('无效的操作!');
+    }
+    
+    if(!confirm("您确定要拦截京东包裹吗？"))
+    {
+        return false;    
+    }
+    
+    new Request(
+    {
+        url: "index.php?app=ome&ctl=admin_return_rchange&act=ajax_hold_delivery",
+        async:false,
+        method:'post',
+        data:{reship_id:reship_id},
+        onComplete: function(json)
+        {
+            json = JSON.decode(json);
+            
+            if(json.res == 'succ')
+            {
+                if(json.error_msg){
+                    alert(json.error_msg);
+                }else{
+                    alert('请求拦截包裹成功，请等待京东返回拦截包裹状态!');
+                }
+                
+                return false;
+            }
+            else
+            {
+                alert(json.error_msg);
+                return false;
+            }
+        }
+    }).send();
+}
+</script>
+<{/if}>

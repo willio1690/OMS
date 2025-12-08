@@ -1,0 +1,33 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!--发票展示界面-->
+<div class="division">
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0">
+        <thead>
+            <tr>
+                <th>单据编号</th>
+                <th>单据类型</th>
+                <th>核销金额</th>
+                <th>核销日期</th>
+            </tr>
+        </thead>
+        <tbody>
+            <{foreach from=$data item=item}>
+            <tr>
+                <td><{$item.bill_bn}></td>
+                <{if $item.type == '0'}>
+                <td>实收单据</td>
+                <{else}>
+                <td>应收单据</td>
+                <{/if}>
+                <td><{$item.money}></td>
+                <td><{$item.trade_time|date_format:"%Y-%m-%d"}></td>
+            </tr>
+            <{/foreach}>
+        </tr>
+    </tbody>            
+</table>
+</div>

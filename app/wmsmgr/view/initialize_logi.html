@@ -1,0 +1,55 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=wmsmgr&ctl=admin_wms&act=doInitializeLogi" id="submitForm">
+            <input type="hidden" name="channel_id" value="<{$wms.channel_id}>">
+            <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+                <tbody>
+                    <tr>
+                        <th><em class="c-red">*</em> 仓储编码：</th>
+                        <td><{$wms.channel_bn}></td>
+                    </tr>
+                    <tr>
+                        <th ><em class="c-red">*</em> 仓储名称：</th>
+                        <td><{$wms.channel_name}></td>
+                    </tr>
+                    <tr>
+                        <th >&nbsp;</th>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <th >&nbsp;</th>
+                        <td>&nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div id='adapter_config'></div>
+            
+            <div class="table-action">
+                <{button class="btn-primary" type="submit" id="saveButton" name="submit" label="确认初始化物流公司"}>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+$('submitForm').store('target',{
+    onRequest:function(){
+        $('saveButton').set('disabled', 'true');
+    },
+    onComplete:function(jsontext){
+        var json = Json.evaluate(jsontext);
+        if (typeof(json.error) != 'undefined'){
+            $('saveButton').set('disabled', '');
+        }else{
+            $('saveButton').set('disabled', 'true');
+            parent.finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,parent.finderGroup['<{$env.get.finder_id}>']);
+            $('saveButton').getParent('.dialog').retrieve('instance').close();
+        }
+    }
+});
+</script>

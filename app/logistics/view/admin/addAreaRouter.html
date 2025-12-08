@@ -1,0 +1,75 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form id="area_add_form" method="post" action="index.php?app=logistics&ctl=admin_area_router&act=saveArea" class="tableform">
+    <div class="division">
+        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <th><font color='red'>*</font><{t}>省级地区:<{/t}></th>
+                <td>
+                    <{if $area.area_id}>
+                        <{$area.area_name}>
+                        <input type='hidden' id='area_id' name='area_id' value='<{$area.area_id}>'/>
+                    <{else}>
+                        <{input type='select' name="area_id" id='area_id' rows=$region valueColumn="region_id" labelColumn="local_name"}><span class="notice-inline"></span>
+                    <{/if}>
+                </td>
+            </tr>
+            <!-- <tr>
+                <th><font color='red'>*</font><{t}>大仓(非门店)优先:<{/t}></th>
+                <td>
+                    <{input type='bool' name="first_dc" value=$area.first_dc}>
+                </td>
+            </tr> -->
+            <tr>
+                <th>地区</th>
+                <td>权重<span>&nbsp;&nbsp;&nbsp;&nbsp;(数值越大表示优先级越高。如不填写,默认为0)</span></td>
+            </tr>
+            <{foreach from=$region item=item key=key}>
+            <tr>
+                <th>
+                    <{t}><{$item.local_name}><{/t}>
+                    <{input type='hidden' name="router_area[{$item.region_id}][name]" value=$item.local_name}>
+                </th>
+                <td>
+                    <{input type='number' name="router_area[{$item.region_id}][weight]" value=$item.weight}>
+                </td>
+            </tr>
+            <{/foreach}>
+        </table>
+    </div>
+    <div class="table-action">
+        <{button label=$___ectools="保存"|t:'ectools' type="button" id='save_area'}><input type="hidden" name="package"
+                                                                                         value="mainland">
+        <{button label=$___ectools="取消"|t:'ectools' isCloseDialogBtn="true"}>
+    </div>
+
+
+</form>
+<script>
+
+    $('save_area').addEvent('click', function (e) {
+        var form = this.getParent('form');
+        var _this = this;
+        if ($('area_id').value == '') {
+            return MessageBox.error('<{t}>请选择省级地区<{/t}>');
+        }
+        form.store('target', {
+            onRequest: function(){
+                _this.disabled = true;
+            },
+            onComplete: function (jsontext) {
+                var json = Json.evaluate(jsontext);
+                if (typeof(json.error) != 'undefined') {
+                    _this.disabled = false;
+                } else {
+                    $('area_add_form').getParent('.dialog').retrieve('instance').close();
+                }
+            }
+        });
+        form.fireEvent('submit', e);
+    });
+
+</script>

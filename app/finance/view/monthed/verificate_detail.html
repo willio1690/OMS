@@ -1,0 +1,389 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{/capture}>
+
+<style type="text/css">
+.none{display: none;}
+</style>
+
+<div class="finder-packet">
+    <div>
+        <ul class="my_clearfix">                    
+            <li class="current" onclick="change_current('verification')" id="verification_tab">
+                <a href="javascript:void(0)">
+                    <span>待核销</span>
+                </a>
+            </li>
+            <li onclick="change_current('order')" id="order_tab">
+                <a href="javascript:void(0)">
+                    <span>同订单收退</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div id="verification_section" class="finder-section ">
+    <form action='index.php?app=finance&ctl=monthend_verification&act=doVerificate' method="post" id="do_form">
+        <input type="hidden" name="finder_id" value="<{$finder_id}>" />
+        <input type="hidden" name="monthly_id" value="<{$monthly_id}>" />
+        <input type="hidden" name="order_bn" value="<{$order_bn}>" />
+        <input type="hidden" name="shop_id" value="<{$shop_id}>" />
+        <div class="tableform">
+            <table cellspacing="0" cellpadding="0" border="0" class="orderdetails_basic">
+                <tbody>
+                    <tr>
+                        <td >
+                            <h4>实收实退单</h4>
+                            
+                            <div class="division">
+                                
+                                <div id="replace_bill">
+                                    <table cellspacing="0" cellpadding="0"  border="0" class='gridlist'>
+                                        <thead>
+                                            <tr>
+                                                <th>选项</th>
+                                                <th>财务流水号</th>
+                                                <th>业务订单号</th>
+                                                <th>对方名称</th>
+                                                <th>资金流向</th>
+                                                <th>收支类型</th>
+                                                <th>金额</th>
+                                                <th>到账时间</th>
+                                                <th>备注</th>
+                                              
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <{foreach from=$bill_data.current item=item key=key}>
+                                
+                                            <tr id="replace_bill_<{$item.bill_id}>" style="height:30px;">
+                                                <td><input id="bill_id" name="bill_id[]" type="checkbox" value="<{$item.bill_id}>" /></td>    
+                                                <td><{$item.credential_number}></td>
+                                                <td><{$item.order_bn}></td>
+                                                <td><{$item.member}></td>
+                                                <td><{if $item.bill_type}>支出<{else}>收入<{/if}></td>
+                                                <td><{$item.fee_type}></td>
+                                                <td><{$item.money|cur}></td>
+                                                <td><{$item.trade_time}></td>
+                                                <td><{$item.remarks}></td>
+                    
+                                            </tr>
+                                            <{/foreach}>
+                                        </tbody>    
+                                    </table>
+                                </div>                    
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            <h4>应收应退单</h4>
+                            <div class="division">
+                                <!-- <div style='height:25px'><{button id="select_ar" label="选择应收/应退单" /}></div> -->
+                                <div id="replace_ar">
+                                    <table cellspacing="0" cellpadding="0"  border="0" class='gridlist'>
+                                        <thead>
+                                            <tr>
+                                                <th>选项</th>
+                                                <th>业务单据号</th>
+                                                <th>单据类型</th>
+                                                <th>业务订单号</th>
+                                                <th>客户/会员</th>
+                                                <th>资金流向</th>
+                                                <th>金额</th>
+                                                <th>单据创建时间</th>
+                                                <!-- <th>操作</th> -->
+             
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ar-section">
+                                            <{foreach from=$ar_data.current item=item key=key}>
+                                            <tr id="replace_ar_<{$item.ar_id}>" style="height:30px;">
+                                                <td><input id="ar_id" name="ar_id[]" type="checkbox" value="<{$item.ar_id}>" /></td>
+                                                <td><{$item.ar_bn}></td>
+                                                <td><{$item.type}></td>
+                                                <td><{$item.order_bn}></td>
+                                                <td><{$item.member}></td>
+                                                <td><{if $item.money > 0}> 收入 <{else}> 支出 <{/if}> </td>
+                                                <td><{$item.money|cur}></td>
+                                                <td><{$item.trade_time}></td>
+                                                <!-- 核销更改， 该功能不可用 -->
+                                                <!-- <td onclick="ar_delete(this,<{$item.ar_id}>);">删除</td> -->
+                               
+                                            </tr>
+                                            <{/foreach}>
+                                        </tbody>                        
+                                    </table>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            商家备注：        
+                            <{foreach from=$order_detail.mark_text item=items}>
+                                <div id="memo_show">
+                                    <b><{$items.op_content|escape:"HTML"}></b> <{$items.op_time}> by <{$items.op_name}>
+                                </div>
+                            <{/foreach}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            是否强制核销：<input type="radio" name="is_verification" value="1"> 是 &nbsp;&nbsp; <input type="radio" name="is_verification" value="0" checked> 否 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            核销备注：<br>
+                            <textarea style="width:500px;height:60px;" name="verification_memo"></textarea>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div align="center">
+            <{button label="确认核销" class="btn btn-primary" id="btn-submit" onclick="do_submit();" }>
+            <{button label="关闭" class="btn btn-primary" onclick="javascript:void(window.close());" }>
+        </div>
+    </form>
+</div>
+
+<div id="order_section" class="finder-section  none">
+    <div class="tableform">
+            <table cellspacing="0" cellpadding="0" border="0" class="orderdetails_basic">
+                <tbody>
+                    <tr>
+                        <td >
+                            <h4>实收实退单</h4>
+                            
+                            <div class="division">
+                                
+                                <div id="replace_bill">
+                                    <table cellspacing="0" cellpadding="0"  border="0" class='gridlist'>
+                                        <thead>
+                                            <tr>
+    
+                                                <th>财务流水号</th>
+                                                <th>业务订单号</th>
+                                                <th>对方名称</th>
+                                                <th>资金流向</th>
+                                                <th>收支类型</th>
+                                                <th>金额</th>
+                                                <th>到账时间</th>
+                                                <th>备注</th>
+                                                <th>所属账期</th>
+                                        
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <{foreach from=$bill_data.other item=item key=key}>
+                                            <input name="bill_id[]" type="hidden" value="<{$item.bill_id}>" />
+                                            <tr id="replace_bill_<{$item.bill_id}>" >
+                                                       
+                                                <td><{$item.credential_number}></td>
+                                                <td><{$item.order_bn}></td>
+                                                <td><{$item.member}></td>
+                                                <td><{if $item.fee_type_id}>支出<{else}>收入<{/if}></td>
+                                                <td><{$item.fee_type}></td>
+                                                <td><{$item.money|cur}></td>
+                                                <td><{$item.trade_time}></td>
+                                                <td><{$item.remarks}></td>
+                                                <td><{$item.monthly_date}></td>
+                                            </tr>
+                                            <{/foreach}>
+                                        </tbody>    
+                                    </table>
+                                </div>                    
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td >
+                            <h4>应收应退单</h4>
+                            <div class="division">
+                                <!-- <div style='height:25px'><{button id="select_ar" label="选择应收/应退单" /}></div> -->
+                                <div id="replace_ar">
+                                    <table cellspacing="0" cellpadding="0"  border="0" class='gridlist'>
+                                        <thead>
+                                            <tr>
+                                                <!-- <th>选项</th> -->
+                                                <th>业务单据号</th>
+                                                <th>单据类型</th>
+                                                <th>业务订单号</th>
+                                                <th>客户/会员</th>
+                                                <th>资金流向</th>
+                                                <th>金额</th>
+                                                <th>单据创建时间</th>
+                                                <th>所属账期</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ar-section">
+                                            <{foreach from=$ar_data.other item=item key=key}>
+                                            <tr id="replace_ar_<{$item.ar_id}>" >
+                                                <!-- <td><input id="ar_id" name="ar_id[]" type="checkbox" value="<{$item.ar_id}>" /></td> -->
+                                                <td><{$item.ar_bn}></td>
+                                                <td><{$item.type}></td>
+                                                <td><{$item.order_bn}></td>
+                                                <td><{$item.member}></td>
+                                                <td><{if $item.money > 0}> 收入 <{else}> 支出 <{/if}> </td>
+                                                <td><{$item.money|cur}></td>
+                                                <td><{$item.trade_time}></td>
+                                                <td><{$item.monthly_date}></td>
+                                            </tr>
+                                            <{/foreach}>
+                                        </tbody>                        
+                                    </table>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+<div>
+<script>
+
+$$('input[name=ar_id[]]').addEvent('click',function(){
+    if ($E('input[name=is_verification]:checked').value == '1') return false;
+});
+// $$('input[name=is_verification]').addEvent('click',function(){
+//     var disabled = false;
+//     if($(this).get('value') == '1') disabled = true;
+//     $$('input[name=ar_id[]]').each(function(item){
+//         item.set('disabled',disabled);         
+//     });
+// });
+
+function do_submit(){
+   
+    var is_verification = $$('input[name=is_verification]:checked').get('value');
+    var verification_memo = $$('textarea[name=verification_memo]').get('value');
+    var ar_sel = new Array();
+    var bill_sel = new Array();
+    $$('input[name=ar_id[]]').each(function(item){
+        if(item.checked==true)
+        {
+            ar_sel.push(item.get('value'));
+        }           
+    });
+
+    $$('input[name=bill_id[]]').each(function(item){
+        if(item.checked==true)
+        {
+            bill_sel.push(item.get('value'));
+        }           
+    });
+
+    
+    if(is_verification == '1')
+    {
+        
+        if(verification_memo == '')
+        {
+            MessageBox.error("填写核销备注!");
+            return;
+        }
+
+        
+    }
+    else
+    {
+        if(ar_sel == 0)
+        {
+            MessageBox.error("请选择应收应退单!");
+            return;
+        }
+
+        if(bill_sel == 0)
+        {
+            MessageBox.error("请选择实收实退单!");
+            return;
+        }
+    }
+
+    
+
+    $('btn-submit').set('disabled',true);
+
+    new Request({
+        url:'index.php?app=finance&ctl=monthend_verification&act=checkVerificate',
+        data:$('do_form'),
+        method:'post',
+        onSuccess:function(json){
+            $('btn-submit').set('disabled',false);
+            rs = JSON.decode(json);
+            if(rs.status == 'fail'){
+                MessageBox.error(rs.msg);
+            }else{
+                var url = 'index.php?app=finance&ctl=monthend_verification&act=confirmVerification';
+                new Dialog(url,{title:rs.title,width:500,height:200,ajaxoptions:{
+                    method: 'post',
+                    data: {data:rs.data}
+                }}); 
+            }
+                       
+
+        }
+    }).send();
+    
+
+}
+
+
+function ar_delete (e,ar_id) {
+
+    if(confirm('是否移除本期账期')){
+        new Request({
+            url:'index.php?app=finance&ctl=monthend_verification&act=doRemove',
+            data:{'ar_id':ar_id},
+            method:'post',
+            onSuccess:function(json){
+                rs = JSON.decode(json);
+                if(rs.res == 'fail'){
+                    alert(rs.msg);
+                }else{
+                    $(e).getParent('tr').remove();
+                }
+            }
+        }).send();
+    }
+    
+}
+
+
+function verificate_callback()
+{
+
+    $('do_form').fireEvent('submit',{stop:function(){
+        setTimeout("opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,opener.finderGroup['<{$env.get.finder_id}>']);window.close();",1000);
+    }});
+}
+
+
+
+
+function change_current(key)
+{
+    $$('.my_clearfix li').each(function(el){
+        el.set('class','');
+    });
+    $(key+'_tab').set('class','current');
+
+    $$('.finder-section').each(function(el){
+        el.addClass('none');
+    });
+    $(key+'_section').removeClass('none');
+}
+
+
+</script>

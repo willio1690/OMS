@@ -1,0 +1,258 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="option-btns division">
+    <{button class="btn-primary" label="返回" onclick="javascript:history.back(-1);" id="goback-list"}>
+
+   
+</div>
+<div id="allocation-error" class="error" style="display:none;"></div>
+
+<div id="allocation-edit-form">
+    <input type="hidden" name="sug_id" value="<{$suggests.sug_id}>">
+   <div id="allocation-header" class="allocation-info">
+        <div class="allocation-info__row">
+            <div class="allocation-search__col">
+                <div class="search-label">任务单号：</div>
+                <div class="search-value"><{$suggests.task_bn}></div>
+            </div>
+            <div class="allocation-search__col">
+                <div class="search-label">任务状态：</div>
+                <div class="search-value"><{$suggests.sug_status_value}></div>
+            </div>
+            <div class="allocation-search__col">
+                <div class="search-label">创建时间：</div>
+                <div class="search-value"><{$suggests.create_time}></div>
+            </div>
+            <div class="allocation-search__col">
+                <div class="search-label">仓库：</div>
+                <div class="search-value"><{$branchs.name}></div>
+            </div>
+        </div>
+        
+     </div>   
+    <div class="allocation-table" id="item-list">
+        <table border="1" class="gridlist">
+            <thead>
+            <tr>
+                <th class="w-90">商品条码</th>
+                <th class="w-60">申请量</th>
+                <th class="w-90">确认量</th>
+            </tr>
+            </thead>
+            <{foreach from=$items item=sku}>
+            <tbody sku="<{$sku.material_bn}>" item_code="<{$sku.material_bn}>">
+            <tr>
+               
+                <td rowspan="0"><{$sku.material_bn}></td>
+                <td rowspan="0"><{$sku.apply_nums}></td>
+                <td rowspan="0">
+                    <{if $suggests.sug_status == '0'}>
+                   <input style="width:60px;" type="text" id="<{$sku.item_id}>_num" name="<{$sku.item_id}>"
+                           value="<{$sku.reple_nums}>" onchange="saveApplyNums('<{$sku.item_id}>',this.value)" size=6/>
+                 <{else}>
+                    <{$sku.reple_nums}>
+                    <{/if}>
+                </td>
+            </tr>
+            </tbody>
+            <{/foreach}>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+    (function () {
+       
+        tail.select('#allocation-edit-form .filter-list select', {
+            search: true,
+            width: 150,
+            height: 200,
+            searchMinLength: 0
+        });
+
+        $$('#allocation-edit-form .filter-list select', '#allocation-edit-form .filter-list input').addEvent('change', function () {
+            var s = "#item-list tbody";
+            $$('#allocation-edit-form .filter-list select', '#allocation-edit-form .filter-list input').each(function (i) {
+                if (i.value) {
+                    s += '[' + i.id + '=' + i.value + ']';
+                }
+            });
+
+            if (s != '#item-list tbody') $$(s).inject($E('#item-list thead'), 'after');
+        });
+
+        
+
+
+    })();
+
+    function saveApplyNums(item_id, reple_nums) {
+        if (isNaN(reple_nums)) {
+            return MessageBox.error('请填写数字!');
+        }
+        if (reple_nums == '' || reple_nums == 0) {
+            return MessageBox.error('请填写补货数量!');
+        }
+        W.page('index.php?app=console&ctl=admin_replenish_suggest&act=saveApplyNums', {
+            method: 'POST',
+            data: {'item_id': item_id, 'reple_nums': reple_nums},
+            onComplete: function (resp) {
+                resp = JSON.decode(resp)
+                if (resp.error) {
+                   
+                } else {
+                    
+                }
+            },
+            onRequest: function (resp) {
+            }
+
+        });
+    }
+
+    
+</script>
+
+<style type="text/css">
+    .gridlist thead th {
+        font-size: 14px;
+    }
+
+    .gridlist tbody td {
+        font-size: 14px;
+    }
+
+    .allocation-info {
+        padding-left: 15px;
+        box-sizing: border-box;
+    }
+
+    .allocation-info .allocation-info__row .allocation-search__col {
+        display: inline-block;
+        width: 260px;
+        font-size: 0;
+        vertical-align: top;
+        margin-right: 20px;
+        height: 34px;
+        line-height: 34px;
+    }
+
+    .allocation-info .allocation-info__row .allocation-search__col:last-child {
+        width: 330px;
+    }
+
+    .allocation-info .allocation-info__row .allocation-search__col > div {
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 14px;
+    }
+
+    .allocation-info .allocation-info__row .allocation-search__col .search-label {
+        width: 90px;
+        text-align: right;
+    }
+
+    .allocation-info .allocation-info__row .allocation-search__col .search-value {
+        width: calc(100% - 90px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: left;
+    }
+
+    .allocation-info .allocation-info__row .allocation-search__col .search-value .cal {
+        margin-top: -3px;
+    }
+
+    .filter-list {
+        border-top: 1px solid #ddd;
+        padding-top: 20px;
+        margin: 5px 15px 0;
+        box-sizing: border-box;
+    }
+
+    .filter-list .filter-col {
+        display: inline-block;
+        vertical-align: top;
+        margin-right: 20px;
+        margin-bottom: 20px;
+        height: 34px;
+    }
+
+    .filter-list .filter-col:last-child {
+        margin-right: 0;
+    }
+
+    .filter-list .filter-col > div {
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 14px;
+    }
+
+    .filter-list .filter-col input {
+        height: 34px;
+    }
+
+    .allocation-table {
+        width: 1100px;
+        margin-left: 15px;
+    }
+
+    /* .allocation-table thead, .allocation-table tbody tr {
+        width: 100%;
+        display: table;
+        table-layout: fixed;
+    }
+    .allocation-table tbody {
+        height: 300px;
+        overflow-y: scroll;
+        display: block;
+    } */
+    .allocation-table tr th, .allocation-table tr td {
+        padding: 7px 10px;
+        box-sizing: border-box;
+        font-size: 12px;
+    }
+
+    .allocation-table tr th {
+        font-weight: bold;
+    }
+
+    .w-90 {
+        width: 80px !important;
+    }
+
+    .w-60 {
+        width: 60px !important;
+    }
+
+    .w-140 {
+        width: 140px !important;
+    }
+
+    .w-180 {
+        width: 180px !important;
+    }
+
+    .expend-form .s-label {
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 14px;
+        width: 90px;
+        text-align: right;
+    }
+
+    .expend-form .s-value {
+        display: inline-block;
+        max-width: calc(100% - 120px);
+        vertical-align: middle;
+    }
+
+    .expend-form .s-value textarea {
+        width: 450px;
+        max-width: 100%;
+    }
+</style>

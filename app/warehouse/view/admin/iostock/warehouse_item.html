@@ -1,0 +1,53 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../app/wms/statics/wms.css" rel="stylesheet" type="text/css">       
+<{/capture}>
+
+
+
+<div class="tableform"> 
+
+<h4>原始内容</h4>
+
+<div class="division">
+<table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+<thead>
+<tr>
+	<th>基础物料编码</th>
+    <th>基础物料名称</th>
+    <th>规格</th>
+	<th>条码</th>
+	<th>入库数量</th>
+ <!-- <th>良品</th>
+ <th>不良品</th> -->
+ <th>计量单位</th>
+ <th>PO名称</th>
+ <th>发货编码</th>
+ <th>装卸单元</th>
+</tr>
+</thead>
+<{foreach from=$rs_items item=item}>
+<tbody>
+<tr>
+    <td><{$item.bn}></td>
+    <td><{$item.product_name}></td>
+    <td><{$item.spec_info}></td>
+    <td><{$item.barcode}></td>
+    <td><{$item.nums}></td>
+     <!-- <td><{$item.normal_num}></td>
+      <td><{$item.defective_num}></td> -->
+      <td><{$item.unit}></td>
+      <td><{$item.po_name}></td>
+      <td><{$item.dly_note_number}></td>
+      <td><{$item.box_number}></td>
+</tr>
+</tbody>
+<{/foreach}>
+</table>
+</div>
+</div>
+

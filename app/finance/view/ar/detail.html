@@ -1,0 +1,30 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!--发票展示界面-->
+<div class="division">
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0">
+      <thead>
+        <tr>
+             <th>货号</th>
+             <th>商品名称</th>
+             <th>数量</th>
+             <th>金额</th>
+             <th>客户实付</th>
+        </tr>
+      </thead>
+      <tbody>
+           <{foreach from=$items item=item}>
+             <tr>
+                  <td><{$item.bn}></td>
+                  <td><{$item.name}></td>
+                  <td><{$item.num}></td>
+                  <td><{$item.money}></td>
+                  <td><{$item.actually_money}></td>
+             </tr>
+        <{/foreach}>
+      </tbody>            
+    </table>
+</div>

@@ -1,0 +1,85 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout" style="padding-bottom: 0px;">
+    <form method="post" id="order_form" action="index.php?app=monitor&ctl=admin_alarm_receiver&act=save" name="order_form">
+        <div class="form-layout-block">
+            <h3>基本信息</h3>
+            <{if $action == 'add'}>
+                <{button id='cpAdd' label="增加接收信息地址（邮箱）" style="margin-bottom:10px;"}>
+            <{/if}>
+            <div class="form-layout-fields" id="receiver">
+                <{foreach from=$data.receiver key=key item=val}>
+                <div class="form-field" style="width: 30%">
+                    <span class="form-field-label">接收信息地址：</span>
+                    <input class="form-input" placeholder="请输入接收信息地址" type="text" name="receiver[]" size="60"
+                           value="<{$val}>"/>
+                </div>
+                <{foreachelse}>
+                <div class="form-field"  style="width: 30%">
+                    <span class="form-field-label">接收信息地址：</span>
+                    <input class="form-input" placeholder="请输入接收信息地址" type="text" name="receiver[]" size="60"
+                           value="<{$val}>"/>
+                </div>
+                <{/foreach}>
+            </div>
+            <div id="cc" class="form-layout-fields" >
+                <input type="hidden" name="id" value="<{$data.id}>">
+                <button class="btn-primary" id="material-save-btn">保存</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    (function () {
+        if ($('cpAdd')) {
+            $('cpAdd').addEvent('click', function (e) {
+                var sHtml = '<div class="form-field">\n' +
+                    '                    <span class="form-field-label">接收信息地址：</span>\n' +
+                    '                    <input class="form-input" placeholder="请输入接收信息地址" type="text" name="receiver[]" size="60" value="<{$data.template_name}>"  />\n' +
+                    '                </div>';
+                document.getElementById("receiver").insertAdjacentHTML('beforeend', sHtml);
+            });
+        }
+    })();
+
+    (function(){
+        var _form = $('order_form');
+        var btn = $('material-save-btn');
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+
+        _form.store('target',{
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+                    if(_dialogIns){
+                        _dialogIns.close();
+                        finder.refresh();
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+            var flag = submit_frm();
+            if(flag){
+                _form.fireEvent('submit',{stop:$empty});
+            }
+        });
+
+    })();
+
+    tail.select('select[data-search="fuzzy_search"]', {
+        search: true,
+        multiple: true,
+        height: 200,
+        hideDisabled: true,
+        multiContainer: true,
+        hideSelected: true,
+    });
+</script>

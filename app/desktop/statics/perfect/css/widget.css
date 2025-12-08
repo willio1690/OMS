@@ -1,0 +1,196 @@
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+:root {
+    --input-border-color: #ebebeb
+}
+
+.btn-danger {
+    border: 1px solid #e12020!important;
+}
+
+.btn-danger,
+.btn-danger span {
+    color: #e12020!important;
+}
+
+.btn-danger:hover {
+    background: #e12020!important;
+}
+
+.btn-danger:hover span {
+    color: #FFFFFF!important;
+}
+
+.dialog button,
+.dialog .btn,
+.content-container button,
+.content-container .btn {
+    font-weight: 400;
+    color: #157FE3;
+    border: 1px solid rgba(20, 127, 227, 0.4);
+    margin-right: 20px;
+    padding: 0 10px;
+    text-align: center;
+    background: #FFFFFF;
+    height: 32px;
+    line-height: 32px;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.dialog .btn span,
+.dialog button span,
+.content-container .btn span,
+.content-container button span{
+    color: #157FE3;
+}
+
+.dialog button:hover,
+.dialog .btn:hover,
+.content-container button:hover,
+.content-container .btn:hover {
+    background: #157FE3;
+    color: #FFFFFF;
+}
+
+.dialog .btn:hover,
+.dialog .btn:hover span,
+.dialog button:hover span,
+.content-container .btn:hover,
+.content-container .btn:hover span,
+.content-container button:hover span {
+    color: #FFFFFF!important;
+}
+
+.dialog .btn-default,
+.content-container .btn-default {
+    height: 32px;
+    line-height: 32px;
+}
+
+.dialog .btn:hover span,
+.content-container .btn:hover span
+{
+    color: #157FE3;
+}
+
+.side-r .btn-primary:hover span,
+.dialog .btn-primary:hover span,
+.content-container .btn-primary:hover span
+{
+    color: #FFFFFF;
+}
+
+.dialog .btn span ,
+.content-container .btn span {
+    background: none;
+    line-height: 1;
+    display: inline;
+}
+
+.side-r .btn-primary,
+.dialog .btn-primary ,
+.content-container .btn-primary {
+    background: #157FE3;
+    color: #FFFFFF;
+    height: 32px;
+    line-height: 32px;
+    font-weight: 400;
+    margin-right: 20px;
+    padding: 0 10px;
+    text-align: center;
+    border: none;
+    box-sizing: border-box;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.side-r .btn-primary span,
+.dialog .btn-primary span,
+.content-container .btn-primary span{
+    display: inline!important;
+    color: #FFFFFF;
+    font-weight: 400;
+    background: transparent;
+    line-height: 1;
+}
+
+.side-r .btn-primary:hover,
+.dialog .btn-primary:hover,
+.content-container .btn-primary:hover{
+    background: rgba(21, 127, 227, .7);
+    opacity: .9;
+}
+
+.btn.btn-secondary {
+    height: 32px;
+    line-height: 32px;
+    font-weight: 400;
+    margin-right: 20px;
+    padding: 0 10px;
+    text-align: center;
+    background: #FFFFFF;
+    box-sizing: border-box;
+    border-radius: 4px;
+    border: 1px solid #EEEEEE;
+}
+
+.btn.btn-secondary span {
+    display: inline;
+    font-weight: 400;
+    color: #333333;
+    background: transparent;
+}
+
+.btn.btn-secondary:hover {
+    background: #f2f2f2;
+}
+
+input,
+select,
+textarea {
+    background: #FFFFFF!important;
+    box-sizing: border-box;
+    line-height: 32px;
+    height: 32px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 4px;
+    margin: 0;
+    padding: 4px 8px;
+    font-weight: 400!important;
+    color: #333333!important;
+}
+#type_content input[type="checkbox"] {
+    height: 17px;
+    margin-right: 4px;
+}
+.x-tree-list .node span, .x-tree-list .node input {
+    height: 17px;
+    line-height: 17px;
+}
+input::placeholder,
+select::placeholder,
+textarea::placeholder {
+    color: #999999;
+}
+
+input[type="radio"] {
+    height: auto;
+    margin: 5px;
+}
+
+.btn-disabled,
+button:disabled {
+    background: #c8c8c8!important;
+    color: #898989!important;
+    border: none!important;
+    cursor: not-allowed!important;
+    /*pointer-events: none!important;*/
+}
+
+.btn-disabled:hover span,
+button:disabled span {
+    color: #898989!important;
+}

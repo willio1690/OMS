@@ -1,0 +1,86 @@
+<services>
+
+    <service id="desktop_finder.finance_mdl_bill">
+        <class>finance_finder_bill</class>
+    </service>
+
+	<service id="desktop_finder.finance_mdl_ar_statistics">
+        <class>finance_finder_ar_statistics</class>
+    </service>
+
+    <service id="desktop_finder.finance_mdl_bill_order">
+        <class>finance_finder_bill_order</class>
+    </service>
+
+    <service id="desktop_finder.finance_mdl_tasklog">
+        <class>finance_finder_tasklog</class>
+    </service>
+
+    <service id="desktop_finder.finance_mdl_bill_confirm">
+        <class>finance_finder_bill_confirm</class>
+    </service>
+
+    <service id="delivery_finish_all_over">
+        <class>finance_iostocksales</class>
+    </service>
+
+     <service id="reship_finish_dosales">
+        <class>finance_iostocksales</class>
+    </service>
+
+    <service id="desktop_finder.finance_mdl_ar">
+        <class>finance_finder_ar</class>
+    </service>
+
+    <service id="desktop_finder.finance_mdl_monthly_report">
+        <class>finance_finder_monthly_report</class>
+    </service>
+
+    <service id="desktop_finder.finance_mdl_verification">
+        <class>finance_finder_verification</class>
+    </service>
+
+    <service id="desktop_finder.finance_mdl_ar_verification">
+        <class>finance_finder_ar_verification</class>
+    </service>
+
+    <service id="desktop_finder.finance_mdl_uncharge_ar">
+        <class>finance_finder_uncharge_ar</class>
+    </service>
+
+    <service id="extend_filter_finance_mdl_ar">
+        <class>finance_finder_extend_filter_ar</class>
+    </service>
+
+    <service id="extend_filter_finance_mdl_bill">
+        <class>finance_finder_extend_filter_bill</class>
+    </service>
+
+    <service id="extend_filter_finance_mdl_verification">
+        <class>finance_finder_extend_filter_verification</class>
+    </service>
+
+    <service id="data_clear">
+        <class>finance_service_data_clear</class>
+    </service>
+
+    <service id="desktop_finder.finance_mdl_bill_fee_type">
+        <class>finance_finder_bill_fee_type</class>
+    </service>
+
+    <service id="desktop_finder.finance_mdl_monthly_report_items">
+        <class>finance_finder_monthly_report_items</class>
+    </service>
+
+    <service id="extend_filter_finance_mdl_monthly_report_items">
+        <class>finance_finder_extend_filter_monthly_report_items</class>
+    </service>
+
+    <service id="ome_shop_relation">
+        <class>finance_shop_relation</class>
+    </service>
+
+    <service id="openapi.finance.bill">
+        <class>finance_rpc_response_bill</class>
+    </service>
+</services>

@@ -1,0 +1,93 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div style="margin: 15px 0px 15px;">
+        <a href="<{$template_cfg.print_url}>" target="_blank">下载<{$template_cfg.template_name}>组件</a> &nbsp;&nbsp;
+    </div>
+    <div class="division" id="tplFormDiv">
+        <form method="post" action="index.php?app=logisticsmanager&ctl=admin_express_cainiao&act=saveTpl" id="frm">
+            <{input type="hidden" name="channel_type" value=$channel_type}>
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th>模板名称：</th>
+                        <td><{input type='text' vtype='required' name='temlateName'}></td>
+                        <th></th>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th>模板编码：</th>
+                        <td><select name="templateCode">
+                            <option value="fm_150_standard_SPRJmKkSvUY">丰密二联面单100mm*150mm</option>
+                            <option value="fm_210_standard_SPRJmKkSvUY">丰密三联面单100mm*210mm</option>
+                            <option value="fm_150_international_SPRJmKkSvUY">丰密二联国际面单100mm*150mm</option>
+                            <option value="fm_180_standard_SPRJmKkSvUY">丰密二联面单100mm*180mm</option>
+                            <option value="fm_76130_standard_SPRJmKkSvUY ">丰密一联面单76mm*130mm</option>
+                            <option value="fm_210_international_SPRJmKkSvUY ">丰密三联国际面单100mm*210mm</option>
+                        </select></td>
+                        <th><!-- 自定义模板编码： --></th>
+                        <td><!-- <{input type="text" name="customTemplateCode"}> --></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' label='保存' }>
+                    <{button type="button" id='close_btn' label='关闭' }>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+        $('close_btn').addEvent('click', function(){
+            try{
+                var _dialogIns = this.getParent('.dialog').retrieve('instance');
+            }catch(e){}
+
+            if(_dialogIns){
+                setTimeout(finder.refresh(),30000);
+                _dialogIns.close();
+            }
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+
+                    if(_dialogIns){
+                        //setTimeout(finder.refresh(),30000);
+                        _dialogIns.close();
+                    }
+                }
+            }
+        });
+        W.render('tplFormDiv');
+        btn.addEvent('click',function(){
+            _form.fireEvent('submit',{stop:$empty});
+        });
+
+    })();
+</script>

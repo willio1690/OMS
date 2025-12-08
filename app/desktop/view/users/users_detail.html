@@ -1,0 +1,470 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+﻿<style>
+#role, #role2 , #role3{padding-bottom:5px; padding-top:5px;border:none;}
+.row .span-2 strong{font-weight:bold;}
+#work2, #o2o_work{padding:10px 10px 10px 5px;}
+#work_obj, #work2_obj, #work3_obj{border-bottom:1px dotted #e8e8e8;}
+#work3_obj{border:none;white-space:normal;}
+
+div.row {overflow:visible;}
+.row .span-2 { width:90px; }
+.center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+</style>
+<form method="POST" action="index.php?app=desktop&ctl=users&act=saveUser" class="tableform" id="form_user">
+    <div class="tableform">
+        <h5>基本信息 <{help docid="101" type="link"}><{t}>点击查看帮助<{/t}><{/help}></h5>
+        <div class="division">
+                <table cellspacing="0" cellpadding="0" width="100%">
+                    <tbody>
+                    
+                    <tr>
+                        <th>
+                            <em class="red">*</em>
+                            <label for="dom_el_3e40f71"><{t}>姓名：<{/t}></label>
+                        </th>
+                        <td>
+                            <span>
+                                <{$name|ciphertext:'member','uname'}><input type="button" style="padding: 0px 8px" onclick="$('input_name').setAttribute('type', 'text');this.getParent('span').setHTML('');" value="<{t}>编辑<{/t}>" />
+                            </span>
+                            <input type="hidden" id="input_name" value="<{$name}>" name="name" title="<{t}>姓名<{/t}>" class="x-input " autocomplete="off" vtype="required"/>
+                            <{if !$ban_edit}><input type="button" style="padding: 0px 8px" onclick="new Dialog('index.php?ctl=users&act=chkpassword&id=<{$account_id}>',{width:400,height:300,title:'<{t}>密码修改<{/t}>'})" value="<{t}>修改密码<{/t}>" /><{/if}>
+                        </td>
+                    </tr>        
+                    
+                    <tr>
+                        <th>
+                            <label for="dom_el_3e40f72"><{t}>工号：<{/t}></label>
+                        </th>
+                        <td>
+                            <input type="text" id="dom_el_3e40f72" value="<{$op_no}>" name="op_no" title="<{t}>工号<{/t}>" class="x-input " autocomplete="off"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <em class="red">*</em>
+                            <label for="dom_el_3e40f74"><{t}>手机：<{/t}></label>
+                        </th>
+                        <td>
+                            <span>
+                                <{$hidemobile}><input type="button" style="padding: 0px 8px" onclick="$('input_mobile').setAttribute('type', 'text');this.getParent('span').setHTML('');" value="<{t}>编辑<{/t}>" />
+                            </span>
+                            <input type="hidden" id="input_mobile" value="<{$mobile}>" name="mobile" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th>
+                            <label><{t}>邮箱：<{/t}></label>
+                        </th>
+                        <td>
+                            <{if $email}>
+                            <span><{$email}></span>
+                            <{else}>
+                            <input type="text" value="<{$email}>" name="email" title="邮箱" class="x-input " autocomplete="off"/>
+                            <{/if}>
+                        </td>
+                    </tr>
+
+                    <{if ($ismyself != 'true') && (!$super)}>
+                    <tr>
+                        <th>
+                            <em class="red">*</em>
+                            <label for="dom_el_3e40f73"><{t}>启用：<{/t}></label>
+                        </th>
+                        <td>
+                            <select id="dom_el_3e40f73" required="1" name="status" type="select" title="<{t}>启用<{/t}>" class="x-input-select inputstyle">
+                                <option value="0" <{if !$status}>selected="selected"<{/if}>><{t}>否<{/t}></option>
+                                <option value="1" <{if $status}>selected="selected"<{/if}>><{t}>是<{/t}></option>
+                            </select>
+                        </td>
+                    </tr>
+                    <{/if}>
+                    <input type="hidden" value="<{$account_id}>" name="account_id" />
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+<div class="tableform" id="setting_self" >
+<h5>直营</h5>
+<div class="gridlist clearfix">
+
+<div class="tableform"  <{if $super}>style="display:none"<{/if}>>
+    <h5>工作组</h5>
+    <div class="gridlist clearfix" id="access-form">
+
+            <div class="row" id="role">
+                <div class="row-line role-list" style="padding:5px;">
+                    <div class="span-2"><strong>订单角色</strong></div>
+                    <div class="span-13">
+                        <{foreach from=$workgroup_order item=item}>
+                        <div class="span-auto">
+                            <label class="center"><input class="role" type="checkbox" value='<{$item.role_id}>' name="role[<{$item.role_id}>]" <{if $item.checked=='true'}>checked='checked'<{/if}> /><{$item.role_name}></label>
+                        </div>
+                        <{/foreach}>
+                    </div>
+                </div>
+                <!-- 订单小组 -->
+                <div class="row-line role-list" style="padding:5px;">
+                    <div class="span-2"><strong></strong></div>
+                    <div class="" id="access-ordergroup"></div>
+                </div>
+            </div>
+            
+            <div class="row" id="role2">
+                <div class="row-line role-list" style="padding:5px;">
+                    <div class="span-2"><strong>仓库角色</strong></div>
+                    <div class="span-13">
+                        <{foreach from=$workgroup_branch item=item}>
+                        <div class="span-auto">
+                            <label class="center"><input class="role2" type="checkbox" value='<{$item.role_id}>' name="role[<{$item.role_id}>]" <{if $item.checked=='true'}>checked='checked'<{/if}> /><{$item.role_name}></label>
+                        </div>
+                        <{/foreach}>
+                    </div>
+                </div>
+                <!-- 仓库授权 -->
+                <div class="row-line role-list" style="padding:5px;">
+                    <div class="span-2"><strong></strong></div>
+                    <div class="span-13" id="access-branch"></div>
+                </div>
+            </div>
+            
+
+    </div>
+</div>
+
+  <div class="tableform">
+        <h5>数据权限</h5>
+        <div class="gridlist clearfix">
+            <div class="row" style="padding:10px 0;">
+                <div class="row-line role-list" style="padding:5px;">
+                    <div class="span-2 center">
+                        <{ if (!empty($orgs)) }>
+                        <input type="checkbox" class="role role_org_workground" value="org_id" onclick="this.getParent('.row').getElements('.span-auto input:enabled').set('checked',this.checked)">
+                        <{ /if }>
+                        <strong>运营组织：</strong>
+                    </div>
+                    <div class="span-13">
+                        <{foreach from=$orgs item=item}>
+                        <div class="span-auto">
+                            <label class="center"><input class="role org_id" type="checkbox" value='<{$item.org_id}>' name="org_id[<{$item.org_id}>]" <{if $item.checked=='true'}>checked='checked'<{/if}> /><{$item.name}></label>
+                        </div>
+                        <{/foreach}>
+                    </div>
+                </div>
+            </div>
+        </div>
+  </div>
+</div>
+</div>
+
+<div class="tableform" id="setting_store">
+<h5>门店</h5>
+<div class="gridlist clearfix">
+
+  <div class="tableform">
+    <h5>门店工作组</h5>
+    <div class="gridlist clearfix" id="access-form-store">
+        <div class="row">
+            <div class="row-line role-list" style="padding:5px;">
+                <div class="span-2"><strong>门店角色：</strong></div>
+                <div class="span-13">
+                    <{foreach from=$workgroup_o2o_branch item=item}>
+                    <div class="span-auto">
+                        <label class="center"><input class="store_role_new" type="checkbox" value="<{$item.role_id}>" name="role[<{$item.role_id}>]" <{if $item.checked=='true'}>checked='checked'<{/if}> /><{$item.role_name}></label>
+                    </div>
+                    <{/foreach}>
+                </div>
+            </div>
+            <!-- 门店授权 -->
+            <div class="row-line role-list" style="padding:5px;">
+                <div class="span-2"><strong></strong></div>
+                <div class="" id="access-store"></div>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <div class="tableform">
+    <h5>门店组织权限</h5>
+    <div class="gridlist clearfix">
+        <div class="row" style="padding:10px 0;">
+            <div class="row-line role-list" style="padding:5px;">
+              <li class='division' style="line-height:30px;">
+                <div class='storeOrgCity'>
+                    门店组织 <input style="width:300px;" type='text' name='store_org_conf[orgCollectName][]' readonly=true value='<{$store_org.orgCollectName}>' class="_x_ipt" onclick="storeOrgSelect(this);">
+                    <input type='hidden' name='store_org_conf[orgIds][]' value="<{$store_org.orgIds}>"/><{img class='storeOrgSelect' src='images/bundle/editcate.gif' style='cursor:pointer;display:none;' onclick='storeOrgSelect(this)' alt='编辑组织' title="编辑组织"}>
+                    <a onclick='deleteStoreOrg($(this).getParent("li"))' >清空</a>
+                </div>
+              </li>
+            </div>
+        </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="tableform" id="setting_dealer"  >
+<h5>经销</h5>
+<div class="gridlist clearfix">
+
+  <div class="tableform">
+    <h5>经销工作组</h5>
+    <div class="gridlist clearfix" id="access-form">
+        <div class="row" id="role">
+            <div class="row-line role-list" style="padding:5px;">
+                <div class="span-2"><strong>分销角色：</strong></div>
+                <div class="span-13">
+                    <{foreach from=$workgroup_dealer item=item}>
+                    <div class="span-auto">
+                        <label class="center"><input class="role" type="checkbox" value="<{$item.role_id}>" name="role[<{$item.role_id}>]" <{if $item.checked=='true'}>checked='checked'<{/if}> /><{$item.role_name}></label>
+                    </div>
+                    <{/foreach}>
+                </div>
+            </div>
+            <!-- 订单小组 -->
+            <div class="row-line role-list" style="padding:5px;">
+                <div class="span-2"><strong></strong></div>
+                <div class="" id="access-ordergroup"></div>
+            </div>
+        </div>
+    </div>
+  </div>
+<!-- 
+  <div class="tableform">
+    <h5>经销数据权限</h5>
+    <div class="gridlist clearfix">
+        <div class="row" style="padding:10px 0;">
+            <div class="row-line role-list" style="padding:5px;">
+                <div class="span-2 center" >
+                    <{ if (!empty($orgs)) }>
+                    <input type="checkbox" class="role_org_workground" value="org_id" onclick="this.getParent('.row').getElements('.span-auto input:enabled').set('checked',this.checked)">
+                    <{ /if }>
+                    <strong>运营组织：</strong></div>
+                <div class="span-13">
+                    <{foreach from=$orgs item=item}>
+                    <div class="span-auto">
+                        <label class="center"><input class="org_id" type="checkbox" value='<{$item.org_id}>' name="org_id[<{$item.org_id}>]" <{if $item.checked=='true'}>checked='checked'<{/if}> /><{$item.name}></label>
+                    </div>
+                    <{/foreach}>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+ -->
+  <div class="tableform">
+    <h5>经销组织权限</h5>
+    <div class="gridlist clearfix">
+        <div class="row" style="padding:10px 0;">
+            <div class="row-line role-list" style="padding:5px;">
+              <li class='division' style="line-height:30px;">
+                <div class='deliverycity'>
+                    
+                    经销商店铺 <input style="width:300px;" type='text' name='dealer_shop_conf[cosCollectName][]' readonly=true required="true" value='<{$area.cosCollectName}>' class="_x_ipt" onclick="regionSelect(this);">
+                    <input type='hidden' name='dealer_shop_conf[cosIds][]' value="<{$area.cosIds}>"/><{img class='regionSelect' src='images/bundle/editcate.gif' style='cursor:pointer;display:none;' onclick='regionSelect(this)' alt='编辑地区' title="编辑地区"}>
+                    <a onclick='deleteDelivery($(this).getParent("li"))' >清空</a>
+                    <!-- 
+                    经销商店铺 <div><a href="javascript:void(0);" id= 'addrole'>增加经销店铺</a> <span></span></div><ul id="roleList">
+                    <{ foreach from=$info.config item=role key=uid}>
+                    <li id="m_item_<{$uid}>"><div title="<{$role.attr.caption}>"><{$role.attr.caption}> </div><span><a ref='<{$role.json}>' sku='<{$role.sku}>' class="edit" href="javascript:void(0);">编辑</a>&nbsp;<a class="del" href="javascript:void(0);">删除</a></span></li>
+                    <{ /foreach }>
+                    </ul>
+ -->
+                </div>
+              </li>
+            </div>
+        </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+</form>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <{button class="btn-primary" type="button"  label=$___desktop="保存"|t:'desktop' id="user-submit"}>
+</div>
+<{/area}>
+
+<script>
+//订单角色
+var show_group = 3;
+//仓库角色
+var show_branch = 2;
+//门店角色
+var show_o2o_branch = 99;
+
+
+(function(){
+  
+    $$('.role').addEvent('click',function(e){
+        var checkedName = $ES('input.role:checked').get('value');
+
+          new Request.HTML({
+            url:'index.php?app=desktop&ctl=users&act=detail_ground&user_id=<{$env.get.p[0]}>&role='+show_group,
+            data:$('access-form').toQueryString()+'&checkedName='+checkedName,
+            update:'access-ordergroup',
+          }).send();
+    });
+
+    $$('.role2').addEvent('click',function(e){
+        var checkedName = $ES('input.role2:checked').get('value');
+
+        new Request.HTML({
+            url:'index.php?app=desktop&ctl=users&act=detail_ground&user_id=<{$env.get.p[0]}>&role='+show_branch,
+            data:$('access-form').toQueryString()+'&checkedName='+checkedName,
+            update:'access-branch'
+        }).send();
+    });
+
+    // 门店角色事件处理已禁用，现在通过门店组织权限来管理门店权限
+    // $$('.store_role_new').addEvent('click',function(e)
+    // {
+    //     var checkedName = $ES('input.store_role_new:checked').get('value');
+
+    //     new Request.HTML({
+    //         url:'index.php?app=desktop&ctl=users&act=detail_ground&user_id=<{$env.get.p[0]}>&role='+show_o2o_branch,
+    //         data:$('access-form-store').toQueryString()+'&checkedName='+checkedName,
+    //         update:'access-store',
+    //     }).send();
+    // });
+})();
+
+</script>
+
+<script>
+(function(){
+    var _form = $('form_user');
+    var btn =$('user-submit');
+    var finder = finderGroup['<{$env.get._finder.finder_id}>'];
+    
+    _form.store('target',{
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+        
+            if (hash_res_obj.success != undefined && hash_res_obj.success != "")
+            {
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+                
+                if(_dialogIns)
+                {    
+                    _dialogIns.close();
+                    window.finderGroup['<{$env.get._finder.finder_id}>'].refresh();
+                }
+            }
+            
+        }
+    });
+
+        btn.addEvent('click',function(){
+        
+            _form.fireEvent('submit',{stop:$empty});
+            
+        
+        
+        });
+
+
+
+})();
+    
+    
+</script>
+
+<script>
+    
+
+
+
+window.addEvent('domready', function(){
+
+    if($defined($E('input.role2:checked'))){
+        $E('input.role2:checked').fireEvent('click', {stop:$empty});
+    }
+
+    // 门店角色自动触发已禁用，现在通过门店组织权限来管理
+    // if($defined($E('input.store_role_new:checked'))){
+    //     $E('input.store_role_new:checked').fireEvent('click', {stop:$empty});
+    // }
+
+    if($defined($E('input.role:checked'))){
+        $E('input.role:checked').fireEvent('click', {stop:$empty});
+    }
+})
+
+    function regionSelect(el){
+        var el=$(el).getParent('.deliverycity');
+        var iptText=el.getElement('input[type=text]');
+        var iptHidden=el.getElement('input[type=hidden]');
+        // console.log(iptText);
+        // console.log(iptHidden);
+        Ex_Loader('modedialog',function(){
+            new ModeDialog('index.php?app=desktop&ctl=users&act=showCosTreeList&p[0]='+el.uid+'&p[1]=multi',{
+                width:270,height:340,params:{iptText:iptText,iptHidden:iptHidden}
+            });
+        });
+    }
+
+    function deleteDelivery(d){
+        if (!confirm('清空后无法恢复，确定要清空吗？')){
+            return;
+        }
+        var areaid_group=d.getElement('input[name^=dealer_shop_conf[cosIds][]]');
+        var areaname_group=d.getElement('input[name^=dealer_shop_conf[cosCollectName][]]');
+        areaid_group.value = '';
+        areaname_group.value = '';
+    }
+
+    function storeOrgSelect(el){
+        var el=$(el).getParent('.storeOrgCity');
+        var iptText=el.getElement('input[type=text]');
+        var iptHidden=el.getElement('input[type=hidden]');
+        Ex_Loader('modedialog',function(){
+            new ModeDialog('index.php?app=desktop&ctl=users&act=showStoreOrgTreeList&finder_id=<{$env.get._finder.finder_id}>&p[0]='+el.uid+'&p[1]=multi',{
+                width:270,height:340,params:{iptText:iptText,iptHidden:iptHidden}
+            });
+        });
+    }
+
+    function deleteStoreOrg(d){
+        if (!confirm('清空后无法恢复，确定要清空吗？')){
+            return;
+        }
+        var areaid_group=d.getElement('input[name^=store_org_conf[orgIds][]]');
+        var areaname_group=d.getElement('input[name^=store_org_conf[orgCollectName][]]');
+        areaid_group.value = '';
+        areaname_group.value = '';
+    }
+</script>
+
+<style>
+    .row-line .span-auto {
+        width: 130px;
+    }
+    .row-line .span-auto input {
+        margin-right: 3px;
+    }
+    .row-line .span-13 {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        /*width: auto;*/
+    }
+    .row-line .span-13 input {
+        height: auto;
+    }
+</style>

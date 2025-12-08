@@ -1,0 +1,147 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=dealer&ctl=admin_shop&act=saveShop" id="submitForm">
+            <input type="hidden" id="shop_id" name="shop[shop_id]" value="<{$shop.shop_id}>" />
+            <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+                <tbody>
+                <tr>
+                    <th><em class="c-red">*</em> 店铺编码：</th>
+                    <td>
+                        <{if $shop.shop_bn}>
+                            <{$shop.shop_bn}>
+                        <{else}>
+                            <{input type='text&&required' name="shop[shop_bn]" value=$shop.shop_bn size="40"}>
+                        <{/if}>
+                        <{help}><{t}>前端网店在系统中的唯一标识<{/t}><{/help}>
+                    </td>
+                </tr>
+                <tr>
+                    <th ><em class="c-red">*</em> 店铺名称：</th>
+                    <td><{input type="text&&required" size="40" name="shop[name]" value=$shop.name}>
+                        <{help}><{t}>前端网店在此系统需要显示的中文名称<{/t}><{/help}>
+                    </td>
+                </tr>
+                <tr>
+                    <th ><em class="c-red">*</em> 运营组织：</th>
+                    <td>
+                        <select name='shop[org_id]'>
+                            <{foreach from=$orgs item=item}>
+                            <option value="<{$item.org_id}>" <{if $shop.org_id == $item.org_id}>selected<{/if}> ><{$item.name}></option>
+                            <{/foreach}>
+                        </select>
+                        <{help}><{t}>定义后可针对订单、售后、单据等细分权限进行管理<{/t}><{/help}>
+                    </td>
+                </tr>
+                <tr>
+                    <th><em class="c-red">*</em> 地区：</th>
+                    <td><{input type='region' app='eccommon' name="shop[area]" value=$shop.area vtype="area"}>
+                        <{help}><{t}>用来联系及打印在“快递单”中发货点所在省/市/县（区）<{/t}><{/help}>
+                    </td>
+                </tr>
+                <tr>
+                    <th><em class="c-red">*</em> 地址：</th>
+                    <td><input type="text" vtype="required" name="shop[addr]" size="40" value="<{$shop.addr}>"/>
+                        <{help}><{t}>用来联系及打印在“快递单”中发货点的发货地址<{/t}><{/help}>
+
+                    </td>
+                </tr>
+                <tr>
+                    <th><em class="c-red">*</em> 发件人：</th>
+                    <td><input type="text" vtype="required" name="shop[default_sender]" size="40" value="<{$shop.default_sender}>"/>
+                        <{help}><{t}>用来联系及打印在“快递单”中发货点负责人的姓名<{/t}><{/help}>
+                    </td>
+                </tr>
+                <tr>
+                    <th><em class="c-red">*</em> 手机号：</th>
+                    <td><input type="text" id="mobile" name="shop[mobile]" size="40" value="<{$shop.mobile}>" vtype="required" onkeyup="this.value=this.value.replace(/[^0-9]/g,'')" />
+                        <{help}><{t}>用来联系及打印在“快递单”中发货点的移动联系方式；号码前请不要加0<{/t}><{/help}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>&nbsp;</th>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <th>&nbsp;</th>
+                    <td>&nbsp;</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="table-action">
+                <{button class="btn-primary" type="button" id="btn_save" label="提交"}>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    var _form = $('submitForm');
+    var btn = $('btn_save');
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+
+    btn.addEvent('click',function(e){
+        //手机号必填
+        var mobile;
+        mobile = $('mobile').value.replace(' ','');
+        if (!mobile){
+            alert('手机号码必需填写');
+            $('mobile').focus();
+            return false;
+        }
+
+        if (mobile){
+            if(is_mobile(mobile) === false){
+                alert('请输入正确的手机号码');
+                $('mobile').focus();
+                return false;
+            }
+
+            if(mobile[0] == '0'){
+                alert('手机号码前请不要加0');
+                $('mobile').focus();
+                return false;
+            }
+        }
+
+        $('submitForm').fireEvent('submit', e);
+    });
+
+    _form.store('target',{
+        onComplete:function(){
+        },
+        onSuccess:function(response)
+        {
+            var hash_res_obj = JSON.decode(response);
+
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+
+                if(_dialogIns){
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+
+    function is_mobile(str)
+    {
+        var partten = /^\d{8,15}$/;
+        if(partten.test(str)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+</script>

@@ -1,0 +1,26 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{input type='inventorydepth_object' object='sales_material@material' multiple=true breakpoint='0' name='sm_id' textcol='material_name' value=$data.pgid callback='product_object_callback' replacehtml=$replacehtml emptytext='选取销售物料' style='float:left;width:300px;' filter="is_bind=1&in_shop_id={$in_shop_id}" }>
+<script>    
+
+function product_object_callback(rs,handle){
+    var length = handle.getElements('.row').length;
+    var html = '已选择了'+length+'个销售物料,'+"<a href='javascript:void(0);' onclick='product_selected_show()'>查看选中的销售物料.</a>";
+    if ($defined($('hand-selected-product')))
+    {
+        $('hand-selected-product').setHTML(html);
+    } else {
+        var div = new Element('div',{'html':html,'id':'hand-selected-product'});
+        div.injectBefore(handle); 
+    }
+}
+
+function product_selected_show(){
+	new Dialog('index.php?app=inventorydepth&ctl=regulation_apply&act=showProducts',{
+		ajaxoptions:{data:$('hand-selected-product').getNext('div'),method:'post'}
+	});
+}
+</script>

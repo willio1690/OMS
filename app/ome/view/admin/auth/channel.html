@@ -1,0 +1,90 @@
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=ome&ctl=admin_shop&act=savechannel" id="terminal">
+            <input type="hidden" id="shop_id" name="shop[shop_id]" value="<{$shop.shop_id}>"/>
+            <input type="hidden" name="shop[config][adapter]" value="<{$shop_config.adapter}>"/>
+            <input type="hidden" name="act_type" value="<{$act_type}>"/>
+            <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tbody>
+                <tr>
+                    <th>渠道适配器：</th>
+                    <td>
+                        <{input type='select' disabled="true" name='shop[config][adapter]' id='wmstype'
+                        rows=$adapter_list valueColumn='value' labelColumn='label' value=$shop_config.adapter }>
+                        <ul style='color:red' id="adapter_desc">
+                            <{foreach from=$adapter_list item=item}>
+                            <li id="desc_<{$item.value}>" style="display:none"><{$item.desc}></li>
+                            <{/foreach}>
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div id='adapter_config'></div>
+
+            <{if $shop.shop_id}>
+            <input type="hidden" name="shop[shop_id]" value="<{$shop.shop_id}>">
+            <{/if}>
+
+            <div class="table-action">
+                <{button class="btn-primary" type="button" id="savechannel" name="submit" label="申请绑定"}>
+                <{button class="btn-danger" type="button" id="unbind" name="submit" label="取消绑定"}>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+
+    var act_type = $E('input[name=act_type]').get('value');
+    if (act_type == 'bind') {
+        $('unbind').set('disabled', 'true');
+    }else{
+        $('savechannel').set('disabled', 'true');
+    }
+
+    $('savechannel').addEvent('click', function (event) {
+
+        $('terminal').fireEvent('submit', new Event(event));
+    });
+    $('unbind').addEvent('click', function (event) {
+
+        $('terminal').fireEvent('submit', new Event(event));
+    });
+
+    $('terminal').store('target', {
+        onRequest: function () {
+            $('savechannel').set('disabled', 'true');
+        },
+        onComplete: function (jsontext) {
+            var json = Json.evaluate(jsontext);
+            if (typeof (json.error) != 'undefined') {
+                $('savechannel').set('disabled', '');
+            } else {
+                $('savechannel').set('disabled', 'true');
+                finderGroup['<{$env.get.finder_id}>'].refresh();
+                $('terminal').getParent('.dialog').retrieve('instance').close();
+            }
+        }
+    });
+
+    $('wmstype').addEvents({
+        'change': function (e) {
+            if (!this.value) {
+                $ES('#adapter_desc li').hide();
+                // $ES('#adapter_config').hide();
+                return;
+            }
+            $ES('#adapter_desc li').hide();
+            $ES('#adapter_desc #desc_' + this.value).show();
+            W.page('index.php?app=ome&ctl=admin_shop&act=confightml&p[0]=<{$shop.shop_id}>&p[1]=' + this.value, {
+                update: $('adapter_config'),
+                clearUpdateMap: false
+            });
+        },
+        'domready': function (e) {
+            this.fireEvent('change', e);
+        }
+    });
+
+</script>

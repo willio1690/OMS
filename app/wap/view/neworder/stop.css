@@ -1,0 +1,144 @@
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+body {
+  margin: 0;
+  background-color: rgba(243, 243, 243, 1);
+}
+
+.page {
+  background-color: rgba(243, 243, 243, 1);
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+}
+
+.main {
+  margin-top: 2.5625rem;
+}
+
+.group_1 {
+  background-color: rgba(255, 255, 255, 1);
+  padding: 0.75rem 4.969rem 0.625rem 4.532rem;
+}
+
+.text-wrapper_2 {
+  width: 13.5rem;
+  margin: 0 auto 0;
+}
+
+.text_2 {
+  word-break: break-all;
+  font-size: 0.875rem;
+  font-family: PingFangSC-Medium;
+  text-align: right;
+  white-space: nowrap;
+  line-height: 1.25rem;
+  color: #8E8E8F;
+  font-weight: 400;
+}
+
+.text_2.active {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 1);
+  /* border-bottom: 0.125rem solid rgba(198, 181, 117, 1); */
+  /* background-color: rgba(198, 181, 117, 1); */
+  /* width: 4.375rem;
+  height: 0.125rem; */
+}
+.text_2.active:after {
+  content: '';
+  position: absolute;
+  bottom: -0.625rem;
+  left: -0.5rem;
+  display: block;
+  width: 4.375rem;
+  height: 0.125rem;
+  background-color: rgba(198, 181, 117, 1);
+}
+
+.group_3 {
+  width: 21.94rem;
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 1rem;
+  margin: 0.813rem auto;
+  /* padding: 1.094rem 0 1.157rem 0; */
+}
+
+.text-wrapper_3 {
+  padding: 1.094rem 0.75rem 0.907rem 1.094rem;
+  border-bottom:  0.03rem solid #D7D7D7;
+}
+.text-wrapper_3:last-child {
+  border-bottom: none;
+}
+
+.text_4 {
+  word-break: break-all;
+  color: rgba(18, 18, 18, 1);
+  font-size: 0.875rem;
+  letter-spacing: 0.31111112236976624px;
+  font-family: PingFangSC-Regular;
+  font-weight: normal;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 1.25rem;
+}
+
+.text_5 {
+  word-break: break-all;
+  color: rgba(18, 18, 18, 1);
+  font-size: 0.875rem;
+  letter-spacing: 0.31111112236976624px;
+  font-family: PingFangSC-Regular;
+  font-weight: normal;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 1.25rem;
+}
+
+
+
+
+.label_1 {
+  width: 0.938rem;
+  height: 0.938rem;
+  margin: 0.157rem 0 0.157rem 0.66rem;
+}
+
+.text_7 {
+  word-break: break-all;
+  color: rgba(153, 153, 153, 1);
+  font-size: 0.75rem;
+  font-family: PingFangSC-Regular;
+  font-weight: normal;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 1.032rem;
+  margin: 0.219rem 0 0 0;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 0.9375rem;
+  text-align: center;
+}
+
+.footer-btn {
+  border-radius: 0.25rem;
+  border: none;
+  background: #000;
+  cursor: pointer;
+  width: 100%;
+  padding: 0.625rem;
+  color: #d4ca99;
+  font-size: 0.88rem;
+}

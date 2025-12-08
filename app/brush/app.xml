@@ -1,0 +1,22 @@
+<app>
+    <name>特殊订单</name>
+    <description>特殊订单处理</description>
+
+    <author>
+        <name>shopex开发团队</name>
+        <email>dev@shopex.cn</email>
+        <url>http://www.shopex.cn</url>
+    </author>
+
+    <version>0.1.0</version>
+    <parent_model_class>dbeav_model</parent_model_class>
+    <license>shopex license</license>
+
+    <depends>
+        <app>base</app>
+        <app>ome</app>
+        <app>erpapi</app>
+        <app>logisticsmanager</app>
+    </depends>
+
+</app>

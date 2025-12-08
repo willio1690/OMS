@@ -1,0 +1,330 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style type="text/css">
+.input_title { font-size:14px; font-weight:bold; }
+.input_style { width:150px; height:24px; line-height:24px; }
+</style>
+<div class="tableform">
+    <div class="division">
+    
+        <span id='pfba'>
+            <label class="input_title">拣货单号：</label><input name="pick_bn" id="pick_bn" type="text" maxlength="30" class="input_style" />&nbsp;&nbsp;
+            <label class="input_title">货号：</label><input name="product_bn" id="product_bn" type="text" maxlength="30" class="input_style" />&nbsp;&nbsp;
+            <label class="input_title">箱号：</label><input name="box_no" id="box_no" type="text" maxlength="30" class="input_style" style="width:100px;" />&nbsp;&nbsp;
+            <label class="input_title">数量：</label><input name="box_num" id="box_num" type="text" maxlength="10" class="input_style" style="width:60px;" onkeyup="this.value=this.value.replace(/[^0-9-]+/,'');" />
+        </span>
+        <span>&nbsp;&nbsp;<button class="btn btn-primary" id="btn_create_box"><span><span><{t}>点击录入<{/t}></span></span></button></span>
+    </div>
+    
+    <form id="expireForm" name="expireForm" action="index.php?app=wms&ctl=admin_vopstockout&act=checkBoxInfo" method="POST">
+    <input type="hidden" name="stockout_id" id="stockout_id" value="<{$stockout_id}>" />
+    <div class="division">
+      <h5>装箱信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+                <tr>
+                    <th style='text-align:left;padding-left:5px;'>采购单号</th>
+                    <th style='text-align:left;padding-left:5px;'>拣货单号</th>
+                    <th style='text-align:left;padding-left:5px;'>货号</th>
+                    <th style='text-align:left;padding-left:5px;'>货品名称</th>
+                    <th style='text-align:left;padding-left:5px;'>尺寸</th>
+                    <th style='text-align:left;padding-left:5px;'>成本价</th>
+                    <th style='text-align:left;padding-left:5px;'>市场价</th>
+                    <th style='text-align:left;padding-left:5px;'>数量</th>
+                    <th style='text-align:left;padding-left:5px;'>箱号</th>
+                    <th style='text-align:left;padding-left:5px;'>操作</th>
+                </tr>
+            </thead>
+            <tbody id="dataNode" class="dataNode">
+            </tbody>
+        </table>
+    </div>
+
+    <div class="noprint table-action">
+        <{button label="确认装箱" class="btn btn-primary" id="saveBtnBox" name="btn_submit"}> &nbsp; <{button label="关闭" id="cancelBtn" class="btn btn-secondary" isCloseDialogBtn='true'}>
+    </div>
+    </form>
+</div>
+<script language="javascript">
+$('pick_bn').focus();
+$('pick_bn').addEvents({
+    'keyup':function(e)
+    {
+        if(e.code==13){
+            $('product_bn').focus();
+        }
+        return false;
+    }
+});
+$('product_bn').addEvents({
+    'keyup':function(e)
+    {
+        if(e.code==13){
+            $('box_no').focus();
+        }
+        return false;
+    }
+});
+$('box_no').addEvents({
+    'keyup':function(e)
+    {
+        if(e.code==13){
+            $('box_num').focus();
+        }
+        return false;
+    }
+});
+
+void function()
+{
+    var has_box_info = <{$has_box_info}>;
+    
+    var getTemp = function(po_bn, pick_no, bill_id, bn, product_name, size, price, market_price, num, box_no)
+    {
+            var tpl    = '';
+            
+            tpl    += '<td>'+ po_bn +'<input type="hidden" name="chk_'+ pick_no +'_'+ bn +'" value="'+ num +'" /></td>';
+            tpl    += '<td>'+ pick_no +'<input type="hidden" name="bill_ids[]" value="'+ bill_id +'" /></td>';
+            tpl    += '<td>'+ bn +'<input type="hidden" name="bns[]" value="'+ bn +'" /></td>';
+            tpl    += '<td class="product-name">'+ product_name +'</td>';
+            tpl    += '<td>'+ size +'</td><td>'+ price +'</td><td>'+ market_price +'</td>';
+            tpl    += '<td>'+ num +'<input type="hidden" name="box_nums[]" value="'+ num +'" /></td>';
+            tpl    += '<td>'+ box_no +'<input type="hidden" name="box_nos[]" value="'+ box_no +'" /></td>';
+            tpl    += '<td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>';
+            
+            return tpl;
+    }
+    
+    if(has_box_info != '1'){
+        has_box_info.each(function(item){
+            new Element('tr.box_tr_li',{html:getTemp(item.po_bn, item.pick_no, item.bill_id, item.bn, item.product_name, item.size, item.price, item.market_price, item.box_num, item.box_no)}).inject($('dataNode'));
+        });
+        
+        $ES('.btn-delete-item').each(function(item){
+            item.removeEvent('click').addEvent('click',function(e){
+              if(confirm('确定要删除货号'+this.getParent('tr').getElement("input[name=bns[]]").value+'吗？'))
+              {
+                  this.getParent('tr').destroy();
+              }
+          });
+        });
+    }
+    
+    $('btn_create_box').addEvent('click',function()
+    {
+        onSubmit();
+    });
+    
+    $('box_num').addEvents({
+        'keyup':function(e)
+        {
+            if(e.code==13){
+                onSubmit();
+            }
+        }
+    });
+    
+    function onSubmit()
+    {
+        var html_str    = '';
+        var pattrn = /^[0-9A-Za-z_@]+$/;
+        
+        var stockout_id = $("stockout_id").value;
+        var pick_bn = $("pick_bn").value;
+        var product_bn = $("product_bn").value;
+        var box_num = $("box_num").value;
+        var box_no = $("box_no").value;
+        
+        if(stockout_id == "")
+        {
+            alert("无效操作");
+            return false;
+        }
+        if(pick_bn == "")
+        {
+            alert("请输入拣货单号");
+            return false;
+        }
+        if(product_bn == "")
+        {
+            alert("请输入货号");
+            return false;
+        }
+        if(box_num == "")
+        {
+            alert("请输入数量");
+            return false;
+        }
+        if(box_no == "")
+        {
+            alert("请输入箱号");
+            return false;
+        }
+        
+        if(!pattrn.test(box_no))
+        {
+            alert("箱号："+box_no+" 只能输入数字、字母下划线或横线");
+            return false;
+        }
+        
+        var input_num  = 0;
+        var bnsObj     = document.getElementsByName("bns[]");
+        if(bnsObj.length > 0)
+        {
+            temp_name = 'chk_'+ pick_bn +'_'+ product_bn;
+            
+            $$('#dataNode tr input[name='+ temp_name +']').each(function(item, index)
+            {
+                input_num = input_num + parseInt(item.value);
+            });
+        }
+        input_num = input_num + parseInt(box_num);
+        
+        new Request({url:'index.php?app=wms&ctl=admin_vopstockout&act=getItemBn',
+            method:'post',data: {stockout_id: stockout_id, pick_bn: pick_bn, product_bn: product_bn, box_num: box_num, box_no: box_no},
+            onComplete:function(res)
+            {
+                res    = JSON.decode(res);
+                if(res.rsp != 'succ')
+                {
+                    alert(res.msg);
+                    return false;
+                }
+                else
+                {
+                    var po_bn = res.po_bn;
+                    var pick_no = res.pick_no;
+                    var bill_id = res.bill_id;
+                    var item_bn = res.bn;
+                    var item_product_name = res.product_name;
+                    var item_size = res.size;
+                    var price = res.price;
+                    var market_price = res.market_price;
+                    var num = res.box_num;
+                    var box_no = res.box_no;
+                    
+                    var item_num = res.item_num;
+                    if(input_num > item_num)
+                    {
+                        alert("最多可录入数量："+ item_num);
+                        return false;
+                    }
+                    
+                    var newRow = new Element('tr.box_tr_li',{html:getTemp(po_bn, pick_no, bill_id, item_bn, item_product_name, item_size, price, market_price, num, box_no)}).inject($('dataNode'));
+                    
+                    $ES('.btn-delete-item').each(function(item){
+                        item.removeEvent('click').addEvent('click',function(e){
+                            if(confirm('确定要删除货号'+this.getParent('tr').getElement("input[name=bns[]]").value+'吗？'))
+                            {
+                                this.getParent('tr').destroy();
+                            }
+                        });
+                    });
+                    
+                    $('pick_bn').set('value','');
+                    $('product_bn').set('value','');
+                    $('box_no').set('value','');
+                    $('box_num').set('value','');
+                }
+            }
+        }).send();
+    }
+}();
+
+$('cancelBtn').removeEvents('click').addEvent('click', function(e) {
+    $('cancelBtn').getParent('.dialog').retrieve('instance').close();
+});
+
+//保存按钮
+$('saveBtnBox').addEvent('click', function(){
+    var flag    = true;
+    var box_no_list = new Array;
+    var pattrn = /^[0-9A-Za-z_@]+$/;
+    
+    $$('#dataNode tr input[name=box_nos[]]').each(function(item)
+    {
+        temp_box_no    = item.value;
+        box_no_list.push(temp_box_no);
+    });
+    
+    if(box_no_list)
+    {
+        var nary    = box_no_list.sort();
+        for(var i=0; i < nary.length; i++)
+        {
+            var box_no_1 = nary[i];
+            
+            if(box_no_1 === "")
+            {
+                alert("没有输入箱号");
+                return false;    
+            }
+            
+            if(!pattrn.test(box_no_1))
+            {
+                alert("箱号："+box_no_1+" 只能输入数字、字母或下划线");
+                return false;
+            }
+            
+        }
+    }
+
+    if(flag)
+    {
+        $('expireForm').fireEvent('submit', {
+            stop: function() {
+            }
+        });
+    }
+});
+
+$('expireForm').removeEvents('submit').addEvent('submit', function(e) {
+    e.stop();
+    new Request.JSON ({
+        url:this.action,
+        onRequest: function () {
+            $('saveBtnBox').set('disabled', 'true');
+            $('cancelBtn').set('disabled', 'true');
+        },
+        onSuccess: function(result) {
+            if (result.code =='succ') {
+                var stockout_id = $("stockout_id").value;
+                addRole(stockout_id, result.data, result.out_status, result.input_nums);
+                
+                $('saveBtnBox').getParent('.dialog').retrieve('instance').close();
+            } else {
+                $('saveBtnBox').set('disabled', '');
+                $('cancelBtn').set('disabled', '');
+                //提示信息
+                alert(result.msg);
+            }
+        }
+    })[this.method](this);
+});
+
+function addRole(stockout_id, data, out_status, input_nums) {
+    var expire_stock_info = 'expire_stock_'+stockout_id;
+    
+    $$('.set_num_vals').each(function(e) {
+        e.set('html', '0');
+    });
+    
+    if(input_nums)
+    {
+        var num_data = eval(input_nums);
+        var chk_num_id = '';
+        
+        for(var i=0; i<num_data.length; i++)
+        {
+            chk_num_id = "num_"+ num_data[i].bill_id +"_"+ num_data[i].bn;
+            $(chk_num_id).set('html', num_data[i].num);
+        }
+    }
+    
+    $(expire_stock_info).set('expire_box_info', data);
+    $("out_status").set('value', out_status);
+}
+</script>

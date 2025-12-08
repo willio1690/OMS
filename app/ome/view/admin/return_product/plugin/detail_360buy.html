@@ -1,0 +1,171 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<h4>返件地址</h4>
+<div class="division">
+    <table border="0" cellpadding="0" cellspacing="0" class="gridlist">
+        <thead>
+            <tr>
+                <th>收货省份ID</th>
+                <th>收货城市ID</th>
+                <th>收货区县ID</th>
+                <th>收货乡镇ID</th>
+                <th>收货详细地址</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><{$returnExtData.return_address.provinceCode}></td>
+                <td><{$returnExtData.return_address.cityCode}></td>
+                <td><{$returnExtData.return_address.countyCode}></td>
+                <td><{$returnExtData.return_address.villageCode}></td>
+                <td><{$returnExtData.return_address.detailAddress}></td>
+            </tr>
+        </tbody>
+    </table>   
+</div>
+
+<h4>取件地址</h4>
+<div class="division">
+    <table border="0" cellpadding="0" cellspacing="0" class="gridlist">
+        <thead>
+            <tr>
+                <th>取件省份ID</th>
+                <th>取件城市ID</th>
+                <th>取件区县ID</th>
+                <th>取件乡镇ID</th>
+                <th>取件详细地址</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><{$returnExtData.pick_address.provinceCode}></td>
+                <td><{$returnExtData.pick_address.cityCode}></td>
+                <td><{$returnExtData.pick_address.countyCode}></td>
+                <td><{$returnExtData.pick_address.villageCode}></td>
+                <td><{$returnExtData.pick_address.detailAddress}></td>
+            </tr>
+        </tbody>
+    </table>   
+</div>
+
+<h4>客户信息</h4>
+<div class="division">
+    <table border="0" cellpadding="0" cellspacing="0" class="gridlist">
+        <thead>
+            <tr>
+                <th>客户帐号</th>
+                <th>客户姓名</th>
+                <th>客户级别</th>
+                <th>联系人姓名</th>
+                <th>联系人电话号码</th>
+                <th>联系人手机号</th>
+                <th>联系人邮编</th>
+                <th>联系人省份ID</th>
+                <th>联系人城市ID</th>
+                <th>联系人区县ID</th>
+                <th>联系人乡镇ID</th>
+                <th>联系人详细地址</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td> <{$returnExtData.customer_info.jdPin}> </td>
+                <td> <{$returnExtData.customer_info.name}> </td>
+                <td> <{$returnExtData.customer_info.grade}> </td>
+                <td> <{$returnExtData.customer_info.contactInfo.contactName}> </td>
+                <td> <{$returnExtData.customer_info.contactInfo.contactTel}> </td>
+                <td> <{$returnExtData.customer_info.contactInfo.contactMobile}> </td>
+                <td> <{$returnExtData.customer_info.contactInfo.contactZipcode}> </td>
+                <td> <{$returnExtData.customer_info.contactInfo.provinceCode}> </td>
+                <td> <{$returnExtData.customer_info.contactInfo.cityCode}> </td>
+                <td> <{$returnExtData.customer_info.contactInfo.countyCode}> </td>
+                <td> <{$returnExtData.customer_info.contactInfo.villageCode}> </td>
+                <td> <{$returnExtData.customer_info.contactInfo.detailAddress}> </td>
+            </tr>
+        </tbody>
+    </table>   
+</div>
+
+<h4>申请明细列表</h4>
+<div class="division">
+    <table border="0" cellpadding="0" cellspacing="0" class="gridlist">
+        <thead>
+            <tr>
+                <th>申请明细ID</th>
+                <th>商品编号</th>
+                <th>商品名称</th>
+                <th>商品类型</th>
+                <th>商品类型名称</th>
+                <th>商品描述</th>
+                <th>skuType</th>
+                <th>skuType名称</th>
+            </tr>
+        </thead>
+        <tbody>
+            <{foreach from=$returnExtData.apply_detail item=item}>
+            <tr>
+                <td> <{$item.applyDetailId}> </td>
+                <td> <{$item.skuId}> </td>
+                <td> <{$item.wareName}> </td>
+                <td> <{$item.wareType}> </td>
+                <td> <{$item.wareTypeName}> </td>
+                <td> <{$item.wareDescribe}> </td>
+                <td> <{$item.skuType}> </td>
+                <td> <{$item.skuTypeName}> </td>
+            </tr>
+            <{/foreach}>
+        </tbody>
+    </table>   
+</div>
+<div class="tableform">
+    <h4>
+        京东协商查看
+        <input type="button" id='return_message' name='return_message' value='京东协商'>
+    </h4>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0"  class="gridlist">
+        <thead>
+            <tr>
+                <th>协商状态</th>
+                <th>沟通渠道</th>
+                <th>协商方案</th>
+                <th>协商图片</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+            <td> 
+                <{$returnExtData.online_memo.negotiationStatusText}>
+            <td>
+                <{$returnExtData.online_memo.negotiationCloseDetail.communicateChannelsDesc}>
+            </td>
+            <td>
+                <{$returnExtData.online_memo.negotiationCloseDetail.negotiationProgrammeDesc}>
+            </td>
+            <td
+                <{foreach from=$$returnExtData.online_memo.negotiationCloseDetail.negotiationImages item=url}>
+                <br>
+                <img src='<{$url}>' height='50' onclick="showimage('<{$url}>')" alt='点击查看大图' style='cursor:pointer'>
+                <{/foreach}>
+            </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+if ($('return_message'))
+{
+	$('return_message').addEvent('click',function(e){
+		var url = 'index.php?app=ome&ctl=admin_return&act=refund_message&p[0]=<{$returnExtData.return_id}>&p[1]=return&shop_type=360buy&finder_id=<{$env.get.finder_id}>';
+                	new Dialog(url,{title:'京东凭证',width:500,height:300});
+	
+	});
+}
+
+function showimage(imgpath){
+    var url = 'index.php?app=ome&ctl=admin_return&act=showImage&p[0]='+imgpath;
+    new Dialog(url,{title:'查看凭证大图',width:500,height:300});
+}
+</script>

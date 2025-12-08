@@ -1,0 +1,66 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=financebase&ctl=admin_shop_settlement_bill&act=doMatch&finder_id=<{$env.get.finder_id}>" method="post" id="form1" isCloseDialog>
+     <div class="tableform">
+      <div class="division">
+ <table width="100%" border="0" cellpadding="0" cellspacing="0" class="girdlist">
+
+<tr><th>选择店铺</th><td><select name="shop_id" id="export_shop_id" vtype="required">
+  <{foreach from=$shop_list item=item}>
+<option value="<{$item.shop_id}>"><{$item.name}></option>
+<{/foreach}>
+</select></td></tr>
+<tr><th>时间范围</th><td><{input type="date" vtype="date" name="rematch_time_from" id="rematch_time_from" style="width:120px; font-family:arial;" value=$rematch_time_from}>&nbsp;&nbsp;至&nbsp;&nbsp;
+                <{input type="date" vtype="date" name="rematch_time_to" id="rematch_time_to" style="width:120px; font-family:arial;" value=$rematch_time_to}></td></tr>
+<tr><th>匹配范围</th><td>
+  <input type="radio" name="rematch_mode" value="nomatch" checked> 未匹配数据 &nbsp;
+  <input type="radio" name="rematch_mode" value="all" > 全部数据 <br/>
+  <input type="radio" name="rematch_mode" value="bill_category" > <select name="bill_category" id="bill_category">
+                    <{foreach from=$billCategory item=val}>
+                    <option value="<{$val.bill_category}>" <{if $env.post.bill_category == $val.bill_category}>selected="selected"<{/if}> ><{$val.bill_category}></option>
+                    <{/foreach}>
+                </select></td></tr>
+ </table>
+
+<div class="table-action">
+      <{button label="确定" id="btn-submit" class="btn-primary"}> &nbsp; &nbsp;
+      <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+<input type='hidden' id='finder_id' name='finder_id' value='<{$finder_id}>'>
+  </div>  </div>
+</form>
+<script>
+
+(function(){
+
+    var shop_id = $("shop_id").value;
+ 
+    if(shop_id != 0){
+      for(var i=0;i<document.getElementById("export_shop_id").length;i++){
+          if(document.getElementById("export_shop_id").options[i].value == shop_id){
+              document.getElementById("export_shop_id").options[i].selected = true;
+          }
+      }
+    }
+
+})();
+
+
+$('btn-submit').addEvent('click',function(e){
+
+  var _this = this;_this.set('disabled',true);
+  var _data = _this.form.toQueryString().replace(/\+/g,"%2B");
+  new Request.JSON({
+            url:_this.form.get('action'),
+            data:_data,
+            onComplete:function(rs){
+              alert(rs.msg);
+              finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+              _this.getParent('.dialog').retrieve('instance').close();
+            }
+        }).send();
+});
+</script>

@@ -1,0 +1,20 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $data}>
+<div <{if $data.apply_goods == '_ALL_' }>style="visibility:hidden;"<{/if}>>
+    <{input type='ome_object' object='sales_material@material' multiple=true breakpoint='0'
+    name='sm_id' textcol='material_name' value=$pgid callback='product_object_callback'
+    replacehtml=$replacehtml emptytext='选取销售物料' style='float:left;width:200px;'
+    filter="slaes_material_type=12&in_shop_id={$in_shop_id}" }>
+</div>
+<{else}>
+<div <{if $data.apply_goods == '_ALL_' }>style="visibility:hidden;"<{/if}>>
+    <{input type='ome_object' object='sales_material@material' multiple=true breakpoint='0'
+    name='sm_id' textcol='material_name' value=$data.pgid callback='product_object_callback'
+    replacehtml=$replacehtml emptytext='选取销售物料' style='float:left;width:200px;'
+    filter="slaes_material_type=12&in_shop_id={$in_shop_id}" }>
+</div>
+<{/if}>

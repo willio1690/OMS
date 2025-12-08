@@ -1,0 +1,88 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?ctl=dashboard&act=chkpassword&finder_id=a9b819" id="user-chkpass-form" method="POST">
+    <div class="tableform">
+        <{if $env.SESSION.needChangePassword}>
+        <div class="error"><{$env.SESSION.needChangePassword}></div>
+        <{/if}>
+        <div class="division">
+            <input type="hidden" name="user_id" value="<{$user_id}>"/>
+            <table cellspacing="0" cellpadding="0" width="100%">
+                <tbody>
+                <tr>
+                    <th><em class="red">*</em><label for="dom_el_ea78c40"><{t}>原始密码：<{/t}></label></th>
+                    <td><input type="password" id="dom_el_ea78c40" vtype="required" name="old_login_password" title="<{t}>用户名：<{/t}>" class="x-input " autocomplete="off"/></td>
+                </tr>
+                <tr>
+                    <th><em class="red">*</em><label for="dom_el_ea78c41"><{t}>新密码：<{/t}></label></th>
+                    <td><input type="password" id="dom_el_ea78c41" vtype="required" name="new_login_password" title="<{t}>密码：<{/t}>" class="x-input " autocomplete="off"/></td>
+                </tr>
+                <tr>
+                    <th><em class="red">*</em><label for="dom_el_ea78c42"><{t}>再次输入新密码：<{/t}></label></th>
+                    <td><input type="password" id="dom_el_ea78c42" vtype="required" name=":account@pam[login_password]" title="<{t}>确认密码：<{/t}>" class="x-input " autocomplete="off"/></td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="division notice">
+            <h6>密码复杂度要求：</h6>
+            <div>1、密码长度至少12位；</div>
+            <div>2、必须包含数字、大小写字母；</div>
+            <div>3、避免连续的数字或字母；</div>
+        </div>
+    </div>
+</form>
+
+    <{area inject=".mainFoot"}>
+    <div class="table-action">
+        <table width="100%" cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr>
+
+
+                <td><{button label=$___desktop="确定"|t:'desktop' class="btn btn-primary" id="user-chkpass-form-submit" type="submit"}></td>
+
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <{/area}>
+    <script>
+        (function () {
+            var _form = $('user-chkpass-form');
+            var btn = $('user-chkpass-form-submit');
+
+            _form.store('target', {
+                onComplete: function () {
+
+                },
+                onSuccess: function (response) {
+
+                    var hash_res_obj = JSON.decode(response);
+
+                    if (hash_res_obj.success != undefined && hash_res_obj.success != "") {
+                        try {
+
+                        } catch (e) {
+                        }
+                    }
+                }
+            });
+
+            btn.addEvent('click', function () {
+
+                _form.fireEvent('submit', {stop: $empty});
+
+
+            });
+
+        })();
+
+
+    </script>

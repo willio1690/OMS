@@ -1,0 +1,26 @@
+<desktop>
+	<permissions>
+		<permission id="logistics_exrecommend">智选物流</permission>
+		<permission id="channel_index_kuaidi">第三方快递</permission>
+		<permission id="channel_index_cloudprint">云打印授权</permission>
+		<!-- <permission id="channel_index_ticket">工单集成授权</permission> -->
+	</permissions>
+	<workground name="系统集成" id="channel_center" order="1400" icon="icon-xitongjicheng-01">
+		<menugroup name="智能优选" en="intelligent-optimization">
+			<menu controller='admin_logistics_exrecommend' action='index' permission='logistics_exrecommend' display='true' order="100213">智选物流</menu>
+		</menugroup>
+		<menugroup name="第三方授权管理" en="thirdparty-auth">
+			<menu controller='admin_channel' action='index' params='channel_type:kuaidi' permission='channel_index_kuaidi' display='true' order="100213">
+				第三方快递
+			</menu>
+			<!-- <menu controller='admin_channel' action='index' params='channel_type:ticket' permission='channel_index_ticket' display='true' order="100214">
+				工单集成授权
+			</menu> -->
+		</menugroup>
+		<menugroup name="云打印" en="cloudprint-yilian">
+			<menu controller='admin_channel' action='index' params='channel_type:cloudprint' permission='channel_index_cloudprint' display='true' order="100214">
+				云打印授权
+			</menu>
+		</menugroup>
+	</workground>
+</desktop>

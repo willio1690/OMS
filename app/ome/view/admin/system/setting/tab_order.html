@@ -1,0 +1,322 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.nt{
+    color: red
+}
+</style>
+<div class="form-layout-block">
+    <h3>订单缓冲设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">订单缓冲时间：</span>
+            <{input type='select'  class="form-input" required='true' name='set[auto.setting][bufferTime]' value=$setData.auto_setting.bufferTime options=array('10'=>'10分钟','15'=>'15分钟','30'=>'30分钟','45'=>'45分钟','60'=>'1小时','120'=>'2小时','180'=>'3小时','240'=>'4小时')}>
+            <span class="form-remark">用户下单后需等待一定的时间后才进入处理流程，能有效解决多个订单合并的问题</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">强制菜鸟订单自动流转：</span>
+            <div class="form-radios">
+                <input id="ome_cn_order_Auto_on" name="set[ome.cn.order.Auto]" <{if $setData['ome_cn_order_Auto'] == 'true'}>checked<{else}><{/if}> type="radio" value="true">
+                <label for="ome_cn_order_Auto_on">开启</label>
+                <input id="ome_cn_order_Auto_off" name="set[ome.cn.order.Auto]" <{if $setData['ome_cn_order_Auto'] == 'true'}><{else}>checked<{/if}> type="radio" value="false">
+                <label for="ome_cn_order_Auto_off" >关闭</label>
+            </div>
+            <span class="nt form-remark">开启后，订单会自动流转到菜鸟仓储,此类型订单需在前端店铺下指定仓库</span>
+        </div>
+        <div class="form-field order_auto_bindshop" <{if $setData['ome_cn_order_Auto'] == 'true'}><{else}>style="display: none"<{/if}> >
+            <!--子部分S-->
+            <span class="form-field-label">选择店铺：</span>
+            <div class="form-checkbox">
+                <{foreach from=$taobao_bind_shop item=item key=key}>
+                <input id="<{$key}>" name="set[ome.cn.order.Auto.bindshop][]" type="checkbox" value="<{$item.shop_id}>" <{if  in_array($item.shop_id,$setData.ome_cn_order_Auto_bindshop)}>checked<{/if}> >
+                <label for="<{$key}>"><{$item['name']}></label>
+                <{/foreach}>
+            </div>
+            <!--子部分E-->
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">订单失效时间设置(分钟)：</span>
+            <input class="form-input" placeholder="请输入订单失效时间设置(分钟)" type="text" name="set[ome.order.failtime]" value="<{$setData.ome_order_failtime}>" vtype="required" />
+            <span class="form-remark">未支付的款到发货订单在设置时间过后将被自动取消</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">订单未确认提醒设置(分钟)：</span>
+            <input class="form-input" placeholder="请输入订单未确认提醒设置(分钟)" type="text" name="set[ome.order.unconfirmtime]" value="<{$setData.ome_order_unconfirmtime}>" vtype="required" />
+            <span class="form-remark">从下单时间开始计算,设置时间过后仍未被确认的订单将被加粗显示</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">未分派订单获取时间间隔设置(分钟)：</span>
+            <input class="form-input" placeholder="请输入未分派订单获取时间间隔设置(分钟)" type="text" name="set[ome.getOrder.intervalTime]" value="<{$setData.ome_getOrder_intervalTime}>" vtype="required" />
+            <span class="form-remark">执行未分派的订单中的订单获取时，检测上一次操作改功能的执行时间，设置间隔时间，防止短时间执行该操作发生错误！(时间间隔最短2分钟)</span>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>付款确认</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">订单金额为0元的是否需要经过付款确认：</span>
+            <div class="form-radios">
+                <input id="ome_payment_confirm_on" name="set[ome.payment.confirm]" <{if $setData['ome_payment_confirm'] == 'true'}>checked<{else}><{/if}> type="radio" value="true">
+                <label for="ome_payment_confirm_on">开启</label>
+                <input id="ome_payment_confirm_off" name="set[ome.payment.confirm]" <{if $setData['ome_payment_confirm'] == 'true'}><{else}>checked<{/if}> type="radio" value="false">
+                <label for="ome_payment_confirm_off" >关闭</label>
+            </div>
+            <span class="nt form-remark" style="color:red">只支持前端店铺是易开店、ecstore、分销王(本地新建的订单)</span>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>退款状态</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">淘宝订单审单查询退款状态：</span>
+            <div class="form-radios">
+                <input id="ome_order_refund_check_on" name="set[ome.order.refund.check]" <{if $setData['ome_order_refund_check'] == 'true'}>checked<{else}><{/if}> type="radio" value="true">
+                <label for="ome_order_refund_check_on">开启</label>
+                <input id="ome_order_refund_check_off" name="set[ome.order.refund.check]" <{if $setData['ome_order_refund_check'] == 'true'}><{else}>checked<{/if}> type="radio" value="false">
+                <label for="ome_order_refund_check_off" >关闭</label>
+            </div>
+            <span class="nt form-remark" style="color:red">针对"双十一退款不限制"使用</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">拒绝退款是否请求平台：</span>
+            <div class="form-radios">
+                <input type="radio" name="set[ome.refund.refuse.request]" value="true" <{if $setData.ome_refund_refuse_request != 'false'}> checked<{/if}>>启用
+                <input type="radio" name="set[ome.refund.refuse.request]" value="false" <{if $setData.ome_refund_refuse_request == 'false'}> checked<{/if}>>不启用
+            </div>
+        </div>
+    </div>
+ </div>
+
+<div class="form-layout-block">
+    <h3>物流跟踪</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">是否开启物流跟踪：</span>
+            <div class="form-radios">
+                <input id="ome_delivery_hqepay_on" name="set[ome.delivery.hqepay]" <{if $setData['ome_delivery_hqepay'] == 'true'}>checked<{else}><{/if}> type="radio" value="true">
+                <label for="ome_delivery_hqepay_on">开启</label>
+                <input id="ome_delivery_hqepay_off" name="set[ome.delivery.hqepay]" <{if $setData['ome_delivery_hqepay'] == 'true'}><{else}>checked<{/if}> type="radio" value="false">
+                <label for="ome_delivery_hqepay_off" >关闭</label>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>订单规则</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">合并订单规则：</span>
+            <div class="form-checkbox">
+                <input id="ome_combine_member" class="combine_setting" type="checkbox" value="member_id" <{if $setData.ome_combine_member_id==0}>checked<{/if}> >
+                <label for="ome_combine_member">不同会员用户名的订单可以合并</label>
+                <input type="hidden" id='ome_combine_member_id' name="set[ome.combine.member_id]" value='<{$setData.ome_combine_member_id|default:1}>'>
+            </div>
+            <font class="form-remark" style="color:red;">（不选，表示不同会员用户名的订单不可以合并；勾选，表示不同会员用户名、相同收件地址的订单可以通过人工操作合并发货。）</font>
+
+            <div class="form-radios form-remark omeauto_memberidconf" <{if $setData.ome_combine_member_id==1 || $setData.ome_combine_member_id==''}><{else}>style="display:none;padding-left: 210px;color:black"<{/if}> >
+                <input id="omeauto_memberidconf_on" name="set[ome.combine.memberidconf]" <{if $setData['ome_combine_memberidconf'] == '1'}>checked<{else}><{/if}> type="radio" value="1">
+                <label for="omeauto_memberidconf_on">开启</label>
+                <input id="omeauto_memberidconf_off" name="set[ome.combine.memberidconf]" <{if $setData['ome_combine_memberidconf'] == '1'}><{else}>checked<{/if}> type="radio" value="0">
+                <label for="omeauto_memberidconf_off" >关闭</label>
+            </div>
+            <font class="form-remark omeauto_memberidconf_remark" <{if $setData.ome_combine_member_id==1 || $setData.ome_combine_member_id==''}><{else}>style="display:none;padding-left: 210px;color:red"<{/if}> >（针对分销、京东、一号店及团购订单等没有购买人信息的订单：“启用”表示可以通过人工操作合单；“不启用”表示不能合单。）（注：没有分销商信息的分销订单，不论“启用”或“不启用”，都无法进行合单操作）</font>
+
+            <div class="form-checkbox" style="padding-left: 210px;">
+                <input id="ome_combine_shop"  class="combine_setting" type="checkbox" value="shop_id" <{if $setData.ome_combine_shop_id==0|| $setData.ome_combine_shop_id==''}>checked<{/if}> >
+                <label for="ome_combine_shop">不同来源店铺的订单可以合并</label>
+                <input type="hidden" id='ome_combine_shop_id' name="set[ome.combine.shop_id]" value='<{$setData.ome_combine_shop_id|default:1}>'>
+            </div>
+            <font class="form-remark" style="color: red">（不选，表示不同来源店铺的订单不可以合并；勾选，表示不同来源店铺、相同收件地址的订单可以通过人工操作合并发货。） </font>
+            <font class="form-remark" style="color: red">注意：该合单规则，只能通过人工操作进行合单；当自动审单时，出现满足规则的订单，将转为人工审单处理。</font>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label"><em class='c-red'>*</em>相同地址判定：</span>
+            <div class="form-checkbox">
+                <input id="ome_combine_ship_address" type="checkbox" name="set[ome.combine.addressconf][ship_address]" value="0" <{if $setData.ome_combine_addressconf.ship_address==0 || $setData.ome_combine_addressconf.ship_address==''}>checked<{/if}> >
+                <label for="ome_combine_ship_address">收货地址</label>
+                <input id="ome_combine_mobile" type="checkbox" name="set[ome.combine.addressconf][mobile]" value="0" <{if $setData.ome_combine_addressconf.mobile==0 || $setData.ome_combine_addressconf.mobile==''}>checked<{/if}> >
+                <label for="ome_combine_mobile">手机</label>
+                <input type='hidden'  vtype='requiredcheckbox'/>
+            </div>
+            <span class="form-remark" style="color: red">（相同地址判断，至少选择一个）</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label"><em class='c-red'>*</em>是否自动合单：</span>
+            <div class="form-radios">
+                <input id="ome_combine_select_on" name="set[ome.combine.select]" <{if $setData['ome_combine_select'] == '1'}><{else}>checked<{/if}> type="radio" value="0">
+                <label for="ome_combine_select_on">开启</label>
+                <input id="ome_combine_select_off" name="set[ome.combine.select]" <{if $setData['ome_combine_select'] == '1'}>checked<{else}><{/if}> type="radio" value="1">
+                <label for="ome_combine_select_off" >关闭</label>
+            </div>
+            <span class="form-remark" style="color: red">*注意：1、当订单审单时,系统会合并选择的多个订单生成一张发货单；2、手动获取订单进行自动审单时,系统会自动合并符合条件的订单生成一张发货单；(注：不选，则每个订单都会对应生成一张发货单)</span>
+            <span class="form-field-label"><em class='c-red'>*</em>自动合单条数限制：</span>
+             <div class="form-radios">
+
+               <input type="text" size="6" maxlength="3" name="set[ome.combine.merge.limit]" value="<{if $setData.ome_combine_merge_limit>0}><{$setData.ome_combine_merge_limit}><{else}>0<{/if}>" oninput = "value=value.replace(/[^\d]/g,'')" />
+            </div>
+             <span class="form-remark" style="color: red"> <font color="red">&nbsp;&nbsp;*注意：不填写 或者 填写0时，是不限制合并条数；只对自动审核订单有效果，手工审单不限制条数。<br>
+             1、当实际订单可合并条数 大于 当前设置的合并条数时，系统审单时只会按当前“设置条数”合并生成一张发货单，剩余未合并的订单，需要再次触发审单才会审核生成发货单</font></span>
+
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">物流探查是否开启：</span>
+            <div class="form-radios">
+                <input id="ome_logi_arrived_on" class="arrive_setting" name="set[ome.logi.arrived]" <{if $setData['ome_logi_arrived'] == '1'}>checked<{else}><{/if}> type="radio" value="1">
+                <label for="ome_logi_arrived_on">开启</label>
+                <input id="ome_logi_arrived_off" class="arrive_setting" name="set[ome.logi.arrived]" <{if $setData['ome_logi_arrived'] == '1'}><{else}>checked<{/if}> type="radio" value="0">
+                <label for="ome_logi_arrived_off" >关闭</label>
+            </div>
+            <span class="form-remark">支持抖音</span>
+        </div>
+        <div class="form-field" id='arriveauto'>
+            <span class="form-field-label">自动审单是否拦截：</span>
+            <div class="form-radios">
+                <input id="ome_logi_arrived_auto_on" name="set[ome.logi.arrived.auto]" <{if $setData['ome_logi_arrived_auto'] == 'true'}>checked<{else}><{/if}> type="radio" value="true">
+                <label for="ome_logi_arrived_auto_on">开启</label>
+                <input id="ome_logi_arrived_auto_off" name="set[ome.logi.arrived.auto]" <{if $setData['ome_logi_arrived_auto'] == 'true'}><{else}>checked<{/if}> type="radio" value="false">
+                <label for="ome_logi_arrived_auto_off" >关闭</label>
+            </div>
+        </div>
+        <{if $presalehtml == 1}>
+            <div class="form-field">
+                <span class="form-field-label">是否接收淘宝已付定金预售订单：</span>
+                <div class="form-radios">
+                    <input id="ome_order_presale_on" class="presalesetting"  name="set[ome.order.presale]" <{if $setData.ome_order_presale=='1'}>checked<{/if}> type="radio" value="1">
+                    <label for="ome_order_presale_on">是</label>
+                    <input id="ome_order_presale_off" class="presalesetting"  name="set[ome.order.presale]" <{if $setData.ome_order_presale=='0' || $setData.ome_order_presale==''}>checked<{/if}> type="radio" value="0">
+                    <label for="ome_order_presale_off" >否</label>
+                </div>
+                <span class="form-remark" style="color: red">(开启后天猫预售已付定金但未付尾款的订单也将进入系统)</span>
+            </div>
+          
+             <div class="form-field presalehtml">
+                <span class="form-field-label">付定金未付尾款能否审单：</span>
+                <div class="form-radios">
+                    <input id="ome_order_presale_money_on" name="set[ome.order.presaleconfirm]" <{if $setData.ome_order_presaleconfirm == '1'}>checked<{/if}> type="radio" value="1">
+                    <label for="ome_order_presale_money_on">是</label>
+                    <input id="ome_order_presale_money_off" name="set[ome.order.presaleconfirm]" <{if $setData.ome_order_presaleconfirm == '0' || $setData.ome_order_presaleconfirm==''}>checked<{/if}> type="radio" value="0">
+                    <label for="ome_order_presale_money_off" >否</label>
+                </div>
+                <span class="form-remark" style="color: red">(开启后天猫预售已付定金但未付尾款的订单也可以审单)</span>
+            </div>
+            
+        <{/if}>
+            <div class="form-field">
+                <span class="form-field-label">预售订单是否合并：</span>
+                <div class="form-radios">
+                    <input id="ome_order_presale_combine_on" name="set[ome.order.presale.combine]" <{if $setData.ome_order_presale_combine=='1'}>checked<{/if}> type="radio" value="1">
+                    <label for="ome_order_presale_combine_on">是</label>
+                    <input id="ome_order_presale_combine_off" name="set[ome.order.presale.combine]" <{if $setData.ome_order_presale_combine=='0' || $setData.ome_order_presale_combine==''}>checked<{/if}> type="radio" value="0">
+                    <label for="ome_order_presale_combine_off" >否</label>
+                </div>
+            </div>
+        <div class="form-field">
+            <span class="form-field-label">货到付款订单签收后是否自动完成付款：</span>
+            <div class="form-radios">
+                <input id="ome_codorder_autopay_on" name="set[ome.codorder.autopay]" <{if $setData['ome_codorder_autopay']=='true' || $setData['ome_codorder_autopay']=='' }>checked<{else}><{/if}> type="radio" value="true">
+                <label for="ome_codorder_autopay_on">开启</label>
+                <input id="ome_codorder_autopay_off" name="set[ome.codorder.autopay]" <{if $setData['ome_codorder_autopay']=='true' || $setData['ome_codorder_autopay']=='' }><{else}>checked<{/if}> type="radio" value="false">
+                <label for="ome_codorder_autopay_off" >关闭</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">平台发货订单：</span>
+            <select class="form-input"  name="set[ome.platform.order.consign]">
+                <option value="false"  <{if $setData['ome_platform_order_consign']=='false'  }>selected<{/if}> >不接收</option>
+                <option value="true"   <{if $setData['ome_platform_order_consign']=='true'   }>selected<{/if}> >发货接收</option>
+                <option value="signed" <{if $setData['ome_platform_order_consign']=='signed' }>selected<{/if}> >签收接收</option>
+                <option value="payed" <{if $setData['ome_platform_order_consign']=='payed' }>selected<{/if}> >已支付接收</option>
+            </select>
+            <span class="nt form-remark" style="color: red">开启后，平台(淘宝、京东)发货订单会收取到ERP;开启前,请先添加平台自发仓库</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">获取全状态订单是否开启：</span>
+            <div class="form-radios">
+                <input id="ome_get_all_status_order_on" name="set[ome.get.all.status.order]" <{if $setData['ome_get_all_status_order'] == '1'}>checked<{else}><{/if}> type="radio" value="1">
+                <label for="ome_get_all_status_order_on">开启</label>
+                <input id="ome_get_all_status_order_off" name="set[ome.get.all.status.order]" <{if $setData['ome_get_all_status_order'] == '1'}><{else}>checked<{/if}> type="radio" value="0">
+                <label for="ome_get_all_status_order_off" >关闭</label>
+            </div>
+            <span class="form-remark">支持抖音、拼多多</span>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>数据安全</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">敏感数据加密：</span>
+            <div class="form-radios">
+                <input id="ome_sensitive_data_encrypt_on" name="set[ome.sensitive.data.encrypt]" <{if $setData['ome_sensitive_data_encrypt'] == 'true'}>checked<{else}><{/if}> type="radio" value="true">
+                <label for="ome_sensitive_data_encrypt_on">开启</label>
+                <input id="ome_sensitive_data_encrypt_off" name="set[ome.sensitive.data.encrypt]" <{if $setData['ome_sensitive_data_encrypt'] == 'true'}><{else}>checked<{/if}> type="radio" value="false">
+                <label for="ome_sensitive_data_encrypt_off" >关闭</label>
+            </div>
+            <span class="nt form-remark" style="color:red">*注：针对会员昵称、会员姓名、会员手机、会员电话、收货人姓名、收货人手机、收货人电话加密</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">敏感数据导出加密：</span>
+            <div class="form-radios">
+                <input id="ome_sensitive_exportdata_encrypt_on" name="set[ome.sensitive.exportdata.encrypt]" <{if $setData['ome_sensitive_exportdata_encrypt'] == 'true'}>checked<{else}><{/if}> type="radio" value="true">
+                <label for="ome_sensitive_exportdata_encrypt_on">开启</label>
+                <input id="ome_sensitive_exportdata_encrypt_off" name="set[ome.sensitive.exportdata.encrypt]" <{if $setData['ome_sensitive_exportdata_encrypt'] == 'true'}><{else}>checked<{/if}> type="radio" value="false">
+                <label for="ome_sensitive_exportdata_encrypt_off" >关闭</label>
+            </div>
+            <span class="nt form-remark" style="color:red">*注：针对会员昵称、会员姓名、会员手机、会员电话、收货人姓名、收货人手机、收货人电话加密</span>
+        </div>
+    </div>
+</div>
+<script>
+
+    $ES('input[name=set[ome.cn.order.Auto]]').each(function(item){
+        item.addEvent('click',function(e){
+            if(this.value == 'true'){
+                $ES('.order_auto_bindshop').setStyle('display','flex');
+            }else{
+                $ES('.order_auto_bindshop').setStyle('display','none');
+            }
+        })
+    });
+    function presale(value) {
+
+        if(value=='1') {
+            $$('.presalehtml').setStyle('display','');
+
+        } else {
+            $$('.presalehtml').setStyle('display','none');
+
+        }
+    }
+
+    if($$('.presalesetting').length>0){
+        presale($$('input[name=set[ome.order.presale]]:checked').get('value'));
+
+        $$('.presalesetting').addEvent('click',function(e){
+            var value = $$('input[name=set[ome.order.presale]]:checked').get('value');
+            presale(value);
+
+
+        });
+    }
+
+if($$('.cn_autoset').length>0){
+    cnautoset($$('input[name=set[ome.cn.order.Auto]]:checked').get('value'));
+    $$('.cn_autoset').addEvent('click',function(e){
+        cnautoset(this.value);
+
+
+    });
+}
+function cnautoset(value){
+    if(value=='true'){
+        $$('.cn_autohtml').setStyle('display','');
+    }else{
+        $$('.cn_autohtml').setStyle('display','none');
+    }
+}
+</script>

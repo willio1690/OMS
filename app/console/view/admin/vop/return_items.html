@@ -1,0 +1,60 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <h5>退供单明细</h5>
+        <table class="gridlist"  style="margin:4px 0;">
+        <thead>
+            <tr>
+
+                <th>商品条形码</th>
+                <th>商品货号</th>
+                <th>店铺货号</th>
+                <th>商品名称</th>
+                <th>采购订单号</th>
+                <th>退供数量</th>
+                <th>已拆数量</th>
+                <th>入库数量</th>
+                <th>退供箱号</th>
+                <th>供应商入库单号</th>
+                <th>运单号</th>
+                <th>平台原始订单号</th>
+                <th>原始销售订单号</th>
+                <th>退货单号</th>
+                <th>出库单号</th>
+                <th>备件码</th>
+                <th>价格</th>
+                <th>来源</th>
+            </tr>
+        </thead>
+        <tbody id="dataNode">
+            <{foreach from=$items item=item}>
+            <tr>
+                <th><{$item.barcode}></th>
+                <th><{$item.material_bn}></th>
+                <th><{$item.shop_product_bn}></th>
+                <th><{$item.product_name}></th>
+               
+                <th><{$item.po_no}></th>
+                <th><{$item.qty}></th>
+                <th><{$item.split_num}></th>
+                <th><{$item.num}></th>
+                <th><{$item.box_no}></th>
+                <th><{$item.storage_no}></th>
+                <th><{$item.storage_box_no}></th>
+                <th><{$item.saleordid}></th>
+                <th><{$item.originsaleordid}></th>
+                <th><{$item.refundid}></th>    
+                <th><{$item.transferoutcode}></th>
+                <th><{$item.partcode}></th> 
+                <th><{$item.price}></th>    
+                <th><{$item.source_name}></th>
+            </tr>
+            <{/foreach}>
+        </tbody>
+        </table>
+    </div>
+</div>

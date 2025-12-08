@@ -1,0 +1,133 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .processBarBg {
+        border: 1px solid #999999;
+        width: 98%;
+        margin: 5px;
+        height: 25px;
+        line-height: 25px;
+        padding: 1px;
+        background: #EEEEEE;
+    }
+    .processBar {
+        background: #3366cc;
+        width: 0px;
+        padding-bottom: 1px;
+        overflow: hidden;
+    }
+</style>
+<div class="division">
+    <h4>当前共<{$count}>个模板，升级后根据需求自行调整</h4>
+    <div class="division" style="display:none;" id="information">
+        已经处理 <span id="iTotal" style="color:#083E96"></span> 个模板，<br/>
+        <span id="iSucc" style="color:green"></span> 个升级成功，<br/>
+        <span id="iNone" style="color:green"></span> 个无需升级，<br/>
+        <span id="iFail" style="color:red"></span> 个升级失败，请稍候……
+    </div>
+    <div id="processBarBg" class="processBarBg">
+        <div id="processBar" class="processBar">
+            &nbsp;
+        </div>
+    </div>
+    <div class="table-action">
+        <{button label="开始" type="botton" name="Start" id="btn-run"}>
+        <{button label="关闭" type="botton" isCloseDialogBtn="true" }>
+    </div>
+</div>
+<script>
+    (function(){
+        $('btn-run').addEvent('click', function(){
+            doRun();
+        });
+        var MaxProcessNum = 10;
+        var arrId = <{$arrId}>;
+        var total = '<{$count}>';
+        var arrQueue = new Array();
+        var doTotal, doSucc, doFail, doNone;
+        function doRun(){
+            initOptQueue();
+            if (arrQueue.length == 0) {
+                return ;
+            }
+            //禁用开始按钮
+            doTotal = doSucc = doFail = doNone = 0;
+            displayProcessInfo();
+            $('information').style.display ='';
+            $('btn-run').disabled = true;
+            $('btn-run').set('html', '<span><span>数据处理中，请稍候！</span></span>');
+            doAjaxProcess(1);
+        }
+        function initOptQueue() {
+            var sHash = '';
+            var iNum = 0;
+            var sKey = '';
+            if (arrId == '') {
+                return;
+            }
+            var LeaveProcessNum = total;
+            if (MaxProcessNum > LeaveProcessNum) {
+                MaxProcessNum = LeaveProcessNum;
+            }
+            var groupNum = arrId.length;
+            for (var i=0;i<groupNum;i++) {
+                if (sHash == '')
+                    sHash = arrId[i];
+                else
+                    sHash = sHash + ';' + arrId[i];
+                iNum ++;
+                if (iNum >= MaxProcessNum) {
+                    arrQueue.push(sHash);
+                    iNum =0;
+                    sHash = '';
+                    LeaveProcessNum = LeaveProcessNum - MaxProcessNum;
+                    if (MaxProcessNum > LeaveProcessNum) {
+                        MaxProcessNum = LeaveProcessNum;
+                    }
+                }
+            }
+            if (sHash != '') {
+                arrQueue.push(sHash);
+            }
+        }
+
+        /**
+         * 执行一次AJAX调用
+         */
+        function doAjaxProcess(idx) {
+            if (idx > arrQueue.length || doTotal >= total) {
+                $('processBar').setStyle('width', '100%');
+                $('btn-run').set('html', '<span><span>处理已完成，本窗口将在3秒后自动关闭！</span></span>');
+                setTimeout("$('btn-run').getParent('.dialog').retrieve('instance').close();finderGroup['<{$env.get.finder_id}>'].refresh();",2000);
+            } else {
+                var params = arrQueue[idx-1];
+                new Request({url:'<{$request_url}>',method:'post',data:'ajaxParams='+params,
+                    onComplete:function(result){
+                        if(!result) return;
+                        var ret = JSON.decode(result);
+                        doTotal += ret['total'];
+                        doSucc += ret['succ'];
+                        doNone += ret['none'];
+                        doFail += ret['fail'];
+                        displayProcessInfo();
+                        $('processBar').setStyle('width', (doTotal*100/(total)) + '%');
+                        doAjaxProcess(idx+1);
+                    }
+                }).send();
+            }
+        }
+
+        /**
+         * 显示信息进度
+         */
+        function displayProcessInfo() {
+            $('iTotal').set('html', doTotal);
+            $('iNone').set('html', doNone);
+            $('iSucc').set('html', doSucc);
+            $('iFail').set('html', doFail);
+        }
+    }());
+</script>

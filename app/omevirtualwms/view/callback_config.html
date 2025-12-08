@@ -1,0 +1,66 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <h3>callback配置</h3>
+    <div class="division">
+        <form action="index.php?app=omevirtualwms&ctl=admin_wms&act=callback_config" method="post" id="form-reship" >
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tbody>
+              <tr>
+                <th>CALLBACK模拟</th>
+                <td>
+                   <!--<input type="radio" name="callback[status]" value="1"  <{if $callback.status == 1}>checked="checked"<{/if}> />
+                   模拟
+                   <input type="radio" name="callback[status]" value="0" <{if $callback.status == 0 || $callback.status == ''}>checked="checked"<{/if}> />
+                   内网-->
+                   <input type="radio" name="callback[status]" value="2" <{if $callback.status == 2 || $callback.status == '2' || $callback.status == ''}>checked="checked"<{/if}> />
+                   外网
+                </td>
+              </tr>
+              <tr>
+                <th>异步接口状态:</th>
+                <td>
+                   <select name="callback[async][rsp]">
+                      <option value="running" <{if $callback.async.rsp == 'running'}>selected="selected"<{/if}>>运行中</option>
+                      <option value="fail" <{if $callback.async.rsp == 'fail'}>selected="selected"<{/if}>>失败</option>
+                   </select>
+                </td>
+              </tr>
+              <tr>
+                <th>同步接口状态:</th>
+                <td>
+                   <select name="callback[sync][rsp]">
+                      <option value="succ" <{if $callback.sync.rsp == 'succ'}>selected="selected"<{/if}>>成功</option>
+                      <option value="fail" <{if $callback.sync.rsp == 'fail'}>selected="selected"<{/if}>>失败</option>
+                   </select>
+                </td>
+              </tr>
+              <tr>
+                <th>单据状态:</th>
+                <td>
+                <select name="callback[res]">
+                  <option value="">请选择</option>
+                  <option value="w03101" <{if $callback.res == 'w03101'}>selected="selected"<{/if}>>单据号不存在</option>
+                  <option value="w03102" <{if $callback.res == 'w03102'}>selected="selected"<{/if}>>单据已发货</option>
+                  <option value="w03103" <{if $callback.res == 'w03103'}>selected="selected"<{/if}>>单据已取消</option>
+                  <option value="w03104" <{if $callback.res == 'w03104'}>selected="selected"<{/if}>>单据已关闭</option>
+                  <option value="w03105" <{if $callback.res == 'w03105'}>selected="selected"<{/if}>>单据号重复</option>
+                  <option value="w03106" <{if $callback.res == 'w03106'}>selected="selected"<{/if}>>单据已收货</option>
+                  <option value="w03107" <{if $callback.res == 'w03107'}>selected="selected"<{/if}>>退货单原始订单号不对</option>
+                  <option value="w03108" <{if $callback.res == 'w03108'}>selected="selected"<{/if}>>单据不能撤销</option>
+                  <option value="w03020" <{if $callback.res == 'w03020'}>selected="selected"<{/if}>>第三方仓储无此接口</option>
+                </select>
+                错误消息:<input type="text" name="callback[err_msg]" value="<{$callback.err_msg}>" size=50 />
+                </td>
+              </tr>
+            </tbody>
+        </table>
+        <div class="table-action">
+            <{button label="提交" type="submit" name="submit"}>
+        </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,94 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title><{$env.conf.desktop.background.title}></title>
+    <link href="<{$env.app.res_url}>/perfect/main.css" rel="stylesheet">
+    <link href="<{$env.app.res_url}>/perfect/login.css" rel="stylesheet">
+</head>
+<body>
+<div id="login-container" class="login-container">
+    <div class="login-container-bg">
+        <img class="login-log" src="<{$env.app.res_url}>/logo.png" width="282" height="202" style="margin-left:30px;">
+        <img class="bg-img" src="<{$env.app.res_url}>/perfect/login-bg.jpg">
+    </div>
+    <div class="login-container-content">
+        <div class="login-form">
+
+            <!-- 登录方式切换 -->
+            <div class="login-type">
+                <span class="login-type-active" onclick="toggleLoginMethod('account')">账户密码登录</span>
+                <span onclick="toggleLoginMethod('store')">门店登录</span>
+            </div>
+
+            <!-- 账户密码登录 -->
+            <form id="login-account" action="" method="post" class="login-account">
+                <div class="login-form-item">
+                    <span class="login-form-item-label">账户</span><input name="uname"></div>
+                <div class="login-form-item">
+                    <span class="login-form-item-label">密码</span><input name="password" type="password">
+                </div>
+                <div class="login-form-item">
+                    <span class="login-form-item-label">验证码</span><input maxlength="6">
+                    <img class="validate-code" src="<{$env.app.res_url}>/perfect/login-left-bg.jpg">
+                </div>
+            </form>
+
+            <!-- 手机号登录 -->
+<!--            <div id="login-phone" class="login-store" style="display: none">-->
+<!--                <div class="login-form-item">-->
+<!--                    <span class="login-form-item-label">手机号</span><input maxlength="11"></div>-->
+<!--                <div class="login-form-item">-->
+<!--                    <span class="login-form-item-label">验证码</span><input maxlength="6">-->
+<!--                    <button>获取验证码</button>-->
+<!--                </div>-->
+<!--            </div>-->
+
+            <!-- 门店登录 -->
+            <div id="login-store" class="login-store" style="display: none">
+                <img class="qr-code" src="<{$env.app.res_url}>/perfect/login-left-bg.jpg">
+            </div>
+
+            <div class="login-submit-btn" type="submit">登录</div>
+        </div>
+    </div>
+</div>
+
+<!-- 表单提交 -->
+<form action="index.php?app=desktop&ctl=createshortcuts" name="createshortcuts" target="_blank" method="post">
+    <input type="hidden" name="furl" value=""/>
+    <input type="hidden" name="fname" value=""/>
+</form>
+
+<script>
+    var loginMethod = 'account'
+    function toggleLoginMethod(type) {
+        loginMethod - type
+        var event = window.event
+        var activeClass = 'login-type-active'
+        if (!event.target.classList.contains(activeClass)) {
+            event.target.classList.add(activeClass)
+        }
+        if (event.target.previousElementSibling) {
+            event.target.previousElementSibling.classList.remove(activeClass)
+        } else {
+            event.target.nextElementSibling.classList.remove(activeClass)
+        }
+        document.getElementById('login-account').style.display = type === 'account' ? 'flex' : 'none'
+        document.getElementById('login-store').style.display = type === 'store' ? 'flex' : 'none'
+    }
+
+    function onSubmit() {
+
+    }
+</script>
+</body>
+</html>

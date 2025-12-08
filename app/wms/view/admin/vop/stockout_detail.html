@@ -1,0 +1,56 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form name="form1" method="POST" action="index.php?app=wms&ctl=admin_vopstockout&act=doDetail&finder_id=<{$finder_id}>">
+<div class="tableform">
+    <h4>基础信息:</h4>
+    <div class="division">
+        <table border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <th>出库单号：</th>
+                <td ><{$data.stockout_no}></td>
+                <th>拣货单号：</th>
+                <td ><{$pickInfo.pick_no}></td>
+                <th >单据状态：</th>
+                <td ><{$data.status}></td>
+                <th >出库状态：</th>
+                <td ><{$data.o_status}></td>
+            </tr>
+            <tr>
+                <th >拣货数量：</th>
+                <td ><{$data.pick_num}></td>
+                <th >出库仓：</th>
+                <td ><{$data.branch_name}></td>
+                <th >入库仓：</th>
+                <td ><{$pickInfo.branch_name}></td>
+                <th>创建时间：</th>
+                <td><{$data.create_time}></td>
+            </tr>
+        </table>
+    </div>
+    
+    <h4>物流信息:</h4>
+    <div class="division">
+        <table border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <th>入库单号：</th>
+                <td ><{$data.storage_no}></td>
+                <th>承运商：</th>
+                <td ><{$data.carrier_code}></td>
+                <th >要求到货时间：</th>
+                <td ><{$data.arrival_time}></td>
+            </tr>
+            <tr>
+                <th >运单号：</th>
+                <td ><{$data.delivery_no}></td>
+                <th >配送方式：</th>
+                <td ><{$data.dly_mode}></td>
+                <th >&nbsp;</th>
+                <td >&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+</div>
+</form>

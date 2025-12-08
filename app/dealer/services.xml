@@ -1,0 +1,80 @@
+<services>
+    <service id="desktop_finder.dealer_mdl_business">
+        <class>dealer_finder_business</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_goods">
+        <class>dealer_finder_goods</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_shop">
+        <class>dealer_finder_shop</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_platform_orders">
+        <class>dealer_finder_platform_orders</class>
+    </service>
+    <service id="operation_log">
+        <class>dealer_operation_log</class>
+    </service>
+    <service id="html_input">
+        <class>dealer_view_input</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_series"> 
+        <class>dealer_finder_series</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_platform_aftersale"> 
+        <class>dealer_finder_platform_aftersale</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_shop_stocksync">
+        <class>dealer_finder_shop_stocksync</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_orders">
+        <class>ome_finder_orders</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_sales">
+        <class>sales_finder_sales</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_delivery">
+        <class>console_finder_delivery</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_bbu">
+        <class>dealer_finder_bbu</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_betc">
+        <class>dealer_finder_betc</class>
+    </service>
+    <service id="extend_filter_dealer_mdl_betc">
+        <class>dealer_finder_extend_filter_betc</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_bs">
+        <class>dealer_finder_bs</class>
+    </service>
+    <service id="extend_filter_dealer_mdl_bs">
+        <class>dealer_finder_extend_filter_bs</class>
+    </service>
+    <service id="extend_filter_dealer_mdl_series">
+        <class>dealer_finder_extend_filter_series</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_sales_material">
+        <class>dealer_finder_material_sales</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_series_endorse_products">
+        <class>dealer_finder_series_endorse_products</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_series_products">
+        <class>dealer_finder_series_products</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_series_endorse">
+        <class>dealer_finder_series_endorse</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_reship">
+        <class>dealer_finder_reship</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_aftersale">
+        <class>sales_finder_aftersale</class>
+    </service>
+    <service id="desktop_finder.dealer_mdl_goods_price">
+        <class>dealer_finder_goods_price</class>
+    </service>
+    <service id="extend_filter_dealer_mdl_goods_price">
+        <class>dealer_finder_extend_filter_goods_price</class>
+    </service>
+</services>

@@ -1,0 +1,15 @@
+<services>
+    <service id="openapi.asynccallback">
+        <class>erpapi_rpc_service</class>
+    </service>
+    <service id="openapi.process">
+        <class>erpapi_rpc_service</class>
+    </service>
+    <service id="extend_filter_erpapi_mdl_api_fail">
+        <class>erpapi_finder_extend_filter_api_fail</class>
+    </service>
+    <service id="autotask">
+        <class>erpapi_misc_task</class>
+    </service>
+</services>
+<!-- /openapi/process/handle -->

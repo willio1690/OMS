@@ -1,0 +1,130 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $return_product_tmall.refund_type=='change'}>
+<h4>买家换货信息</h4>
+<div class="division">
+
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="gridlist">
+    <tbody>
+        <tr>
+            <th>换货sku</th>
+            <th>换货地址</th>
+            <th>买家发货物流公司</th>
+            <th>买家联系方式</th>
+        </tr>
+        <tr>
+            <td><{$return_product_tmall.exchange_sku}></td>
+            <td><{$return_product_tmall.buyer_address}></td>
+            <td><{$return_product_tmall.buyer_logistic_name}></td>
+            <td><{$return_product_tmall.buyer_phone}></td>
+        </tr>
+    </tbody>
+    </table>
+
+</div>
+<h4>卖家换货信息</h4>
+<div class="tableform">
+
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="gridlist">
+    <tbody>
+        <tr>
+           <th>卖家发货快递单号</th>
+            <th>卖家发货物流公司</th>
+
+        </tr>
+        <tr>
+
+           <td><{$return_product_tmall.seller_logistic_no}></td>
+            <td><{$return_product_tmall.seller_logistic_name}></td>
+        </tr>
+    </tbody>
+    </table>
+
+</div>
+<{/if}>
+<{if $intercept}>
+<h4>
+    零秒退快递拦截
+</h4>
+<div class="tableform">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="gridlist">
+        <tbody>
+        <tr>
+            <th>出资方</th>
+            <th>商品截单状态</th>
+            <th>截单失败原因</th>
+        </tr>
+        <tr>
+            <td><{$intercept.interceptInvestor}></td>
+            <td><{$intercept.logisticInterceptEnum}></td>
+            <td><{$intercept.interceptFailCode}></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<{/if}>
+<div class="tableform">
+    <h4>标签:
+        <font color='red'>
+        <{foreach from=$return_product_tmall.tag_list.tag item=tag_list}>
+        <{$tag_list.tag_name}>
+        <{/foreach}>
+        </font>
+    </h4>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="gridlist">
+    <tbody>
+        <tr>
+            <th>支付宝交易号</th>
+            <th>会员ID</th>
+            <th>卖家ID</th>
+            <th>当前状态超时时间</th>
+        </tr>
+        <tr>
+            <td><{$return_product_tmall.alipay_no}></td>
+            <td><{$return_product_tmall.buyer_nick}></td>
+            <td><{$return_product_tmall.seller_nick}></td>
+            <td><{$return_product_tmall.current_phase_timeout|date_format:'%Y-%m-%d %H:%M:%S'}></td>
+        </tr>
+    </tbody>
+    </table>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="gridlist">
+        <tr>
+            <td>退货地址:<{$return_product_tmall.province}>
+            <{$return_product_tmall.city}><{$return_product_tmall.country}><{$return_product_tmall.addr}>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="tableform">
+    <h4>凭证查看
+    <input type="button" id='return_message' name='return_message' value='下载淘宝凭证'>
+    </h4>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="gridlist">
+        <tbody>
+            <{foreach from=$return_product_tmall.online_memo item=memo}>
+            <tr>
+                <td>
+    <b><{$memo.created}> &nbsp;&nbsp;<{$memo.owner_nick}></b>&nbsp;&nbsp;<{$memo.content}><{if $memo.voucher_urls}><br><img src='<{$memo.voucher_urls}>' height='50' onclick="showimage('<{$memo.voucher_urls}>')" alt='点击查看大图' style="cursor:pointer;"><{/if}>
+    </td>
+            </tr>
+                <{/foreach}>
+        </tbody>
+    </table>
+</div>
+<script>
+if ($('return_message'))
+{
+	$('return_message').addEvent('click',function(e){
+		var url = 'index.php?app=ome&ctl=admin_return&act=refund_message&p[0]=<{$return_product_tmall.return_id}>&p[1]=<{$return_product_tmall.refund_type}>&shop_type=tmall&finder_id=<{$env.get.finder_id}>';
+        new Dialog(url,{title:'淘宝凭证',width:500,height:300});
+
+	});
+}
+function showimage(imgpath){
+    var url = 'index.php?app=ome&ctl=admin_return&act=showImage&p[0]='+imgpath;
+    new Dialog(url,{title:'查看凭证大图',width:500,height:300});
+}
+</script>

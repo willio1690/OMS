@@ -1,0 +1,19 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout">
+<form id="dorefund"  class="tableform" method='post' action='index.php?app=ome&ctl=admin_return_refund_apply&act=apply_refund&finder_id=<{$env.get.finder_id}>'>
+    <input type="hidden" name="source" value="<{$source}>">
+    <div width="100%" cellspacing="0" cellpadding="0" border="0" id="insert_html">
+         <{include file="admin/return_product/refund/detail.html" app="ome"}>
+    </div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <{button label='提交' onclick="return submitchk();" id="ome_register_refund" type="button" class="btn btn-primary"}>
+    <{button_permission label="返回"  class="btn-secondary" type="button" onclick="location.href=window.frameElement.src;"}>
+</div>
+<{/area}>
+</form>
+</div>

@@ -1,0 +1,110 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<div class="division">
+<form method="post" action="index.php?app=dchain&ctl=admin_branch&act=saveDchainBranch" id="terminal">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+        <tr>
+          <th><em class="c-red">*</em> 优仓编码：</th>
+          <td><{if $branch_list.channel_bn}><{$branch_list.channel_bn}><{else}>
+              <{input type="text&&required" name="branch[channel_bn]" value=""}><{/if}>
+              <{help}><{t}>第三方优仓的唯一标识<{/t}><{/help}>
+          </td>
+        </tr>
+        <tr>
+        <th ><em class="c-red">*</em> 优仓名称：</th>
+          <td><{input type="text&&required" size="32" name="branch[channel_name]" value=$branch_list.channel_name}>
+              <{help}><{t}>中文名称<{/t}><{/help}>
+          </td>
+        </tr>
+        <tr>
+        <th ><em class="c-red">*</em> 关联店铺：</th>
+          <td><{input type='select' name='config[shop_id]' id='wmstype' vtype='required' rows=$shop_list valueColumn="shop_id" labelColumn="name" value=$branch_list.config.shop_id }>
+            <ul style='color:red' id="adapter_desc">
+              <{foreach from=$shop_list item=item}>
+                <li id="desc_<{$item.shop_id}>" style="display:none"><{$item.name}></li>
+              <{/foreach}>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+            <th style="vertical-align: top;">仓库编码映射：</th>
+            <td>
+                <{button id="add" label="增加映射仓库关系"}>
+                <{foreach from=$branch_list.config.warehouse_mapping key=key value=value}>
+                <div>系统仓编码:<{input type="text" name="oms_warehouse[]" value=$key}> - 优仓编码:<{input type="text" name="outer_warehouse[]" value=$value}></div>
+                <{foreachelse}>
+                <div>系统仓编码:<{input type="text" name="oms_warehouse[]" value}> - 优仓编码:<{input type="text" name="outer_warehouse[]" value}></div>
+                <{/foreach}>
+            </td>
+        </tr>
+        <tr>
+            <td width="20%" align="right" nowrap="nowrap"><em class="c-red">*</em> 状态：</td>
+            <td>
+                <input type="radio" name='disabled' value='false' <{if $branch_list.disabled == 'false'}> checked<{/if}> <{if !$branch_list.disabled}> checked<{/if}>  >启用&nbsp;&nbsp;
+                <input type="radio" name='disabled' value='true' <{if $branch_list.disabled == 'true'}> checked<{/if}> >停用
+            </td>
+        </tr>
+        </tbody>
+      </table>
+      <div id='adapter_config'></div>
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+<!--        <tr>-->
+<!--          <th>开票信息：</th>-->
+<!--          <td>-->
+<!--              <div class="span-auto"><input type="checkbox" name="config[notpush_invoice]" value="1" <{if $branch_list.config.notpush_invoice}>checked<{/if}>> 不推送 </div>-->
+<!--          </td>-->
+<!--        </tr>-->
+        </tbody>
+      </table>
+
+      <{if $branch_list.channel_id}>
+       <input type="hidden" name="branch[channel_id]" value="<{$branch_list.channel_id}>">
+      <{/if}>
+      <{if $branch_list.config.adapter}>
+        <input type='hidden' name='adapter' value="<{$branch_list.config.adapter}>">
+      <{/if}>
+      <div class="table-action">
+      <{button class="btn-primary" type="submit" id="saveterminal" name="submit" label="提交"}>
+      </div>
+</form>
+</div>
+</div>
+<div id="remark" style="color:red;margin: 5px 10px 7px;padding: 2px;"></div>
+<script>
+$('terminal').store('target',{
+  onRequest:function(){
+     $('saveterminal').set('disabled', 'true');
+  },
+  onComplete:function(jsontext){
+     var json = Json.evaluate(jsontext);
+     if (typeof(json.error) != 'undefined'){
+         $('saveterminal').set('disabled', '');
+         $('remark').setHTML(json.error);
+     }else{
+         $('saveterminal').set('disabled', 'true');
+         parent.finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,parent.finderGroup['<{$env.get.finder_id}>']);
+         $('saveterminal').getParent('.dialog').retrieve('instance').close();
+     }
+  }
+});
+
+(function () {
+    if($('add')) {
+        $('add').addEvent('click', function (e) {
+            var pTd = this.getParent('td');
+            var oDiv = document.createElement('DIV');
+            var sHtml = '系统仓编码:<{input type="text" name="oms_warehouse[]" value}> - 优仓编码:<{input type="text" name="outer_warehouse[]" value}>';
+            oDiv.setHTML(sHtml);
+            oDiv.inject(pTd);
+        });
+    }
+
+})();
+
+</script>

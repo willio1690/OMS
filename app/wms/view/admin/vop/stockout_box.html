@@ -1,0 +1,256 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+
+<div class="tableform">
+    <div class="division"><span id='pfba'><label style="font-size:18px; font-weight:bold;">录入货号：</label><input name="bn" type="text" style="width:200px; height:26px; line-height:26px;" maxlength="50" /></span><span style="color:red;">&nbsp;&nbsp;*请按回车键录入！</span></div>
+    
+    <form id="form1" name="form1" action="index.php?app=wms&ctl=admin_vopstockout&act=doAddBox" method="POST">
+    <input type="hidden" name="stockout_id" id="stockout_id" value="<{$data.stockout_id}>" />
+    <div class="division">
+      <h5>装箱信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+                <tr>
+                    <th style='text-align:left;padding-left:5px;'>货号</th>
+                    <th style='text-align:left;padding-left:5px;'>货品名称</th>
+                    <th style='text-align:left;padding-left:5px;'>尺寸</th>
+                    <th style='text-align:left;padding-left:5px;'>成本价</th>
+                    <th style='text-align:left;padding-left:5px;'>市场价</th>
+                    <th style='text-align:left;padding-left:5px;'>可申请数量</th>
+                    <th style='text-align:left;padding-left:5px;'>申请数量</th>
+                    <th style='text-align:left;padding-left:5px;'>箱号</th>
+                    <th style='text-align:left;padding-left:5px;'>操作</th>
+                </tr>
+            </thead>
+            <tbody id="dataNode">
+              <tr>
+                  <td colspan="9" style="padding:0;"><div class="note" style="text-align:center;">暂无装箱货品信息...</div></td>
+              </tr>
+          </tbody>
+        </table>
+    </div>
+
+    <div id="cc" class="noprint table-action"> <{button type="button" class="btn" id="purchase-save-btn" label="确认出库"}> &nbsp; <{button type="button" class="btn" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}></div>
+    </form>
+</div>
+
+<script>
+(function(){
+    var pag;
+    
+    $('purchase-save-btn').addEvent('click',function(e)
+    {
+        var _this=this;
+        var form=this.getParent('form');
+        var finder_id    = '<{$env.get.finder_id}>';
+        
+        form.store('target',{
+            onRequest:function(){
+                _this.disabled=true;
+            },
+            onComplete:function(jsontext){
+                try{
+                    var json = JSON.decode(jsontext);
+                    
+                    if (typeof(json.error)!='undefined'){
+                        _this.disabled=false;
+                    }else{
+                        _this.disabled=true;
+                        
+                        window.opener.location.reload();
+                        
+                        //if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                        setTimeout('window.close()',200);
+                    }
+                }catch(e){}
+            }
+        });
+        
+        form.fireEvent('submit',e);
+    });
+    
+    var callurl='index.php?app=wms&ctl=admin_vopstockout&act=getStockoutItem&stockout_id=<{$data.stockout_id}>',store=[];
+    var options={
+        'getVar':'bn',
+        'fxOptions':false,
+        callJSON:function(){return window.autocompleter_json;},
+        injectChoice:function(json){
+            var choice = new Element('li', {'html': this.markQueryValue(json[this.options.getVar])});
+            choice.store('_data',json);
+            choice.inputValue = json[this.options.getVar];
+            this.addChoiceEvents(choice).inject(this.choices);
+        },
+        onHide:function(){
+            if(!this.selected)return;
+            var json=this.selected.retrieve('_data');
+            json=$splat(json);
+            init(json);
+            MessageBox.success('加载商品成功!!');
+        },
+        onFocus:function(ipt){
+            ipt.value='';
+        }
+    };
+    new Autocompleter.script($E('#pfba input'),callurl, options);
+    
+    var tpl='<tr key="{product_id}" id="product_{product_id}">'+
+        '<td>{bn}<input type="hidden" name="item_ids[]" value="{product_id}" /></td><td class="product-name">{product_name}</td>'+
+        '  <td>{size}</td><td>{price}</td><td>{market_price}</td><td>{pick_num}</td>'+
+        '  <td><input type="text" value="{num}" key="num" tname="at[_PRIMARY_]" name="at[]" size="8" maxlength="10" vtype="number&amp;&amp;required"></td>'+
+        '  <td><input type="text" value="{box_no}" name="box[]" size="25" vtype="required"></td>'+
+        '  <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>'+
+        '</tr>';
+
+    function emptyData(){
+        var noData='<tr>'+
+            '<td colspan="9" style="padding:0;"><div class="note" style="margin:0;"> 暂无货品信息 </div></td>'+
+            '</tr>';
+        $('dataNode').set('html',noData);
+    }
+    
+    var _next_key = next_key =  product_id = last_key = null;
+    function createProduct(data){
+        pag=new PageData(tpl,data,{'updateMain':$('dataNode'),'pageNum':10000,
+            'format': function(d) {
+                d.count = (d.num * d.price).toFixed(2);
+                d['price'] = (d.price * 1).toFixed(2);
+            },
+            'onShow':function(){
+                var _this=this;
+                
+                $$('#dataNode input[tname$="[_PRIMARY_]"]').each(function(item){
+                    item.store('initval',item.value).addEvent('change',function(e){
+                        var patten,
+                            parent = this.getParent('tr'),
+                            pid= parent.get('key'),
+                            value= this.value,
+                            
+                            diffval = this.retrieve('initval') - value;
+
+                        if (/^at\[/.test(this.get('tname'))){
+                            patten = /^[1-9]\d*$/;
+                        }else{
+                            patten = /^\d+(\.*)\d*$/;
+                        }
+                        if(!patten.test(value)){
+                            this.focus();
+                            this.select();
+                            return MessageBox.error('输入格式有误！');
+                        }
+                        
+                        this.store('initval', value);
+                        _this.editData(pid,[this.get('key'),value]);
+
+                        //var count = parent.getElement('td.count'),
+                        //    num = _this.selectData(pid).num.toInt(),
+                            //pr = (_this.selectData(pid).price.toFloat() * 1).toFixed(2),
+                       //     sums = (num * pr).toFixed(2);
+
+                            //if(this.get('key') == 'price') {
+                            //    this.set('value',pr);
+                            //}
+                        //count.set('text',sums);
+                        //_this.editData(pid,['count',sums]);
+                        //if (/^at\[/.test(this.get('tname'))){
+                            
+                           // $('buy_count').set('text', $('buy_count').get('text') - diffval);
+                           // $('buy_amount').set('text', ($('buy_amount').get('text') - diffval * pr).toFixed(2));
+                       // }else{
+                           // $('buy_amount').set('text', ($('buy_amount').get('text') - diffval * num).toFixed(2));
+                       // }
+                    });
+                });
+                
+                $$('#dataNode tr').each(function(item,i){
+                    
+                    item.getElement('.btn-delete-item').addEvent('click',function(e){
+                        e.stop();
+                        product_id = 'product_'+item.get('key');
+                        _next_key = $$('#'+product_id+'+tr').get('key');
+
+                        if(_this.selectData(item.get('key')) && confirm('确定要删除 '+ _this.selectData(item.get('key'))['product_name'] +' 吗？')){
+                          compute(item);
+                          _this.delData(item.get('key'));
+                          
+                          if(isNaN(_next_key) == false){
+                              next_key = 'product_'+_next_key; 
+                              $E('#'+next_key).set('style','background:none repeat scroll 0 0 #6699FF;color:#FFFFCC');               
+                          }else{
+                              _next_key = null;
+                          }
+                          product_id =  next_key = null;
+
+                        }
+                        if(!$E('#dataNode tr')) emptyData();
+                    });
+                    item.getElement('input[tname^=at]').addEvent('enter',function(e){
+                        $E('#pfba input').focus();
+                    });
+                });
+                
+                if(this.data.length) {
+                    $E('#dataNode input[key^=num]').focus();
+                
+                }
+
+              $ES('.product-name').each(function(item){
+                if (item.get('visibility')=='false')
+                {
+                    item.setStyle('color','#808080');
+                }
+              });
+              $ES('.product-name').removeEvent('mouseover').addEvent('mouseover',function(e){
+                    if (this.get('visibility')=='false')
+                    {
+                        var e  = new Event(e), el = e.target;
+                        visiTips.attach(el);
+                        el.addEvent('mouseleave',function(){
+                            this.removeClass('active');
+                        });
+                        el.fireEvent('mouseenter',e);
+                    }
+              });
+            }
+        });
+    }
+    
+    function compute(e){
+      //var num = e.getElement('input[tname="at[_PRIMARY_]"]').value.toInt();
+     // var pr = e.getElement('input[tname="pr[_PRIMARY_]"]').value.toFloat();
+      //var sum = num * pr;
+      //$('buy_count').set('text',$('buy_count').get('text') - num);
+      //$('buy_amount').set('text',($('buy_amount').get('text') - sum).toFixed(2));
+    }
+
+    function init(rs){
+        var tmparr=findProduct(rs,'product_id');
+         store.unshift.apply(store,tmparr);
+         createProduct(store);
+    }
+    function findProduct(arr,PRIMARY){
+        if(!store.length)return arr;
+        store.each(function(a){
+            arr.each(function(b){
+                if(a[PRIMARY]==b[PRIMARY])arr.erase(b);
+            });
+        });
+        return arr;
+    }
+    function delProduct(obj,arr){
+        arr.each(function(d){obj.delData(d);});
+    }
+})();
+</script>
+<style>
+.autocompleter-choices { left:100px; } 
+</style>

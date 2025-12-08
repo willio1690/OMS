@@ -1,0 +1,147 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout-block">
+    <h3>开票设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">默认开票方式：</span>
+            <div class="form-radios">
+                <input id="ome_invoice_mode_on" type="radio" value="paper" name="set[ome.invoice.mode]" <{if $setData['ome_invoice_mode']!='electron'}>checked<{/if}> >
+                <label for="ome_invoice_mode_on">纸质</label>
+                <input id="ome_invoice_mode_off" type="radio" value="electron" name="set[ome.invoice.mode]" <{if $setData['ome_invoice_mode']=='electron'}>checked<{/if}> >
+                <label for="ome_invoice_mode_off" >电子</label>
+            </div>
+            <span class="form-remark" style="color: red">如果平台未设置具体开票方式，将以此配置为主</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">强制开票：</span>
+            <div class="form-radios">
+                <input id="ome_invoice_force_on" type="radio" name="set[ome.invoice.force]" value="on" <{if $setData.ome_invoice_force == 'on'}> checked<{/if}> >
+                <label for="ome_invoice_force_on">是</label>
+                <input id="ome_invoice_force_off" type="radio"  name="set[ome.invoice.force]" value="off" <{if $setData.ome_invoice_force == 'off'}> checked<{/if}> >
+                <label for="ome_invoice_force_off" >否</label>
+            </div>
+            <span class="form-remark" style="color: red">开启后，未开票的订单将以默认的方式开票</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">纸质发票开电子：</span>
+            <div class="form-radios">
+                <input id="ome_invoice_p2e_on" type="radio" name="set[ome.invoice.p2e]" value="on" <{if $setData.ome_invoice_p2e == 'on'}> checked<{/if}> >
+                <label for="ome_invoice_p2e_on">是</label>
+                <input id="ome_invoice_p2e_off" type="radio"  name="set[ome.invoice.p2e]" value="off" <{if $setData.ome_invoice_p2e == 'off'}> checked<{/if}> >
+                <label for="ome_invoice_p2e_off" >否</label>
+            </div>
+            <span class="form-remark" style="color: red">开启后，普通纸质开票转电子开票，不包括专票，不包括未开票上面强制转的</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">自动开电子发票：</span>
+            <div class="form-radios">
+                <input id="ome_order_autoinvoice_on" type="radio" name="set[ome.order.autoinvoice]" value="on" <{if $setData.ome_order_autoinvoice == 'on'}> checked<{/if}> >
+                <label for="ome_order_autoinvoice_on">是</label>
+                <input id="ome_order_autoinvoice_off" type="radio"  name="set[ome.order.autoinvoice]" value="off" <{if $setData.ome_order_autoinvoice == 'off'}> checked<{/if}> >
+                <label for="ome_order_autoinvoice_off" >否</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">开票金额：</span>
+            <div class="form-checkbox">
+                <input id="ome_invoice_amount_infreight_on"  type="checkbox" value="1" name="set[ome.invoice.amount.infreight]" <{if $setData['ome_invoice_amount_infreight']=='1'}>checked<{/if}> >
+                <label for="ome_invoice_amount_infreight_on">开运费</label>
+            </div>
+            <span class="form-remark" style="color: red">勾选代表开运费，运费第一条明细的销售价上，不勾代表不开运费</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">默认开票物料类型：</span>
+            <div class="form-radios">
+                <input id="ome_invoice_material_type_on" type="radio" value="basic" name="set[ome.invoice.material.type]" <{if $setData['ome_invoice_material_type']!='sales'}>checked<{/if}> >
+                <label for="ome_invoice_material_type_on">基础物料</label>
+                <input id="ome_invoice_material_type_off" type="radio" value="sales" name="set[ome.invoice.material.type]" <{if $setData['ome_invoice_material_type']=='sales'}>checked<{/if}> >
+                <label for="ome_invoice_material_type_off" >销售物料</label>
+            </div>
+        </div>
+        <div class="form-field ome_invoice_infreight" <{if $setData['ome_invoice_amount_infreight']!='1'}>style="display:none"<{/if}> >
+            <span class="form-field-label">运费开票分类：</span>
+            <input class="form-input" placeholder="请输入开票分类" type="text" name="set[ome.invoice.infreight.category]" value="<{$setData.ome_invoice_infreight_category}>"  />
+        </div>
+        <div class="form-field ome_invoice_infreight" <{if $setData['ome_invoice_amount_infreight']!='1'}>style="display:none"<{/if}> >
+            <span class="form-field-label">运费开票名称：</span>
+            <input class="form-input" placeholder="请输入开票名称" type="text" name="set[ome.invoice.infreight.name]" value="<{$setData.ome_invoice_infreight_name}>"  />
+        </div>
+        <div class="form-field ome_invoice_infreight" <{if $setData['ome_invoice_amount_infreight']!='1'}>style="display:none"<{/if}> >
+            <span class="form-field-label">运费开票税率：</span>
+            <{input type="select" required="true" name="set[ome.invoice.infreight.rate]" value=$setData.ome_invoice_infreight_rate options=array('0.06'=>'6%','0.09'=>'9%','0.1'=>'10%','0.13'=>'13%','0.16'=>'16%')}>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">发票自动上传：</span>
+            <div class="form-radios">
+                <input id="ome_invoice_autoupload_on" type="radio" name="set[ome.invoice.autoupload]" value="on" <{if $setData.ome_invoice_autoupload == 'on'}> checked<{/if}> >
+                <label for="ome_invoice_autoupload_on">是</label>
+                <input id="ome_invoice_autoupload_off" type="radio"  name="set[ome.invoice.autoupload]" value="off" <{if $setData.ome_invoice_autoupload == 'off'}> checked<{/if}> >
+                <label for="ome_invoice_autoupload_off" >否</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">是否开赠品：</span>
+            <div class="form-radios">
+                <input id="ome_invoice_gift_on" type="radio" name="set[ome.invoice.gift]" value="on" <{if $setData.ome_invoice_gift == 'on'}> checked<{/if}> >
+                <label for="ome_invoice_gift_on">是</label>
+                <input id="ome_invoice_gift_off" type="radio"  name="set[ome.invoice.gift]" value="off" <{if $setData.ome_invoice_gift == 'off'}> checked<{/if}> >
+                <label for="ome_invoice_gift_off" >否</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">发票本地存储：</span>
+            <div class="form-radios">
+                <input id="ome_invoice_local_storage_on" type="radio" name="set[ome.invoice.local.storage]" value="on" <{if $setData.ome_invoice_local_storage == 'on'}> checked<{/if}> >
+                <label for="ome_invoice_local_storage_on">是</label>
+                <input id="ome_invoice_local_storage_off" type="radio"  name="set[ome.invoice.local.storage]" value="off" <{if $setData.ome_invoice_local_storage == 'off'}> checked<{/if}> >
+                <label for="ome_invoice_local_storage_off" >否</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-layout-block">
+    <h3>物流对帐设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">物流对帐任务：</span>
+            <div class="form-radios">
+                <input id="task_logistestimate_on" type='radio' class='on-off-cost-init_time' name='set[ome.task.logistestimate]' <{if $setData.ome_task_logistestimate != 'off'}> checked<{/if}> value='on'>
+                <label for="task_logistestimate_on">开启</label>
+                <input id="task_logistestimate_off"  type='radio' class='on-off-cost-init_time' name='set[ome.task.logistestimate]' <{if $setData.ome_task_logistestimate == 'off'}> checked<{/if}> value='off'>
+                <label for="task_logistestimate_off" >关闭</label>
+            </div>
+            <span class="form-remark" style="color: red">开启后，每天定时会生成物流对账单（财务管理--》物流对账--》物流账单）；</span>
+        </div>
+    </div>
+</div>
+
+<div class="form-layout-block">
+    <h3>唯品会账单设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">唯品会账单任务：</span>
+            <div class="form-radios">
+                <input id="task_logistestimate_on" type='radio' class='on-off-cost-init_time' name='set[ome.vopbill.set]' <{if $setData.ome_vopbill_set && $setData.ome_vopbill_set != 'off'}> checked<{/if}> value='on'>
+                <label for="task_logistestimate_on">开启</label>
+                <input id="task_logistestimate_off"  type='radio' class='on-off-cost-init_time' name='set[ome.vopbill.set]' <{if $setData.ome_vopbill_set == 'off'}> checked<{/if}> value='off'>
+                <label for="task_logistestimate_off" >关闭</label>
+            </div>
+            <span class="form-remark" style="color: red">开启后，会获取唯品账单</span>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" charset="utf-8">
+    $E('input[name=set[ome.invoice.amount.infreight]]').addEvent('click',function(){
+        var value = $$('input[name=set[ome.invoice.amount.infreight]]:checked').get('value');
+        if(value == '1'){
+            $$('.ome_invoice_infreight').setStyle('display','');
+        }else{
+            $$('.ome_invoice_infreight').setStyle('display','none');
+        }
+    });
+</script>

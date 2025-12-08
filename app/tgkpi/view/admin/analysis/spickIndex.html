@@ -1,0 +1,91 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class='division'  id='spick'>
+	<h3>拣货查询</h3>
+	<table>
+            <tbody>
+            <tr>
+                <td width	="55px">&nbsp;</td>
+                <td>
+                    <span style="font-size: 1.5em;font-weight: bold;">请输入快递单号：</span>(建议使用条码枪扫描)<br />
+                    <input type="text" id="logi_no" vtype="required" name="logi_no" style="margin-top: 10px;background: none repeat scroll 0 0 #FAFAFA;border: 2px solid #CCCCCC;border-radius: 10px 10px 10px 10px;color: #069CBC;font-size: 30px;height: 45px;line-height: 40px;margin-bottom: 10px;padding-left: 19px;width: 400px;" > <span style="color: red;"></span>
+                    <button type="button" id="btn" style="margin-top: -10px;margin-left: 25px;font-size:3.0em;font-weight: 700; height: 50px; width:120px;cursor: pointer;display: -moz-inline-stack;line-height: 40px;overflow: visible;text-decoration: none;vertical-align: middle;" ><span><span>确定</span></span></button>
+                </td>
+            </tr>
+            </tbody>
+	</table>
+</div>
+
+<div class='division' id='spick-result' style='width:35%;margin-left:54px;background-color:#c8c8c8;display:none'>
+	<!--查询结果-->
+	<div class='title'>查询结果</div>
+	<ul>
+	<li>快递单号：24324442，拣货员：咕咕</li>
+	</ul>
+<!--	<div style='background-color:#969696;height:300px;font-size:20px;overflow:auto;border-top-width: thin; '>242</div>-->
+</div>
+<style>
+#spick-result .title{
+	 text-align: center;
+	 font-size: 25px;
+}
+#spick-result ul{
+	height:100px;
+}
+#spick-result ul li{
+	display: list-item;
+	list-style-position: inside;
+	list-style-type:square;
+	font-size:20px;
+}
+</style>
+<script>
+window.addEvent('domready',function(){
+	$E('#spick #logi_no').focus();
+
+	function requestData(){
+		var value = $E('#spick #logi_no').getValue();
+		if (value=='')
+		{
+			$E('#spick #logi_no').focus();
+			return ;
+		}
+		new Request.JSON({
+			url:'index.php?app=tgkpi&ctl=admin_analysis_pick&act=spick',
+			method:'post',
+			data:{
+				logi_no:value
+			},
+			onSuccess:function(resp){
+				var el = $E('#spick-result ul li'); 
+				var html = '';
+				if (resp.status=='fail')
+				{
+					html = "<span style='color:#cc3300'>快递单号("+value+")</span>异常："+resp.msg;
+				}else if(resp.status=='succ'){
+					html = "快递单号：<span style='color:#cc6600'>"+value+"</span>，拣货员：<span style='color:#cc6600'>"+resp.data.username+"</span>";
+				}
+				el.setHTML(html);
+				$E('#spick-result').show();
+				 $E('#spick #logi_no').set('value','');
+				 $E('#spick #logi_no').focus();
+			}
+		}).send();
+	}
+
+	$E('#spick #logi_no').addEvent('keyup',function(e){
+		if (e.code==13)
+		{
+			requestData();
+		}
+		
+	});
+
+	$E('#spick #btn').addEvent('click',function(e){
+		requestData();
+	});
+});
+</script>

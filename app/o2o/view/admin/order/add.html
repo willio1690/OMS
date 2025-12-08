@@ -1,0 +1,294 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .shop_text {
+        font-size: 14px;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="tableform newOrder">
+    <h3><{$title}></h3>
+    <form action="index.php?app=o2o&ctl=admin_order&act=doAdd" method="post" id="newOrderForm">
+        <input type="hidden" />
+        <div class="shop_text gray_form">
+            <table cellpadding="0" cellspacing="0">
+                <tbody>
+                <tr>
+                    <th>门店:</th>
+                    <td colspan="3">
+                        <{input type='select' issearch="fuzzy-search" required="required" name='shop_id' options=$shopData}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        手机号:
+                    </th>
+                    <td>
+                        <input type="text" name="mobile" required="required" vtype="required" />
+                    </td>
+                    <th>
+                        姓名:
+                    </th>
+                    <td>
+                        <input type="hidden" name="member_id" />
+                        <input type="text" name="name" required="required" vtype="required" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>地址:</th>
+                    <td colspan="3" id="address"><{input type='region' app='ectools' name="area" vtype="area" }>
+                        <input type="text" name="addr" required="required" vtype="required" />
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="shop_text gray_form">
+            <div>
+                销售物料编码：<input type="text" id="sales_material_bn" />
+                <div style="width:98%;height:190px; overflow-y: auto;border: 1px solid #ccc; margin: 10px auto">
+                    <table class="gridlist" style="*width:97%;">
+                        <thead>
+                        <tr class="shop_text">
+                            <th>销售物料编码</th>
+                            <th>商品名称</th>
+                            <th>单价</th>
+                            <th>数量</th>
+                            <th>原价</th>
+                            <th>折扣</th>
+                            <th>销售价</th>
+                            <th style="display: none">发货</th>
+                            <th>删除</th>
+                        </tr>
+                        </thead>
+                        <tbody id="proNode">
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+        <div class="shop_text gray_form">
+            <table cellpadding="0" cellspacing="0">
+                <tbody>
+                <tr>
+                    <th>应收:</th>
+                    <td><input type="number" name="receivable" size="7" required="required" readonly /></td>
+
+                    <th>折扣/优惠:</th>
+                    <td><input type="number" name="pmt_order" size="7" value="0" /></td>
+
+                    <th>实收:</th>
+                    <td><input type="number" name="payed" size="7" required="required" /></td>
+
+                    <th>支付方式:</th>
+                    <td>
+                        <select name="payment" vtype="required">
+                            <{foreach from=$payment_list item=item}>
+                            <option value="<{$item}>"><{$item}></option>
+                            <{/foreach}>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>支付单号:</th>
+                    <td>
+                        <input type="test" name="payment_no" size="15" required="required" vtype="required"/>
+                    </td>
+                    <th>备注:</th>
+                    <td colspan="5">
+                        <textarea rows="3" style="width: 100%" name="mark_text"></textarea>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <{button type="button" class="btn-primary" id="btn_submit" label="提交" disabled='disabled'}>
+</div>
+<{/area}>
+<script  type="text/javascript">
+        // 初始化门店搜索下拉框
+        tail.select('select[issearch="fuzzy-search"]', {
+            search: true,
+            width: 300,
+            height: 300,
+            searchMinLength: 0
+        });
+        
+    (function () {
+        var form = $('newOrderForm');
+        form.store('target', {
+            onRequest: function () {
+                $('btn_submit').set('disabled', 'true');
+                $('btn_submit').getElements('span')[1].set('text', '处理中');
+            },
+            onComplete: function (jsontext) {
+                var json = Json.evaluate(jsontext);
+                if (typeof(json.error) != 'undefined') {
+                    MessageBox.error(json.error);
+                    $('btn_submit').set('disabled', '');
+                    $('btn_submit').getElements('span')[1].set('text', '提交');
+                } else {
+                    $('btn_submit').set('disabled', 'true');
+                    $('btn_submit').getElements('span')[1].set('text', '处理中');
+                }
+            }
+        });
+        $('btn_submit').addEvent('click',function(e){
+            
+            var mobiles = $E('input[name="mobile"]').get('value');
+            if(mobiles != '' && is_mobile(mobiles) === false)
+            {
+                alert('请填写正确的手机号码');
+                return false;
+            }
+
+            form.fireEvent('submit', {stop: $empty});
+        });
+        $E('[name="mobile"]').addEvent('enter', function () {
+            var _this = this;
+            var oVal = _this.value.trim();
+            if(!oVal) {
+                return;
+            }
+            new Request.JSON({
+                url:'index.php?app=o2o&ctl=admin_order&act=getConsignee',
+                method:'post',
+                data:{mobile:oVal},
+                onSuccess:function(json){
+                    if(json.data) {
+                        $E('[name="member_id"]').value = json.data.member_id;
+                        $E('[name="name"]').value = json.data.ship_name;
+                        $('address').setHTML(json.address);
+                    }
+                }
+            }).send();
+        });
+        $('sales_material_bn').addEvent('enter', function () {
+            var oVal = this.value.trim();
+            if(!oVal) {
+                return;
+            }
+            $('btn_submit').set('disabled', '');
+            new Request.JSON({
+                url:'index.php?app=o2o&ctl=admin_order&act=getProduct',
+                method:'post',
+                data:{sales_material_bn:oVal},
+                onSuccess:function(json){
+                    $('sales_material_bn').value = '';
+                    if(json.rsp == 'fail') {
+                        var msg = json.msg ? json.msg : '没有该商品';
+                        MessageBox.error(msg);
+                        return;
+                    }
+                    createProduct(json.data);
+                }
+            }).send();
+        });
+
+        function createProduct(product) {
+            var oTr = document.createElement('TR');
+            oTr.id = 'product-' + product.product_id;
+            if($(oTr.id)) {
+                var oNum =  $(oTr.id).getElement('[name="num['+product.product_id+']"]');
+                oNum.value = oNum.value.toFloat() + 1;
+                oNum.fireEvent('change');
+            } else {
+                var sHtml = '<td>'+product.sales_material_bn+'</td>';
+                sHtml += '<td>'+product.name+'</td>';
+                sHtml += '<td><input type="number" style="width: 90px" name="price['+product.product_id+']" value="'+product.price+'" /></td>';
+                sHtml += '<td><input type="number" style="width: 90px" name="num['+product.product_id+']" value="1" /></td>';
+                sHtml += '<td><input type="number" style="width: 90px" name="original_price['+product.product_id+']" value="'+product.price+'" /></td>';
+                sHtml += '<td><input type="number" style="width: 90px" name="discount['+product.product_id+']" value="0" /></td>';
+                sHtml += '<td><input type="number" style="width: 90px" class="sale_price" name="sale_price['+product.product_id+']" value="'+product.price+'" /></td>';
+                sHtml += '<td style="display: none"><select name="delivery['+product.product_id+']"><!--<option value="1">已发货</option>--><option value="0">未发货</option></select></td>';
+                sHtml += '<td><{button class="del" label="删除"}></td>';
+                oTr.setHTML(sHtml);
+                oTr.inject($('proNode'));
+                oTr.getElement('.del').addEvent('click', function () {
+                    this.getParent('TR').remove();
+                    calculateAmount();
+                });
+                oTr.getElements('INPUT').each(function(item){
+                    $(item).addEvent('change', function (e) {
+                        dealInputValue(this);
+                    })
+                });
+                oTr.getElement('[name="price['+product.product_id+']"]').fireEvent('change');
+            }
+        }
+        $E('[name="pmt_order"]').addEvent('change', function () {
+            var payed = $E('[name="receivable"]').value - $E('[name="pmt_order"]').value;
+            $E('[name="payed"]').value = payed.toFixed(2);
+        });
+        $E('[name="payed"]').addEvent('change', function () {
+            var pmtOrder = $E('[name="receivable"]').value - $E('[name="payed"]').value;
+            $E('[name="pmt_order"]').value = pmtOrder.toFixed(2);
+        });
+        function calculateAmount() {
+            var salePrice = 0;
+            $$('.sale_price').each(function (item) {
+                salePrice += item.value.toFloat();
+            });
+            $E('[name="receivable"]').value = salePrice.toFixed(2);
+            var payed = salePrice - $E('[name="pmt_order"]').value;
+            $E('[name="payed"]').value = payed.toFixed(2);
+        }
+        function dealInputValue(obj) {
+            var sName = obj.getAttribute('name');
+            var arrName = sName.split('[');
+            var oTr = obj.getParent('TR');
+            switch (arrName[0]) {
+                case 'price' :
+                    var originalPrice = oTr.getElement('[name="num['+arrName[1]+'"]').value * obj.value;
+                    oTr.getElement('[name="original_price['+arrName[1]+'"]').value = originalPrice.toFixed(2);
+                    var salePrice = originalPrice - oTr.getElement('[name="discount['+arrName[1]+'"]').value;
+                    oTr.getElement('[name="sale_price['+arrName[1]+'"]').value = salePrice.toFixed(2);
+                    break;
+                case 'num' :
+                    var originalPrice = oTr.getElement('[name="price['+arrName[1]+'"]').value * obj.value;
+                    oTr.getElement('[name="original_price['+arrName[1]+'"]').value = originalPrice.toFixed(2);
+                    var salePrice = originalPrice - oTr.getElement('[name="discount['+arrName[1]+'"]').value;
+                    oTr.getElement('[name="sale_price['+arrName[1]+'"]').value = salePrice.toFixed(2);
+                    break;
+                case 'original_price' :
+                    var originalPrice = obj.value;
+                    var price = originalPrice / oTr.getElement('[name="num['+arrName[1]+'"]').value;
+                    oTr.getElement('[name="price['+arrName[1]+'"]').value = price.toFixed(2);
+                    var salePrice = originalPrice - oTr.getElement('[name="discount['+arrName[1]+'"]').value;
+                    oTr.getElement('[name="sale_price['+arrName[1]+'"]').value = salePrice.toFixed(2);
+                    break;
+                case 'discount' :
+                    var originalPrice = oTr.getElement('[name="original_price['+arrName[1]+'"]').value;
+                    var salePrice = originalPrice - obj.value;
+                    oTr.getElement('[name="sale_price['+arrName[1]+'"]').value = salePrice.toFixed(2);
+                    break;
+                case 'sale_price' :
+                    var originalPrice = oTr.getElement('[name="original_price['+arrName[1]+'"]').value;
+                    var discount = obj.value - originalPrice;
+                    oTr.getElement('[name="discount['+arrName[1]+'"]').value = discount.toFixed(2);
+                    break;
+            }
+            calculateAmount();
+        }
+    })();
+
+    function is_mobile(str){
+        var partten = /^1\d{10}$/;
+        if(partten.test(str)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+</script>

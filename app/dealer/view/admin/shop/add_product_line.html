@@ -1,0 +1,460 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=dealer&ctl=admin_shop&act=saveProductLine" id="submitForm">
+            <input type="hidden" id="shop_id" name="shop[shop_id]" value="<{$shop.shop_id}>" />
+            <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+                <tbody>
+                <tr style="display: none;">
+                    <th><em class="c-red">*</em> 店铺编码：</th>
+                    <td>
+                        <{if $shop.shop_bn}>
+                            <{$shop.shop_bn}>
+                        <{else}>
+                            <{input type='text&&required' name="shop[shop_bn]" value=$shop.shop_bn}>
+                        <{/if}>
+                        <{help}><{t}>前端网店在系统中的唯一标识<{/t}><{/help}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>产品线选择：</th>
+                    <td>
+                        <div id="goods-transfer-wrap" class="transfer-wrap" style="display:block">
+                            <div class="transfer-panel left-panel">
+                                <div class="transfer-panel__header">
+                                    <div class="colum1">
+                                        <input id="left-all2" type='checkbox' name='unselect-store' onchange="changeLeftAll2(this)" <{if $history}>disabled="disabled"<{/if}> />
+                                    </div>
+                                    <div class="colum4">产品线名称（可选）</div>
+                                </div>
+                                <div class="transfer-panel__body">
+                                    <{foreach from=$dataList item=item}>
+                                    <div class="transfer-panel__item">
+                                        <div class="colum1"><input type="checkbox" value="<{$item.series_id}>"  <{if $history}>disabled="disabled"<{/if}> /></div>
+                                        <div class="colum4" title="<{$item.series_name}>(<{$item.series_code}>)"><{$item.series_name}>(<{$item.series_code}>)</div>
+                                    </div>
+                                    <{/foreach}>
+                                </div>
+                            </div>
+                            <div class="transfer-buttons">
+                                <span class="btn-item" onclick="handleTransferDataToLeft2(this)"><</span>
+                                <span class="btn-item" onclick="handleTransferDataToRight2(this)">></span>
+                            </div>
+                            <div class="transfer-panel right-panel">
+                                <div class="transfer-panel__header">
+                                    <div class="colum1">
+                                        <input id="right-all2" type='checkbox' name='select-store' onchange="changeRightAll2(this)" <{if $history}>disabled="disabled"<{/if}> />
+                                    </div>
+                                    <div class="colum4">产品线名称（已选）</div>
+                                </div>
+                                <div class="transfer-panel__body">
+                                    <{foreach from=$selectedList item=item}>
+                                    <div class="transfer-panel__item">
+                                        <div class="colum1"><input type="checkbox" value="<{$item.series_id}>" <{if $history}>disabled="disabled"<{/if}> /></div>
+                                        <div class="colum4" title="<{$item.series_name}>(<{$item.series_code}>)"><{$item.series_name}>(<{$item.series_code}>)</div>
+                                    </div>
+                                    <{/foreach}>
+                                </div>
+                            </div>
+
+                            <input type='hidden' id="series_ids" name='series_ids' value="">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>&nbsp;</th>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <th>&nbsp;</th>
+                    <td>&nbsp;</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="table-action">
+                <{button class="btn-primary" type="button" id="btn_save" label="提交"}>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    var _form = $('submitForm');
+    var btn = $('btn_save');
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+
+    btn.addEvent('click',function(e){
+        $('submitForm').fireEvent('submit', e);
+    });
+
+    _form.store('target',{
+        onComplete:function(){
+        },
+        onSuccess:function(response)
+        {
+            var hash_res_obj = JSON.decode(response);
+
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+
+                if(_dialogIns){
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+
+    var d = $('goods-transfer-wrap');
+
+    //初始化
+    initData()
+
+    function initData() {
+        var leftNodes = d.getElementsByClassName('left-panel')[0].getElementsByClassName('transfer-panel__item')
+        for (var i=0; i<leftNodes.length; i++) {
+            leftNodes[i].getElementsByTagName('input')[0].addEventListener('change', changeLeftStoreStatus)
+        }
+        var rightNodes = d.getElementsByClassName('right-panel')[0].getElementsByClassName('transfer-panel__item')
+        for (var i=0; i<rightNodes.length; i++) {
+            rightNodes[i].getElementsByTagName('input')[0].addEventListener('change', changeRightStoreStatus)
+        }
+        resetVal()
+    }
+
+    this.handleTransferDataToLeft2 = handleTransferDataToLeft;
+    this.handleTransferDataToRight2 = handleTransferDataToRight;
+    this.changeLeftAll2 = changeLeftAll;
+    this.changeRightAll2 = changeRightAll;
+
+    function changeLeftStoreStatus () {
+        var nodes = this.getParent().getParent().getParent().children
+        var checkedLen = 0
+        for (var i=0; i<nodes.length; i++) {
+            if (nodes[i].getElementsByTagName('input')[0].checked) {
+                checkedLen++
+            }
+        }
+
+        if (checkedLen > 0) {
+            d.getElementById('left-all2').checked = checkedLen == nodes.length
+            d.getElementsByClassName('transfer-buttons')[0].children[1].classList.add('active');
+        } else {
+            d.getElementById('left-all2').checked = false
+            d.getElementsByClassName('transfer-buttons')[0].children[1].classList.remove('active');
+        }
+    }
+
+    function changeRightStoreStatus () {
+        var nodes = this.getParent().getParent().getParent().children
+        var checkedLen = 0
+        for (var i=0; i<nodes.length; i++) {
+            if (nodes[i].getElementsByTagName('input')[0].checked) {
+                checkedLen++
+            }
+        }
+        if (checkedLen > 0) {
+            d.getElementById('right-all2').checked = checkedLen == nodes.length
+            d.getElementsByClassName('transfer-buttons')[0].children[0].classList.add('active');
+        } else {
+            d.getElementById('right-all2').checked = false
+            d.getElementsByClassName('transfer-buttons')[0].children[0].classList.remove('active');
+        }
+    }
+
+    function handleTransferDataToLeft () {
+        var nodes = d.getElementsByClassName('right-panel')[0].getElementsByClassName('transfer-panel__item')
+        var parentNode = d.getElementsByClassName('left-panel')[0].getElementsByClassName('transfer-panel__body')[0]
+        var leftParentNode = d.getElementsByClassName('right-panel')[0].getElementsByClassName('transfer-panel__body')[0]
+        var moveList = []
+        for (var i=0; i<nodes.length; i++) {
+            if (nodes[i].getElementsByTagName('input')[0].checked) {
+                moveList.push(nodes[i])
+            }
+        }
+        moveList.map(item => {
+            item.getElementsByTagName('input')[0].checked = false
+            item.getElementsByTagName('input')[0].removeEventListener('change', changeRightStoreStatus)
+            item.getElementsByTagName('input')[0].addEventListener('change', changeLeftStoreStatus)
+            parentNode.prepend(item)
+        })
+        resetVal(true)
+    }
+
+    function handleTransferDataToRight () {
+        var nodes = d.getElementsByClassName('left-panel')[0].getElementsByClassName('transfer-panel__item')
+        var parentNode = d.getElementsByClassName('right-panel')[0].getElementsByClassName('transfer-panel__body')[0]
+        var leftParentNode = d.getElementsByClassName('left-panel')[0].getElementsByClassName('transfer-panel__body')[0]
+        var moveList = []
+        for (var i=0; i<nodes.length; i++) {
+            if (nodes[i].getElementsByTagName('input')[0].checked) {
+                moveList.push(nodes[i])
+            }
+        }
+        moveList.map(item => {
+            item.getElementsByTagName('input')[0].checked = false
+            item.getElementsByTagName('input')[0].removeEventListener('change', changeLeftStoreStatus)
+            item.getElementsByTagName('input')[0].addEventListener('change', changeRightStoreStatus)
+            parentNode.appendChild(item)
+        })
+        resetVal(true)
+    }
+
+    function changeLeftAll (e) {
+        if (e.checked) {
+            d.getElementsByClassName('transfer-buttons')[0].children[1].classList.add('active');
+        } else {
+            d.getElementsByClassName('transfer-buttons')[0].children[1].classList.remove('active');
+        }
+        var nodes = d.getElementsByClassName('left-panel')[0].getElementsByClassName('transfer-panel__item')
+        for (var i=0; i<nodes.length; i++) {
+            nodes[i].getElementsByTagName('input')[0].checked = e.checked
+        }
+    }
+
+    function changeRightAll (e) {
+        if (e.checked) {
+            d.getElementsByClassName('transfer-buttons')[0].children[0].classList.add('active');
+        } else {
+            d.getElementsByClassName('transfer-buttons')[0].children[0].classList.remove('active');
+        }
+        var nodes = d.getElementsByClassName('right-panel')[0].getElementsByClassName('transfer-panel__item')
+        for (var i=0; i<nodes.length; i++) {
+            nodes[i].getElementsByTagName('input')[0].checked = e.checked
+        }
+    }
+
+    function resetVal (status) {
+        if (status) {
+            d.getElementsByClassName('transfer-buttons')[0].children[0].classList.remove('active');
+            d.getElementsByClassName('transfer-buttons')[0].children[1].classList.remove('active');
+            d.getElementById('left-all2').checked = false
+            d.getElementById('right-all2').checked = false
+        }
+
+        var rightNodes = d.getElementsByClassName('right-panel')[0].getElementsByClassName('transfer-panel__item')
+        var list = []
+        for (var i=0; i<rightNodes.length; i++) {
+            list.push(rightNodes[i].getElementsByTagName('input')[0].value)
+        }
+        d.getElementById('series_ids').value = list
+    }
+</script>
+<style>
+    .shop-code-fuzzy{
+        z-index: 9999999;
+    }
+    .gridlist thead th{
+        font-size: 14px;
+    }
+    .gridlist tbody td{
+        font-size: 14px;
+    }
+    .allocation-info {
+        padding-left: 15px;
+        box-sizing: border-box;
+    }
+    .allocation-info .allocation-info__row .allocation-search__col {
+        display: inline-block;
+        width: 260px;
+        font-size: 0;
+        vertical-align: top;
+        margin-right: 20px;
+        height: 34px;
+        line-height: 34px;
+    }
+    .allocation-info .allocation-info__row .allocation-search__col:last-child {
+        width: 330px;
+    }
+    .allocation-info .allocation-info__row .allocation-search__col >div {
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 14px;
+    }
+    .allocation-info .allocation-info__row .allocation-search__col .search-label {
+        width: 90px;
+        text-align: right;
+    }
+    .allocation-info .allocation-info__row .allocation-search__col .search-value {
+        width: calc(100% - 90px);
+    }
+    .allocation-info .allocation-info__row .allocation-search__col .search-value .cal {
+        margin-top: -3px;
+    }
+    .filter-list {
+        border-top: 1px solid #ddd;
+        padding-top: 20px;
+        margin: 5px 15px 0;
+        box-sizing: border-box;
+    }
+    .filter-list .filter-col {
+        display: inline-block;
+        vertical-align: top;
+        margin-right: 20px;
+        margin-bottom: 20px;
+        height: 34px;
+    }
+    .filter-list .filter-col:last-child {
+        margin-right: 0;
+    }
+    .filter-list .filter-col >div {
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 14px;
+    }
+    .filter-list .filter-col input {
+        height: 34px;
+    }
+    .allocation-table {
+        width: 1100px;
+        margin-left: 15px;
+    }
+    .allocation-table tr th, .allocation-table tr td {
+        padding: 7px 10px;
+        box-sizing: border-box;
+        font-size: 12px;
+    }
+    .allocation-table tr th {
+        font-weight: bold;
+    }
+    .w-90 {
+        width: 80px !important;
+    }
+    .w-140 {
+        width: 140px !important;
+    }
+    .select-common {
+        width: 100px;
+        margin: 0 10px 10px 0;
+        vertical-align: top;
+    }
+    .transfer-wrap {
+        height: 300px;
+        font-size: 0;
+        margin-top: 5px;
+    }
+    .transfer-wrap >div {
+        height: 100%;
+        display: inline-block;
+        vertical-align: top;
+    }
+    .transfer-wrap .transfer-panel {
+        font-size: 14px;
+        width: calc((100% - 130px)/2);
+        border: 1px solid #ebeef5;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    .transfer-wrap .transfer-panel .transfer-panel__header {
+        height: 40px;
+        line-height: 40px;
+        background: #f5f7fa;
+        margin: 0;
+        /* padding-left: 15px; */
+        border-bottom: 1px solid #ebeef5;
+        box-sizing: border-box;
+        color: #000;
+        font-size: 0;
+    }
+    .transfer-wrap .transfer-panel .transfer-panel__header >div {
+        /* line-height: 40px !important; */
+        border-bottom-width: 0 !important;
+    }
+    .transfer-wrap .transfer-panel .colum1, .transfer-wrap .transfer-panel .colum2,.transfer-wrap .transfer-panel .colum4, .transfer-wrap .transfer-panel .colum3 {
+        display: inline-block;
+        padding-left: 10px;
+        box-sizing: border-box;
+        vertical-align: top;
+        height: 100%;
+        line-height: 39px;
+        border-bottom: 1px solid #ebeef5;
+        font-size: 12px;
+    }
+    .transfer-wrap .transfer-panel .colum1 {
+        width: 35px;
+        border-right: 1px solid #ebeef5;
+    }
+    .transfer-wrap .transfer-panel .colum2 {
+        width: 130px;
+        border-right: 1px solid #ebeef5;
+    }
+    .transfer-wrap .transfer-panel .colum4 {
+        width: 180px;
+        border-right: 1px solid #ebeef5;
+    }
+    .transfer-wrap .transfer-panel .colum3 {
+        width: calc(100% - 155px);
+    }
+    .transfer-panel__item .colum4 {
+        width: 180px; /* 假设这是你想要限制的宽度 */
+        white-space: nowrap; /* 防止文本换行 */
+        overflow: hidden; /* 隐藏超出的内容 */
+        text-overflow: ellipsis; /* 显示省略号 */
+    }
+    /*
+    .transfer-panel__item:hover .colum4 {
+      width: 180px;  或者设定一个足够宽的宽度来显示全部内容
+      white-space: normal; 允许文本换行
+      overflow: visible;  显示超出的内容
+    }*/
+    .transfer-wrap .transfer-panel .transfer-panel__body {
+        height: 260px;
+        /* padding: 0 15px; */
+        overflow-y: scroll;
+        font-size: 0;
+    }
+    .transfer-wrap .transfer-panel .transfer-panel__body .transfer-panel__item {
+        height: 40px;
+    }
+    .transfer-wrap .transfer-buttons {
+        line-height: 300px;
+        padding: 0 10px;
+    }
+    .transfer-wrap .transfer-buttons .btn-item {
+        width: 35px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        display: inline-block;
+        font-size: 14px;
+        cursor: not-allowed;
+        color: #fff;
+        border-radius: 4px;
+        background-color: #a0cfff;
+        margin: 0 5px;
+    }
+    .transfer-wrap .transfer-buttons .btn-item.active {
+        cursor: pointer;
+        background-color: #409eff;
+    }
+    .import_file {
+        position: relative;
+        display: inline-block;
+        /*background: #D0EEFF;*/
+        /*border: 1px solid #99D3F5;*/
+        /*border-radius: 4px;*/
+        /*padding: 4px 12px;*/
+        overflow: hidden;
+        /*color: #1E88C7;*/
+        text-decoration: none;
+        text-indent: 0;
+        line-height: 20px;
+    }
+    .import_file input {
+        position: absolute;
+        font-size: 100px;
+        right: 0;
+        top: 0;
+        opacity: 0;
+    }
+</style>

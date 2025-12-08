@@ -1,0 +1,297 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="promise-info" style="margin-bottom: 30px;">
+    <span id="promise-totalCount">总条数：<{$totalCount|default:0}>，</span>
+    <span id="promise-pageSize">每页：<{$pageSize|default:0}>，</span>
+    <span id="promise-totalPages">总页数：<{$totalPages|default:0}>，</span>
+    <span id="promise-succCount">成功页数：<em style="color: green;">0</em>，</span>
+    <span id="promise-failCount">失败页数：<em style="color: red;">0</em>，</span>
+</div>
+
+<form id="promise-form" action="">
+    <{$inputhtml}>
+</form>
+
+<div id="progress-bar">
+    <div class="progress" style="width: 0%"></div>
+    <span id="progress-text">0%</span>
+</div>
+
+<div>结果：</div>
+<div id="promise-results">
+    <div class="succ"></div>
+    <div class="fail"></div>
+</div>
+
+<div class="table-action">
+  <{button label="开始" class="btn btn-primary" id="promise-start" }>
+  <{button label="关闭" class="btn btn-secondary" id="promise-close" }>
+</div>
+
+
+<style>
+    #progress-bar {
+        width: 100%;
+        height: 20px;
+        background-color: #f3f3f3;
+        border: 1px solid #ccc;
+        position: relative;
+        margin: 10px 0px;
+    }
+    #progress-bar .progress {
+        background-color: #4CAF50;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        transition: width 0.2s ease-in-out;
+    }
+    #progress-text {
+        position: absolute;
+        top: -25px; /* 将文字放在进度条上方 */
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 14px;
+        font-weight: bold;
+        pointer-events: none; /* 避免点击进度条时影响其他元素 */
+        color: #000; /* 默认颜色 */
+    }
+    #promise-results {
+            max-height: 150px; /* 设定最大高度 */
+            overflow-y: auto; /* 启用垂直滚动条 */
+            border: 1px solid #ccc; /* 边框 */
+            padding: 10px; /* 内边距 */
+            margin-top: 10px; /* 外边距 */
+        }
+</style>
+<script>
+(function(){
+    // 创建一个将MooTools的Request对象转换成Promise的函数
+    function requestToPromise(url, page) {
+        return new Promise((resolve, reject) => {
+            // 创建一个新的Request实例
+            var req = new Request({
+                url: url,
+                method: 'post',
+                data:$('promise-form').toQueryString()+"&pageSize=<{$pageSize}>",
+                // 请求成功的回调
+                onSuccess: function(responseText) {
+                    try {
+                        const response = JSON.parse(responseText);
+
+                        if (response.success) {
+                            resolve({"response":response, "page":page});
+                        } else {
+                            reject({'e': response.error, "page": page});
+                        }
+
+                        
+                    } catch (e) {
+                        reject({'e': e, "page": page});
+                    }
+                },
+                // 请求失败的回调
+                onFailure: function(error) {
+                    reject({'e': error, "page": page});
+                },
+                // 请求开始时的回调
+                onRequest: function() {
+                    console.log(`请求开始：${url}`);
+                },
+                // 请求完成时的回调
+                onComplete: function() {
+                    console.log(`请求完成：${url}`);
+                },
+                // 进度更新时的回调
+                onProgress: function(xhr) {
+                    updateProgressBar(xhr); // 更新进度条
+                },
+                // 设置超时时间，0表示无超时
+                timeout: 0,
+                // 是否显示文本进度条
+                text: false
+            }).send(); // 确保在这里调用 send()
+        });
+    }
+
+    // 更新进度条的函数
+    function updateProgressBar(xhr) {
+        const progressElement = document.querySelector('#progress-bar .progress');
+        const progressText = document.getElementById('progress-text');
+        const loaded = xhr.loaded;
+        const total = xhr.total;
+        const percentage = Math.round((loaded / total) * 100);
+        
+        if (xhr.readyState === 4) { // 只有当请求完成时才更新总进度
+            progressElement.style.width = `${percentage}%`;
+            progressText.textContent = `${percentage}%`; // 显示当前进度百分比
+        } else {
+            // 如果请求尚未完成，仅更新当前请求的进度
+            progressElement.style.width = `${percentage}%`;
+            progressText.textContent = `${percentage}% (${xhr.status})`; // 显示当前进度百分比和状态码
+        }
+        
+        // 动态调整进度条数字的位置
+        progressText.style.left = `50%`; // 始终居中
+        progressText.style.transform = `translateX(-50%)`; // 水平居中
+        
+        // 根据进度条背景颜色自动调整文字颜色
+        if (percentage > 0) {
+            progressText.style.color = '#000'; // 当进度条有颜色时，文字颜色为黑色
+        } else {
+            progressText.style.color = '#000'; // 当进度条无颜色时，文字颜色也为黑色
+        }
+    }
+
+    // 分页请求函数
+    async function fetchPagesWithConcurrency(urls, concurrency) {
+        const results = [];
+        let currentUrlIndex = 0; // 确保从 0 开始
+        const totalRequests = urls.length;
+        const runningRequests = new Set(); // 使用 Set 存储正在处理的请求 URL
+
+        // 控制并发请求的数量
+        function processNextRequest() {
+            if (currentUrlIndex < totalRequests && runningRequests.size < concurrency) {
+                const url = urls[currentUrlIndex];
+                if (!runningRequests.has(url)) { // 检查是否已经在处理该请求
+                    console.log(`Processing request at index ${currentUrlIndex}: ${url}`);
+                    const request = requestToPromise(url, currentUrlIndex);
+
+
+                    runningRequests.add(url); // 将请求 URL 添加到 Set 中
+                    currentUrlIndex++; // 确保每次请求后递增
+
+                    request.then(response => {
+                        results.push(response);
+                        runningRequests.delete(url); // 请求完成后从 Set 中移除
+                        
+                        // 在每次请求完成后立即更新页面
+                        updateResultsPage(response);
+                        
+                        // 更新总进度
+                        updateTotalProgress(totalRequests, results.length);
+                        
+                        // 处理下一个请求
+                        processNextRequest();
+                    }).catch(error => {
+                        results.push(error);
+                        runningRequests.delete(url); // 请求失败后从 Set 中移除
+                        
+                        updateErrorPage(error);
+
+                        // 更新总进度
+                        updateTotalProgress(totalRequests, results.length);
+                        
+                        // 处理下一个请求
+                        processNextRequest();
+                    });
+
+                }
+            }
+        }
+
+        let succCount = 0;
+        // 更新页面结果的函数
+        function updateResultsPage(response) {
+            succCount++;
+            $E('#promise-succCount em').setText(succCount);
+
+            let index  = response.page;
+            const resultsDiv = $E('#promise-results .succ');
+            const pageOutput = `<p>Page ${index + 1}: <em style="color:green">处理完成</em><pre></p>`;
+            resultsDiv.insertAdjacentHTML('beforeend', pageOutput);
+            console.log(`已添加第 ${index + 1} 页数据`);
+        }
+
+        let failCount = 0;
+        // 更新页面结果的函数
+        function updateErrorPage(error) {
+            failCount++;
+
+            $E('#promise-failCount em').setText(failCount);
+            
+            let index  = error.page;
+            const resultsDiv = $E('#promise-results .fail');
+            const pageOutput = `<p>Page ${index + 1}: <em style="color:red">${error.e}</em><pre></p>`;
+            resultsDiv.insertAdjacentHTML('beforeend', pageOutput);
+            console.log(`已添加第 ${index + 1} 页数据`);
+        }
+
+        // 更新总进度的函数
+        function updateTotalProgress(totalRequests, completedRequests) {
+            const totalPercentage = Math.round((completedRequests / totalRequests) * 100);
+            const progressElement = document.querySelector('#progress-bar .progress');
+            const progressText = document.getElementById('progress-text');
+            progressElement.style.width = `${totalPercentage}%`;
+            progressText.textContent = `${totalPercentage}%`; // 显示当前进度百分比
+            
+            // 动态调整进度条数字的位置
+            progressText.style.left = `50%`; // 始终居中
+            progressText.style.transform = `translateX(-50%)`; // 水平居中
+            
+            // 根据进度条背景颜色自动调整文字颜色
+            if (totalPercentage > 0) {
+                progressText.style.color = '#000'; // 当进度条有颜色时，文字颜色为黑色
+            } else {
+                progressText.style.color = '#000'; // 当进度条无颜色时，文字颜色也为黑色
+            }
+        }
+
+        // 启动初始请求
+        while (currentUrlIndex < totalRequests && runningRequests.size < concurrency) {
+            processNextRequest();
+        }
+
+        return new Promise((resolve) => {
+            const intervalId = setInterval(() => {
+                if (runningRequests.size === 0) {
+                    clearInterval(intervalId);
+                    resolve(results); // 返回所有结果
+                }
+            }, 100); // 每隔一段时间检查一次请求状态
+        });
+    }
+
+
+
+    $('promise-close').addEvent('click', function(){
+        this.getParent('.dialog').retrieve('instance').close();
+    });
+
+    $('promise-start').addEvent('click', function(){
+        // 示例URL列表
+        const baseApiUrl = '<{$env.post.baseApiUrl}>';
+        const totalPages = '<{$totalPages|default:0}>';
+
+        if (!baseApiUrl){
+            return MessageBox.error('请先设置请求地址');
+        }
+
+        if (totalPages <= 0){
+            return MessageBox.error('没有数据');
+        }
+        
+        // 生成 URL 数组
+        const urls = [];
+        for (let i = 0; i < totalPages; i++) {
+            urls.push(`${baseApiUrl}&pageNo=${i + 1}`);
+        }
+        
+        this.set('disabled', 'disabled');
+        
+        // 初始化并发请求
+        const concurrency = 5;
+        fetchPagesWithConcurrency(urls, concurrency)
+            .then(allResponses => {
+                console.log('所有请求已完成');
+            })
+            .catch(error => {
+                $E('#promise-results .fail').innerHTML = `<p>发生错误：${error.message}</p>`;
+            });
+    });
+})()
+</script>

@@ -1,0 +1,33 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="clearfix" style="white-space:normal;">
+<label>选择订单小组：</label>
+<select name="confirm_group[]" id="confirm-group" multiple=true>
+    <!-- <option >请选择...</option> -->
+    <{foreach from=$groups item=item}>
+    <option value="<{$item.group_id}>" <{if $item.selected}>selected<{/if}> ><{$item.name}></option>
+    <{/foreach}>
+</select>
+</div>
+<!-- <style>
+#confirm-group {
+    top: 5px;
+    z-index: 10000;
+    overflow: visible;
+}
+</style> -->
+<script>
+tail.select("#confirm-group", {
+    multiContainer: true,
+    // multiple: true,
+    // width: 150,
+    // height: 160,
+    searchMinLength: 0,
+    openAbove: true,
+    multiSelectAll: true
+    // multiShowLimit:true
+});
+</script>

@@ -1,0 +1,84 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+  <form action="index.php?app=vop&ctl=admin_vreturn_diff&act=doSync" method="post" id="orderForm">
+    <table cellspacing="0" cellpadding="0" border="0">
+        <tr>
+          <th>唯品会店铺：</th>
+          <td>
+            <select id="shop_id" name="shop_id">
+                <{foreach from=$shop_list key=key item=val}>
+                <option value="<{$val.shop_id}>"><{$val.name}></option>
+                <{/foreach}>
+            </select>
+          </td>
+        </tr>
+
+        <tr>
+          <th>差异单号：</th>
+          <td><{input name="rv_difference_no"}></td>
+        </tr>
+        <tr>
+            <th>退供单号：</th>
+            <td><{input name="return_no"}></td>
+          </tr>
+        <tr>
+          <th>开始时间：</th>
+          <td><{input type="time" name="begin_time"}></td>
+        </tr>
+        <tr>
+          <th>结束时间：</th>
+          <td><{input type="time" name="end_time"}></td>
+        </tr>
+   </table>
+  </form>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td><{button type="button" class="btn-primary" id="btn_manual"  label="立即获取" }></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<{/area}>
+<script>
+(function(){
+
+    var _form = $('orderForm');
+    var btn =$('btn_manual');
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+
+    _form.store('target',{
+        onRequest:function(){
+            btn.disabled = true;
+        },
+        onSuccess:function(response){
+            try {
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.error){
+                    btn.disabled = false;
+                    return MessageBox.error(hash_res_obj.error);
+                }
+
+                var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                finder.refresh();
+                _dialogIns.close();
+            } catch (error) {
+                btn.disabled = false;
+                return MessageBox.error(error);
+            }
+        }
+    });
+
+    btn.addEvent('click',function(){
+        _form.fireEvent('submit',{stop:$empty});
+    });
+
+})();
+</script>

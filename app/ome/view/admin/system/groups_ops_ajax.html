@@ -1,0 +1,11 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{foreach from=$operators item=operator}>
+<label class="admin-checkbox-item" style="display: inline-flex !important; align-items: center !important; margin-right: 15px !important; margin-bottom: 5px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; max-width: 180px !important; font-size: 12px !important;">
+<input name="groups[op_id][]" type="checkbox" value="<{$operator.user_id}>" style="margin-right: 5px !important; margin-bottom: 0 !important; vertical-align: middle !important;" />
+<{$operator.name}>
+</label>
+<{/foreach}>

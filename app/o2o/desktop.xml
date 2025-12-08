@@ -1,0 +1,107 @@
+<desktop>
+    <permissions>
+        <permission id="o2o_shop_order_add">新建门店订单</permission>
+        <permission id="o2o_store_manage">门店配置</permission>
+        <permission id="o2o_server_manage">服务端管理</permission>
+        <permission id="o2o_autostore">门店优选管理</permission>
+        <permission id="o2o_shop_pending" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>待处理</permission>
+        <permission id="o2o_shop_processed" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>已处理</permission>
+        <permission id="o2o_branch_product" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>门店供货管理</permission>
+    
+        <permission id="o2o_inventory" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>门店盘点</permission>
+        <permission id="o2o_store_inventory" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>门店库存列表</permission>
+        <permission id="o2o_refuse_reason">门店拒单原因</permission>
+        <!-- <permission id="o2o_refuse_analysis">门店拒单分析</permission> -->
+        <!-- <permission id="o2o_store_daliy_analysis">门店每日统计</permission> -->
+        <!--
+        <permission id="o2o_shop_manage">线下店铺管理</permission>
+        <permission id="o2o_branch_manage">虚拟仓管理</permission>
+        -->
+         <permission id='o2o_channel_manage' show='ome_roles:show_o2o_branch'>仓店列表</permission>
+        <!-- 门店履约订单管理 -->
+        <permission id="store_performance_orders">门店履约订单</permission>
+        <!-- 门店履约订单管理 end -->
+
+        <permission id="o2o_product_sync">门店商品</permission>
+        <permission id="o2o_ctrl_store">设置库存管控</permission>
+
+
+    </permissions>
+
+    <workground name="订单管理" id="order_center" order="100" icon="icon-dingdanguanli-01">
+        <menugroup name="订单查看" en="order-view">
+            <menu controller='admin_order' action='index' permission='store_performance_orders' display='true' order='1000305'>门店履约订单</menu>
+        </menugroup>
+    </workground>
+
+    <workground name="门店管理" id="o2o_center" order="1000" icon="icon-mendianguanli-01">
+       <!--<menugroup name="门店信息管理">
+            
+            <menu controller='admin_server' action='index' permission='o2o_server_manage' display='true' order='1000200'>服务端管理</menu>
+            <menu controller='admin_shop' action='index' permission='o2o_shop_manage' display='true' order='1000300'>线下店铺管理</menu>
+            <menu controller='admin_branch' action='index' permission='o2o_branch_manage' display='true' order='1000400'>虚拟仓管理</menu>
+           
+
+        </menugroup>
+        -->
+        <menugroup name="自营渠道" en="self-operated-channel">
+         
+            <menu controller='admin_store' action='listing' permission='o2o_store_manage' display='true' order='7' params='p[0]:offline'>门店列表</menu>
+            <menu controller='admin_store' action='setCtrlStore' permission='o2o_ctrl_store' display='false' order='10' >设置库存管控</menu>
+        </menugroup>
+        <menugroup name="企业组织" order='1' en="business-organization">
+            <menu controller='admin_store' permission='org_show_view' action='index' display='true' order='200'>展示</menu>
+        </menugroup>
+        <menugroup name="门店订单" order='9' en="store-order">
+            <menu controller='admin_order' action='add' permission='o2o_shop_order_add' display='true' order='1000010'>新建订单</menu>
+        </menugroup>
+        <menugroup name="门店发货" order='10' en="store-delivery-management">
+            <menu controller='admin_delivery_pending' action='index' permission='o2o_shop_pending' display='true' order='1000305'>待处理</menu>
+            <menu controller='admin_delivery_processed' action='index' permission='o2o_shop_processed' display='true' order='1000405'>已处理</menu>
+        </menugroup>
+        <menugroup name="门店库存" order='20' en="store-stock-management">
+            <menu controller='admin_store_inventory' action='index' permission='o2o_store_inventory' display='true' order='1000605'>门店库存列表</menu>
+        </menugroup>
+         <menugroup name="门店销售" order='11' en="o2o-store-material">
+            <menu controller='admin_productsync' action='index' permission='o2o_product_sync' display='true' order='1000805'>门店商品</menu>
+           
+        </menugroup>
+    </workground>
+
+    <workground name="系统集成" id="channel_center" order="1400" icon="icon-xitongjicheng-01">
+       <menugroup name="线下系统管理" en="offline-system-management">
+             <menu controller='admin_server' action='index' permission="o2o_server_manage" display='true' order="1001">线下服务端</menu>
+        </menugroup>
+    </workground>
+
+    <!--
+    <workground name="基础档案" id="goods_manager"  order="600" icon="icon-jichudangan-01">
+        <menugroup name="门店信息管理" order='2'>
+            <menu controller='admin_store' action='index' permission='o2o_store_manage' display='true' order='7'>门店管理</menu>
+            <menu controller='admin_autostore' action='index' permission='o2o_autostore' display='true' order='7'>门店优选规则</menu>
+            <menu controller='admin_branch_product' action='index' permission='o2o_branch_product' display='true' order='8'>门店供货管理</menu>
+        </menugroup>
+    </workground>
+    
+    <!--
+    <workground name="系统" id="setting_tools"  order="800">
+        <menugroup name="订单自动设置">
+            <menu controller='admin_autostore' action='index' permission='o2o_autostore' display='true' order='4500600'>门店优选规则</menu>
+        </menugroup>
+    </workground>
+    -->
+    <workground name="单据报表" id="invoice_center"  order="1200" icon="icon-danjubaobiao-01">
+        <menugroup name="分析报表" en="analytical-statement">
+            <menu controller='admin_refuse_reason' action='statistics' permission='o2o_refuse_analysis' display='true' order='1000606'>门店拒单分析</menu>
+        </menugroup>
+        <menugroup name="销售报表" en="sales-statement">
+            <menu controller='admin_analysis' action='storedaliy' permission='o2o_store_daliy_analysis' display='true' order='1000705'>门店每日统计</menu>
+        </menugroup>
+    </workground>
+
+    <workground name="系统设置" id="setting_tools"  order="1100" icon="icon-xitongshezhi-01">
+        <menugroup name="基本设置" en="basic-set">
+            <menu controller='admin_refuse_reason' action='index' permission='o2o_refuse_reason' display='true' order='1000497'>门店拒单原因</menu>
+        </menugroup>
+    </workground>
+</desktop>

@@ -1,0 +1,11 @@
+<services>
+    <service id="desktop_finder.billcenter_mdl_sales">
+        <class>billcenter_finder_sales</class>
+    </service>
+     <service id="desktop_finder.billcenter_mdl_bill">
+        <class>billcenter_finder_bill</class>
+    </service>
+    <service id="desktop_finder.billcenter_mdl_aftersales">
+        <class>billcenter_finder_aftersales</class>
+    </service>
+</services>

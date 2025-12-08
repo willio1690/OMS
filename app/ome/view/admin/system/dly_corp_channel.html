@@ -1,0 +1,136 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?<{$env.server.QUERY_STRING}>" id="terminal">
+            <table class="gridlist" cellspacing="0" cellpadding="0" border="0">
+                <tbody id="channelTable">
+                <tr>
+                    <th>平台</th>
+                    <th>电子面单来源</th>
+                    <th>模板</th>
+                    <th>操作</th>
+                </tr>
+                <tr>
+                    <td>默认</td>
+                    <td><{$dly_info.channel_name}></td>
+                    <td><{$dly_info.template}></td>
+                    <td><{button id="addChannel" label='添加'}></td>
+                </tr>
+                <{foreach from=$corp_channel item=item}>
+                    <tr data-id="<{$item.id}>">
+                        <td><{input type="select" name="shop_type[]" required="true" options=$shop_type value=$item.shop_type}></td>
+                        <td><{input type="select" name="channel_id[]" required="true" rows=$channel valueColumn='channel_id' labelColumn='name' value=$item.channel_id}></td>
+                        <td>
+                            <{if $cainiaoTmpl[$item.prt_tmpl_id]}>
+                                <{assign var="tmpT" value=$cainiaoTmpl}>
+                            <{elseif $pddTmpl[$item.prt_tmpl_id]}>
+                                <{assign var="tmpT" value=$pddTmpl}>
+                            <{elseif $jdTmpl[$item.prt_tmpl_id]}>
+                                <{assign var="tmpT" value=$jdTmpl}>
+                            <{elseif $dyTmpl[$item.prt_tmpl_id]}>
+                                <{assign var="tmpT" value=$dyTmpl}>
+                            <{else}>
+                                <{assign var="tmpT" value=$electronTmpl}>
+                            <{/if}>
+                            <{input type="select" name="prt_tmpl_id[]" options=$tmpT value=$item.prt_tmpl_id}>
+                        </td>
+                        <td><{button class="delChannel" label='删除'}></td>
+                    </tr>
+                <{/foreach}>
+                </tbody>
+            </table>
+            <div class="table-action">
+                <{button class="btn-primary" type="submit" id="saveterminal" name="submit" label="保存"}>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    (function () {
+        var channel = JSON.decode('<{$channel|json_encode}>');
+        var shopType = JSON.decode('<{$shop_type|json_encode}>');
+        var cainiaoTmpl = JSON.decode('<{$cainiaoTmpl|json_encode}>');
+        var pddTmpl = JSON.decode('<{$pddTmpl|json_encode}>');
+        var jdTmpl = JSON.decode('<{$jdTmpl|json_encode}>');
+        var dyTmpl = JSON.decode('<{$dyTmpl|json_encode}>');
+        var ksTmpl = JSON.decode('<{$ksTmpl|json_encode}>');
+        var electronTmpl = JSON.decode('<{$electronTmpl|json_encode}>');
+        $('addChannel').addEvent('click', function () {
+            if(channel.length){
+                var oTr = document.createElement('TR');
+                var sHtml = '<td><{input type="select" name="shop_type[]" required="true" options=$shop_type}></td>';
+                sHtml += '<td><{input type="select" name="channel_id[]" required="true" rows=$channel valueColumn="channel_id" labelColumn="name"}></td>';
+                sHtml += '<td><{input type="select" name="prt_tmpl_id[]"}></td>';
+                sHtml += '<td><{button class="delChannel" label="删除"}></td>';
+                oTr.setHTML(sHtml);
+                oTr.getElement('.delChannel').addEvent('click',function () {
+                    delChannel(this);
+                });
+                oTr.getElement('[name="channel_id[]"]').addEvent('change', function () {
+                    changeChannelId(this);
+                });
+                oTr.getElement('[name="channel_id[]"]').fireEvent('change');
+                oTr.inject($('channelTable'));
+            } else {
+                MessageBox.show('没有更多可用的电子面单来源');
+            }
+        });
+
+        $$('.delChannel').each(function (item) {
+            item.addEvent('click', function () {
+                delChannel(this);
+            });
+        });
+
+        $$('[name="channel_id[]"]').each(function (item) {
+            item.addEvent('change', function () {
+                changeChannelId(this);
+            });
+        });
+
+        function delChannel(obj) {
+            if (!$defined(obj.getParent('TR').dataset.id)){
+                obj.getParent('TR').remove();
+            } else {
+                W.page('index.php?app=ome&ctl=admin_dly_corp&act=delCorpChannel&p[0]='+obj.getParent('TR').dataset.id,{
+                    onComplete:function(resp){
+                        resp = JSON.decode(resp);
+                        if (resp.success) {
+                            obj.getParent('TR').remove();
+                        }
+                    }
+                });
+            }            
+        }
+
+        function changeChannelId(obj) {
+            var oTmp = {};
+            Object.each(channel, function (item) {
+                if(item.channel_id == obj.value) {
+                    if(item.channel_type == 'taobao') {
+                        oTmp = cainiaoTmpl;
+                    } else if(item.channel_type == 'pdd') {
+                        oTmp = pddTmpl;
+                    } else if(item.channel_type == '360buy' || item.channel_type == 'jdalpha') {
+                        oTmp = jdTmpl;
+                    } else if(item.channel_type == 'douyin') {
+                        oTmp = dyTmpl;
+                    } else if(item.channel_type == 'kuaishou') {
+                        oTmp = ksTmpl;
+                    } else {
+                        oTmp = electronTmpl;
+                    }
+                }
+            });
+            var sHtml = '';
+            Object.each(oTmp, function (item, key) {
+                sHtml += '<option value="'+key+'">'+item+'</option>';
+            });
+            obj.getParent('TR').getElement('[name="prt_tmpl_id[]"]').setHTML(sHtml);
+        }
+    })();
+</script>

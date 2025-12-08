@@ -1,0 +1,110 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .processBarBg {border:1px solid #999999; width:98%; margin:5px; height:25px;line-height:25px;padding:1px; background:#EEEEEE;}
+    .processBar {background:#3366cc; width:0px; padding-bottom:1px;overflow:hidden;}
+</style>
+<div id="processBarBg" class="processBarBg"><div id="processBar" class="processBar">&nbsp;</div></div>
+
+<div class="tableform">
+    <form id="invoice-upload-dialog" method='post' action='index.php?app=invoice&ctl=admin_order&act=doUploadTmall'>
+        <input type='hidden' name='invoice_id' id="invoice_id" value="<{$invoice_id}>" /> 
+        <table width="100%" >
+            <tbody> 
+                <tr>
+                     <td align="center" nowrap="nowrap" style="color:red">电子发票回流天猫：上传电子发票数据给天猫，天猫给消费者提供下载功能。</td>
+                </tr>
+            </tbody>
+        </table>
+        <{if $update_tmall_status == '1'}>
+	        <{if !$invoice_action_type}>
+	        <table align="center" style="border-top:1px solid #e0e0e0">
+	            <tr>
+	                <th>请选择作废或重开原因: </th>
+	                <td><input type='radio' name='invoice_action_type' value="2">退货、退款成功</td>
+	            </tr>
+	            <tr>
+	                <th></th>
+	                <td><input type='radio' name='invoice_action_type' value="3">电子换纸质</td> 
+	            </tr>
+	            <tr>
+	                <th></th>
+	                <td><input type='radio' name='invoice_action_type' value="4">换发票内容（抬头的变化等，其他未归类的情况）</td> 
+	            </tr>
+	        </table>
+	         <{else}>
+	            <input type='hidden' name='invoice_action_type' id="invoice_action_type1" value="1" />
+	         <{/if}>
+        <{/if}>
+    </form>
+</div>
+<div class="table-action">
+<{button label="开始" type="botton" id="btn-run"}>
+<{button label="关闭" type="botton" isCloseDialogBtn="true" }>
+</div>
+<script type="text/javascript">
+(function(){
+    function process(step){
+        var _form = $("invoice-upload-dialog");
+        var url = _form.action+'&step='+step+'&total_step=<{$total_step}>';
+        if(! validate(_form)) return;
+        new Request({url:url,method:'post',data:_form,
+            onComplete:function(result){
+                if(!result) return;
+                ret = JSON.decode(result);
+                
+                if(ret.error){
+                	MessageBox.error(ret.error);
+                	return false;
+                }
+                
+                $('processBar').setStyle('width', ret.data.rate + '%');
+                if (ret.status == 'running') {
+                	step++;
+                    return process(step);
+                };
+                
+                $('btn-run').set('html', '<span><span>处理已完成，本窗口将在3秒后自动关闭！</span></span>');
+                setTimeout("$('btn-run').getParent('.dialog').retrieve('instance').close();finderGroup['<{$env.get.finder_id}>'].refresh();",3000);
+            },
+            onRequest:function(){
+                $('btn-run').disabled = true;
+                $('btn-run').set('html', '<span><span>上传天猫中，请稍候！</span></span>');
+            }
+        }).send();
+    }
+
+    //开始启动 第一步
+    $("btn-run").addEvent('click',function(){
+    	var update_tmall_status = '<{$update_tmall_status}>';
+    	if(update_tmall_status == '1'){
+    		//未更新过发票天猫状态
+    		//判断不是第一次开蓝 必须选择作废或重开原因 同步天猫状态接口需要
+            if($('invoice_action_type1') && $('invoice_action_type1').getValue() == "1"){
+                //第一次开蓝票 invoice_action_type为1
+            }else{
+                //冲红或者后续开蓝
+                var _form = $("invoice-upload-dialog");
+                var invoice_action_type = _form.getElements("input[name='invoice_action_type']:checked");
+                //非第一次开蓝票 并且
+                if(invoice_action_type.length<=0){
+                    MessageBox.error("请选择作废或重开原因");
+                    return false;
+                }
+            }
+    	}
+    	
+    	//判断必须存在发票记录主键id
+    	if(!$('invoice_id').getValue() || $('invoice_id').getValue() == "0"){
+    		MessageBox.error("不存在此条发票记录 请重试");
+    		return false;
+    	}
+    	
+        process(1);
+    });
+
+})();
+</script>

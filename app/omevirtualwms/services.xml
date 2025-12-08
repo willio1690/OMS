@@ -1,0 +1,45 @@
+<services>
+  <service id="desktop_finder.omevirtualwms_mdl_stockin">
+        <class>omevirtualwms_finder_stockin</class>
+  </service>
+    <service id="desktop_finder.omevirtualwms_mdl_stockout">
+        <class>omevirtualwms_finder_stockout</class>
+  </service>
+  <service id="desktop_finder.omevirtualwms_mdl_stockdump">
+        <class>omevirtualwms_finder_stockdump</class>
+  </service>
+    <service id="desktop_finder.omevirtualwms_mdl_delivery">
+        <class>omevirtualwms_finder_delivery</class>
+  </service>
+    <service id="desktop_finder.omevirtualwms_mdl_storeprocess">
+        <class>omevirtualwms_finder_storeprocess</class>
+  </service>
+    <service id="desktop_finder.omevirtualwms_mdl_reship">
+        <class>omevirtualwms_finder_reship</class>
+  </service>
+  <service id="desktop_finder.omevirtualwms_mdl_goods">
+        <class>omevirtualwms_finder_goods</class>
+    </service>
+  <service id="desktop_finder.omevirtualwms_mdl_callback">
+        <class>omevirtualwms_finder_callback</class>
+    </service>
+
+  <service id="autotask">
+        <class>omevirtualwms_task</class>
+  </service>
+  <service id="desktop_view_helper">
+        <class>omevirtualwms_helper</class>
+  </service>
+
+  <service id="data_clear">
+        <class>omevirtualwms_data</class>
+    </service>
+
+  <service id="openapi.virtualwms">
+        <class>omevirtualwms_callback</class>
+  </service>
+
+    <service id="desktop_finder.omevirtualwms_mdl_vopstockout">
+        <class>omevirtualwms_finder_vopstockout</class>
+    </service>
+</services>

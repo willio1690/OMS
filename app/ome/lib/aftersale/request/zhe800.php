@@ -1,0 +1,17 @@
+<?php
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+/**
+ * create by jintao
+ */
+class ome_aftersale_request_zhe800 extends ome_aftersale_abstract{
+    function show_aftersale_html()
+    {
+
+        $html = '';
+        return $html;
+    }
+}

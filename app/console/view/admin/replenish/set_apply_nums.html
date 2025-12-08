@@ -1,0 +1,25 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!-- POST需要提交的字段，需要加上class="dailog-batch-ipt" -->
+<table>
+    <tbody>
+        <tr>
+            <th width="60"><label for="dom_el_bc">补货任务：</label> </th>
+            <td><span style="font-weight:bold; color:red;"><{$reTaskInfo.task_bn}></span>（<span style="font-weight:bold;"><{$reTaskInfo.task_name}></span>）</td>
+        </tr>
+        <tr>
+            <th width="60"><label for="dom_el_bc">门店名称：</label> </th>
+            <td><span style="font-weight:bold; color:red;"><{$storeInfo.store_bn}></span>（<span style="font-weight:bold;"><{$storeInfo.name}></span>）</td>
+        </tr>
+        <tr>
+            <th><span style="color:red;">*</span>实际补货量：</th>
+            <td>
+            <input name="apply_nums" type="text" id="apply_nums" value="0" size="6" maxlength="6" class="dailog-batch-ipt" onkeyup="value=value.replace(/[^0-9]/ig,'')" />
+            &nbsp;<{help}>实际补货数量必须大于0,否则会过滤掉补货数量为0的商品任务。<{/help}>
+            </td>
+        </tr>
+    </tbody>
+</table>

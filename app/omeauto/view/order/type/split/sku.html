@@ -1,0 +1,65 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="mt-10">
+    <div>
+        <input type="radio" name="split_config[split_goods]" value='1'
+        <{if $data.split_config.split_goods == '1' || !$data.split_config.split_goods}>checked<{/if}>/>&nbsp;&nbsp;全部商品&nbsp;&nbsp;
+        <input type="radio" name="split_config[split_goods]" value='2'
+        <{if $data.split_config.split_goods == '2'}>checked<{/if}>/>&nbsp;&nbsp;指定商品
+    </div>
+    <div id="split_goods">
+        <br />
+        <div>指定商品: &nbsp;&nbsp;<span>(输入SKU,多个用逗号分隔。如 EH-SHIRT-L,EH-OTHER-X)</span></div>
+        <button id="btn_add_product" class="btn" type="button">
+                                    <span>
+                                        <span>添加基础物料</span>
+                                    </span>
+        </button>
+        <br/>
+        <h4>已添加的基础物料货号：</h4>
+        <input type="text" name="split_config[split_goods_product]" value="<{$data.split_config.split_goods_product}>" size="90"/>
+    </div>
+    <div class="mt-10">
+        <h4>拆分数量：</h4>
+        <input type="text" size="3" name="split_config[split_goods_num]" value="<{$data.split_config.split_goods_num}>" size="90"/>
+        <span style="color: red">*输入正整数或all, all代表该商品的所有</span>
+    </div>
+</div>
+<script> 
+    (function() {
+        $$('input[name="split_config[split_goods]"]').addEvent('click',function(){
+            var oValue = this.value;
+            if(oValue == '2') {
+                $('split_goods').style.display = '';
+            } else {
+                $('split_goods').style.display = 'none';
+            }
+        });
+
+        $E('input[name="split_config[split_goods]"]:checked').fireEvent('click');
+
+        var callurl='index.php?app=ome&ctl=admin_order&act=getProducts';
+        function init(rs,s_name){
+            var bns='';
+            Object.each(rs,function(value){
+                bns += value.bn+',';
+            });
+            bns=bns.substring(0,bns.length-1);
+            $('split_goods').getElement('input[name="'+s_name+'"]').value = bns;
+        }
+        $('btn_add_product').addEvent('click',function(e){
+            var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=ome&ctl=admin_order&act=findProduct');
+            var s_skus = "split_config[split_goods_product]";
+            new finderDialog(url,{params:{url:callurl,name:'product_id[]'},width:1000,height:660,
+                onCallback:function(rs){
+                    if(!rs)return;
+                    rs=JSON.decode(rs);
+                    init(rs,s_skus);
+                }
+            });
+        });
+    })();
+</script>

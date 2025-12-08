@@ -1,0 +1,50 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+<{if $data }>
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+            <tr><th>总调用次数：</th>
+              <td><{$data.total}></td>
+            </tr>
+            <tr><th>今日调用次数：</th>
+              <td><{$data.today}></td>
+            </tr>
+            <tr><th>昨日调用次数：</th>
+              <td><{$data.yesterday}></td>
+            </tr>
+        </tbody>
+      </table>
+      <br/>
+      <{foreach from=$data.details item=obj key=key}>
+      <h5><{$obj.label}></h5>
+      <table class="gridlist" cellspacing="0" cellpadding="0" border="0" >
+        <thead>
+            <tr>
+                <th>接口方法</th>
+                <th>总调用次数</th>
+                <th>今日调用次数</th>
+                <th>昨日调用次数</th>
+            </tr>
+        </thead>
+        <tbody>
+            <{foreach from=$obj.info item=item key=k}>
+            <tr>
+              <td><{$item.label}></td>
+              <td><{$item.total}></td>
+              <td><{$item.today}></td>
+              <td><{$item.yesterday}></td>
+            </tr>
+            <{/foreach}>
+        </tbody>
+      </table>
+      <{/foreach}>
+<{else}>
+暂无统计消息
+<{/if}>	 
+  </div>
+</div>

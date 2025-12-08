@@ -1,0 +1,71 @@
+<desktop>
+    <permissions>
+        <permission id="analysis_income">订单收入统计</permission>
+        <permission id="analysis_delivery">快递费统计</permission>
+        <permission id="analysis_cod">货到付款统计</permission>
+        <permission id="analysis_shop">店铺每日汇总</permission>
+        <permission id="analysis_products">销售明细统计</permission>
+        <permission id="analysis_sales">订单销售统计</permission>
+        <permission id="analysis_sales_delivery_order_item">发货销售统计</permission>
+        <permission id="analysis_goodsrank">商品销售排行</permission>
+        <permission id="analysis_aftersale">退货情况统计</permission>
+        <permission id="analysis_setting">报表配置</permission>
+        <!-- <permission id="analysis_order_price">客单价分布统计</permission> -->
+        <!-- <permission id="analysis_order_time">下单时间分析</permission> -->
+        <!--
+        <permission id="analysis_goods_sale">销售物料统计</permission>
+        -->
+        <!-- <permission id="analysis_rma_type">售后类型分析</permission> -->
+        <permission id="analysis_branchdelivery">仓库发货情况统计</permission>
+        <!-- <permission id="analysis_storeStatus">库存状况分析</permission> -->
+        <!-- <permission id="productnsale_analysis">不动销商品报表</permission> -->
+        <permission id="analysis_export">报表导出</permission>
+        <!--仓储物流分析-->
+        <!-- <permission id="logistics_analysts">仓储物流配送分析</permission> -->
+        <!--仓储物流分析-->
+        <permission id="analysis_orderDiscounts">订单优惠明细统计</permission>
+        <permission id="analysis_refundNoreturn">退款未退货统计</permission>
+    </permissions>
+
+
+    <workground name="单据报表" id="invoice_center"  order="1200" icon="icon-danjubaobiao-01">
+
+        <menugroup name="财务报表" en="financial-statement">
+            <menu controller='ome_analysis' action='income' permission='analysis_income' display='true' order='1000500'>订单收入统计</menu>
+            <menu controller='ome_analysis' action='delivery' permission='analysis_delivery' display='true' order='1000501'>快递费统计</menu>
+            <menu controller='ome_analysis' action='cod' permission='analysis_cod' display='true' order='1000502'>货到付款统计</menu>
+            <menu controller='ome_analysis' action='branchdelivery' permission='analysis_branchdelivery' display='true' order='1000503'>仓库发货统计</menu>
+            <menu controller='ome_orderDiscounts' action='index' permission='analysis_orderDiscounts' display='true' order='1000505'>订单优惠明细统计</menu>
+        </menugroup>
+
+        <!-- <menugroup name="分析报表" en="analytical-statement"> -->
+            <!--
+            <menu controller='ome_analysis' action='goodsrank' permission='analysis_goodsrank' display='true' order='1000600'>商品销售排行</menu>
+            -->
+            <!-- <menu controller='ome_ordersPrice' action='index' permission='analysis_order_price' display='true' order='1000601'>客单价分布</menu> -->
+            <!-- <menu controller='ome_ordersTime' action='index' permission='analysis_order_time' display='true' order='1000602'>下单时间分析</menu> -->
+            <!-- <menu controller='ome_rmatype' action='rmatype' permission='analysis_rma_type' display='true' order='1000603'>售后类型分析</menu> -->
+            <!-- <menu controller='ome_storeStatus' action='index' permission='analysis_storeStatus' display='true' order='1000604'>库存状况分析</menu> -->
+        	<!-- <menu controller='analysis_productnsale' action='index' permission='productnsale_analysis' display='true' order='1000605'>不动销商品报表</menu> -->
+            <!-- <menu controller='logistics_analysts' action='index' permission='logistics_analysts' display='true' order='1000606'>仓储物流配送分析</menu> -->
+        <!-- </menugroup>  -->
+        <menugroup name="销售报表" en="sales-statement">
+            <menu controller='ome_analysis' action='shop' permission='analysis_shop' display='true' order='1000700'>店铺每日统计</menu>
+            <menu controller='ome_analysis' action='products' permission='analysis_products' display='true' order='1000701'>销售明细统计</menu>
+            <!--
+            <menu controller='ome_goodsale' action='index' permission='analysis_goods_sale' display='true' order='1000702'>销售物料统计</menu>
+            -->
+            <menu controller='ome_analysis' action='sales' permission='analysis_sales' display='true' order='1000703'>订单销售统计</menu>
+            <menu controller='ome_analysis' action='salesDeliveryOrdeItem' permission='analysis_sales_delivery_order_item' display='true' order='1000704'>发货销售统计</menu>
+            <menu controller='ome_analysis' action='aftersale' permission='analysis_aftersale' display='true' order='1000705'>退货统计</menu>            
+            <menu permission='analysis_export' display='false'>报表导出</menu>
+            <menu controller='ome_analysis' action='refundNoreturn' permission='analysis_refundNoreturn' display='true' order='1000706'>退款未退货统计</menu>
+            <menu controller='ome_salestatistics' action='salestatistics' permission='analysis_salestatistics' display='true' order='1000704'>退货率统计</menu>
+        </menugroup>
+    </workground>
+	<workground name="系统设置" id="setting_tools"  order="1100" icon="icon-xitongshezhi-01">
+        <menugroup name="报表配置" en="report-configuration">
+            <menu controller='ome_setting' action='index' permission='analysis_setting' display='true' order='4500600'>报表配置</menu>
+        </menugroup>
+    </workground>
+</desktop>

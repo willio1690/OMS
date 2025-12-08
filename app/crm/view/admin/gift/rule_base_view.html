@@ -1,0 +1,303 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    #num_rules {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    #num_rules label {
+        cursor: pointer;
+    }
+
+    #num_rules li {
+        color: #999;
+        padding: 3px 0;
+        background: #EFEFEF;
+        display: none;
+    }
+
+    #num_rules li.active {
+        color: #000;
+        background: #FFc;
+        display: block;
+    }
+</style>
+<form class="tableform" id="form_member_lv">
+<div class="division1">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <th><em class="c-red">*</em><{t}>规则编码：<{/t}></th>
+            <td><b><{$rule.rule_bn}></b>
+            </td>
+        </tr>
+        <tr>
+            <th><em class="c-red">*</em><{t}>规则名称：<{/t}></th>
+            <td><b><{$rule.title}></b>
+            </td>
+        </tr>
+        <tr>
+            <th><{t}>订单类型：<{/t}></th>
+            <td>
+                <{if(!$rule.filter_arr.order_types)}><font color=gray>所有订单</font><{/if}>
+                <{if is_array($rule.filter_arr.order_types) && 'normal'|in_array:$rule.filter_arr.order_types}>普通订单&nbsp;<{/if}>
+                <{if is_array($rule.filter_arr.order_types) && 'presale'|in_array:$rule.filter_arr.order_types}>预售订单&nbsp;<{/if}>
+            </td>
+        </tr>
+        <tr>
+            <th><{t}>支付状态：<{/t}></th>
+            <td>
+                <{if(!$rule.filter_arr.pay_status)}><font color=gray>无限制</font><{/if}>
+                <{if $rule.filter_arr.pay_status == '3'}>部分支付&nbsp;<{/if}>
+                <{if $rule.filter_arr.pay_status == '1'}>已支付&nbsp;<{/if}>
+            </td>
+        </tr>
+        <tr>
+            <th><{t}>订单金额：<{/t}></th>
+            <td>
+                <select id="order_amount_type" name="filter_arr[order_amount][type]" class="x-input">
+                    <option value="0">无限制</option>
+                    <option value="1">单笔付款</option>
+                </select>
+
+                <span style="<{if($rule.filter_arr.order_amount.type==0)}>display:none;<{/if}>">
+                    <select id="order_amount_sign" name="filter_arr[order_amount][sign]" class="x-input">
+                        <option value="between">介于</option>
+                        <option value="bthan">大于等于</option>
+                    </select>
+                    
+                    <span style="<{if($rule.filter_arr.order_amount.sign=='bthan')}>display:none;<{/if}>"><{input id="order_amount_min_num" type="text" name="filter_arr[order_amount][min_num]" value=$rule.filter_arr.order_amount.min_num size="4" }>元
+                    ~</span>
+                    <{input id="order_amount_max_num" type="text" name="filter_arr[order_amount][max_num]" value=$rule.filter_arr.order_amount.max_num size="4" }>元       
+                </span>
+            </td>
+        </tr>
+
+        <tr>
+            <th><{t}>购买商品：<{/t}></th>
+            <td>
+                <select id="filter_arr[buy_goods][type]" name="filter_arr[buy_goods][type]" class="x-input">
+                    <option value="0">无限制</option>
+                    <option value="1">指定销售物料</option>
+                    <option value="2">指定基础物料</option>
+                </select>
+
+                <span style="<{if($rule.filter_arr.buy_goods.type == 0)}>display:none;<{/if}>">
+                    <select id="filter_arr[buy_goods][buy_type]" name="filter_arr[buy_goods][buy_type]" class="x-input">
+                        <option value="any">购买了任意一个指定商品</option>
+                        <option value="all">购买了全部指定商品</option>
+                        <option value="none">排除购买的指定商品</option>
+                    </select>
+                    计算方式：
+                    <{if $rule.filter_arr.buy_goods.calculate_type =="appoint"}>购买的指定商品之和<{/if}>
+                    <{if $rule.filter_arr.buy_goods.calculate_type =="all"}>购买的全部商品之和<{/if}>
+                    <{if $rule.filter_arr.buy_goods.calculate_type =="least"}>购买的指定商品最小值<{/if}>
+                    指定物料编码：
+                    <{foreach from=$rule.filter_arr.buy_goods.goods_bn item=data key=k}>
+                        <font color=blue><{$data}></font>；
+                    <{/foreach}>
+                </span>
+
+            </td>
+        </tr>
+
+        <tr>
+            <th><{t}>赠送数量：<{/t}></th>
+            <td>
+                <ul id="num_rules">
+                    <li>
+                        <input name="filter_arr[buy_goods][num_rule]" type="radio" value="fixed"/>
+
+                        购买
+                        <select id="num_rules_sign" name="filter_arr[buy_goods][rules_sign]" class="x-input">
+                            <option value="nequal">等于</option>
+                            <option value="between">介于</option>
+                            <option value="bthan">大于等于</option>
+                        </select>
+                        <{input type="text" id="buy_goods_min_num" name="filter_arr[buy_goods][min_num]"
+                        value=$rule.filter_arr.buy_goods.min_num size="4" }>
+
+                        <span style="<{if($rule.filter_arr.buy_goods.rules_sign!='between')}>display:none;<{/if}>">
+                            ~ <{input id="buy_goods_max_num" type="text" name="filter_arr[buy_goods][max_num]" value=$rule.filter_arr.buy_goods.max_num size="4" }>
+                            </span>
+
+                        <select id="count_type" name="filter_arr[buy_goods][count_type]" class="x-input">
+                            <option value="num">件</option>
+                            <option value="paid">元</option>
+                            <option value="sku">种</option>
+                        </select>
+                        商品时赠送，不累加
+                    </li>
+                    <li>
+                        <input id="num_rules_auto" name="filter_arr[buy_goods][num_rule]" type="radio"
+                               value="auto"/>
+                        每购买
+                        <{input type="text" id="per_num" name="filter_arr[buy_goods][per_num]"
+                        value=$rule.filter_arr.buy_goods.per_num size="4" }>
+
+                        <select id="count_type" name="filter_arr[buy_goods][count_type]" class="x-input">
+                            <option value="num">件</option>
+                            <option value="paid">元</option>
+                            <option value="sku">种</option>
+                        </select>
+
+                        赠送<{input type="text" id="send_suite" name="filter_arr[buy_goods][send_suite]"
+                        value=$rule.filter_arr.buy_goods.send_suite size="4" }>组赠品，
+
+                        每订单最多送<{input type="text" id="max_send_suite" name="filter_arr[buy_goods][max_send_suite]"
+                        value=$rule.filter_arr.buy_goods.max_send_suite size="4" }>组
+                    </li>
+                </ul>
+            </td>
+        </tr>
+
+        <tr>
+            <th><{t}>限量赠送：<{/t}></th>
+            <td>
+                <{if($rule.filter_arr.buy_goods.limit_type==1)}>
+                    <{if $rule.filter_arr.buy_goods.limit_time_day == 'day'}> 每日 <{/if}>
+                    符合条件的前 <{$rule.filter_arr.buy_goods.limit_orders}> 笔订单赠送
+                <{else}>
+                <font color=gray>无限制</font>
+                <{/if}>
+            </td>
+        </tr>
+
+        <tr>
+            <th><{t}>每ID第一次购买赠送：<{/t}></th>
+            <td><{if $rule.filter_arr.buyer_nick eq '1'}>是<{else}>不限<{/if}></td>
+        </tr>
+
+        <tr>
+            <th><{t}>赠送品种：<{/t}></th>
+            <td>
+                <{if $rule.filter_arr.send_goods.kinds =='2' }> 与购买相符的一个品种 <{elseif $rule.filter_arr.send_goods.kinds =='1' }> 一个品种 <{else}> 所有选定品种 <{/if}>
+            </td>
+        </tr>
+        <tr>
+            <th><{t}>指定会员：<{/t}></th>
+            <td><{$rule.filter_arr.member_uname}></td>
+        </tr>
+        
+        <tr>
+            <th><{t}>指定商家备注：<{/t}></th>
+            <td><{$rule.filter_arr.order_remark}></td>
+        </tr>
+        <tr>
+            <th><{t}>指定客户备注：<{/t}></th>
+            <td><{$rule.filter_arr.member_remark}></td>
+        </tr>
+        <tr>
+            <th><{t}>赠品：<{/t}></th>
+            <td>
+                <table id="gift_list" class="gridlist">
+                    <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>商家编码</th>
+                        <th>商品名称</th>
+                        <th>成本价</th>
+                        <th>赠送数量</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <{foreach from=$gifts item=data key=k}>
+                    <tr style="display:;">
+                        <td><{$k+1}></td>
+                        <td><{$data.gift_bn}></td>
+                        <td><{$data.gift_name}></td>
+                        <td><{$data.gift_price}></td>
+                        <td><{$data.num}></td>
+                    </tr>
+                    <{/foreach}>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+</form>
+<script>
+    var num_rule = '<{$rule.filter_arr.buy_goods.num_rule}>';
+    var gift_template = '';//赠品列表tr模板
+
+    (function () {
+
+        init_select_value();
+
+        if (!num_rule) {
+            num_rule = 'fixed';
+        }
+        var num_rule_radio = $$('#num_rules input[type=radio][value="' + num_rule + '"]');
+        num_rule_radio.set('checked', 'checked');
+        num_rule_radio.getParent().set('class', 'active');
+
+
+        $$('input[name="status"][value=' + status + ']').set('checked', 'checked');
+
+        $$('select[name="filter_arr[order_amount][type]"]').addEvent('change', function () {
+            var ele = $(this);
+            if (ele.value == '0') {
+                ele.getNext().hide();
+            } else {
+                ele.getNext().show();
+            }
+        });
+
+        $$('select[name="filter_arr[order_amount][sign]"]').addEvent('change', function () {
+            var ele = $(this);
+            if (ele.value == 'bthan') {
+                ele.getNext().hide();
+            } else {
+                ele.getNext().show();
+            }
+        });
+
+        $$('#num_rules_sign').addEvent('change', function () {
+            var ele = $(this);
+            if (ele.value != 'between') {
+                ele.getNext().getNext().hide();
+            } else {
+                ele.getNext().getNext().show();
+            }
+        });
+
+        var _form = $('form_member_lv');
+
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+
+        $$('#num_rules input[type=radio]').addEvent('click', function () {
+            $$('#num_rules li').set('class', '');
+            $(this).getParent().set('class', 'active');
+        });
+    })();
+
+    function get_selected_text(ele) {
+        return ele.options[ele.selectedIndex].text;
+    }
+
+
+    //预设下拉框的值
+    function init_select_value() {
+
+        var _form = $('form_member_lv');
+
+        _form.getElement('select[name="filter_arr[order_amount][type]"]').set('value', '<{$rule.filter_arr.order_amount.type}>');
+
+        _form.getElement('select[name="filter_arr[order_amount][sign]"]').set('value', '<{$rule.filter_arr.order_amount.sign}>');
+
+        _form.getElement('select[name="filter_arr[buy_goods][rules_sign]"]').set('value', '<{$rule.filter_arr.buy_goods.rules_sign}>');
+
+        _form.getElement('select[name="filter_arr[buy_goods][type]"]').set('value', '<{$rule.filter_arr.buy_goods.type}>');
+
+        _form.getElement('select[name="filter_arr[buy_goods][buy_type]"]').set('value', '<{$rule.filter_arr.buy_goods.buy_type}>');
+
+        _form.getElements('select[name="filter_arr[buy_goods][count_type]"]').set('value', '<{$rule.filter_arr.buy_goods.count_type}>');
+
+    }
+</script>
+

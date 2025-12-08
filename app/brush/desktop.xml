@@ -1,0 +1,29 @@
+<desktop>
+    <permissions>
+        <permission id="brush_condition_index">特殊订单条件</permission>
+        <permission id="brush_order_index">特殊订单列表</permission>
+        <permission id="brush_delivery_index">特殊订单发货</permission>
+        <permission id="brush_statusback_index">特殊订单状态回写</permission>
+    </permissions>
+
+    <workground name="订单管理" id="order_center" order="100" icon="icon-dingdanguanli-01">
+        <menugroup name="订单查看" en="order-view">
+            <menu controller='admin_orders' action='index'  permission='brush_order_index' display='true' order='1000600'>特殊订单列表</menu>
+        </menugroup>
+    </workground>
+    
+    <workground name="发货管理" id="wms_delivery"  order="200" icon="icon-fahuoguanli-01">
+        <menugroup name="单据打印" en="bill-print">
+            <menu controller='admin_delivery' action='index' permission='brush_delivery_index' display='true' order='1000600'>特殊订单发货</menu>
+        </menugroup>
+        <menugroup name="发货" en="deliver">
+            <menu controller='admin_statusback' action='index' permission='brush_statusback_index' display='true' order='3000700'>特殊订单状态回写</menu>
+        </menugroup>
+    </workground>
+    
+    <workground name="系统设置" id="setting_tools"  order="1100" icon="icon-xitongshezhi-01">
+        <menugroup name="订单配置" en="order-config">
+            <menu controller='admin_condition' action='index'  permission='brush_condition_index' display='true' order='1000400'>特殊订单配置</menu>
+        </menugroup>
+    </workground>
+</desktop>

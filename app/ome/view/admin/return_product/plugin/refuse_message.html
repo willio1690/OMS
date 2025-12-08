@@ -1,0 +1,95 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .jj_refund_th {padding-top: 15px;}
+</style>
+<div class='division'>
+<form id='refuse' method='post' action='index.php?app=ome&ctl=admin_return&act=refuse_message' <{if $shop_type == 'taobao' || $shop_type == 'tmall' || $shop_type == 'luban'}> enctype="multipart/form-data" target="upload" isCloseDialog<{/if}>>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="girdlist">
+        <{if $shop_type == 'taobao' || $shop_type == 'tmall' || $shop_type == 'luban'}>
+        <tr>
+            <th class="jj_refund_th"><i style="color: red;">*</i><t>上传凭证</t></th>
+            <td class="jj_refund_th">
+                <{input type="sfile" name="refuse_proof" f_type="public" }>
+            </td>
+        </tr>
+        <{/if}>
+        <{if $refuse_reason}>
+        <tr>
+            <{if  $shop_type == 'luban' || $shop_type == 'meituan4medicine'}>
+            <th class="jj_refund_th"><i style="color: red;">*</i><t>拒绝原因</t></th>
+            <{else}>
+            <th class="jj_refund_th"><i style="color: red;">*</i><t>换货原因</t></th>
+            <{/if}>
+            <td class="jj_refund_th">
+                <select name="seller_refuse_reason_id">
+                    <{foreach from=$refuse_reason item=reason}>
+                    <option value="<{$reason.reason_id}>"><{$reason.reason_text}></option>
+                    <{/foreach}>
+                </select>
+            </td>
+        </tr>
+        <{/if}>
+
+        <{if $shop_type == 'kaola'}>
+            <tr>
+                <th><t>拒绝理由：</t></th>
+                <td>
+                    <select name='refuse_message'>
+                        <option value="1">签收超过7天申请无理由退货</option>
+                        <option value="2">签收超过7天申请差价补偿</option>
+                        <option value="3">商品有差价但还未签收</option>
+                        <option value="4">上传商品完整图片</option>
+                        <option value="5">商品不支持7天申请无理由退货</option>
+                        <option value="6">海淘关税报销</option>
+                    </select>
+                </td>
+            </tr>
+        <{else}>
+            <tr>
+                <th class="jj_refund_th"><i style="color: red;">*</i><t>备注</t></th>
+                <td class="jj_refund_th"><textarea style="margin: 0px; width: 258px; height: 77px;" name='refuse_message' vtype="required"></textarea></td>
+            </tr>
+        <{/if}>
+        
+    </table>
+    <div class="table-action">
+      <{button label="确定" class="btn-primary" type='submit'}> 
+    </div>
+    <input type="hidden" name='return_id' value='<{$return_id}>'>
+    <input type="hidden" name='shop_type' value='<{$shop_type}>'>
+    <input type="hidden" id='finder_id' name='finder_id' value='<{$finder_id}>'>
+</form>
+</div>
+<script>
+    var finder_id = $('finder_id').value;
+    $('refuse').store('target',{
+        onComplete:function(resp){
+            rs = JSON.decode(resp);
+            if(rs.error){
+                if(rs.status == '-2'){
+                    if (confirm("线上拒绝失败,是否本地拒绝？! "))
+                    {
+                        new Request({
+                            url:'index.php?app=ome&ctl=admin_return&act=do_updateReturn&p[0]=<{$return_id}>&p[1]=5',
+                            method:'post',
+                            onSuccess:function(response){
+                                alert('操作成功');
+                            }
+                        }).send();
+                    }
+                    $('refuse').getParent('.dialog').retrieve('instance').close();
+                    finderGroup[finder_id].refresh.delay(400,finderGroup[finder_id]);
+                }
+            }else{
+                $('refuse').getParent('.dialog').retrieve('instance').close();
+                finderGroup[finder_id].refresh.delay(400,finderGroup[finder_id]);
+            }
+
+        }
+    });
+</script>
+

@@ -1,0 +1,65 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<div class="division">
+<form method="post" action="index.php?app=wmsmgr&ctl=admin_channel&act=saveChannel" id="terminal">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+        <tr>
+            <th>关联第三方仓储:</th>
+            <td>
+                <select name="channel[wms_id]" id="wms_id">
+                    <{foreach from=$wms item=item}>
+                    <option value="<{$item.channel_id}>"><{$item.channel_name}></option>
+                    <{/foreach}>
+                </select>
+            </td>
+        </tr>
+        <tr>
+          <th><em class="c-red">*</em> 渠道ID：</th>
+          <td><{if $channel.channel_id}><{$channel.channel_id}><{else}>
+              <{input type="text&&required" name="channel[channel_id]" value=""}><{/if}>
+              <{help}><{t}>渠道ID的唯一标识<{/t}><{/help}>
+          </td>
+        </tr>
+        <tr>
+        <th ><em class="c-red">*</em> 渠道名称：</th>
+          <td><{input type="text&&required" size="32" name="channel[channel_name]" value=$channel.channel_name}>
+              <{help}><{t}>中文名称<{/t}><{/help}>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <div id='adapter_config'></div>
+      <{if $channel.channel_id}>
+       <input type="hidden" name="channel[id]" value="<{$channel.id}>">
+      <{/if}>
+
+      <div class="table-action">
+      <{button class="btn-primary" type="submit" id="saveterminal" name="submit" label="提交"}>
+      </div>
+</form>
+</div>
+</div>
+
+<script>
+$('terminal').store('target',{
+  onRequest:function(){
+     $('saveterminal').set('disabled', 'true');
+  },
+  onComplete:function(jsontext){
+     var json = Json.evaluate(jsontext);
+     if (typeof(json.error) != 'undefined'){
+         $('saveterminal').set('disabled', '');
+     }else{
+         $('saveterminal').set('disabled', 'true');
+         parent.finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,parent.finderGroup['<{$env.get.finder_id}>']);
+         $('saveterminal').getParent('.dialog').retrieve('instance').close();
+     }
+  }
+});
+
+</script>

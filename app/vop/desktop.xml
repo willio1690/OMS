@@ -1,0 +1,19 @@
+<desktop>
+    <permissions>
+        <permission id="vop_bill">唯品会结算单</permission>
+    
+        <permission id="vop_vreturn_diff">退供差异单</permission>
+        <permission id="vop_po_bill">唯品会PO结算单</permission>
+        <permission id="vop_sku_stock">平台库存列表</permission>
+    </permissions>
+    <workground name="唯品会" id="vopvip"  order="2000" icon="icon-weipinguanli">
+         <menugroup name="唯品账单" en="vipshop-bill">
+            <menu controller='admin_bill' action='index' permission='vop_bill' display='true' order="2000101">结算单</menu>
+            <menu controller='admin_po' action='index' permission='vop_po_bill' display='true' order="2000102">PO结算</menu>
+        </menugroup>
+        <menugroup name="唯品JIT" en="console-vipshop-jit">
+            <menu controller='admin_vreturn_diff' action='index' permission='vop_vreturn_diff' display='true' order="9000401">退供差异单</menu>
+            <menu controller='admin_sku_stock' action='index' permission='vop_sku_stock' display='true' order="9000501">平台库存列表</menu>
+        </menugroup>
+    </workground>
+</desktop>

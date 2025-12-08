@@ -1,0 +1,55 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=logisticsmanager&ctl=admin_warehouse&act=doSyncShop&finder_id=<{$finder_id}>" method="post" id="form1">
+
+<div class="division">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" >
+        <tbody>
+         
+             
+            <tr>
+                <td colspan="2">
+                    <div style='padding-left:10px;width:600px;float: left;'>
+                        <ul>
+                <{foreach from=$shopList item=shop}>
+                <li style='width: 100px;float: left;'>
+               <input type="checkbox" name="shop_ids[]" value="<{$shop.shop_id}>">  <{$shop.name}>
+            </li>
+               <{/foreach}>
+           </ul>
+                 </div>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
+
+
+<div class="table-action">
+      <{button label="确定" class="btn-primary" type='submit'}> &nbsp; &nbsp;
+      <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+<input type='hidden' id='finder_id' name='finder_id' value='<{$finder_id}>'>
+<input type='hidden' name="ids" value='<{$ids}>'>
+</form>
+<script>
+$('form1').store('target',{
+
+    onComplete:function(rsp){
+        
+        rsp = JSON.decode(rsp);
+        var finder_id = $('finder_id').value;
+        if (rsp.error)
+        {
+            return false;
+        }
+        if($('form1').getParent('.dialog')){
+            $('form1').getParent('.dialog').retrieve('instance').close();
+            window.finderGroup[finder_id].refresh.delay(400,finderGroup[finder_id]);
+        }
+        }
+        });
+</script>

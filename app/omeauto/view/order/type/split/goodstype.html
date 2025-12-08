@@ -1,0 +1,88 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="mt-10">
+    <div><span>捆绑商品不参与拆分</span></div>
+    <span>数量： 取值为正数或all,all表示所有 <button type="button" id="addTr"><span>增加</span></button></span>
+    <table border="0" cellspacing="0" cellpadding="0" >
+        <tbody id="goods_type_rows">
+            
+        </tbody>
+    </table>
+    <span>上面数量为正数，且订单明细数量不够时使用 <button type="button" id="addOtherTr"><span>增加</span></button></span>
+    <table border="0" cellspacing="0" cellpadding="0" >
+        <tbody id="goods_type_other_rows">
+            
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    (function () {
+        var goods_type = JSON.decode('<{$special_data|json_encode}>');
+        function getStrIndex() {
+            var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+            var uuid = [], i;
+            radix = chars.length;
+            for (i = 0; i < 8; i++) uuid[i] = chars[0 | Math.random()*radix];
+            var strIndex = uuid.join('');
+            if($(strIndex)) {
+                return getStrIndex();
+            }
+            return strIndex;
+        }
+        function addTr(oldRow) {
+            oldRow = oldRow || {};
+            var strIndex = oldRow.index || getStrIndex();
+            var type_id = oldRow.goods_type || [];
+            var other = oldRow.other || '';
+            var oTr = document.createElement('TR');
+            oTr.id = strIndex;
+            var sHtml = "<td>商品类型：</td><td><select class=\"goods_type\" name=\"split_config[goods"+other+"_type]["+strIndex+"][]\" multiple>";
+            Object.each(goods_type, function(item){
+                sHtml += "<option value=\""+item.type_id+"\" "+(-1!=type_id.indexOf(item.type_id)?"selected":"")+">"+item.name+"</option>";
+            });
+            sHtml += "</select></td><td>数量:</td><td><input type=\"text\" name=\"split_config[goods"+other+"_num]["+strIndex+"]\" size=\"5\" value=\""+(oldRow.goods_num?oldRow.goods_num:'')+"\" /></td><td><button type=\"button\" onclick=\"this.getParent('TR').remove();\"><span>删除</span></button></td></tr>";
+            oTr.setHTML(sHtml);
+            var fuzzySearch = oTr.getElement('select');
+            tail.select(fuzzySearch, {
+                multiple:true,
+                width: 300,
+                height: 200,
+                descriptions: true,
+                hideDisabled: true,
+                multiContainer: true,
+                hideSelected: true,
+                multiShowCount: false,
+            });
+            $('goods_type'+other+'_rows').append(oTr);
+        }
+        $('addTr').addEvent('click', function(){addTr();});
+        $('addOtherTr').addEvent('click', function(){addTr({other: '_other'});});
+        var split_config = JSON.decode('<{$data.split_config|json_encode}>');
+        if(split_config && split_config.goods_type) {
+            Object.each(split_config.goods_type, function(item, index){
+                var oldRow = {
+                    goods_type: split_config.goods_type[index],
+                    goods_num: split_config.goods_num[index],
+                    index: index
+                };
+                addTr(oldRow);
+            });
+            if(split_config.goods_other_type) {
+                Object.each(split_config.goods_other_type, function(item, index){
+                    var oldRow = {
+                        goods_type: split_config.goods_other_type[index],
+                        goods_num: split_config.goods_other_num[index],
+                        index: index,
+                        other: '_other'
+                    };
+                    addTr(oldRow);
+                });
+            }
+        } else {
+            addTr();
+        }
+    })();
+</script>

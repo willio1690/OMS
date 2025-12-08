@@ -1,0 +1,122 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+  <tbody>
+    <tr>
+      <td >
+        <div class="tableform">
+          <table cellspacing="0" cellpadding="0" border="0" class="orderdetails_basic">
+            <tbody>
+              <tr>
+                <td valign="top" >
+                    <h4>保质期批次信息</h4>
+                    <div class="division">
+                      <table cellspacing="0" cellpadding="0"  border="0">
+                        <tbody>
+                          <tr>
+                            <th width="80" nowrap="nowrap" >保质期编码：</th>
+                            <td><span style="color:red;"><{$item.expire_bn}></span></td>
+                          </tr>
+                          <tr>
+                            <th >生产日期：</th>
+                            <td><{$item.production_date|cdate}></td>
+                          </tr>
+                          <tr>
+                            <th >保质期时长：</th>
+                            <td><{$item.guarantee_period}><{$item.date_type}></td>
+                          </tr>
+                          <tr>
+                            <th >过期日期：</th>
+                            <td><{$item.expiring_date|cdate}></td>
+                          </tr>
+                          <tr>
+                            <th >入库数量：</th>
+                            <td><{$item.in_num}></td>
+                          </tr>
+                          <tr>
+                            <th >剩余数量：</th>
+                            <td><{$item.balance_num}></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                </td>
+                  
+                <td valign="top" ><h4>基础物料信息</h4>
+                    <div class="division">
+                        <table cellspacing="0" cellpadding="0"  border="0">
+                          <tbody>
+                            <tr>
+                              <th >物料编码：</th>
+                              <td><span style="color:red;"><{$item.material_bn}></span></td>
+                            </tr>
+                            <tr>
+                              <th >物料名称：</th>
+                              <td><{$item.material_name}></td>
+                            </tr>
+                            
+                            <tr>
+                              <th >物料类型：</th>
+                              <td><b><{$item.type}></b></td>
+                            </tr>
+                            <tr>
+                              <th >销售状态：</th>
+                              <td><{$item.visibled}></td>
+                           </tr>
+                        </tbody>
+                        </table>
+                    </div>
+                </td>
+                
+                <td valign="top" ><h4>保质期预警信息</h4>
+                    <div class="division">
+                        <table cellspacing="0" cellpadding="0"  border="0">
+                            <tbody>
+                            <tr>
+                            <th width="80" nowrap="nowrap" >预警天数：</th>
+                            <td><{$item.warn_day}>天</td>
+                            </tr>
+                            <tr>
+                            <th >预警日期：</th>
+                            <td><{$item.warn_date|cdate}></td>
+                            </tr>
+                            <tr>
+                            <th >自动退出库存天数：</th>
+                            <td><{$item.quit_day}>天</td>
+                            </tr>
+                            <tr>
+                            <th >自动退出库存日期：</th>
+                            <td><{$item.quit_date|cdate}></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+                
+                <td valign="top" >
+                    <h4>仓库信息</h4>
+                    <div class="division">
+                        <table cellspacing="0" cellpadding="0"  border="0">
+                            <tbody>
+                            <tr>
+                            <th width="80" nowrap="nowrap" >所属仓库：</th>
+                            <td><{$item.branch_name}></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </td>          
+          </tr>
+      </tbody></table>
+      </div>
+</td>
+</tr>
+</tbody>
+</table>
+<style type="text/css">
+.finder-detail .tableform table td { vertical-align:top; }
+.finder-detail .tableform th { width:70px; }
+</style>

@@ -1,0 +1,385 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="lkb_list" <{if empty($conf.objs)}> style="display:none" <{/if}> >
+  <input type="hidden" name="objtype[]" value="lkb"/>
+  <h5 style="text-align:center;">福袋商品</h5>
+  
+<{if empty($delivery_list)}>
+  <table class="lkb gridlist" width="100%" cellspacing="0" cellpadding="0" border="0" >
+      <thead>
+        <tr>
+            <th>销售物料编码</th>
+            <th>销售物料名称</th>
+            <th>购买数量</th>
+            <th>单价</th>
+            <th>优惠金额</th>
+            <th>销售价格</th>
+            <th>操作</th>
+        </tr>
+     </thead>
+     <tbody>
+        <{foreach from=$conf.objs item=obj}>
+        <{foreach from=$obj.order_items item=item}>
+        <{if $item.delete == 'true'}>
+        <{assign var='lkb_del' value="true"}>
+        <{else}>
+        <{assign var='lkb_del' value="false"}>
+        <{/if}>
+        <{/foreach}>
+        <tr class="bindtitle" lkb-type="lkb" g-id="<{$obj.goods_id}>" lkb-id="<{$obj.goods_id}>" <{if $lkb_del=='true'}>style="background-color: #D8D8D8;" lkb-del='b'<{else}> lkb-del="a"<{/if}>>
+          <td class="goods_bn"><{$obj.bn}></td>
+          <td class="goods_name"><{$obj.name}></td>
+          <td class="goods_num">
+              <input type="text" id="lkbnum_<{$obj.goods_id}>" lkb-id="<{$obj.goods_id}>" aid="<{$obj.goods_id}>" vtype="required&&unsignedint" atype="num_obj" value="<{$obj.quantity}>" name="lkb[num][<{$obj.obj_id}>]" size="4" <{if $lkb_del == 'true'}>disabled="true"<{/if}> onchange="changetotallkb(this);total();" />
+          </td>
+          <td class="goods_price"><span id="lkbpr_<{$obj.goods_id}>"><{$obj.price}></span><input type="hidden" name="lkb[price][<{$obj.obj_id}>]" value="<{$obj.price}>"/></td>
+          <td class="goods_num">
+            <input type="text" id="lkbpmtpr_<{$obj.goods_id}>" lkb-id="" aid="<{$obj.goods_id}>" atype="pmt_price_obj" value="<{$obj.pmt_price|default:0}>" vtype="unsigned" class="goods_pmt_price"  name="lkb[obj_pmt_price][<{$obj.obj_id}>]" size="6" <{if $lkb_del == 'true'}>disabled="true"<{/if}> onchange="changetotallkb(this);total();" />
+          </td>
+          <td class="goods_num">
+            <input type="text" class="lkbtotal" style="display:none" id="lkbtotal_<{$obj.goods_id}>" size="2" value="0" <{if $lkb_del == 'true'}>disabled="true"<{/if}> />
+            <input type="text" size="5" id="lkbsalepr_<{$obj.goods_id}>" class="none_input lkbsaleprice" readonly="readonly" value="<{$obj.sale_price}>" <{if $lkb_del == 'true'}>disabled="true"<{/if}> >
+            <input type="hidden" size="5" id="lkbpmtorderpr_<{$obj.goods_id}>" class="none_input lkbpmtorderprice" readonly="readonly" value="<{$obj.pmt_order_price}>">
+          </td>
+          <td class="goods_op">
+          <{if empty($item.make_nums)}>
+                <{if $lkb_del == 'true'}>
+                  &nbsp;
+                <{else}>
+                  <{button type="button" label="删除" id="bt_{$obj.goods_id}" onclick="del_lkb('{$obj.goods_id}')" }>
+                <{/if}>
+            <{else}>
+                <span style="color:red;"><{if $obj.left_nums <= 0}>已拆分完<{else}>部分拆分<{/if}></span>
+            <{/if}>
+          </td>
+        </tr>
+        <{foreach from=$obj.order_items item=item}>
+        <tr id="tr_<{$item.item_id}>" lkb-id="<{$obj.goods_id}>" g-pid="<{$item.product_id}>" g-type="<{$item.item_type}>" lkb-type="<{$item.item_type}>" g-shop-pid="<{$item.shop_product_id}>" aid="<{$item.item_id}>" <{if $item.delete == 'true'}>style="background-color: #D8D8D8;" lkb-del="b"<{else}> lkb-del="a"<{/if}>>
+          <td class="item_bn"><{$item.bn}></td>
+          <td class="item_name"><{$item.name}><input name="product_ids[]" id="product_ids_<{$item.item_id}>" type="text" value="<{$item.product_id}>" style="display:none;" /></td>
+          <td class="item_num">
+            <input type="hidden" value="<{$item.item_id}>" name="lkb[obj][<{$obj.obj_id}>][]" />
+            <input type="text" class="none_input" id="num_<{$item.item_id}>" name="lkb[inum][<{$obj.obj_id}>]" pg-id="<{$obj.goods_id}>" aid="<{$item.item_id}>" size="4" readonly="true" js="<{$item.quantity/$obj.quantity}>" <{if $item.delete == 'true'}>disabled="true"<{/if}> value="<{$item.quantity/$obj.quantity}>" />
+          </td>
+          <td class="item_price"><span><{$item.price}></span></td>
+          <td class="goods_num"><span id="pmtpr_<{$item.item_id}>"><{$item.pmt_price|default:0}></span></td>
+          <td class="goods_num">-</td>
+          <td class="item_op"></td>
+        </tr>
+        <{/foreach}>
+        <{/foreach}>
+     </tbody>
+</table>
+
+<{else}>
+  <table class="lkb gridlist" width="100%" cellspacing="0" cellpadding="0" border="0" >
+      <thead>
+        <tr>
+            <th>销售物料编码</th>
+            <th>销售物料名称</th>
+            <th>购买数量</th>
+            <th>可编辑数量</th>
+            <th>单价</th>
+            <th>优惠金额</th>
+            <th>销售价格</th>
+            <th>操作</th>
+        </tr>
+     </thead>
+     <tbody>
+        <{foreach from=$conf.objs item=obj}>
+        <{foreach from=$obj.order_items item=item}>
+        <{if $item.delete == 'true'}>
+        <{assign var='lkb_del' value="true"}>
+        <{else}>
+        <{assign var='lkb_del' value="false"}>
+        <{/if}>
+        <{/foreach}>
+        <tr class="bindtitle" lkb-type="lkb" g-id="<{$obj.goods_id}>" lkb-id="<{$obj.goods_id}>" <{if $lkb_del=='true'}>style="background-color: #D8D8D8;" lkb-del='b'<{else}> lkb-del="a"<{/if}>>
+          <td class="goods_bn"><{$obj.bn}></td>
+          <td class="goods_name"><{$obj.name}></td>
+          <td class="goods_num"><input type="text" id="lkbnum_<{$obj.goods_id}>" lkb-id="<{$obj.goods_id}>" aid="<{$obj.goods_id}>" vtype="required&&unsignedint" atype="num_obj" value="<{$obj.quantity}>" name="lkb[num][<{$obj.obj_id}>]" size="4" <{if $lkb_del == 'true'}>disabled="true"<{else}>readonly="readonly" style="color:#666;"<{/if}> /><input type="hidden" value="<{$obj.quantity}>" id="old_lkb_nums_<{$obj.goods_id}>" /></td>
+            <td class="lkb_buy_nums">
+            <{if $obj.left_nums <= 0}>
+              <input aid="<{$obj.goods_id}>" lkb-id="<{$obj.goods_id}>" name="lkb[lkb_buy_nums][<{$obj.goods_id}>]" type="text" size="5" value="<{$obj.left_nums}>" id="lkb_buy_nums_<{$obj.goods_id}>" disabled="true" />
+            <{else}>
+              <input atype="lkb_num_obj" aid="<{$obj.goods_id}>" lkb-id="<{$obj.goods_id}>" name="lkb[lkb_buy_nums][<{$obj.goods_id}>]" type="text" size="5" value="<{$obj.left_nums}>" id="lkb_buy_nums_<{$obj.goods_id}>" <{if $item.delete == 'true'}>disabled="true"<{/if}> onchange="split_changetotallkb(this);total();" />
+            <{/if}>
+            <{if $obj.make_nums}><br />(<font color="#f00;">已发货：<{$obj.make_nums}></font>)<input type="hidden" value="<{$obj.make_nums}>" id="split_lkb_send_<{$obj.goods_id}>" /><{/if}>
+            </td>
+          <td class="goods_price"><span id="lkbpr_<{$obj.goods_id}>" <{if $item.make_nums > 0}>style="color:#666;"<{/if}>><{$obj.price}></span><input type="hidden" name="lkb[price][<{$obj.obj_id}>]" value="<{$obj.price}>"/></td>
+          <td class="goods_num">
+            <input type="text" id="lkbpmtpr_<{$obj.goods_id}>" lkb-id="" aid="<{$obj.goods_id}>" atype="pmt_price_obj" value="<{$obj.pmt_price|default:0}>" vtype="unsigned" class="goods_pmt_price"  name="lkb[obj_pmt_price][<{$obj.obj_id}>]" size="6" <{if $lkb_del == 'true'}>disabled="true"<{elseif $item.make_nums > 0}>readonly="readonly" style="color:#666;"<{else}>onchange="changetotallkb(this);total();"<{/if}> />
+          </td>
+          <td class="goods_num">
+             <input type="text" class="lkbtotal" style="display:none" id="lkbtotal_<{$obj.goods_id}>" size="2" value="0" <{if $item.delete == 'true'}>disabled="true"<{/if}> />
+            <input type="text" size="5" id="lkbsalepr_<{$obj.goods_id}>" class="none_input lkbsaleprice" readonly="readonly" value="<{$obj.sale_price}>" <{if $item.delete == 'true'}>disabled="true"<{/if}> >
+            <input type="hidden" size="5" id="lkbpmtorderpr_<{$obj.goods_id}>" class="none_input lkbpmtorderprice" readonly="readonly" value="<{$obj.pmt_order_price}>">
+          </td>
+
+          <td class="goods_op">
+            <{if empty($item.make_nums)}>
+                <{if $lkb_del == 'true'}>
+                  &nbsp;
+                <{else}>
+                  <{button type="button" label="删除" id="bt_{$obj.goods_id}" onclick="del_lkb('{$obj.goods_id}')" }>
+                <{/if}>
+            <{else}>
+                <span style="color:red;"><{if $obj.left_nums <= 0}>已拆分完<{else}>部分拆分<{/if}></span>
+            <{/if}>
+          </td>
+        </tr>
+        <{foreach from=$obj.order_items item=item}>
+        <tr id="tr_<{$item.item_id}>" lkb-id="<{$obj.goods_id}>" g-pid="<{$item.product_id}>" g-type="<{$item.item_type}>" lkb-type="<{$item.item_type}>" g-shop-pid="<{$item.shop_product_id}>" aid="<{$item.item_id}>" <{if $item.delete == 'true'}>style="background-color: #D8D8D8;" lkb-del="b"<{else}> lkb-del="a"<{/if}>>
+          <td class="item_bn"><{$item.bn}></td>
+          <td class="item_name"><{$item.name}><input name="product_ids[]" id="product_ids_<{$item.item_id}>" type="text" value="<{$item.product_id}>" style="display:none;" /></td>
+          <td class="item_num">
+            <input type="hidden" value="<{$item.item_id}>" name="lkb[obj][<{$obj.obj_id}>][]" />
+            <input type="text" class="none_input" id="num_<{$item.item_id}>" name="lkb[inum][<{$obj.obj_id}>]" pg-id="<{$obj.goods_id}>" aid="<{$item.item_id}>" size="4" readonly="true" js="<{$item.quantity/$obj.quantity}>" <{if $item.delete == 'true'}>disabled="true"<{/if}> value="<{$item.quantity/$obj.quantity}>" />
+          </td>
+          <td>-</td>
+          <td class="item_price"><span><{$item.price}></span></td>
+          <td class="goods_num"><span id="pmtpr_<{$item.item_id}>"><{$item.pmt_price|default:0}></span></td>
+          <td class="goods_num">-</td>
+          <td class="item_op"></td>
+        </tr>
+        <{/foreach}>
+        <{/foreach}>
+     </tbody>
+</table>
+<{/if}>
+</div>
+<script>
+
+$('lkb_list').getElements("input[atype]").each(function(e){
+    changetotallkb(e);
+});
+
+function total_lkb(){
+    var total = 0, amount=0;
+    $('lkb_list').getElements("input.lkbtotal").each(function(item){
+        if(!item.disabled)total += parseFloat(item.value);
+    });
+    $('lkb_list').getElements("input.lkbsaleprice").each(function(item){
+        if(!item.disabled)amount += parseFloat(item.value);
+    });
+    return [total,amount];
+}
+
+function changetotallkb(e){
+    var id = e.get('aid'),l=0,_ca = e.getNext('.error');
+    if(e.disable) return;
+    if (/^\d+(\.\d+)?$/.test(e.value)){
+        if(e.get('atype') == 'num_obj'){
+            if (parseInt(e.value) <= 0){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }else{
+                if (_ca) _ca.remove();
+            }
+            if (e.get('lkb-id') != null || e.get('lkb-id') != ''){
+                $('lkb_list').getElements('input[type=text]').each(function (eee){
+                    if (eee.get('pg-id') == e.get('lkb-id')){
+                        eee.value = eee.get('js')*e.value;
+                    }
+                });
+            }
+            $('lkbtotal_'+id).value = parseFloat($('lkbnum_'+id).value).toFixed(3)*parseFloat($('lkbpr_'+id).innerHTML).toFixed(3);
+        }
+        e.getParent('tbody').getElements('tr').each(function(item){
+            if(e.getParent('tr').get('lkb-id') == item.get('lkb-id')){
+                if(item.get('aid')) l += parseFloat($('pmtpr_'+item.get('aid')).innerHTML);
+            }
+        });
+        var lkbsalepr_ = (parseFloat($('lkbnum_'+id).value)*parseFloat($('lkbpr_'+id).innerHTML) - parseFloat($('lkbpmtpr_'+id).value) - l).toFixed(3);
+        if (/^[-|0-9]*[0-9|.]+$/.test(lkbsalepr_)){
+            $('lkbsalepr_'+id).set('value', lkbsalepr_);
+        }
+    }else{
+        if (!_ca){
+            new Element('span',{'class':"error caution notice-inline",html:"请录入数值"}).injectAfter(e);
+            e.set('value', '0');
+        }
+    }
+
+}
+
+//删除福袋商品
+function del_lkb(id,subtotal,saleprice){
+    $ES('#lkb_list tbody tr').each(function (e){
+        if (e.get('lkb-id') == id){
+            if (e.get('newlkb') == '1'){
+                e.remove();
+            }else {
+                if (e.get('lkb-del') == 'b'){
+                    e.getElements('input[type=text]').each(function (a){a.disabled=false;});
+                    if ($("bt_"+id)) $("bt_"+id).getElement('span').getElement('span').set('text','删除');
+                    e.set('lkb-del','a');
+                    e.setStyle('background-color','');
+                }else {
+                    e.getElements('input[type=text]').each(function (a){a.disabled=true;});
+                    if ($("bt_"+id)) $("bt_"+id).getElement('span').getElement('span').set('text','恢复');
+                    e.set('lkb-del','b');
+                    e.setStyle('background-color','#D8D8D8');
+                }
+            }
+        }
+    });
+    dellkbtotal(id,subtotal,saleprice);
+}
+
+function dellkbtotal(id,lkbtotal,lkbsalepr)
+{
+    //计算相关金额
+    total();
+}
+
+//删除捆绑商品
+function del_lkb_new(id){
+    $ES('#lkb_list tbody tr[lkb-type]').each(function (e){
+        if (e.get('lkb-id') == id){
+            if (e.get('newlkb') == '1'){
+                e.remove();
+            }else {
+                if (e.get('lkb-del') == 'b'){
+                    e.getElements('input[type=text]').each(function (a){a.disabled=false;});
+                    if ($("bt_"+id)) $("bt_"+id).getElement('span').getElement('span').set('text','删除');
+                    e.setProperty('lkb-del','a');
+                    e.setStyle('background-color','');
+                }else {
+                    e.getElements('input[type=text]').each(function (a){a.disabled=true;});
+                    if ($("bt_"+id)) $("bt_"+id).getElement('span').getElement('span').set('text','恢复');
+                    e.setProperty('lkb-del','b');
+                    e.setStyle('background-color','#D8D8D8');
+                }
+            }
+        }
+    });
+    total();
+    if (!$E('#lkb_list tbody').getElement('td')){
+        $('lkb_list').style.display = "none";
+    }
+}
+
+function createlkb(rs){
+    var ishave='false';
+    var gid = rs.sm_id;
+    var items = rs['items'];
+    $ES('#lkb_list tbody tr').each(function (es){
+        if (es.get('g-id') == gid){
+            if (es.get('lkb-del')==null || es.get('lkb-del')=='a'){
+                ishave='true'
+                alert("有此福袋商品："+rs.sales_material_name);
+                $("lkbnum_"+gid).focus();
+            }else {
+                ishave='true'
+                alert("请恢复福袋商品："+rs.sales_material_name);
+            }
+        }
+    });
+    if (ishave!='true'){
+        <{if $delivery_list}>
+        var ptr = new Element('tr.bindtitle', {"lkb-type":'lkb','g-id':gid,"lkb-id":gid,'lkb-del':'a','newlkb':'1',html:'<td>'+rs.sales_material_bn+'</td><td>'+rs.sales_material_name+'</td><td><input type="text" id="lkbnum_'+gid+'" lkb-id="'+gid+'" aid="'+gid+'" vtype="required&amp;&amp;unsignedint" atype="num_obj" value="1" name="lkb[lkbonum]['+gid+']" size="4" onchange="changetotallkb(this);total();"></td><td>0</td><td><span id="lkbpr_'+gid+'">'+rs.price+'</span><input type="hidden" name="lkb[lkbopr]['+gid+']"  value="'+rs.price+'"/></td><td><input type="text" id="lkbpmtpr_'+gid+'" lkb-id="" aid="'+gid+'" atype="pmt_price_obj" value="0" vtype="unsigned" name="lkb[new_obj_pmt_price]['+gid+']" size="6" onchange="changetotallkb(this);total();"></td><td><input type="text" class="lkbtotal" style="display:none" id="lkbtotal_'+gid+'" size="2" value="'+rs.price+'"><input type="text" size="5" class="none_input lkbsaleprice" readonly="readonly" id="lkbsalepr_'+gid+'" value="'+rs.price+'" /></td><td><{button type="button" id="bt_'+gid+'" onclick="del_lkb_new('+gid+')" label="删除"}></td>'}).inject($E('#lkb_list tbody'));
+        <{else}>
+        var ptr = new Element('tr.bindtitle', {"lkb-type":'lkb','g-id':gid,"lkb-id":gid,'lkb-del':'a','newlkb':'1',html:'<td>'+rs.sales_material_bn+'</td><td>'+rs.sales_material_name+'</td><td><input type="text" id="lkbnum_'+gid+'" lkb-id="'+gid+'" aid="'+gid+'" vtype="required&amp;&amp;unsignedint" atype="num_obj" value="1" name="lkb[lkbonum]['+gid+']" size="4" onchange="changetotallkb(this);total();"></td><td><span id="lkbpr_'+gid+'">'+rs.price+'</span><input type="hidden" name="lkb[lkbopr]['+gid+']"  value="'+rs.price+'"/></td><td><input type="text" id="lkbpmtpr_'+gid+'" lkb-id="" aid="'+gid+'" atype="pmt_price_obj" value="0" vtype="unsigned" name="lkb[new_obj_pmt_price]['+gid+']" size="6" onchange="changetotallkb(this);total();"></td><td><input type="text" class="lkbtotal" style="display:none" id="lkbtotal_'+gid+'" size="2" value="'+rs.price+'"><input type="text" size="5" class="none_input lkbsaleprice" readonly="readonly" id="lkbsalepr_'+gid+'" value="'+rs.price+'" /></td><td><{button type="button" id="bt_'+gid+'" onclick="del_lkb_new('+gid+')" label="删除"}></td>'}).inject($E('#lkb_list tbody'));
+        <{/if}>
+        items.each(function (e){
+            createlkbproduct(rs,e);
+        });
+    }
+    $('lkb_list').show();
+    total();
+}
+
+function createlkbproduct(rs,e){
+    var gid = rs.sm_id;
+    var pid = e.bm_id;
+    <{if $delivery_list}>
+    var trr = new Element('tr', {id:'tr_'+pid,'lkb-id':gid,'g-pid':pid,'lkb-type':'lkb','aid':pid,'lkb-del':'a','newlkb':'1',html:'<td><input type="hidden" name="lkb[lkbilbrid]['+gid+']['+pid+']" value="'+e.lbr_id+'"/>'+e.material_bn+'</td><td>'+e.material_name+'<input name="product_ids[]" id="product_ids_'+pid+'" type="text" value="'+pid+'" style="display:none;" /></td><td><input type="hidden" value="'+e.material_bn+'" name="bn_list[]"><input type="text" class="none_input" id="num_'+pid+'" name="lkb[lkbnum]['+gid+']['+pid+']" pg-id="'+gid+'" aid="'+pid+'" size="4" readonly="readonly" js="'+e.number+'" value="'+e.number+'"></td><td>-</td><td><span>'+e.price+'</span><input type="hidden" name="lkb[lkbipr]['+gid+']['+pid+']" value="'+e.price+'"/></td><td><span id="pmtpr_'+pid+'">0</span></td><td>-</td><td>&nbsp;</td>'}).inject($E('#lkb_list tbody'));
+    <{else}>
+    var trr = new Element('tr', {id:'tr_'+pid,'lkb-id':gid,'g-pid':pid,'lkb-type':'lkb','aid':pid,'lkb-del':'a','newlkb':'1',html:'<td><input type="hidden" name="lkb[lkbilbrid]['+gid+']['+pid+']" value="'+e.lbr_id+'"/>'+e.material_bn+'</td><td>'+e.material_name+'<input name="product_ids[]" id="product_ids_'+pid+'" type="text" value="'+pid+'" style="display:none;" /></td><td><input type="hidden" value="'+e.material_bn+'" name="bn_list[]"><input type="text" class="none_input" id="num_'+pid+'" name="lkb[lkbnum]['+gid+']['+pid+']" pg-id="'+gid+'" aid="'+pid+'" size="4" readonly="readonly" js="'+e.number+'" value="'+e.number+'"></td><td><span>'+e.price+'</span><input type="hidden" name="lkb[lkbipr]['+gid+']['+pid+']" value="'+e.price+'"/></td><td><span id="pmtpr_'+pid+'">0</span></td><td>-</td><td>&nbsp;</td>'}).inject($E('#lkb_list tbody'));
+    <{/if}>
+}
+
+//[拆单]部分拆分编辑购买数量
+function split_changetotallkb(e){
+
+    var id = e.get('aid'),l=0,_ca = e.getNext('.error');
+    if(e.disable) return;
+    
+    var split_lkb_buy_nums      = 0;
+    var split_lkb_send_nums     = 0;
+    var split_lkb_edit_nums     = 0;
+    if($('old_lkb_nums_'+id))
+    {
+        split_lkb_buy_nums      = parseInt($('old_lkb_nums_'+id).value);
+    }
+    if($('split_lkb_send_'+id))
+    {
+        split_lkb_send_nums     = parseInt($('split_lkb_send_'+id).value);
+    }
+    
+    if (/^\d+(\.\d+)?$/.test(e.value)){
+        if(e.get('atype') == 'lkb_num_obj'){
+            if (parseInt(e.value) < 0){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }
+            else if(parseInt(e.value) == 0 && split_lkb_send_nums == 0)
+            {
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }
+            else{
+                if (_ca) _ca.remove();
+            }
+            
+            split_lkb_edit_nums     = split_lkb_send_nums + parseInt(e.value);
+            $('lkbnum_'+id).value       = split_lkb_edit_nums;
+            
+            if (e.get('lkb-id') != null || e.get('lkb-id') != ''){
+                $('lkb_list').getElements('input[type=text]').each(function (eee){
+                    if (eee.get('pg-id') == e.get('lkb-id')){
+                        eee.value = eee.get('js')*split_lkb_edit_nums;
+                    }
+                });
+            }
+            $('lkbtotal_'+id).value = parseFloat($('lkbnum_'+id).value).toFixed(3)*parseFloat($('lkbpr_'+id).innerHTML).toFixed(3);
+        }
+        
+        e.getParent('tbody').getElements('tr').each(function(item){
+            if(e.getParent('tr').get('lkb-id') == item.get('lkb-id')){
+                if(item.get('aid')) l += parseFloat($('pmtpr_'+item.get('aid')).innerHTML);
+            }
+        });
+        var lkbsalepr_ = (parseFloat($('lkbnum_'+id).value)*parseFloat($('lkbpr_'+id).innerHTML) - parseFloat($('lkbpmtpr_'+id).value) - l).toFixed(3);
+        if (/^[-|0-9]*[0-9|.]+$/.test(lkbsalepr_)){
+            $('lkbsalepr_'+id).set('value', lkbsalepr_);
+        }
+    }else{
+        if (!_ca){
+            new Element('span',{'class':"error caution notice-inline",html:"请录入数值"}).injectAfter(e);
+            e.set('value', '0');
+        }
+    }
+
+}
+
+function lkbinit(rs){
+    rs.each(function (ee){
+        createlkb(ee);
+    });
+}
+
+</script>

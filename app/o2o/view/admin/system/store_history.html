@@ -1,0 +1,240 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <h5>编辑门店<em class='c-red'>《快照》</em></h5>
+    <form method="post" action="index.php?app=o2o&ctl=admin_store&act=save" id="store-form">
+        <input type="hidden" name="store_id" value="<{$store_prop.store_id}>">
+        <h4>基本信息</h4>
+        <div class="division">
+            <table>
+                <tbody>
+                <tr>
+                    <th><em class="c-red">*</em>门店编码：</th>
+                    <td>
+                        <{$store_prop.store_bn}>
+                    </td>
+                    <th>
+                        <em class="c-red">*</em>门店名称CN：
+                    </th>
+                    <td>
+                        <{input type="text&&required" name="name" value=$store_prop.name readonly='readonly'}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <em class="c-red">*</em>状态：
+                    </th>
+                    <td>
+                        <{input type="radio" name="status" value=$store_prop.status|default:"1" options=array("1"=>"开店","2"=>"关店") separator="&nbsp;"  disabled='disabled'}>
+                    </td>
+                    <th>
+
+                    </th>
+                    <td>
+
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <em class="c-red">*</em>所属服务端：
+                    </th>
+                    <td>
+                        <select name="server_id" id="server_id" >
+                            <{foreach from=$serverList item=server}>
+                            <option value="<{$server.server_id}>" <{if $server.server_id==$store_prop.server_id}>selected<{/if}> ><{$server.name}></option>
+                            <{/foreach}>
+                        </select>
+                    </td>
+                    <th>
+
+                    </th>
+                    <td>
+
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <em class="c-red">*</em>所属组织：
+                    </th>
+                    <td colspan="3">
+                        <{if $store_prop.org_name}>
+                        <{$store_prop.org_name}>
+                        <input type="hidden" name="org_parents_structure" value="<{$org.org_parents_structure}>">
+                        <{else}>
+                        <{input type='organization' app='organization' name="org_parents_structure" value=$org.org_parents_structure required="true" show='onlytree' readonly='readonly'}>
+                        <{/if}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>所属总店：</th>
+                    <td colspan="3">
+                        <select name="online_id[]" id="online_id" multiple>
+                            <{foreach from=$shopList item=shop}>
+                            <option value="<{$shop.shop_id}>"><{$shop.name}></option>
+                            <{/foreach}>
+                        </select>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4>地址信息</h4>
+        <div class="division">
+            <table>
+                <tbody>
+
+                <tr>
+                    <th>
+                        <em class="c-red">*</em>地区：
+                    </th>
+                    <td>
+                        <{input type="region" app="eccommon" name="area" value=$store_prop.area readonly='readonly'}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <em class="c-red">*</em>地址：
+                    </th>
+                    <td>
+                        <{input type="text" vtype="required" name="addr" size="60" value=$store_prop.addr readonly='readonly'}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <em class="c-red">*</em>联系人：
+                    </th>
+                    <td>
+                        <{input type="text" vtype="required"  name="contacter" size="60" value=$store_prop.contacter readonly='readonly'}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <em class="c-red">*</em>手机：
+                    </th>
+                    <td>
+                        <{input type="text" vtype="required"  name="mobile" size="60" value=$store_prop.mobile readonly='readonly'}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        固定电话：
+                    </th>
+                    <td>
+                        <{input type="text"  name="tel" size="60" value=$store_prop.tel readonly='readonly'}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        邮编：
+                    </th>
+                    <td>
+                        <{input type="text"  name="zip" size="60" value=$store_prop.zip readonly='readonly'}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        传真：
+                    </th>
+                    <td>
+                        <{input type="text"  name="fax" size="60" value=$store_prop.fax readonly='readonly'}>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4>扩展信息</h4>
+        <div class="division">
+            <table>
+                <tbody>
+                <tr>
+                    <th>
+                        <em class="c-red">*</em>营业时间：
+                    </th>
+                    <td>
+                        <{input type="text" name="open_hours" value=$store_prop.open_hours readonly='readonly'}>
+                    </td>
+                </tr>
+                <{if $env.get.store_classify != "agent"}>
+                <tr>
+                    <th>
+                        <em class="c-red">*</em>经营模式：
+                    </th>
+                    <td>
+                        <{input type="radio" vtype="requiredradio" name="store_type" value=$store_prop.store_type|default:'self' options=array("self"=>"自营","join"=>"加盟","cooperation"=>"联营") separator="&nbsp;"  disabled='disabled'}>
+                    </td>
+                </tr>
+                <{if $store_prop.dealer_cos_name}>
+                <tr>
+                    <th>
+                        所属经销商：
+                    </th>
+                    <td>
+                        <{$store_prop.dealer_cos_name}>
+                    </td>
+                </tr>
+                <{/if}>
+                <{/if}>
+
+                <tr>
+                    <th>
+                        <em class="c-red">*</em>销售类型：
+                    </th>
+                    <td>
+                        <{input type="radio" vtype="requiredradio" name="store_mode" value=$store_prop.store_mode|default:'normal' options=array("normal"=>"正价店","discount"=>"奥莱店铺") separator="&nbsp;"  disabled='disabled'}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>库位：</th>
+                    <td><{input type="text" name="storage_codes[main]" value=$store_prop.storage_code readonly='readonly'}></td>
+                </tr>
+
+                <tr>
+                    <th><em class="c-red">*</em>优先级：</th>
+                    <td><{input type="text" vtype="required" name="priority" value=$store_prop.priority|default:50 readonly='readonly'}></td>
+                </tr>
+                <tr>
+                    <th>
+                        <em class="c-red">*</em>管控库存：
+                    </th>
+                    <td>
+                        <{input type="radio" vtype="requiredradio" name="is_ctrl_store" value=$store_prop.is_ctrl_store|default:'1' options=array("1"=>"是","2"=>"否") separator="&nbsp;" disabled='disabled'}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <em class="c-red">*</em>允许负库存：
+                    </th>
+                    <td>
+                        <{input type="radio" vtype="requiredradio" name="is_negative_store" value=$store_prop.is_negative_store|default:'1' options=array("1"=>"是","2"=>"否") separator="&nbsp;" disabled='disabled'}>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+<script>
+    tail.select($('server_id'),
+        {
+            width: 140
+        });
+    tail.select($('company_id'),
+        {
+            width: 140,
+            search: true,
+            searchMinLength: 0
+        });
+    tail.select($('online_id'),
+        {
+            width: 140,
+            search: true,
+            searchMinLength: 0,
+            multiple:true,
+            multiContainer: true
+        });
+</script>

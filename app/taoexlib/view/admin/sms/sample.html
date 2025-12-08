@@ -1,0 +1,215 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $nosample=='true'}>
+    <div class="notice">
+        缺少模板信息,不能编辑！请先选择规则的模板，在进行编辑！
+    </div>
+<{else}>
+<div class="tableform">
+    <h3>短信模板设置</h3>
+    <div class="division">
+        <form method="post" action="index.php?app=taoexlib&ctl=admin_sms_sample&act=save_sample" id="form-sample">
+            <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+                <tbody>
+                    <tr>
+                        <th><em class="c-red">*</em> 发送节点：</th>
+                        <td colspan="3">
+                            <input type='hidden' name='id' value="<{$info.id}>">
+                            <input type='hidden' id='current_send_type' value="<{$current_send_type}>">
+                            <input type='hidden' id='action_flag' value="<{$action_flag}>">
+                            <select id='send_type' name='send_type'  onchange="changeSendType(this);" >
+                              <{foreach from=$type_list item=item key=key}>
+                                 <option value="<{$item.type}>" <{if $item.type==$current_send_type}>selected='selected'<{/if}> > <{$item.name}> </option>
+                              <{/foreach}>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th><em class="c-red">*</em> 模板标题：</th>
+                        <td colspan="3">
+                            <input type="text" id="title" name="title" caution='请填写模板标题' value="<{$info.title|default:'发货提醒'}>" size="20" vtype="required"/>
+                            <{help}><{t}>设置一个短信模板标题<{/t}><{/help}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><em class="c-red">*</em> 模板编号：</th>
+                        <td colspan="3">
+                            <input type="text" id="sample_no" name="sample_no" caution='请填写模板编号' value="<{$info.sample_no|default:''}>" size="20" vtype="required"/>
+                            <{help}><{t}>设置一个短信模板标题<{/t}><{/help}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><em class="c-red">*</em> 审核成功即开启：</th>
+                        <td colspan="3">
+                            <{input type='bool' name='isapproved' value=$info.isapproved|default:'false' vtype='requiredradio'}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><em class="c-red">*</em> 开启状态：</th>
+                        <td colspan="3">
+                            <{input type='bool' name='status' value=$info.status|default:'1' vtype='requiredradio'}>
+                        </td>
+                    </tr>
+                   
+                    <tr>
+                        <th width="10%">
+                            <em class="c-red">*</em>
+                            发送内容：
+                        </th>
+                        <td colspan="3">
+                            <{input type="textarea" name="content" id="content" style="width:100px;height:120px" 
+                            value=$info.content vtype='required' caution='请填写短信内容'}>
+                            <{help}><{t}>发送的短信内容<{/t}><{/help}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="10%" style="line-height:26px;">
+                            <em class="c-red">
+                                <{t}>内容参数：<{/t}>
+                            </em>
+                        </th>
+                        <td colspan="3" align="left" style="line-height:25px;">
+                            <div id="sample_variables">
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </form>
+            <div class="table-action">
+                <{button label="保存" name="submit" id="btn-branch"}>
+                &nbsp;&nbsp;
+                <{button label="预览" id="btn_preview" }>
+            </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+//切换发送节点
+function changeSendType(el){
+   var eventType = el.value;
+   var action_flag = $('action_flag').value;
+   new Request.JSON({
+        url:"index.php?app=taoexlib&ctl=admin_sms_sample&act=getTmplConf",
+        method:"post",
+        data:{"event_type":eventType},
+        onComplete:function(rsp){
+        	if(action_flag == "edit"){
+        		//编辑模板 首次加载相应的title\content\sample_no
+        		$('action_flag').value = "";
+        	}else{
+        		$('title').value = rsp.title;
+                $('content').value = rsp.content;
+                $('sample_no').value = "";
+        	}
+
+            var html ='';
+            rsp.variables.each(function(item){
+                html += '<button style="margin:0" class="btn" p="'+item.id+'" str="'+item.value+'" type="button"><span><span><i class="btn-icon">';
+                if(item.img){
+                    html += '<img src="'+item.img+'"></i>';
+                }else{
+                    html += '<img src="<{$add_img}>"></i>';
+                }
+                html += item.name+'</span></span></button>';
+            });
+            $('sample_variables').setHTML(html);
+
+            //获取表单事件
+            $ES("#form-sample .btn").addEvent('click',function(event){
+                event.stop();
+                var id = this.get('p');
+                var html = this.get('str');
+                if(id!='recovery'){
+                    textareaEditor.replaceSelection(html);
+                }else{
+                    $E("#form-sample textarea[name='content']").set('value',html);
+                }
+            });
+        }
+   }).send();
+}
+
+window.addEvents({
+    'domready':function(){
+        textareaEditor ={
+            element:$E('#form-sample #content'),
+            initRange:function(){
+                this.element.focus();
+                if(!!document.selection) {
+                    var range=this.element.createTextRange();
+                    range.moveStart('character',this.element.value.length);
+                    range.collapse(true);
+                    range.select();
+                }
+            },
+            replaceSelection:function (text) {
+                var scrollTop=this.element.scrollTop;
+                if(!!document.selection) {
+                    this.element.focus();
+                    var range=this.range||document.selection.createRange();
+                    range.text=text;
+                }else if(!!this.element.setSelectionRange) {
+                    var selection_start=this.element.selectionStart;
+                    this.element.value=this.element.value.substring(0,selection_start)+text+this.element.value.substring(this.element.selectionEnd);
+                    this.element.setSelectionRange(selection_start+text.length,selection_start+text.length);
+                }
+                this.element.focus();
+                this.element.scrollTop=scrollTop;
+            }
+        };
+
+        $ES('#btn_preview').addEvent('click',function(event){
+            var cont = {};
+            cont['content'] = $('content').value;
+            cont['id'] = '<{$info.id}>';
+            new Dialog('index.php?app=taoexlib&ctl=admin_setting&act=preview',{
+                    width:450,
+                    title:'短信预览',
+                    height:400,
+                    ajaxoptions:{data:cont,method:'post'},
+                    modal:true,
+                    }
+                );
+        
+        });
+    }
+});
+(function(){
+	       
+        changeSendType($('send_type'));
+
+        var _form = $('form-sample');
+        var btn   = $('btn-branch');
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+        _form.store('target',{
+            onComplete:function(){},
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){
+                    }
+
+                    if(_dialogIns){
+                        finder.refresh.delay(400,finder);
+                        _dialogIns.close();
+
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+            _form.fireEvent('submit',{stop:$empty});
+        });
+    })();
+</script>
+<{/if}>

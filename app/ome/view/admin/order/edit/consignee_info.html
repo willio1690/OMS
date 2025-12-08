@@ -1,0 +1,46 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="delivery-info">
+  <tbody>
+    <tr>
+        <th>收货人：</th>
+        <td>
+            <span sensitive-field="ship_name"><{$order.consignee.name|ciphertext:'order','ship_name',$order.shop_type}></span>
+        </td>
+        <th>配送地址：</th>
+        <td>
+            <span><{$order.consignee.area|region}></span>
+            <span sensitive-field="ship_addr"><{$order.consignee.addr|ciphertext:'order','ship_addr',$order.shop_type}></span>
+        </td>
+        <th>手机：</th>
+        <td>
+            <span sensitive-field="ship_mobile"><{$order.consignee.mobile|ciphertext:'order','ship_mobile',$order.shop_type}></span>
+        </td>
+        <th>电话： </th>
+        <td>
+            <span sensitive-field="ship_tel"><{$order.consignee.telephone|ciphertext:'order','ship_tel',$order.shop_type}></span>
+        </td>
+    </tr>
+    <tr>
+        <th>送货时间：</th>
+        <td>
+            <span><{$order.consignee.r_time}>
+        </span>
+        <th>邮政编码：</th>
+        <td>
+            <span><{$order.consignee.zip}></span>
+        </td>
+        <th>Email地址：</th>
+        <td>
+            <span><{$order.consignee.email}></span>
+        </td>
+        <th>身份证：</th>
+        <td>
+            <span><{$order.certId}></span>
+        </td>
+    </tr>
+  </tbody>
+</table>

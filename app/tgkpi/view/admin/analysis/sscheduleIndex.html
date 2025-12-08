@@ -1,0 +1,113 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class='division'  id='sschedule'>
+	<h3>进度查询</h3>
+	<table>
+            <tbody>
+            <tr>
+                <td width	="55px">&nbsp;</td>
+                <td>
+                    <span style="font-size: 1.5em;font-weight: bold;">请输入快递单号：</span>(建议使用条码枪扫描)<br />
+                    <input type="text" id="logi_no" vtype="required" name="logi_no" style="margin-top: 10px;background: none repeat scroll 0 0 #FAFAFA;border: 2px solid #CCCCCC;border-radius: 10px 10px 10px 10px;color: #069CBC;font-size: 30px;height: 45px;line-height: 40px;margin-bottom: 10px;padding-left: 19px;width: 400px;" > <span style="color: red;"></span>
+                    <button type="button" id="btn" style="margin-top: -10px;margin-left: 25px;font-size:3.0em;font-weight: 700; height: 50px; width:120px;cursor: pointer;display: -moz-inline-stack;line-height: 40px;overflow: visible;text-decoration: none;vertical-align: middle;" ><span><span>确定</span></span></button>
+                </td>
+            </tr>
+            </tbody>
+	</table>
+</div>
+
+<div class='division' id='sschedule-result' style='width:50%;margin-left:54px;background-color:#c8c8c8;display:none'>
+	<!--查询结果-->
+	<table>
+		<caption>查询结果</caption>
+		<thead>
+			<th>操作时间</th>
+			<th>操作员</th>
+			<th>操作内容</th>
+		<thead>
+		<tbody>
+		</tbody>
+	</table>
+</div>
+<style>
+#sschedule-result table{
+	border-collapse: separate;
+	border-spacing: 5px;
+}
+#sschedule-result table caption{
+	 text-align: center;
+	 font-size: 25px;
+	 background-color:#d2d2d2;
+}
+#sschedule-result table thead th{
+	 text-align: center;
+	 font-size: 20px;
+}
+#sschedule-result table tbody tr {
+	 text-align: center;
+	 font-size: 18px;
+}
+#sschedule-result table tbody th {
+	 background-color:#d2d2d2;
+}
+</style>
+<script>
+window.addEvent('domready',function(){
+	$E('#sschedule #logi_no').focus();
+
+	function requestData(){
+		var el = $E('#sschedule #logi_no');
+		var value = el.getValue();
+		if (value=='')
+		{
+			el.focus();
+			return ;
+		}
+		new Request.JSON({
+			url:'index.php?app=tgkpi&ctl=admin_analysis_pick&act=sschedule',
+			method:'post',
+			data:{
+				logi_no:value
+			},
+			onSuccess:function(resp){
+				var table = $E('#sschedule-result table tbody'); 
+				if (resp.status=='fail')
+				{
+					html = "<tr><td><span style='color:#cc3300'>快递单号("+value+")</span>异常："+resp.msg+"</td></tr>";
+					table.setHTML(html);
+				}else if(resp.status=='succ'){
+					html = "";
+					resp.data.each(function(item){
+						html +="<tr>";
+						html += "<td>"+item.operate_time+"</td>";
+						html += "<td>"+item.op_name+"</td>";
+						html += "<td>"+item.memo+"</td>";
+						html += "</tr>";
+					});
+					table.setHTML(html);
+				}
+				var caption = "快递单号(<span style='color:#cc6600'>"+value+"</span>)发货进度"
+				$E('#sschedule-result table caption').setHTML(caption);
+				$E('#sschedule-result').show();
+				 el.set('value','');
+				 el.focus();
+			}
+		}).send();
+	}
+
+	$E('#sschedule #logi_no').addEvent('keyup',function(e){
+		if (e.code==13)
+		{
+			requestData();
+		}
+		
+	});
+
+	$E('#sschedule #btn').addEvent('click',function(e){
+		requestData();
+	});
+});
+</script>

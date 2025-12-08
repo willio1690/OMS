@@ -1,0 +1,29 @@
+<desktop>
+
+    <permissions>
+        <permission id="pick">拣货绩效</permission>
+    </permissions>
+
+    <workground name="绩效管理" id="performance"  order="1300" icon="icon-jixiaoguanli-01">
+        <menugroup name="任务分配/领取" en="task-allocate-receive">
+            <menu controller='admin_pick' action='index' permission='pick' display='true'>拣货</menu>
+        </menugroup>
+        <menugroup name="绩效统计" en="performance-statistics">
+            <menu controller='admin_analysis_pick' action='index' permission='pick' display='true' order='6000100'>拣货流水</menu>
+            <menu controller='admin_analysis' action='pick' permission='pick' display='true' order='6000110'>拣货统计</menu>
+            <menu controller='admin_analysis' action='check' permission='pick' display='true' order='6000110'>校验统计</menu>
+            <menu controller='admin_analysis' action='delivery' permission='pick' display='true' order='6000110'>发货统计</menu>
+            <menu controller='admin_analysis' action='reason' permission='pick' display='true' order='6000110'>校验失败原因统计</menu>
+            <menu controller='admin_analysis_pick' action='showCharts' permission='pick' display='true' target='_blank' order='6000120'>拣货日报</menu>
+            <menu controller='admin_analysis_check' action='showCharts' permission='pick' display='true' target='_blank' order='6000130'>校验日报</menu>
+        </menugroup>
+		<menugroup name='查询' en="query">
+            <menu controller='admin_analysis_pick' action='spickIndex' permission='pick' display='true' order='6000100'>拣货查询</menu>
+            <menu controller='admin_analysis_pick' action='sscheduleIndex' permission='pick' display='true' order='6000110'>进度查询</menu>
+		</menugroup>
+        <menugroup name='绩效配置' en="performance-config">
+            <menu controller='admin_setting' action='reason' permission='pick' display='true' order='7000100'>校验失败原因设置</menu>
+        </menugroup>
+    </workground>
+
+</desktop>

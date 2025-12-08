@@ -1,0 +1,18 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{input type="select" name="shop_mode" rows=$shopModeList valueColumn="key" labelColumn="label" value=$current_shop_mode id='shop_mode' value=$init.content.type required='true'}>
+
+<script>
+(function(){
+    function displayDetail(role) {
+            // new Request.HTML({
+            //     url : 'index.php?app=omeauto&ctl=order_type&act=ajax',
+            //     method : 'post',
+            //     update : $('shop_area')
+            // }).post('p[0]=shopmode&p[1]=getShopMode&p[2]='+$('shop_mode').value + '&p[3]='+role);
+    }
+})();
+</script>

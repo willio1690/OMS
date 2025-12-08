@@ -1,0 +1,22 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<script>
+    var itemData = <{$postIds}>;
+    var channel_id = "<{$channel.channel_id}>";
+    var request_uri = "<{$request_uri}>";
+    var after_print = 1;
+    var directNum = <{$directNum}>;
+
+    setTimeout('getloginopage()',1000);
+    function getloginopage() {
+        new Dialog('index.php?ctl=admin_receipts_print&act=async_logino_page&app=wms&channel_id='+channel_id+'&after_print='+after_print+'&itemIds='+encodeURIComponent(itemData)+'&directNum='+directNum+'&request_uri='+encodeURIComponent(request_uri),{width:700,height:180,title:'获取物流号',
+            onClose:function(){
+                self.close();
+            }
+        });
+    }
+
+</script>

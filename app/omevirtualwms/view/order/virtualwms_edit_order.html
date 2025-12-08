@@ -1,0 +1,439 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<style type="text/css">
+b{color:#FF0000;font:14px 宋体;padding:0 5px;}
+</style>
+<form action="index.php?app=omevirtualwms&ctl=admin_order&act=virtual_order_edit_save" method="post" >
+    <div class="gray_form" style="">
+	<h3>新建/编辑 订单</h3>
+	 <table  cellspacing="0" cellpadding="0" border="0">
+      <tbody>
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b>*</b>来源店铺：</td>
+        <td style="text-align: left;" >
+        <select name="orders[node_id]" onchange="getFxSelect(this);">
+	        <option value="">请选择...</option>
+			<{foreach from=$shopData item=v}>
+				<option value="<{$v.node_id}>" <{if $ordersData.shop_id == $v.shop_id}>selected<{/if}>><{$v.name}></option>
+			<{/foreach}>
+        </select>
+        <span id="shop_b2b_span"></span>
+        </td>
+        </tr>
+        <tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b>*</b>订单号：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[order_bn]" id='order_bn' value="<{$ordersData.order_bn}>" style="width:250px;">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b>*</b>商品信息：</td>
+        <td style="text-align: left;" >
+        <!--<a href="javascript:oc('order_objects_input');" style="color:green;font-weight:bold;line-height:25px;">展开/收起</a>-->
+		<div id = "order_objects_input">
+		<a href="javascript:addItem();" style="color:green;font-weight:bold;">+增加商品</a>
+		<{foreach from=$ordersData.order_objects item=o}>
+		<{foreach from=$o.order_items key=on item=oi}>
+		<div id="order_objects_input_item_<{$on}>">
+		销售物料编码：<input type="text" name="orders[order_items][bn][]" value="<{$oi.bn}>" style="">
+		数量：<input type="text" name="orders[order_items][nums][]" value="<{$oi.quantity}>" style="width:80px">
+		优惠金额：<input type="text" name="orders[order_items][pmt_price][]" value="<{$oi.pmt_price}>" style="width:80px">
+		成交金额：<input type="text" name="orders[order_items][sale_price][]" value="<{$oi.sale_price}>" style="width:80px">
+		<a href="javascript:delHTMLObject('order_objects_input_item_<{$on}>');" style='color:#FF0000;font-weight:bold;line-height:25px;'>-删除</a>
+		</div>
+		<{/foreach}>
+		<{/foreach}>
+		
+		</div>
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b>*</b>订单状态：</td>
+        <td style="text-align: left;" >
+        <select name="orders[status]">
+			<option value="active" selected <{if $ordersData.status == 'active'}>selected<{/if}>>活动订单</option>
+			<option value="dead" <{if $ordersData.status == 'dead'}>selected<{/if}>>已作废</option>
+			<option value="finish" <{if $ordersData.status == 'finish'}>selected<{/if}>>已完成</option>
+        </select>
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b>*</b>支付状态：</td>
+        <td style="text-align: left;" >
+        <select name="orders[pay_status]">
+			<option value="0" selected <{if $ordersData.pay_status == '0'}>selected<{/if}>>未支付</option>
+			<option value="1" <{if $ordersData.pay_status == '1'}>selected<{/if}>>已支付</option>
+			<option value="2" <{if $ordersData.pay_status == '2'}>selected<{/if}>>处理中</option>
+			<option value="3" <{if $ordersData.pay_status == '3'}>selected<{/if}>>部分付款</option>
+			<option value="4" <{if $ordersData.pay_status == '4'}>selected<{/if}>>部分退款</option>
+			<option value="5" <{if $ordersData.pay_status == '5'}>selected<{/if}>>全额退款</option>
+        </select>
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b>*</b>发货状态：</td>
+        <td style="text-align: left;" >
+        <select name="orders[ship_status]">
+			<option value="0" selected <{if $ordersData.ship_status == '0'}>selected<{/if}>>未发货</option>
+			<option value="1" <{if $ordersData.ship_status == '1'}>selected<{/if}>>已发货</option>
+			<option value="2" <{if $ordersData.ship_status == '2'}>selected<{/if}>>部分发货</option>
+			<option value="3" <{if $ordersData.ship_status == '3'}>selected<{/if}>>部分退货</option>
+			<option value="4" <{if $ordersData.ship_status == '4'}>selected<{/if}>>已退货</option>
+        </select>
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b>*</b>配送信息：</td>
+        <td style="text-align: left;" >
+        配送方式：<input type="text" name="orders[shipping][shipping_name]" value="<{$ordersData.shipping.shipping_name}>" style="">
+		配送价格：<input type="text" name="orders[shipping][cost_shipping]" value="<{$ordersData.shipping.cost_shipping}>" style="">
+		是否保价：<select name="orders[shipping][is_protect]">
+			<option value="true" selected <{if $ordersData.shipping.is_protect == 'true'}>selected<{/if}>>是</option>
+			<option value="false" <{if $ordersData.shipping.is_protect == 'false'}>selected<{/if}>>否</option>
+		</select>
+		
+		
+		保价价格：<input type="text" name="orders[shipping][cost_protect]" value="<{$ordersData.shipping.cost_protect}>" style="">
+		是否货到付款：<select name="orders[shipping][is_cod]">
+			<option value="true" selected <{if $ordersData.shipping.is_cod == 'true'}>selected<{/if}>>是</option>
+			<option value="false" <{if $ordersData.shipping.is_cod == 'false'}>selected<{/if}>>否</option>
+		</select>
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" >支付信息：</td>
+        <td style="text-align: left;" >
+        支付方式：<input type="text" name="orders[payinfo][pay_name]" value="<{$ordersData.payinfo.pay_name}>" style="">
+		支付费用：<input type="text" name="orders[payinfo][cost_payment]" value="<{$ordersData.payinfo.cost_payment}>" style="">
+		</select>
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>支付方式编号：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[pay_bn]" value="<{$ordersData.pay_bn}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>重量：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[weight]" value="<{$ordersData.weight}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>订单文字描述：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[title]" value="<{$ordersData.title}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>订单创建时间：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[createtime]" value="<{$ordersData.createtime}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b>*</b>收货人信息：</td>
+        <td style="text-align: left;">
+		
+		　收货人姓名：<input type="text" name="orders[consignee][name]" value="<{$ordersData.consignee.name}>" style=""><br />
+		收货人省市区：<{input app='ectools' type="region" name='orders[consignee][area]' value="{$ordersData.consignee.area}"}><br />
+		　　详细地址：<input type="text" name="orders[consignee][addr]" value="<{$ordersData.consignee.addr}>" style="width:400px;"><br />
+		　　　　邮编：<input type="text" name="orders[consignee][zip]" value="<{$ordersData.consignee.zip}>" style=""><br />
+		　　固定电话：<input type="text" name="orders[consignee][telephone]" value="<{$ordersData.consignee.telephone}>" style=""><br />
+		　　手机号码：<input type="text" name="orders[consignee][mobile]" value="<{$ordersData.consignee.mobile}>" style=""><br />
+		　　邮箱地址：<input type="text" name="orders[consignee][email]" value="<{$ordersData.consignee.email}>" style=""><br />
+		要求到货时间：<input type="text" name="orders[consignee][r_time]" value="<{$ordersData.consignee.r_time}>" style="">
+
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>发货人信息：</td>
+        <td style="text-align: left;" >
+		
+        　发货人姓名：<input type="text" name="orders[consigner][name]" value="" style=""><br />
+		发货人省市区：<{input app='ectools' type="region" name='orders[consigner][area]' value="{$ordersData.consigner.area}"}><br />
+		　　详细地址：<input type="text" name="orders[consigner][addr]" value="" style="width:400px;"><br />
+		　　　　邮编：<input type="text" name="orders[consigner][zip]" value="" style=""><br />
+		　　固定电话：<input type="text" name="orders[consigner][telephone]" value="" style=""><br />
+		　　手机号码：<input type="text" name="orders[consigner][mobile]" value="" style=""><br />
+
+        </td>
+        </tr>
+
+		<tr style="">
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>买家会员信息：</td>
+        <td style="text-align: left;" >
+		
+		买家登录帐号：<input type="text" name="orders[member_info][uname]" value="" style=""><br />
+        　　买家姓名：<input type="text" name="orders[member_info][name]" value="" style=""><br />
+		　支付宝帐号：<input type="text" name="orders[member_info][alipay_no]" value="" style=""><br />
+		　买家省市区：<{input app='ectools' type="region" name='orders[member_info][area]' value="{$ordersData.member_info.area}"}><br />
+		　　详细地址：<input type="text" name="orders[member_info][addr]" value="" style="width:400px;"><br />
+		　　　　邮编：<input type="text" name="orders[member_info][zip]" value="" style=""><br />
+		　　固定电话：<input type="text" name="orders[member_info][telephone]" value="" style=""><br />
+		　　手机号码：<input type="text" name="orders[member_info][mobile]" value="" style=""><br />
+		　　邮箱地址：<input type="text" name="orders[member_info][email]" value="" style=""><br />
+
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>订单优惠方案：</td>
+        <td style="text-align: left;" >
+		
+		<div id = "pmt_detail_input">
+		<a href="javascript:addPmtDetail();"  style="color:green;font-weight:bold;line-height:25px;">+增加优惠方案</a>
+		<{foreach from=$ordersData.pmt_detail key=pdk item=pdv}>
+		<div id="pmt_detail_input_item_<{$pdk}>">
+		优惠金额：<input type="text" name="orders[pmt_detail][pmt_amount][]" value="<{$pdv.pmt_amount}>" >
+		优惠描述：<input type="text" name="orders[pmt_detail][pmt_describe][]" value="<{$pdv.pmt_describe}>">
+		<a href="javascript:delHTMLObject('pmt_detail_input_item_<{$pdk}>');" style='color:#FF0000;font-weight:bold;line-height:25px;'>-删除</a>
+		</div>
+		<{/foreach}>
+		</div>
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>支付单信息：</td>
+        <td style="text-align: left;" >
+		
+		　　支付单号：<input type="text" name="orders[payments][0][trade_no]" value="" ><br />
+		　　支付金额：<input type="text" name="orders[payments][0][money]" value=""><br />
+		　　付款时间：<input type="text" name="orders[payments][0][pay_time]" value="" ><br />
+		　　收款帐号：<input type="text" name="orders[payments][0][account]" value=""><br />
+		　　收款银行：<input type="text" name="orders[payments][0][bank]" value=""><br />
+		支付方式编号：<input type="text" name="orders[payments][0][pay_bn]" value=""><br />
+		支付网关费用：<input type="text" name="orders[payments][0][paycost]" value=""><br />
+		　　支付帐号：<input type="text" name="orders[payments][0][pay_account]" value=""><br />
+		支付方式名称：<input type="text" name="orders[payments][0][paymethod]" value=""><br />
+		　　支付备注：<input type="text" name="orders[payments][0][memo]" value="">
+
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b>*</b>物料总额：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[cost_item]" value="<{$ordersData.cost_item}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b>*</b>是否含税：</td>
+        <td style="text-align: left;" >
+        <select name="orders[is_tax]">
+			<option value="true" selected <{if $ordersData.is_tax == 'true'}>selected<{/if}>>是</option>
+			<option value="false" <{if $ordersData.is_tax == 'false'}>selected<{/if}>>否</option>
+		</select>
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>税金：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[cost_tax]" value="<{$ordersData.cost_tax}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>发票抬头：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[tax_title]" value="<{$ordersData.tax_title}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>发票号：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[tax_no]" value="<{$ordersData.tax_no}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>货币类型：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[currency]" value="<{$ordersData.currency|default:'CNY'}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>汇率：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[cur_rate]" value="<{$ordersData.cur_rate}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>订单折扣：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[discount]" value="<{$ordersData.discount}>" style=""> 要给顾客便宜100元，则输入"-100";要提高订单价格100元，则输入"100".
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>商品促销优惠金额：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[pmt_goods]" value="<{$ordersData.pmt_goods}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>订单促销优惠金额：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[pmt_order]" value="<{$ordersData.pmt_order}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>订单总金额：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[total_amount]" value="<{$ordersData.total_amount}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>已支付金额：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[payed]" value="<{$ordersData.payed}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>买家留言：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[custom_mark]" value="" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>订单备注：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[mark_text]" value="" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>订单备注旗标：</td>
+        <td style="text-align: left;" >
+        <select name="orders[mark_type]">
+			<option value="b0" selected  <{if $ordersData.mark_type == 'b0'}>selected<{/if}>>灰色</option>
+			<option value="b1" <{if $ordersData.mark_type == 'b1'}>selected<{/if}>>红色</option>
+			<option value="b2" <{if $ordersData.mark_type == 'b2'}>selected<{/if}>>橙色</option>
+			<option value="b3" <{if $ordersData.mark_type == 'b3'}>selected<{/if}>>黄色</option>
+			<option value="b4" <{if $ordersData.mark_type == 'b4'}>selected<{/if}>>蓝色</option>
+			<option value="b5" <{if $ordersData.mark_type == 'b5'}>selected<{/if}>>紫色</option>
+			<option value="b6" <{if $ordersData.mark_type == 'b6'}>selected<{/if}>>粉红色</option>
+			<option value="b7" <{if $ordersData.mark_type == 'b7'}>selected<{/if}>>绿色</option>
+		</select>
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>订单最后修改时间：</td>
+        <td style="text-align: left;" >
+        <input type="text" name="orders[lastmodify]" value="<{$ordersData.outer_lastmodify|cdate:'FDATE_FTIME'}>" style="">
+        </td>
+        </tr>
+
+		<tr>
+        <td style="text-align: right;width:120px;font-weight:bold;" ><b></b>接收方式：</td>
+        <td style="text-align: left;" >
+        <select name="orders[real_time]">
+			<option value="false" selected>异步</option>
+			<option value="true">实时</option>
+		</select>
+        </td>
+        </tr>
+
+		<tr>
+        <td colspan=2 style="text-align:center;">
+		<{button label="保存订单" type="submit" id="btn-stockin"}>
+        </td>
+        </tr>
+
+
+
+      </tbody>
+    </table>
+    </div>
+</form>
+</div>
+<script language='javascript'>
+function oc(id){
+	var box = document.getElementById(id);
+	var display = 'block';
+	if(box.style.display == 'block'){
+		display = 'none';
+	}
+	box.style.display = display;
+}
+
+function addHTMLObject(id,html){
+	$E('#'+id).adopt(new Element('div').set('html',html).getFirst());
+}
+function delHTMLObject(id){
+	$(id).remove();
+}
+
+var ItemNums = 0;
+function addItem(){
+	ItemNums++;
+	var html = '<div id=\'item_'+ItemNums+'\'>销售物料编码：<input type=\'text\' name=\'orders[order_items][bn][]\' value=\'\'> 数量：<input type=\'text\' name=\'orders[order_items][nums][]\' value=\'\' style=\'width:80px\'> 优惠金额：<input type=\'text\' name=\'orders[order_items][pmt_price][]\' value=\'\' style=\'width:80px\'> 成交金额：<input type=\'text\' name=\'orders[order_items][sale_price][]\' value=\'\' style=\'width:80px\'> <a href=\"javascript:delHTMLObject(\'item_'+ItemNums+'\');\" style=\'color:#FF0000;font-weight:bold;line-height:25px;\'>-删除</a></div>';
+	addHTMLObject('order_objects_input',html);
+}
+var PmtDetailNums = 0;
+function addPmtDetail(){
+	PmtDetailNums++;
+	var html = '<div id=\'pmt_detail_'+PmtDetailNums+'\'>优惠金额：<input type=\'text\' name=\'orders[pmt_detail][pmt_amount][]\' value=\'\' > 优惠描述：<input type=\'text\' name=\'orders[pmt_detail][pmt_describe][]\' value=\'\'> <a href=\"javascript:delHTMLObject(\'pmt_detail_'+PmtDetailNums+'\');\" style=\'color:#FF0000;font-weight:bold;line-height:25px;\'>-删除</a></div>';
+	addHTMLObject('pmt_detail_input',html);
+}
+
+window.addEvent('domready', function() {
+    var edit = "<{$edit}>";
+    var shop_node_id = "<{$shop_node_id}>";
+    var option_value = "<{$ordersData.order_source}>";
+    if (edit) {
+        getFxSelectHtml(shop_node_id,option_value);
+    }
+});
+
+function getFxSelect(obj) {
+    var shop_node_id = obj.getValue();
+    getFxSelectHtml(shop_node_id,'');
+}
+
+function getFxSelectHtml(shop_node_id,option_value) {
+    if (!shop_node_id) {
+        return false;
+    }
+    var request = new Request(
+            {
+                url : 'index.php?app=omevirtualwms&ctl=admin_order&act=ajax_load_fx_select',
+                async : false,
+                method : 'post',
+                data : 'shop_node_id=' + shop_node_id+'&option_value='+option_value,
+                onComplete : function(shop_b2b_html) {
+                    $('shop_b2b_span').set('html', shop_b2b_html)
+                }
+            }).send();
+}
+
+</script>

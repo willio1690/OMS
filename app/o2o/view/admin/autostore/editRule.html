@@ -1,0 +1,86 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.gridlist tbody td.area_btns{padding-top:5px;}
+</style>
+
+<div class="tableform">
+    <h3>编辑规则<span style="color:red;">（<{$store_info.name}>）</span></h3>
+    <form method="POST" id='area_form' action="index.php?app=o2o&ctl=admin_autostore&act=doEditRule">
+        <input type="hidden" id="rule_id" name="rule_id" value="<{$rule_info.rule_id}>">
+        <input type="hidden" name="branch_id" value="<{$rule_info.branch_id}>">
+        <div class="division">
+            <table border="0" cellpadding="0" cellspacing="0" class="girdlist">
+                <tr >
+                    <th ><span style='color:red'>*</span>规则名称:</th>
+                    <td>
+                        <{input type="text" name="rule_name" id="rule_name" value=$rule_info.rule_name vtype="required"}><span id='chkrule_name' style='color:red'></span>
+                    </td>
+                </tr>
+                <tr >
+                    <th ><span style='color:red'>*</span>规则类型:</th>
+                    <td>
+                        <{foreach from=$rule_types item=item}>
+                            <input type="radio" name="rule_type" class="rule_type" value="<{$item.type}>" <{if $rule_info.rule_type == $item.type}>checked="checked"<{/if}>><{$item.name}>
+                        <{/foreach}>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <div id="rule_content">
+        </div>
+
+        <div class="table-action">
+            <{button type="button" label="保存" id="create_rule_save" }>
+             &nbsp; <{button label="关闭" id="create_rule_cancle" class="btn btn-secondary" onclick="javascript:void(window.close());"}>
+        </div>
+    </form>
+</div>
+
+<script>
+    $ES('.rule_type').each(function(item){
+        item.addEvent('click',function(e){
+            new Request.HTML({
+                url:"index.php?app=o2o&ctl=admin_autostore&act=getTmplByType",
+                data:'type='+this.value+'&rule_id='+$('rule_id').value,
+                method:'post',
+                update:'rule_content',
+            }).send();
+        })
+    });
+
+    $ES('.rule_type').each(function(item){
+        if(item.checked){
+            item.fireEvent('click');
+        }
+    });
+
+    $('create_rule_save').addEvent('click',function(e){
+        var _this=this;
+        var form=this.getParent('form');
+
+        form.store('target',{
+            onRequest:function(){
+                _this.disabled=true;
+            },
+            onComplete:function(jsontext){
+                try{
+                    var json = JSON.decode(jsontext);
+                    if (typeof(json.error)!='undefined'){
+                        _this.disabled=false;
+                    }else{
+                        _this.disabled=true;
+                        if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                        setTimeout('window.close()',200);
+                    }
+                }catch(e){}
+            }
+        });
+        
+        form.fireEvent('submit',e);
+    });
+</script>

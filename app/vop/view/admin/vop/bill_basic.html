@@ -1,0 +1,137 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+    <table class="gridlist">
+    <thead>
+        <tr>
+           
+            <th></th>
+
+            <th>采购结算数量</th>
+            <th>采购结算金额(不含税)</th>
+            <th>税率</th>
+            <th>税额</th>
+            <th>采购结算金额(含税)</th>
+
+        </tr>
+    </thead>
+    <tbody id="dataNode">
+       
+        <tr>
+            <th>本期销售</th>
+            <th><{$goods.CR_CUST.total_quantity}></th>
+            <th><{$goods.CR_CUST.sum_bill_amount}></th>
+            <th></th>
+            <th><{$goods.CR_CUST.rate_amount}></th>
+            <th><{$goods.CR_CUST.total_bill_amount}></th>
+
+          
+        </tr>
+          <tr>
+            <th>本期客退</th>
+            <th><{$goods.DR_CUST.total_quantity}></th>
+            <th><{$goods.DR_CUST.sum_bill_amount}></th>
+            <th></th>
+            <th><{$goods.DR_CUST.rate_amount}></th>
+            <th><{$goods.DR_CUST.total_bill_amount}></th>
+
+          
+        </tr>
+        <tr>
+            <th>本期其他</th>
+            <th><{$goods.OTHER.total_quantity}></th>
+            <th><{$goods.OTHER.sum_bill_amount}></th>
+            <th></th>
+            <th><{$goods.OTHER.rate_amount}></th>
+            <th><{$goods.OTHER.total_bill_amount}></th>
+
+          
+        </tr>
+          <tr>
+            <th>活动折扣优惠</th>
+           
+            <th></th>
+            <th><{$discounts.dis_total_amount}></th>
+            <th></th>
+            <th><{$discounts.rate_amount}></th>
+             <th><{$discounts.dis_amount}></th>    
+          
+        </tr>
+         <tr>
+            <th>会员价保</th>
+           
+            <th></th>
+            <th><{$insures.insure_total_amount}></th>
+            <th></th>
+            <th><{$insures.rate_amount}></th>
+            <th><{$insures.insure_amount}></th>        
+          
+        </tr>
+
+        <tr>
+            <th>调整项</th>
+           
+            <th></th>
+            <th></th>
+            <th></th>        
+            <th></th>
+            <th></th>      
+        </tr>
+        <tr>
+            <th>退货差异</th>
+           
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th><{$details.reship_amount}></th>        
+          
+        </tr>
+        <tr>
+            <th>客服特殊退款-仅退款</th>
+           
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th><{$details.refund_amount}></th>        
+          
+        </tr>
+        <tr style="background-color: #ccffff">
+            <th>【开票金额合计】</th>
+           
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <th>预付款</th>
+           
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        
+        <tr style="background-color: #ccffff">
+            <th>【结算金额合计】</th>
+           
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th><{$total_amount}></th>
+        </tr>
+       
+      
+    </tbody>
+    </table>
+</div>
+
+

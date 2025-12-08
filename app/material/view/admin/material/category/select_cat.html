@@ -1,0 +1,59 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class=" selectBox">
+ 
+      <div class="" style="padding:10% 0 0 20%;">
+        请选择要复制扩展属性的分类：<{input id="copy_cat_id" type="select" options=$categorys }>
+      </div>     
+      
+</div>
+ 
+<{area inject='.mainFoot'}>
+<div class="table-action">
+    <{button label=$___b2c="确定"|t:'b2c' id="do_copy"  type="button" class="selectbtn"}>
+</div>
+<{/area}>
+
+<script>
+(function(){
+
+    var btn = $('do_copy')
+    var dialog = btn.getParent('.dialog').retrieve('instance');
+
+    btn.addEvent('click',function(e){    
+  
+        var copy_cat_id = $('copy_cat_id').get('value');
+        if( ! copy_cat_id){
+            alert("请选择要复制的分类");
+            return false; 
+        }
+        
+        var _url = 'index.php?app=material&ctl=admin_material_cat&act=copy_cat_prop&cat_id='+copy_cat_id;
+        var _data = 'new_propety_i='+new_propety_i;
+        new Request({
+            url : _url,
+            method : 'get',
+            data : _data,
+            onSuccess : function(responseText){
+                //alert(responseText);
+                try{
+                    var data = JSON.decode(responseText);
+                    data.each(function(item, index){
+                        new_propety_i ++;
+                        var newRow = new Element('tr.property_tr_li',{html:item}).inject($('property_list'));
+                    });
+                }catch(e){
+                    alert("服务器发生了内部错误:"+responseText); 
+                }
+            }
+        }).send();
+   
+        dialog.close();
+        
+    });
+     
+})();
+</script>

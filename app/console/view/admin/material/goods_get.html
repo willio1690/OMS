@@ -1,0 +1,141 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .processBarBg {
+        border: 1px solid #999999;
+        width: 98%;
+        margin: 5px;
+        height: 25px;
+        line-height: 25px;
+        padding: 1px;
+        background: #EEEEEE;
+    }
+    .processBar {
+        background: #3366cc;
+        width: 0px;
+        padding-bottom: 1px;
+        overflow: hidden;
+    }
+</style>
+<div class="division">
+    <table class="tableform">
+        <tbody>
+            <tr>
+                <th>仓库:</th>
+                <td>
+                    <select name="branch_id" id="branch_id">
+                        <{foreach from=$branches item=item}>
+                            <option value="<{$item.branch_id}>"><{$item.name}></option>
+                        <{/foreach}>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>修改时间:</th>
+                <td>
+                    <{input type="date" id="start_time" name="start_time" value=$pre_time}>~<{input type="date" id="end_time"  name="end_time" value=$now_time}>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="division">
+    <h4>当前共<span id="mtotal"></span>个基础物料</h4>
+    <div class="division" style="display:none;" id="information">
+        已经处理 <span id="iTotal" style="color:#083E96"></span> 个基础物料，<br/>
+        其中 <span id="iFail" style="color:#083E96"></span> 个基础物料未匹配到，<br/>
+    </div>
+    <div id="processBarBg" class="processBarBg">
+        <div id="processBar" class="processBar">
+            &nbsp;
+        </div>
+    </div>
+    <div class="table-action">
+        <{button label="开始" class="btn-primary" name="Start" id="btn-run"}>
+        <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true" }>
+    </div>
+    <div id="showError"></div>
+</div>
+
+<{if $notice}><div class="notice"><{$notice}></div><{/if}>
+
+<script>
+    (function(){
+        $('btn-run').addEvent('click', function(){
+            doRun();
+        });
+        var doTotal, doFail, total, branchId, startTime, endTime;
+        function doRun(){
+            //禁用开始按钮
+            doTotal = total = doFail = 0;
+            displayProcessInfo();
+            $('information').style.display ='';
+            $('btn-run').disabled = true;
+            $('btn-run').set('html', '<span><span>数据处理中，请稍候！</span></span>');
+            branchId = $('branch_id').value;
+            startTime = $('start_time').value;
+            endTime = $('end_time').value;
+            doAjaxProcess('');
+        }
+
+        /**
+         * 执行一次AJAX调用
+         */
+        function doAjaxProcess(scrollId) {
+            new Request({url:'index.php?app=console&ctl=admin_goodssync&act=ajaxGoodsGet',
+                method:'post',
+                data: {
+                    scrollId: scrollId,
+                    branchId: branchId,
+                    startTime: startTime,
+                    endTime: endTime
+                },
+                onComplete:function(result){
+                    if(!result) {
+                        $('showError').setHTML('可能超时了，请重试');
+                        return;
+                    }
+                    var ret = JSON.decode(result);
+                    if(ret['err_msg']) {
+                        $('showError').setHTML(ret['err_msg']);
+                        return;
+                    }
+                    var scrollId = ret['scrollId'];
+                    total = ret['total'];
+                    doTotal += ret['itotal'];
+                    doFail += ret['ifail'];
+                    displayProcessInfo();
+                    if(scrollId) {
+                        $('processBar').setStyle('width', (doTotal*100/(total)) + '%');
+                        doAjaxProcess(scrollId);
+                    } else {
+                        $('processBar').setStyle('width', '100%');
+                        // 判断是否弹框
+                        var dailogEl = $('btn-run').getParent('.dialog')
+                        if ($defined(dailogEl)) {
+                            var dailog = dailogEl.retrieve('instance');
+
+                            dailog.close.delay(3000,dailog);
+
+                            <{if $env.get.finder_id}>
+                                finderGroup['<{$env.get.finder_id}>'].refresh.delay(3000,finderGroup['<{$env.get.finder_id}>']);
+                            <{/if}>
+                        }
+                    }
+                }
+            }).send();
+        }
+
+        /**
+         * 显示信息进度
+         */
+        function displayProcessInfo() {
+            $('iTotal').set('html', doTotal);
+            $('iFail').set('html', doFail);
+            $('mtotal').set('html', total);
+        }
+    }());
+</script>

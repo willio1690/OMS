@@ -1,0 +1,113 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="<{$organization_item_action_url}>" id="organization_item_form">
+            <input type="hidden" name="org_id" value="<{$org_info.org_id}>">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tbody>
+                <tr>
+                    <th><em class="c-red">*</em> 组织编码：</th>
+                    <td><input type="text" id="org_no" name="org_no" vtype="required" <{if $org_info.org_no}> value="<{$org_info.org_no}>"<{/if}> />
+                     <{help}><{t}>15个字符以内<{/t}><{/help}></td>
+                </tr>
+                <tr>
+                    <th><em class="c-red">*</em> 组织名称：</th>
+                    <td><input type="text" id="org_name" name="org_name" vtype="required" <{if $org_info.org_name}> value="<{$org_info.org_name}>"<{/if}>>
+                     <{help}><{t}>15个字符以内<{/t}><{/help}></td>
+                </tr>
+                <tr class="bind_store" style="display:none;">
+                    <th><em class="c-red">*</em> 选择门店：</th>
+                    <td>
+                        <{input type='object' object='store@o2o' multiple=false breakpoint='0' name='bind_store[store_id]' value=$bind_store.store_id}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>所属上级：</th>
+                    <td>
+                        <{input type='organization' app='organization' name="organizationSelected" value=$org_info.org_parents_structure required="true" prop_type=1}>
+                        <{help}><{t}>如不做选择 视为最高级<{/t}><{/help}>
+                    </td>
+                </tr>
+                <tr>
+                    <th><em class="c-red">*</em> 状态：</th>
+                    <td>
+                        <input type="radio" name='status' value=1 <{if $org_info.status == 1}> checked<{/if}>>启用&nbsp;&nbsp;
+                        <input type="radio" name='status' value=2 <{if $org_info.status == 2}> checked<{/if}>>停用
+                    </td>
+                </tr>
+            </tbody>
+            </table>
+
+            <div class="table-action">
+                <{button type="submit" class="filterBtn btn-thirdly" label="确定" id="submitGropItemForm"}>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+(function(){
+    
+$('submitGropItemForm').addEvent("click",function(e){
+    
+    var org_no = $('org_no').value.trim();
+    var org_name = $('org_name').value.trim();
+    if(!org_no || !org_name){
+        MessageBox.error('组织编码或名称不能为空');
+        e.stop();
+        return;
+    }
+    
+    var reg = /^[\w]+$/;//只能输入数字字母下划线
+    if(!reg.test(org_no)){
+        MessageBox.error('组织编码只能输入数字、字母和下划线');
+        e.stop();
+        return;
+    }
+    
+    var org_no_length = org_no.length;
+    var org_name_length = org_name.length;
+    if(org_no_length>15 || org_name_length>15){
+        MessageBox.error('组织编码或名称不能超过15字符');
+        e.stop();
+        return;
+    }
+        
+    var status = '';
+    $$('[name=status]').each(function(item){
+        if (item.checked) status = item.value;
+    });
+    if(!status){
+        MessageBox.error('请选择状态');
+        e.stop();
+        return;
+    }
+        
+    $('organization_item_form').fireEvent('submit',new Event(event));
+
+});
+
+
+$('organization_item_form').store('target',{
+    onRequest:function(){
+       $('submitGropItemForm').set('disabled', 'true');
+    },
+    onComplete:function(jsontext){
+       var json = Json.evaluate(jsontext);
+       if (typeof(json.error) != 'undefined'){
+           $('submitGropItemForm').set('disabled', '');
+       }else{
+           $('submitGropItemForm').set('disabled', 'true');
+           $('organization_item_form').getParent('.dialog').retrieve('instance').close();
+           window.location.reload();
+       }
+    }
+});
+
+
+})();
+</script>

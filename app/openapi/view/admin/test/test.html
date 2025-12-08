@@ -1,0 +1,47 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division" style="float:left;width:50%;">
+    <div id="openapi-name-list">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" class='tableform'>
+            <tr>
+                <th>接口选择：</th>
+                <td>
+                    <select id="apiName" name="apiName" onchange="selectDiv(this.value)">
+                        <option value="0">--请选择接口</option>
+                        <{foreach from=$list item=item}>
+                            <option value="<{$item}>"><{$item}></option>
+                        <{/foreach}>
+                    </select>
+                </td>
+                <td>Onex Oms数据接口开发文档：<a target="_blank" href="https://top.shopex.cn/ecos/tpl/OmsOpenAPIDocument.rar">下载</a></td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="openapi-form-page"></div>
+</div>
+
+<div>
+<h3>返回结果：</h3>
+<textarea id="resultarea" readonly="readonly" rows="3" cols="20" style="height:300px; width:500px;"></textarea>
+</div>
+    
+
+
+<script language="javascript" type="text/javascript">
+function selectDiv(val){
+    // W.page('index.php?app=openapi&ctl=admin_test&act=ajaxResult',{data:{'apiName':val},update:'openapi-form-page'});
+    new Request.HTML({
+        url:'index.php?app=openapi&ctl=admin_test&act=ajaxResult',
+        method:'post',
+        update:$('openapi-form-page'),
+        data:{'apiName':val},
+        onSuccess:function(){
+            $('resultarea').empty();
+        }
+    }   ).send();
+}
+</script>

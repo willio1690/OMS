@@ -1,0 +1,92 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.shop-name{
+    color:red;font-weight:bold;
+}
+.rules{
+  margin-bottom: 5px;
+}
+.rules select{
+  margin-right: 5px;
+}
+.rule_tr{
+  margin: 10px 0;
+}
+</style>
+<div class="tableform">
+  <div class="division">
+    <form method="post" action="index.php?app=financebase&ctl=admin_shop_settlement_fee_type&act=save" id="form-rule">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" id="rule-section">
+        <tbody>
+          <tr>
+            <th><em class="c-red">*</em>店铺：</th>
+            <td>
+              <select id="shop_id" name="shop_id" vtype="required">
+                <option value="">选择店铺</option>
+                <{foreach from=$shop_list key=key item=item}>
+                  <option value="<{$item.shop_id}>_<{$item.shop_type}>" date-type=""><{$item.name}></option>
+                <{/foreach}>
+              </select>
+              
+             </td>
+          </tr>
+          <tr>
+            <th><em class="c-red">*</em> 收支分类：</th>
+            <td>
+                <{input type="object" object="bill_category_rules@financebase" breakpoint=100 name="rule_id"}>
+                <span class="c-red">对应收支分类设置</span>
+            </td>
+          </tr>
+
+          <tr>
+            <th><em class="c-red">*</em> 资金流向：</th>
+            <td>
+              <select name="bill_type" vtype="required">
+                <option value="0">收入</option>
+                <option value="1">支出</option>
+              <select>
+              <span class="c-red">配置只有金额为0才起效，金额为正即收入，金额为负即支出。</span>
+            </td>
+          </tr>
+          
+          </table>
+         
+
+      <div class="table-action">
+        <{button label="提交" type="submit" name="submit" id="btn-rule"}> &nbsp;&nbsp;
+        <{button label="关闭" isCloseDialogBtn="true" class="btn-secondary" type="button"}>
+      </div>
+   
+    </form>
+  </div>
+</div>
+<script>
+$('form-rule').store('target',{
+    onRequest:function(){
+       $('btn-rule').set('disabled', 'true');
+       
+    },
+    onComplete:function(jsontext){
+       var json = Json.evaluate(jsontext);
+       if (typeof(json.error) != 'undefined'){
+           $('btn-rule').set('disabled', '');
+       }else{
+           $('btn-rule').set('disabled', 'true');
+           finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+           $('form-rule').getParent('.dialog').retrieve('instance').close();
+       }
+    }
+});
+
+tail.select('select[name="rule_id"]', {
+  search: true,
+  // width: 150,
+  height: 200,
+  searchMinLength: 0,
+});
+
+</script>

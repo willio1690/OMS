@@ -1,0 +1,560 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<style>
+    .notice-inline.error  {background-image:none;margin-left:25px}
+    .luckybag_hr {height:12px;margin-top:10px}
+    .luckybag_title {height:30px;line-height:30px}
+    .luckybag_title_name {float:left}
+    .luckybag_title_del {float:left;cursor:pointer;color:blue;margin-left:6px}
+    .luckybag_title_material {float:right}
+    .luckybag_table {margin:4px 0;}
+    .luckybag_table_operation_th {width:50px;}
+    .luckybag_rule {height:30px}
+</style>
+<div class="form-layout">
+<form method="post" id="sales_material_form" action="index.php?app=dealer&ctl=admin_material_sales&act=toAdd&view=<{$view}>" >
+    <div class="form-layout-block">
+        <h3>新建销售商品</h3>
+        <div class="form-layout-fields form-layout-fields-column">
+            <div class="form-field">
+                <span class="form-field-label">销售商品编码：</span>
+                <input class="form-input" placeholder="请输入商品编码" type="text" name="sales_material_bn" vtype="required" onkeyup="value=value.replace(/[^A-Za-z0-9_-]/ig,'')" /><span style="color:red;">*</span>
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">销售商品名称：</span>
+                <input class="form-input" placeholder="请输入商品名称" type="text" name="sales_material_name" vtype="required" /><span style="color:red;">*</span>
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">商品类型：</span>
+                <div class="form-radios">
+                    <input id="type1" type="radio" name="sales_material_type" value="1" checked="checked"/>
+                    <label for="type1">普通</label>
+                    <input id="type2" type="radio" name="sales_material_type" value="2" />
+                    <label for="type2">组合</label>
+                    <input id="type3" type="radio" name="sales_material_type" value="3" />
+                    <label for="type3">赠品</label>
+                </div>
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">所属经销店铺：</span>
+                <select class="form-input"  id="shop_id" name="shop_id">
+                    <{foreach from=$shops item=shop}>
+                    <option value="<{$shop.shop_id}>" ><{$shop.name}></option>
+                    <{/foreach}>
+                </select>
+                <span id="shop_text" style="display:none;">全部店铺</span>
+            </div>
+
+            <div class="form-field" id="bind_basic_material">
+                <span class="form-field-label">关联基础商品：</span>
+                <{if $hasBm}>
+                    <{input class='form-input' type='material_object' object='basic_material@material' breakpoint='0' name='bm_id' textcol='material_name' value=$data.pgid callback='material_object_callback' replacehtml=$replacehtml emptytext='选取基础商品' style='float:left;width:200px;' filter=$bm_filter}>
+                <{else}>
+                    <span style="color:red;">没有基础物料权限</span>
+                <{/if}>
+            </div>
+        </div>
+    </div>
+    <div class="form-layout-block" id="promotion_items" style="margin-top:10px;display:none">
+        <h3>组合关联基础商品</h3>
+        <div class="form-layout-fields form-layout-fields-column">
+            <div class="form-field"><{button label="商品库频道" id="material-find-btn" }></div>
+            <table class="gridlist" id="material_table"  style="margin:4px 0;">
+                <thead>
+                <tr>
+                    <th>编码</th>
+                    <th style="width:240px;">名称</th>
+                    <th>成本价</th>
+                    <th>数量</th>
+                    <th>组合价格贡献占比(1-100数值)</th>
+                    <th style="width:30px;">删除</th>
+                </tr>
+                </thead>
+                <tbody id="dataNode">
+                <tr>
+                    <td colspan="6" style="padding:0;"><div class="note" style="margin:0;"> 暂无商品信息 </div></td>
+                </tr>
+                </tbody>
+            </table>
+            <div align="right">
+                <{button type="button" id="material-compute-rate" label="按成本价计算贡献比" }>&nbsp;&nbsp;<{button type="button" id="material-delall-btn" label="全部删除" }>
+            </div>
+        </div>
+    </div>
+    <div class="form-layout-block" id="gift_items" style="margin-top:10px;display:none">
+        <h3>赠品关联基础商品</h3>
+        <div class="form-layout-fields form-layout-fields-column">
+            <div class="form-field"><{button label="基础商品列表" id="gift-material-find-btn" }></div>
+            <table class="gridlist" id="material_table" style="margin:4px 0;">
+                <thead>
+                <tr>
+                    <th>编码</th>
+                    <th style="width:240px;">名称</th>
+                    <th>成本价</th>
+                    <th>数量</th>
+                    <th style="width:30px;">删除</th>
+                </tr>
+                </thead>
+                <tbody id="gift_dataNode">
+                <tr>
+                    <td colspan="6" style="padding:0;">
+                        <div class="note" style="margin:0;"> 暂无商品信息</div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div align="right">
+                &nbsp;&nbsp;<{button type="button" id="gift-material-delall-btn" label="全部删除" }>
+            </div>
+        </div>
+    </div>
+    <div class="form-layout-block">
+        <div id="cc" class="noprint table-action">
+            <{button type="button" id="sales_material_btn" label="保 存"}> &nbsp;
+            <{button class="btn-secondary" label="取消" id="cancel-btn"}>
+        </div>
+    </div>
+</form>
+</div>
+<script>
+
+(function(){
+    $('cancel-btn').addEvent('click',function(){
+        W.page('index.php?app=dealer&ctl=admin_material_sales&act=index&view=<{$view}>&finder_vid=<{$finder_vid}>');
+    });
+    window.addEvent('domready', function() {
+        $ES('input[name=sales_material_type]').each(function(item){
+            item.addEvent('click',function(e){
+                $('promotion_items').setStyle('display','none');
+                $('gift_items').setStyle('display','none');
+                
+                if(this.value == '1'){ //普通
+                    $('bind_basic_material').setStyle('display','table-row');
+         
+                    $('shop_id').setStyle('display', 'block');
+                    $('shop_text').setStyle('display', 'none');
+                 
+                }else{ //组合
+                    if (this.value == '3') { //赠品
+                        // 赠品关联基础商品div打开
+                        $('gift_items').setStyle('display', 'block');
+                    }else{ //促销
+                        $('promotion_items').setStyle('display','block');
+                    }
+                    
+                    $('bind_basic_material').setStyle('display','none');
+                    $('shop_id').setStyle('display','block');
+                    $('shop_text').setStyle('display','none');
+                }
+            })
+        });
+        var material_type = $$('input[name=sales_material_type]:checked').get('value');
+
+        var callurl='index.php?app=material&ctl=admin_material_basic&act=getMaterial',store=[],bmStore=[],giftStore=[];
+        var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=material&ctl=admin_material_basic&act=findMaterial&filter=<{$bm_filter}>');
+        //组合
+        var tpl='<tr key="{bm_id}" id="bm_{bm_id}" title="点击选取/反选此条记录">'
+            +'  <td>{material_bn}</td><td class="material-name">{material_name}</td><td>{cost}</td>'
+            +'  <td><input type="text" value="{num}" key="num" vtype="number&amp;&amp;required" tname="at[_PRIMARY_]" size="6"></td>'
+            +'  <td><input type="text" vtype="number&amp;&amp;required" tname="pr[_PRIMARY_]" key="rate" value="{rate}" id="rate_{bm_id}" size="5"></td>'
+            +'  <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>'
+            +'</tr>';
+
+        var gift_tpl = '<tr key="{bm_id}" id="bm_{bm_id}" title="点击选取/反选此条记录">' +
+            '<td>{material_bn}</td>' +
+            '<td class="material-name">{material_name}</td>' +
+            '<td>{cost}</td>' +
+            '<td><input type="text" value="{num}" key="num" vtype="number&amp;&amp;required" tname="at[_PRIMARY_]" size="6"></td>' +
+            '<td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>' + 
+            '</tr>';
+
+        $('material-find-btn').addEvent('click',function(e){
+            new finderDialog(url,{params:{url:callurl,name:'bm_id[]'},width:1000,height:660,
+                onCallback:function(rs){
+                    if(!rs)return;
+                    rs=JSON.decode(rs);
+                    init(rs);
+                }
+            });
+        });
+
+        $ES("input[name=pickone_select_type]").addEvent("change",function(e){
+            if(this.value == "2"){ //排序
+                $$(".sort_column").setStyle('display','block');
+            }else{ //随机
+                $$(".sort_column").setStyle('display','none');
+            }
+        });
+
+        var pag,rows,giftPag;
+        function emptyData(){
+            var noData='<tr>'
+                +'<td colspan="8" style="padding:0;"><div class="note" style="margin:0;"> 暂无商品信息 </div></td>'
+                +'</tr>';
+            $('dataNode').set('html',noData);
+        }
+
+        function createProduct(data){
+            pag=new PageData(tpl,data,{'updateMain':$('dataNode'),'pageNum':100,PRIMARY_ID:'bm_id',
+            'onShow':function(){
+                 var _this=this;
+                 $$('#dataNode input[type]').addEvent('change',function(e){
+                     var pid=this.getParent('tr').get('key'),value=this.value;
+
+                    _this.editData(pid,[this.get('key'),value]);
+                });
+
+                rows=$ES('#dataNode tr');
+                rows.each(function(item,i){
+                    item.addEvent('click',function(e){
+                        this.toggleClass('selected');
+                    });
+                    item.getElement('.btn-delete-item').addEvent('click',function(e){
+                        if(_this.selectData(item.get('key')) && confirm('确定要删除 '+ _this.selectData(item.get('key'))['material_name'] +' 吗？')) _this.delData(item.get('key'));
+                        if(!$E('#dataNode tr')) emptyData();
+                    });
+                    item.getElement('input[tname^=at]').addEvent('keypress',function(e){
+                        if(e.code==13) $E('#pfba input').focus();
+                    });
+                });
+
+                if(this.data.length) rows[0].getElement('input[key^=num]').focus();
+
+               $ES('.material-name').removeEvent('mouseover').addEvent('mouseover',function(e){
+                if (this.get('visibility')=='false')
+                {
+                 var e  = new Event(e), el = e.target;
+                 visiTips.attach(el);
+                 el.addEvent('mouseleave',function(){
+                  this.removeClass('active');
+                 });
+                 el.fireEvent('mouseenter',e);
+                }
+                });
+            }
+            });
+        }
+
+        // 赠品按钮点击触发
+        $('gift-material-find-btn').addEvent('click', function (e) {
+            new finderDialog(url, {
+                params: {url: callurl, name: 'bm_id[]'}, width: 1000, height: 660,
+                onCallback: function (rs) {
+                    if (!rs) return;
+                    rs = JSON.decode(rs);
+                    init(rs,'gift');
+                }
+            });
+        });
+
+        function createGiftProduct(data) {
+            giftPag = new PageData(gift_tpl, data, {
+                'updateMain': $('gift_dataNode'), 'pageNum': 100, PRIMARY_ID: 'bm_id',
+                'onShow': function () {
+                    var _this = this;
+
+
+                    $$('#gift_dataNode input[type]').addEvent('change', function (e) {
+                        var pid = this.getParent('tr').get('key'), value = this.value;
+
+                        _this.editData(pid, [this.get('key'), value]);
+                    });
+
+                    rows = $ES('#gift_dataNode tr');
+                    rows.each(function (item, i) {
+                        item.addEvent('click', function (e) {
+                            this.toggleClass('selected');
+                        });
+                        item.getElement('.btn-delete-item').addEvent('click', function (e) {
+                            if (_this.selectData(item.get('key')) && confirm('确定要删除 ' + _this.selectData(item.get('key'))['material_name'] + ' 吗？')) _this.delData(item.get('key'));
+                            // compute(item);
+                            if (!$E('#gift_dataNode tr')) emptyGiftData();
+                        });
+                        item.getElement('input[tname^=at]').addEvent('keypress', function (e) {
+                            if (e.code == 13) $E('#pfba input').focus();
+                        });
+                    });
+
+                    if (this.data.length) rows[0].getElement('input[key^=num]').focus();
+
+                    $ES('.material-name').removeEvent('mouseover').addEvent('mouseover', function (e) {
+                        if (this.get('visibility') == 'false') {
+                            var e = new Event(e), el = e.target;
+                            visiTips.attach(el);
+                            el.addEvent('mouseleave', function () {
+                                this.removeClass('active');
+                            });
+                            el.fireEvent('mouseenter', e);
+                        }
+                    });
+                }
+            });
+        }
+
+        // 赠品全部删除
+        if ($('gift-material-delall-btn')) {
+            $('gift-material-delall-btn').addEvent('click', function (e) {
+                if (!giftPag || !giftPag.data) return;
+                var delarr = [];
+                giftPag.data.each(function (d) {
+                    delarr.push(d['bm_id']);
+                });
+                if (confirm('确认删除全部商品吗？')) {
+                    delProduct(giftPag, delarr);
+                    emptyGiftData();
+                }
+            });
+        }
+
+        // 赠品关联商品清空时显示
+        function emptyGiftData() {
+            var noData = '<tr>'
+                + '<td colspan="8" style="padding:0;"><div class="note" style="margin:0;"> 暂无商品信息 </div></td>'
+                + '</tr>';
+            $('gift_dataNode').set('html', noData);
+        }
+
+        // 基础商品选择初始化函数
+        function init(rs,sm_type = 'pkg'){
+            // 根据销售商品类型,对全局变量store的内容做调整
+            if (sm_type == 'gift') {
+                store = giftStore;
+            }else{
+                store = bmStore;
+            }
+            
+            // 同已有bm对比,进行去重
+            var tmparr=findProduct(rs,'bm_id');
+             store.unshift.apply(store,tmparr.reverse());
+             // var brandHtml = '';
+             // store.each(function(item) {
+             //    if(item.brand_name) {
+             //      brandHtml += '<option value="'+item.brand_id+'">'+item.brand_name+'</option>';
+             //    }
+             // });
+             // if(brandHtml) {
+             //   $('brand').setHTML(brandHtml);
+             // }
+             
+            // 不同的销售商品类型调用不同的函数,并保存store数据至类型变量
+            if(sm_type == 'gift'){
+                createGiftProduct(store);
+                giftStore = store;
+            }else{
+                createProduct(store);
+                bmStore = store;
+            }
+             
+        }
+
+        function findProduct(arr,PRIMARY){
+            if(!store.length)return arr;
+            store.each(function(a){
+                arr.each(function(b){
+                    if(a[PRIMARY]==b[PRIMARY])arr.erase(b);
+                });
+            });
+            return arr;
+        }
+
+        function delProduct(obj,arr){
+            arr.each(function(d){obj.delData(d);});
+        }
+
+        if($('material-delall-btn')){
+            $('material-delall-btn').addEvent('click',function(e){
+                if(!pag||!pag.data)return;
+                var delarr=[];
+                pag.data.each(function(d){
+                     delarr.push(d['bm_id']);
+                });
+                if(confirm('确认删除全部商品吗？')){
+                    delProduct(pag,delarr);
+                    emptyData();
+                }
+            });
+        }
+
+        if($('material-compute-rate')){
+            $('material-compute-rate').addEvent('click',function(e){
+                if(!pag||!pag.data)return;
+
+                var item_count = 0;
+                var num = 0;
+                var is_error = false;
+                var cost_total = 0;
+
+                pag.data.each(function(d){
+                    num = parseInt(d['num']);
+                    if(num <= 0 || isNaN(num)){
+                        is_error = true;
+                    }else{
+                        cost_total += Number(d['cost']) * num;
+                    }
+                    if(d['cost'] > 0) {
+                        item_count++;
+                    }
+                });
+
+                if(is_error){
+                    alert("请正确填写数量!");
+                    return false;
+                }
+
+                if(cost_total <= 0){
+                    alert("都是0元货品,请手工输入贡献占比!");
+                    return false;
+                }
+
+                var sum_rate = 0;
+                var item_rate = 0;
+                var item_price = 0;
+                var line_i = 0;
+                pag.data.each(function(d){
+                    if(d['cost'] <= 0) {
+                        return;
+                    }
+                    bm_id = d['bm_id'];
+                    num = parseInt(d['num']);
+                    item_price = Number(d['cost']) * num;
+
+                    line_i++;
+
+                    if(line_i == item_count){
+                        item_rate = 100 - sum_rate;
+                    }else{
+                        item_rate = Math.round(item_price / cost_total * 100 * 100) / 100;
+
+                        sum_rate += item_rate;
+
+                        //兼容
+                        if(sum_rate > 100){
+                            sum_rate -= item_rate;
+
+                            item_rate = 100 - sum_rate;
+                            sum_rate += item_rate;
+                        }
+                    }
+
+                    //兼容
+                    if(item_rate < 0){
+                        item_rate = 0;
+                    }
+
+                    if($("rate_" + bm_id)){
+                        $("rate_" + bm_id).set('value', item_rate.toFixed(2));
+                    }
+
+                    rows=$ES('#dataNode tr');
+                    rows.each(function(item,i)
+                    {
+                        if(bm_id == item.get('key')){
+                            var pid = item.get('key');
+                            pag.editData(pid, ['rate', item_rate]);
+                        }
+                    });
+                });
+            });
+        }
+
+
+        $('sales_material_btn').addEvent('click',function(e){
+            var _this=this;
+            var form=this.getParent('form');
+            
+            // 明细绑定页面dom的ID
+            let dataNodeDomName = 'dataNode';
+            // 关联基础商品列表数组
+            let dataItemList;
+            let salesMaterialType = $E("input[name=sales_material_type]:checked").value;
+
+            // 根据销售类型切换判断变量
+            if (salesMaterialType == '3') {
+                // 赠品切换明细dom节点
+                dataNodeDomName = 'gift_dataNode';
+                // 关联基础商品列表数组确定
+                dataItemList = giftPag;
+            }else{
+                // 关联基础商品列表数组确定
+                dataItemList = pag;
+            }
+
+            // 存在关联多商品明细的情况
+            if(dataItemList){
+                var data= dataItemList.toHideInput($(dataNodeDomName).getElement('tr'));
+          
+                form.store('target',{extraData:data,
+                    onRequest:function(){
+                        _this.disabled=true;
+                    },
+                    onComplete:function(jsontext){
+                        try{
+                            var json = JSON.decode(jsontext);
+                            if (typeof(json.error)!='undefined'){
+                                _this.disabled=false;
+                            }else{
+                                _this.disabled=true;
+                                if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                                setTimeout('window.close()',200);
+                            }
+                        }catch(e){}
+                    }
+                });
+            }else{
+                  form.store('target',{
+                      onRequest:function(){
+                          _this.disabled=true;
+                      },
+                      onComplete:function(jsontext){
+                          try{
+                              var json = JSON.decode(jsontext);
+                              if (typeof(json.error)!='undefined'){
+                                  _this.disabled=false;
+                              }else{
+                                  _this.disabled=true;
+                                  if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                                  setTimeout('window.close()',200);
+                              }
+                          }catch(e){}
+                      }
+                  });
+            }
+            form.fireEvent('submit',e);
+        });
+    });
+})();
+
+        function material_object_callback(rs,handle){
+            var p_node = handle.getParent('div');
+            var html = '已选择了1个商品,'+"<a href='javascript:void(0);' onclick='material_selected_show();'>查看关联的商品.</a>";
+            if ($defined($('hand-selected-product')))
+            {
+                $('hand-selected-product').setHTML(html);
+            } else {
+                var div = new Element('div',{'html':html,'id':'hand-selected-product'});
+                div.injectAfter(p_node);
+            }
+        }
+
+        function material_selected_show(){
+            new Dialog('index.php?app=material&ctl=admin_material_sales&act=showMaterials',{
+                ajaxoptions:{data:$('hand-selected-product').getPrevious('div'),method:'post'}
+            });
+        }
+
+</script>
+<style>
+    .object-select {
+        width: auto!important;
+    }
+</style>

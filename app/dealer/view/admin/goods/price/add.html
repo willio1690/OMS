@@ -1,0 +1,210 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{script src="coms/datapicker.js" app="desktop"}>
+<{/capture}>
+<style>
+.division{
+    overflow: visible;
+}
+</style>
+<div class="tableform">
+    <form method="post" action="index.php?app=dealer&ctl=admin_goods_price&act=save" id="frm">
+        <div class="division">
+            <h3>基本信息</h3>
+            <table border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <th><span style="color: red">*</span>经销商：</th>
+                        <td><{input type='select' issearch="fuzzy-search" required="required" name='bs_id' options=$dealerOptions value=$data.bs_id}></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="division">
+            <h5 style="margin-top:10px;">商品价格明细</h5>
+            <{button label="选择基础物料" id="material-find-btn"}>
+            <span id='pfba'>
+              <label>按基础物料编码索引：</label>
+              <input type="text" name="material_bn" />
+            </span>
+            <span id='pfba2'>
+              <label>按基础物料名称索引：</label>
+              <input name="material_name" type="text" size="35" />
+            </span>
+            <table class="gridlist" id="price_table" style="margin:4px 0;">
+              <thead>
+                <tr>
+                  <th>基础物料编码</th>
+                  <th style="width:240px;">基础物料名称</th>
+                  <th>规格</th>
+                  <th>采购价</th>
+                  <th>价格单位</th>
+                  <th style="width:150px;">生效时间</th>
+                  <th style="width:150px;">过期时间</th>
+                  <th style="width:30px;">删除</th>
+                </tr>
+              </thead>
+              <tbody id="price-tbody">
+                
+              </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button class="btn-primary" type="button" id='submit_btn' label='保存'}>
+                    <{button class="btn-secondary" type="button" id='close_btn' label='关闭'}>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<{/area}>
+<script type="text/javascript">
+        tail.select('select[issearch="fuzzy-search"]', {
+            search: true,
+            width: 150,
+            height: 660,
+            searchMinLength: 0
+        });
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = null;
+        try {
+            finder = opener.finderGroup['<{$env.get.finder_id}>'];
+        } catch(e) {}
+        $('close_btn').addEvent('click', function(){
+            try{
+                var _dialogIns = this.getParent('.dialog').retrieve('instance');
+            }catch(e){}
+
+            if(_dialogIns){
+                _dialogIns.close();
+            }
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+
+                    if(_dialogIns){
+                        if(finder){
+                            setTimeout(finder.refresh(),30000);
+                        }
+                        _dialogIns.close();
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+        var callurl = 'index.php?app=console&ctl=admin_purchase&act=getProducts';
+        var options={
+            'getVar':'bn',
+            'fxOptions':false,
+            callJSON:function(){return window.autocompleter_json;},
+            injectChoice:function(json){
+                var choice = new Element('li', {'html': this.markQueryValue(json[this.options.getVar])});
+                choice.store('_data',json);
+                choice.inputValue = json[this.options.getVar];
+                this.addChoiceEvents(choice).inject(this.choices);
+            },
+            onHide:function(ipt){
+                if(!this.selected || ipt.value=='')return;
+                var json=this.selected.retrieve('_data');
+                json=$splat(json);
+                addMaterial(json);
+                MessageBox.success('添加商品成功!!');
+            },
+            onFocus:function(ipt){
+                ipt.value='';
+            }
+        };
+        new Autocompleter.script($E('#pfba input'),callurl, options);
+        new Autocompleter.script($E('#pfba2 input'),callurl,$merge(options,{'getVar':'name'}));
+
+        function createRowHtml(item) {
+            var startTimeId = 'start_time_' + item.product_id;
+            var endTimeId = 'end_time_' + item.product_id;
+            
+            return '<td>' + item.bn + '</td>' +
+                   '<td class="material-name">' + item.name + '</td>' +
+                   '<td>' + item.specifications + '</td>' +
+                   '<td><input type="number" step="0.001" min="0" value="" name="items[' + item.product_id + '][price]" placeholder="请输入采购价" size="10" required></td>' +
+                   '<td><input type="text" name="items[' + item.product_id + '][price_unit]" size="8" value=""></td>' +
+                   '<td><input type="text" name="items[' + item.product_id + '][start_time]" id="' + startTimeId + '" style="width:96px; font-family:arial;" value="" class="cal" size="10" maxlength="10" autocomplete="off" required></td>' +
+                   '<td><input type="text" name="items[' + item.product_id + '][end_time]" id="' + endTimeId + '" style="width:96px; font-family:arial;" value="" class="cal" size="10" maxlength="10" autocomplete="off" required></td>' +
+                   '<td><img src="app/desktop/statics/bundle/delecate.gif" class="pointer btn-delete-item"></td>' +
+                   '<input type="hidden" name="items[' + item.product_id + '][material_bn]" value="' + item.bn + '">';
+        }
+
+        $('material-find-btn').addEvent('click',function(e){
+            var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=console&ctl=admin_purchase&act=findMaterial');
+            Ex_Loader('modedialog',function() {
+                new finderDialog(url,{params:{url:callurl,name:'product_id[]'},width:1000,height:660,
+                    onCallback:function(rs){
+                        if(!rs)return;
+                        rs=JSON.decode(rs);
+                        addMaterial(rs);
+                    }
+                });
+            });
+        });
+        
+        function addMaterial(rs) {
+            rs.each(function(item) {
+                if($("material_"+item.product_id)) {
+                    MessageBox.warning('商品 ' + item.bn + ' 已经存在！');
+                    return;
+                }
+                var oTr = new Element('tr', {html: createRowHtml(item), class:"material_select", id: "material_"+item.product_id});
+                oTr.getElement('.btn-delete-item').addEvent('click',function(e){
+                    e.stop();
+                    oTr.remove();
+                });
+                $('price-tbody').adopt(oTr);
+                
+                // 初始化新添加行的日期选择器
+                var startTimeId = 'start_time_' + item.product_id;
+                var endTimeId = 'end_time_' + item.product_id;
+                
+                // 使用系统的日期选择器初始化
+                try {
+                    Ex_Loader("picker", function(){
+                        new DatePickers([$('start_time_' + item.product_id)]);
+                        new DatePickers([$('end_time_' + item.product_id)]);
+                    });
+                } catch(e) {
+                    $('start_time_' + item.product_id).makeCalable();
+                    $('end_time_' + item.product_id).makeCalable();
+                }
+            });
+        }
+    })();
+</script> 

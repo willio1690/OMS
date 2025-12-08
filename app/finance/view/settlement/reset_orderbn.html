@@ -1,0 +1,78 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.shop-name{
+    color:red;font-weight:bold;
+}
+.rules{
+  margin-bottom: 5px;
+}
+.rules select{
+  margin-right: 5px;
+}
+.rule_tr{
+  margin: 10px 0;
+}
+</style>
+<div class="tableform">
+  <h3>重置订单号</h3>
+  <div class="division">
+    <form method="post" action="index.php?app=finance&ctl=settlement&act=saveOrderBn" id="form-rule">
+      <input type="hidden" name="bill_id" value="<{$bill_info.bill_id}>">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" id="rule-section">
+        <tbody>
+          <tr>
+            <th>单据编号</th>
+            <td><{$bill_info.bill_bn}>
+             </td>
+          </tr> 
+          <tr>
+            <th>流水号</th>
+            <td><{$bill_info.credential_number}>
+             </td>
+          </tr>  
+          <tr>
+            <th>费用</th>
+            <td><{$bill_info.money}>
+             </td>
+          </tr>  
+          <tr>
+            <th><em class="c-red">*</em>订单号</th>
+            <td><input type="text" name="order_bn"  value="<{$bill_info.order_bn}>" vtype="required" style="width:350px;"/>
+             </td>
+          </tr>          
+          </table>
+         
+
+      <div class="table-action">  <{button label="提交" type="submit" name="submit" id="btn-rule"}> &nbsp;&nbsp; <{button label="关闭" onclick="javascript:void(window.close());" class="btn-secondary" type="button"}></div>
+   
+    </form>
+  </div>
+</div>
+<script>
+
+
+
+$('form-rule').store('target',{
+    onRequest:function(){
+       $('btn-rule').set('disabled', 'true');
+       
+    },
+    onComplete:function(jsontext){
+       var json = Json.evaluate(jsontext);
+       if (typeof(json.error) != 'undefined'){
+           $('btn-rule').set('disabled', '');
+       }else{
+           $('btn-rule').set('disabled', 'true');
+           opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,opener.finderGroup['<{$env.get.finder_id}>']);
+           window.close();
+       }
+    }
+});
+
+
+
+</script>

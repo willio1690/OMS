@@ -1,0 +1,61 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    #con_m_d_type li {width:130px; font-size: 12px; float: left; overflow: hidden;margin-bottom: 15px;}
+    #con_m_pan #pan_m_d_1, #con_m_pan #pan_m_d_2, #con_m_pan #pan_m_d_3 {position:static; float: none; clear: both; margin-top: 15px;}
+</style>
+<ul id="con_m_d_type">
+    <li><label for="m_d_1"><input id="m_d_1" type="radio" name="type" value="all" <{if $init.content.type == 'all'}>checked<{/if}>/>所有达人订单</label></li>
+    <li><label for="m_d_2"><input id="m_d_2" type="radio" name="type" value='assign' <{if $init.content.type == 'assign'}>checked<{/if}>/>指定达人订单</label></li>
+</ul>
+<br>
+<br>
+<br>
+<div id="con_m_pan">
+    <div id="pan_m_d_all"></div>
+    <div id="pan_m_d_assign">
+        <span style="color:red">*</span>达人ID：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input id="title" type="text" name="author" placeholder="支持多个, 以逗号符分隔" <{if $init.content.type == 'assign'}>value="<{$init.content.author}>"<{/if}> >
+        <br>
+        <{help}><{t}>设置了达人ID同时也设置直播间ID，<br>两个条件间是“并且”的关系，<br>如果条件间互斥，则规则选出的订单为空<{/t}><{/help}>
+        直播间ID：&nbsp;
+        <input id="title" type="text" name="room" placeholder="支持多个, 以逗号符分隔" <{if $init.content.type == 'assign'}>value="<{$init.content.room}>"<{/if}> >
+    </div>
+</div>
+<script>
+    (function(){
+        function getIndex() {
+            var idx = -1;
+            $$("#con_m_d_type input[type=radio]").each(function(item) {  
+                if (item.checked) { 
+                    idx = item.value;
+                }
+            });
+            return idx; 
+        } 
+        
+        function changeDetail() {
+            var selectIndex = getIndex(); 
+            console.log('-=-=-=-=-=');
+            console.log(selectIndex);
+            if (selectIndex == -1) {
+                $('m_d_1').checked = true;
+                selectIndex = 'all';
+            }
+            $$('#con_m_pan div').each(function(item){
+                item.setStyle('display', 'none');
+            });
+            $('pan_m_d_'+selectIndex).setStyle('display', '');
+        }
+        
+        changeDetail();
+        
+        $$("#con_m_d_type input[type=radio]").addEvent('change',function(){
+            changeDetail();
+        });
+    })();
+</script> 
+

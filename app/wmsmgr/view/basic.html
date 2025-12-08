@@ -1,0 +1,267 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+<form method="post" action="index.php?<{$env.server.QUERY_STRING}>" id="wmsmgr-basic">
+    <div class="tableform">
+        <div class="division">
+            <table>
+                <tr>
+                    <th>同步WMS库存：</th>
+                    <td><{input type="radio" name="stock_query" value=$crop_config.stock_query options=array("0"=>"否","1"=>"是") separator="&nbsp;"}></td>
+                </tr>
+                <tr>
+                    <th>配送拦截：</th>
+                    <td><{input type="radio" name="saleorder_callback" value=$crop_config.saleorder_callback options=array("0"=>"否","1"=>"是") separator="&nbsp;"}></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+<{if $node_type == 'yjdf' || $node_type == 'kepler'}>
+        <h4>基础配置</h4>
+        <div class="tableform">
+            <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+                <tbody>
+                <tr>
+                    <th>地址标准：</th>
+                    <td>
+                        <select type="select" name="address_type" id="address_type" class="x-input-select inputstyle">
+                            <option value="g" <{if $crop_config['address_type'] == 'g'}>selected="selected"<{/if}> >国标</option>
+                            <option value="j" <{if $crop_config['address_type'] == 'j'}>selected="selected"<{/if}> >京标</option>
+                        </select>&nbsp;&nbsp;<{help}>当选择"国标"时，推送给京东WMS仓储时无需转换四级地址,直接传地址参数即可,当选择"京标"时，推送给京东WMS仓储需要把地址转化为四级地址。<{/help}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>二次推送间隔：</th>
+                    <td><{input type="number" name="delivery_send_second_after_first" value=$crop_config.delivery_send_second_after_first }>分</td>
+                </tr>
+                <tr>
+                    <th>库存监控：</th>
+                    <td>
+                        <{input type="radio" name="stock_monitor" value=$crop_config.stock_monitor options=array("0"=>"停用","1"=>"启用") separator="&nbsp;"}>
+                        <label class="help c-red"> 开启后，若开普勒库存不足对应OMS的货号将清零</label>
+                    </td>
+                </tr>
+                <tr>
+                    <th>自动同步商品：</th>
+                    <td>
+                        <{input type="radio" name="sync_goods" value=$crop_config.sync_goods options=array("0"=>"停用","1"=>"启用") separator="&nbsp;"}>
+                        <label class="help c-red"> 开启后，自动同步开普勒商品</label>
+                    </td>
+                </tr>
+                <tr>
+                    <th>发货回写方式：</th>
+                    <td>
+                        <select type="select" name="delivery_mode" id="delivery_mode" class="x-input-select inputstyle">
+                            <option value="normal" <{if $crop_config['delivery_mode'] != 'package'}>selected="selected"<{/if}> >默认回写方式</option>
+                            <option value="package" <{if $crop_config['delivery_mode'] == 'package'}>selected="selected"<{/if}> >按京东订单号回写</option>
+                        </select>&nbsp;&nbsp;<{help}>选择[按京东订单号回写]方式，当OMS接收到京东订单完成发货状态时，会以每个京东订单号对应的SKU进行通知平台回传发货状态。<{/help}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>是否转换物流：</th>
+                    <td>
+                        <{input type="radio" name="change_logi_off" class="change_logi_off" value=$crop_config.change_logi_off options=array("0"=>"停用","1"=>"启用") separator="&nbsp;"}>
+                        <label class="help c-red"> 开启后，指定渠道下的京东包裹自动转为其他物流回写平台发货</label>
+                    </td>
+                </tr>
+                <tr class="change_logi_box" style="display:none;">
+                    <th>&nbsp;</th>
+                    <td>
+                       指定渠道ID：<input type="text" name="change_channel_id" value="<{$crop_config.change_channel_id}>" vtype="required" onkeyup="this.value=this.value.replace(/^ +| +$/g,'')" > 
+                       &nbsp;对应物流公司编码：<b style="color:red;">JD</b> 自动转换为物流公司：
+                        <select type="select" name="change_logi_code" id="change_logi_code" class="x-input-select inputstyle">
+                            <option value="">请选择</option>
+                            <{foreach from=$corpList item=itemVal key=itemKey}>
+                            <option value="<{$itemVal.type}>" <{if $crop_config['change_logi_code'] == $itemVal.type}>selected="selected"<{/if}> ><{$itemVal.name}></option>
+                            <{/foreach}>
+                        </select>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4>商家信息</h4>
+        <div class="tableform">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tbody>
+                <tr>
+                    <th><em class="c-red">*</em>商家账号PIN：</th>
+                    <td>
+                        <{input type="text" name="pin" value=$crop_config.pin}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>邮费设置：</th>
+                    <td>
+                        <select type="select" name="shipping_cost" id="shipping_cost" class="x-input-select inputstyle">
+                            <option value="pay_postage" <{if $crop_config['shipping_cost'] != 'free_postage'}>selected="selected"<{/if}> >获取京东邮费</option>
+                            <option value="free_postage" <{if $crop_config['shipping_cost'] == 'free_postage'}>selected="selected"<{/if}> >免邮费(0运费)</option>
+                        </select>&nbsp;&nbsp;<{help}>当选择"免邮费"时，推送给京东WMS仓储时无需获取配送方式和邮费Api接口,直接传配送方式shipmentType='4',运费freightFee=0。<{/help}>
+                    </td>
+                </tr>
+                <tr>
+                    <th>平台结算模式：</th>
+                    <td>
+                        <select type="select" name="settle_model" id="settle_model" class="x-input-select inputstyle">
+                            <option value="3" <{if $crop_config['settle_model'] == '3'}>selected="selected"<{/if}> >佣金订单+补贴订单(默认)</option>
+                            <option value="2" <{if $crop_config['settle_model'] == '2'}>selected="selected"<{/if}> >补贴订单</option>
+                            <option value="0" <{if $crop_config['settle_model'] == '0'}>selected="selected"<{/if}> >无模式</option>
+                        </select>
+                        &nbsp;&nbsp;<{help}>佣金订单+补贴订单：佣金信息列表和补贴信息列表都不能为空；<br />补贴订单：补贴信息列表不能为空，佣金信息列表必须为空；<br />无模式： 佣金信息和补贴信息都为空。<br /><{/help}>
+                    </td>
+                </tr>
+                <tr>
+                <th>商品单价模式：</th>
+                <td>
+                    <select type="select" name="price_model" id="price_model" class="x-input-select inputstyle">
+                        <option value="wms_price" <{if $crop_config['price_model'] == 'wms_price'}>selected="selected"<{/if}> >京东云交易价格(默认)</option>
+                        <option value="shop_price" <{if $crop_config['price_model'] == 'shop_price'}>selected="selected"<{/if}> >平台店铺实付价格</option>
+                        <option value="shop_original_price" <{if $crop_config['price_model'] == 'shop_original_price'}>selected="selected"<{/if}> >平台商品原价</option>
+                    </select>
+                    &nbsp;&nbsp;<{help}>1、京东云交易价格(默认)：推送发货单时，获取京东云交易的商品单价（可以在 仓储中心==》基础物料分配 栏目中查看映射价格）；
+                    2、平台店铺实付价格：推送发货单时，获取平台店铺里的商品实付单价；
+                    3、平台商品原价：推送发货单时，获取平台店铺里的商品原价和总计优惠额；<br />
+                    <{/help}>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+
+        <h4>开票信息</h4>
+        <div class="tableform">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+        <tr>
+            <th>发票类型：</th>
+            <td>
+                <{input type="select" required="true" name="invoice[type]" value=$invoice.type options=array('2'=>'增票','3'=>'电子票') }>
+            </td>
+        </tr>
+        </tbody>
+        </table>
+        <table class="invoice-table" width="100%" cellspacing="0" cellpadding="0" border="0" id="vatInvoice" style="display: none;">
+        <tbody>
+        <tr>
+            <th>增票资质公司名称：</th>
+            <td><{input type="text" name="invoice[vat_companyName]" value=$invoice.vat_companyName size=50}></td>
+        </tr>
+        <tr>
+            <th>增票资质公司纳税人标识号：</th>
+            <td><{input type="text" name="invoice[vat_code]" value=$invoice.vat_code size=50}></td>
+        </tr>
+        <tr>
+            <th>增票资质公司注册地址：</th>
+            <td><{input type="text" name="invoice[vat_regAddr]" value=$invoice.vat_regAddr size=50}></td>
+        </tr>
+        <tr>
+            <th>增票资质公司注册电话：</th>
+            <td><{input type="text" name="invoice[vat_regPhone]" value=$invoice.vat_regPhone size=50}></td>
+        </tr>
+        <tr>
+            <th>增票资质公司注册银行：</th>
+            <td><{input type="text" name="invoice[vat_regBank]" value=$invoice.vat_regBank size=50}></td>
+        </tr>
+        <tr>
+            <th>增票资质公司注册银行帐号：</th>
+            <td><{input type="text" name="invoice[vat_regBankAccount]" value=$invoice.vat_regBankAccount size=50}></td>
+        </tr>
+        <tr>
+            <th>增票邮寄收件人姓名：</th>
+            <td><{input type="text" name="invoice[vat_consigneeName]" value=$invoice.vat_consigneeName size=50}></td>
+        </tr>
+        <tr>
+            <th>增票邮寄收件人电话：</th>
+            <td><{input type="text" name="invoice[vat_consigneeMobile]" value=$invoice.vat_consigneeMobile size=50}></td>
+        </tr>
+        <tr>
+            <th>增票邮寄地址：</th>
+            <td><{input type="text" name="invoice[vat_consigneeAddr]" value=$invoice.vat_consigneeAddr size=50}></td>
+        </tr>
+        </tbody>
+        </table>
+        <table class="invoice-table" width="100%" cellspacing="0" cellpadding="0" border="0" id="electronicInvoice" style="display: none;">
+        <tbody>
+        <tr>
+            <th>开票类型：</th>
+            <td>
+                <{input type="select" required="true" name="invoice[elect_mode]" value=$invoice.elect_mode options=array('0'=>'请选择','4'=>'个人','5'=>'公司') }>
+            </td>
+        </tr>
+        <tr>
+            <th>发票抬头：</th>
+            <td><{input type="text" name="invoice[elect_title]" value=$invoice.elect_title size=50}></td>
+        </tr>
+        <tr>
+            <th>公司名称：</th>
+            <td><{input type="text" name="invoice[elect_companyName]" value=$invoice.elect_companyName size=50}></td>
+        </tr>
+        <tr>
+            <th>纳税人识别号：</th>
+            <td><{input type="text" name="invoice[elect_code]" value=$invoice.elect_code size=50}></td>
+        </tr>
+        <tr>
+            <th>联系邮箱：</th>
+            <td><{input type="text" name="invoice[elect_consigneeEmail]" value=$invoice.elect_consigneeEmail size=50}></td>
+        </tr>
+        <tr>
+            <th>联系电话：</th>
+            <td><{input type="text" name="invoice[elect_consigneePhone]" value=$invoice.elect_consigneePhone size=50}></td>
+        </tr>
+        </tbody>
+        </table>
+        </div>
+        <script type="text/javascript">
+        function invoiceChange(type){
+            $ES('.invoice-table').hide();
+            if (type == '3') {
+                $('electronicInvoice').show();
+            } else {
+                $('vatInvoice').show();
+            }
+        }
+        invoiceChange($E('select[name="invoice[type]"]').value);
+
+        $E('select[name="invoice[type]"]').addEvent('change',function(){
+            invoiceChange(this.value);
+        })
+        </script>
+<{/if}>
+    <div class="table-action">
+        <{button class="btn-primary" type="submit" id="saveterminal" name="submit" label="保存"}>
+    </div>
+</form>
+</div>
+
+<script>
+$('wmsmgr-basic').store('target',{
+    onRequest:function(){},
+    onComplete:function(jsontext){
+        finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+    }
+});
+
+if($$('.change_logi_off').length>0){
+    changeLogiCode($$('input[name=change_logi_off]:checked').get('value'));
+
+    $$('.change_logi_off').addEvent('click',function(e){
+        var value = $$('input[name=change_logi_off]:checked').get('value');
+        
+        changeLogiCode(value);
+    });
+}
+
+function changeLogiCode(value)
+{
+    if(value == '1') {
+        $$('.change_logi_box').setStyle('display','');
+    } else {
+        $$('.change_logi_box').setStyle('display','none');
+    }
+}
+</script>

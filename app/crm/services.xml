@@ -1,0 +1,22 @@
+<services>
+    <service id="openapi.crm.channel">
+        <class>crm_rpc_response_channel</class>
+    </service>
+    <service id="desktop_finder.crm_mdl_gift">
+        <class>crm_finder_gift</class>
+    </service>
+    <service id="desktop_finder.crm_mdl_gift_rule">
+        <class>crm_finder_gift_rule</class>
+    </service>
+    
+    <service id="desktop_finder.crm_mdl_gift_rule_base">
+        <class>crm_finder_gift_rule_base</class>
+    </service>
+    <service id="extend_filter_crm_mdl_gift_rule_base">
+        <class>crm_finder_extend_filter_gift_rule_base</class>
+    </service>
+    
+    <service id="desktop_finder.crm_mdl_gift_rule_logs">
+        <class>crm_finder_gift_rule_logs</class>
+    </service>
+</services>

@@ -1,0 +1,44 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+	<h3>订单添加模拟</h3>
+    <div class="division">
+		<form action="index.php?app=omevirtualwms&ctl=admin_order&act=virtual_order_edit" method="post">
+			<table width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tbody>
+              <tr>
+				<th>订单号</th>
+				<td><input type="text" name="order_bn" id="order_bn" value='' > </td>
+			  </tr>
+		</table>
+        <div class="table-action">
+        <{button label="新建订单" type="button" name="button" onclick="update()" id="btn-stockin"}><{button label="编辑订单" type="button" onclick="update(document.getElementById('order_bn').value);" id="btn-stockin"}>
+        </div>
+	  </form>
+  </div>
+</div>
+<script>
+  function update(order_bn){
+	  var order_id;
+	  var p = window.open('about:blank');
+	  var finder_id = '<{$env.get.finder_id}>';
+	  new Request({
+         url:'index.php?app=omevirtualwms&ctl=admin_order&act=get_order_id',
+         method:'get',
+         onComplete:function (rs){
+			if(rs != 'null'){
+				var rs = JSON.decode(rs);
+				order_id = rs.order_id;
+			}
+			if(order_id){
+				p.location = 'index.php?app=omevirtualwms&ctl=admin_order&act=virtual_order_edit&p[0]='+order_id+'&finder_id='+finder_id;
+			  }else{
+				p.location = 'index.php?app=omevirtualwms&ctl=admin_order&act=virtual_order_edit'+'&finder_id='+finder_id;
+			  }
+		 }
+	  }).send('p[0]='+order_bn);
+  }
+</script>

@@ -1,0 +1,20 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="clearfix">
+    <div>
+    <label for="">
+        <input type="checkbox" onclick="this.getParent('.row').getElements('.span-3 input:enabled').set('checked',this.checked)"><strong style="font-weight: bold;">仓库全选</strong>
+    </label>
+    </div>
+<{foreach from=$branchList item=item}>
+<div class="span-3">
+    <label>
+        <input type="checkbox" name="branch[]" value="<{$item.branch_id}>" <{if $item.checked}>checked<{/if}> />
+        <strong><{$item.name}></strong> 
+    </label>
+</div>
+<{/foreach}>
+</div>

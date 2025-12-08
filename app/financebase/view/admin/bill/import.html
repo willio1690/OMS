@@ -1,0 +1,32 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="system-setting" class="tableform tableform-tabs">
+        <{tabber}>
+        <{foreach from=$settingTabs item=item key=key}>
+        <{tab name=$item.name url=$item.url current=$item.current}>
+        <{include file=$item.file_name app=$item.app}>
+        <{/tab}>
+        <{/foreach}>
+        <{/tabber}>
+    </div>
+
+</div>
+<script>
+    (function(){
+        var state;
+        $('ImportBtn').addEvent('click',function(e){
+           
+            if(state||!$('ImportCSV').value.length)return false;
+            state=true;
+            this.style.cursor='not-allowed';
+        });
+        $('ImportCSV').addEvent('change',function(e){
+            state=false;
+            $('ImportBtn').style.cursor='pointer';
+        });
+
+    })();
+</script>

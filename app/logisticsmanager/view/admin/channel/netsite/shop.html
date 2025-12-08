@@ -1,0 +1,49 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div>
+<table>
+    <tr>
+        <th>关联店铺：</th>
+        <td>
+            <{input type="select" name="shop_id" rows=$shopList valueColumn="shop_id" labelColumn="name" required="true"}>
+        </td>
+    </tr>
+    <tr>
+        <th>物流公司：</th>
+        <td>
+            <{input type="select" name="logistics_code" rows=$cpList valueColumn="code" labelColumn="name"}>
+        </td>
+    </tr>
+</table>
+</div>
+<hr/>
+<div class="netsite-list division">
+    
+</div>
+<script>
+    (function(){
+        let logiCodeEl = $E('select[name=logistics_code]');
+        let lastSelectedIndex = logiCodeEl.selectedIndex;
+        logiCodeEl.addEvent('change',function(e){
+            var shop_id = $E('select[name=shop_id]').value;
+
+            if (!shop_id) {
+                MessageBox.error('请先选择关系店铺');
+                this.selectedIndex = lastSelectedIndex;
+                return false;
+            }
+            
+            lastSelectedIndex = this.selectedIndex;
+
+            // new Dialog('index.php?app=logisticsmanager&ctl=admin_channel&act=queryNetsiteDetail&p[]='+this.value+'&p[]='+shop_id);
+
+            W.page('index.php?app=logisticsmanager&ctl=admin_channel&act=queryNetsiteDetail&p[]='+this.value+'&shop_id='+shop_id+'&channel_type=<{$env.get.channel_type}>',{
+                update:$E('.netsite-list'),
+                clearUpdateMap:false,
+            });
+        });
+    })();
+</script>

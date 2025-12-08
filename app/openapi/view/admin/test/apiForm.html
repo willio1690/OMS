@@ -1,0 +1,87 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form name='openapiForm' method='post' action='index.php?app=openapi&ctl=admin_test&act=result'>
+    <input type="hidden" name="method1" value="<{$post['apiName']}>">
+
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" class='tableform'>
+        <tr>
+            <th>接口：</th>
+            <td><{$post['apiName']}></td>
+        </tr>
+        <tr>
+            <th>接口说明：</th>
+            <td><{$description['name']}></td>
+        </tr>
+        <tr>
+            <th>接口描述：</th>
+            <td><{$description['description']}></td>
+        </tr>
+        <tr>
+            <th>返回格式：</th>
+            <td><select name='data_format'><option value='json'>json</option><option value='xml'>xml</option></select></td>
+        </tr>
+        <tr>
+            <th><em style='color:red;padding:0 5px 0 0'>*</em>标识：</th>
+            <td><input type = "text" name="flag"></td>
+        </tr>
+        <tr>
+            <th><em style='color:red;padding:0 5px 0 0'>*</em>密钥：</th>
+            <td><input type = "text" name="token"></td>
+        </tr>
+        <tr>
+            <th><em style='color:red;padding:0 5px 0 0'>*</em>时间戳：</th>
+            <td><input type = "text" name="timestamp">
+            &nbsp;&nbsp;<a onclick="javascript:this.getPrevious('input').value=Date.parse(new Date())/1000;"><{img src="bundle/refresh.gif" app="desktop" }></a>
+            </td>
+        </tr>
+        <{foreach from=$list item=item key=key}>
+            <{if $item.type=='select'}>
+                <tr>
+                    <th><{$item['name']}>：</th>
+                    <td style='width:160px'>
+                    <{foreach from=$item.desc item=desc}>
+                    <input type = "checkbox" name='shop[]' value = "<{$desc.shop_id}>" ><{$desc.name}>
+                    <{/foreach}>
+                    </td>
+                    <td></td>
+                <tr>
+            <{elseif $item.type=='enum'}>
+            <tr>
+                <th><{$item['name']}>：</th>
+                <td style='width:160px'>
+                    <select name="<{$key}>">
+                        <{foreach from=$item.value item=optionName key=optionValue}>
+                            <option value="<{$optionValue}>"><{$optionName}></option>
+                        <{/foreach}>
+                    </select>
+                </td>
+                <td><{$item.desc}></td>
+            <tr>
+            <{else}>
+                <tr>
+                    <th><{$item['name']}>：</th>
+                    <td style='width:160px'><input type = "text" name = "<{$key}>" ></td>
+                    <td><{$item['desc']}></td>
+                <tr>
+            <{/if}>
+        <{/foreach}>
+        </table>
+        <div class="table-action">
+            <{button label='提交' type='button' id='openapi-btn'}>
+        </div>
+</form>
+
+<script language="javascript" type="text/javascript">
+$('openapi-btn').addEvent('click',function() {
+    new Request.HTML({
+        url:'index.php?app=openapi&ctl=admin_test&act=result',
+        method:'post',
+        update:$('resultarea'),
+        data:this.form,
+    }).send();
+});
+
+</script>

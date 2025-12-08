@@ -1,0 +1,60 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<form name="form1" id="memo_form" action="index.php?<{$env.server.QUERY_STRING}>" method="post">
+<div class="tableform">
+    <h4>销售订单详情</h4>
+    <div class="division">
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <tbody>
+                <tr>
+                    <th>订单号:</th>
+                    <td ><{$orderInfo.order_sn}></td>
+                    <th>根订单号:</th>
+                    <td ><{$orderInfo.root_order_sn}></td>
+                    <th >库存占用订单号:</th>
+                    <td ><{$orderInfo.occupied_order_sn}></td>
+                </tr>
+                <tr>
+                    <th>处理状态:</th>
+                    <td ><{$orderInfo.dispose_status_value}></td>
+                    <th>hold标记:</th>
+                    <td ><{$orderInfo.hold_flag_value}></td>
+                    <th >仓库编码:</th>
+                    <td ><{$orderInfo.warehouse}></td>
+                </tr>
+                <tr>
+                    <th>品牌ID:</th>
+                    <td ><{$orderInfo.brand_id}></td>
+                    <th >常态合作编码:</th>
+                    <td ><{$orderInfo.cooperation_no}></td>
+                    <th>仓库编码标识:</th>
+                    <td ><{$orderInfo.warehouse_flag}></td>
+                </tr>
+                <tr>
+                    <th>销售来源:</th>
+                    <td ><{$orderInfo.sales_source_indicator}></td>
+                    <th>销售区域:</th>
+                    <td ><{$orderInfo.sale_warehouse}></td>
+                    <th >自动抢货订单标识:</th>
+                    <td ><{$orderInfo.is_prebuy}></td>
+                </tr>
+                <tr>
+                    <th>订单时间:</th>
+                    <td ><{$orderInfo.create_time|date:"Y-m-d H:i:s"}></td>
+                    <th>创建时间:</th>
+                    <td ><{$orderInfo.at_time}></td>
+                    <th >更新时间:</th>
+                    <td ><{$orderInfo.up_time}></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</form>

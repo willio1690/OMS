@@ -1,0 +1,125 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form id="orgForm" action="index.php?app=ome&ctl=admin_operationorg&act=save&finder_id=<{$env.get.finder_id}><{if $env.get.no_redirect}>&no_redirect=<{$env.get.no_redirect}><{/if}>"  method="post" isCloseDialog>
+    <input type="hidden" name="org_id" value="<{$orgInfo.org_id}>">
+    <div class="tableform">
+        <div class="division">
+            <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tbody>
+                <tr>
+                    <th><em class="c-red">*</em> <{t}>运营组织名称：<{/t}></th>
+                    <td><{input type="text" name="name" value=$orgInfo.name size="30" vtype="required"}></td>
+                </tr>
+                <tr>
+                    <th><em class="c-red">*</em> <{t}>组织编码：<{/t}></th>
+                    <td><{input type="text" name="code" value=$orgInfo.code size="30" vtype="required"}></td>
+                </tr>
+                <tr>
+                    <th><{t}>是否启用：<{/t}></th>
+                    <td>
+                        <input type="radio" name="status" value="1" <{if $orgInfo.status == '1'}>checked="checked"<{/if}> <{if !$orgInfo}>checked="checked"<{/if}> /> 开启 
+                        &nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="status" value="2" <{if $orgInfo.status == '2'}>checked="checked"<{/if}>/> 关闭
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</form>
+
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <{button class="btn-primary" type="button" id="btn-org" label="保存"}>
+</div>
+<{/area}>
+<script>
+
+window.addEvent('domready', function() {
+    $('btn-org').addEvent('click', function(event) {
+        $('orgForm').fireEvent('submit', new Event(event));
+    });
+    var orgForm = $('orgForm');
+    var existingTarget = orgForm.retrieve('target');
+    
+    if (existingTarget) {
+        // 扩展 dialog 自动设置的 onRequest 和 onComplete
+        var originalOnRequest = existingTarget.onRequest;
+        var originalOnComplete = existingTarget.onComplete;
+        
+        existingTarget.onRequest = function() {
+            $('btn-org').set('disabled', 'true');
+            if (originalOnRequest) {
+                originalOnRequest.call(this);
+            }
+        };
+        
+        existingTarget.onComplete = function(jsontext) {
+            if (!jsontext) {
+                $('btn-org').set('disabled', '');
+                return;
+            }
+            
+            var json = {};
+            try {
+                json = JSON.decode(jsontext);
+            } catch(e) {
+                $('btn-org').set('disabled', '');
+                return;
+            }
+            
+            if (typeof(json.error) != 'undefined') {
+                $('btn-org').set('disabled', '');
+            } else {
+                $('btn-org').set('disabled', 'true');
+            }
+            
+            if (originalOnComplete) {
+                originalOnComplete.call(this, jsontext);
+            }
+        };
+    } else {
+        // 如果 dialog 没有设置，我们自己设置
+        orgForm.store('target', {
+            onRequest: function() {
+                $('btn-org').set('disabled', 'true');
+            },
+            onComplete: function(jsontext) {
+                if (!jsontext) {
+                    $('btn-org').set('disabled', '');
+                    return;
+                }
+                
+                var json = {};
+                try {
+                    json = JSON.decode(jsontext);
+                } catch(e) {
+                    $('btn-org').set('disabled', '');
+                    return;
+                }
+                
+                if (typeof(json.error) != 'undefined') {
+                    $('btn-org').set('disabled', '');
+                } else {
+                    $('btn-org').set('disabled', 'true');
+                    // 手动关闭 dialog 并刷新 finder
+                    var dialog = orgForm.getParent('.dialog');
+                    if (dialog) {
+                        var dialogInstance = dialog.retrieve('instance');
+                        if (dialogInstance) {
+                            dialogInstance.close();
+                        }
+                    }
+                    var finderId = '<{$env.get.finder_id}>';
+                    if (finderId && finderGroup && finderGroup[finderId]) {
+                        finderGroup[finderId].refresh();
+                    }
+                }
+            }
+        });
+    }
+});
+</script>

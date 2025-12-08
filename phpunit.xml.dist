@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/|version|/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true">
+    <testsuites>
+        <testsuite name="OMSTestSuite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- Code coverage configuration -->
+    <!-- <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter> -->
+
+    <php>
+        <!-- 指定 PHP 版本 -->
+<!--        <const name="ROOT_DIR" value="./" />-->
+        <const name="TESTSUITE" value="1" />
+        <const name="APIFOX_MOCK_URL" value="https://mock.apifox.com/m2/3769194-0-default/{apifoxApiId}?apifoxApiId={apifoxApiId}&amp;apifoxToken=mazom9fLogBwmOHYvCdegEEwXF2y5xV5" />
+        <ini name="display_errors" value="1" />
+        <ini name="error_reporting" value="-1" />
+    </php>
+
+    <logging>
+        <junit outputFile="tests/logs/junit.xml"/>
+    </logging>
+</phpunit>

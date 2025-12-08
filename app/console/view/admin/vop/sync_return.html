@@ -1,0 +1,104 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <form id="custom-bill-sync">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tbody>
+          <tr>
+            <th style="width: auto;">店铺：</th>
+            <td><{input type="select" name="shop_id" rows=$shop valueColumn="shop_id" labelColumn="name" class="dailog-batch-ipt" required=1}></td>
+        </tr>
+          <tr>
+            <th style="width: auto;">仓库：</th>
+            <td>
+                <select name="warehouse">
+                    <{foreach from=$warehouse item=item}>
+                    <option value="<{$item}>"><{$item}></option>
+                    <{/foreach}>
+                </select>
+
+            </td>
+        </tr>
+        <tr id="time-range">
+            <th style="width: auto;">开始时间：</th>
+            <td><{input type='time'  name='start_time' class="dailog-batch-ipt" value=$start_time}></td>
+            <th style="width: auto;">结束时间：</th>
+            <td><{input type='time'  name='end_time' class="dailog-batch-ipt" value=$end_time}></td>
+        </tr>
+        </tbody>
+    </table>
+    </form>
+    <div class="division" style="display:none;" id="information">
+        发起第 <span id="iRequest"></span> 个请求,<br />
+        已经处理 <span id="iTotal" style="color:#083E96"></span> 个单据，<br/>
+        <span id="iSucc" style="color:green"></span> 个单据成功，<br/>
+        <span id="iFail" style="color:red"></span> 个单据失败，
+    </div>
+    <div class="console">
+        <p class="iErrsg"></p>
+    </div>
+    <div class="table-action">
+        <{button label="开始" class="btn-primary" name="Start" id="btn-run"}>
+        <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true" }>
+    </div>
+</div>
+
+<{if $notice}><div class="notice"><{$notice}></div><{/if}>
+
+<script>
+    (function(){
+        $('btn-run').addEvent('click', function(){
+            doRun();
+        });
+        var doTotal, doSucc, doFail;
+        function doRun(){
+            //禁用开始按钮
+            doTotal = doSucc = doFail = 0;
+            displayProcessInfo();
+            $('information').style.display ='';
+            $('btn-run').disabled = true;
+            $('btn-run').set('html', '<span><span>数据处理中，请稍候！</span></span>');
+            doAjaxProcess(1);
+        }
+
+        /**
+         * 执行一次AJAX调用
+         */
+        function doAjaxProcess(idx) {
+            $('iRequest').set('html', idx);
+            new Request({url:'<{$request_url}>',method:'post',data:$('custom-bill-sync').toQueryString()+'&page_no='+idx,
+                onComplete:function(result){
+                    if(!result) return;
+                    var ret = JSON.decode(result);
+                    if (ret['err_msg']) {
+                        $E('.iErrsg').adopt(new Element('div',{html:ret['err_msg']}));
+                    }
+                    if(ret.total < 1) {
+                        $('btn-run').set('html', '<span><span>处理已完成</span></span>');
+                        $('information').set('html', '处理已完成');
+                        //setTimeout("$('btn-run').getParent('.dialog').retrieve('instance').close();finderGroup['<{$env.get.finder_id}>'].refresh();",5000);
+                        return;
+                    }
+                    doTotal += ret['total'];
+                    doSucc += ret['succ'];
+                    doFail += ret['fail'];
+                    
+                    displayProcessInfo();
+                    doAjaxProcess(idx+1);
+                }
+            }).send();
+        }
+
+        /**
+         * 显示信息进度
+         */
+        function displayProcessInfo() {
+            $('iTotal').set('html', doTotal);
+            $('iSucc').set('html', doSucc);
+            $('iFail').set('html', doFail);
+        }
+    }());
+</script>

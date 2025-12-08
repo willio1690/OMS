@@ -1,0 +1,51 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout">
+    <form method="post" action="<{$url}>" id="form-common">
+    <h3><{$title}></h3>
+
+    <{foreach from=$formGroups item=group}>
+    <div class="form-layout-block">
+        <div class="form-layout-fields form-layout-fields-column">
+            
+            <{foreach from=$group item=item key=key}>
+            <div class="form-field">
+                <span class="form-field-label">
+                    <{if $item.required == true}><em class="c-red">*</em><{/if}>
+                    <{$item.label}>：
+                </span>
+
+                <{if $item.type == 'radio'}>
+                    <div class="form-radios">
+                        <{input type="radio" name=$key options=$item.options value=$item.value|default:$item.default}>
+                    </div>
+                <{elseif $item.type == 'select'}>
+                    <{input type="select" name=$key options=$item.options value=$item.value}>
+                <{elseif $item.type == 'checkbox'}>
+                    <div class="form-checkbox">
+                    <{foreach item=cbItem key=cbKey from=$item.options}>
+                    <label>
+                        <input type="checkbox" name="<{$key}>[]" value="<{$cbKey}>" <{if $item.value == $cbKey }>checked<{/if}> > <{$cbItem}>
+                    </label>
+                    <{/foreach}>
+                    </div>
+                <{else}>
+                    <input class="form-input" name="<{$key}>"  value="<{$item.value}>" vtype="<{$item.vtype}>" placeholder="<{$item.placeholder}>" />
+                <{/if}>
+
+                <{if $item.description}><p class="form-remark"><{$item.description}></p><{/if}>
+            </div>
+            <{/foreach}>
+        </div>
+    </div>
+    <{/foreach}>
+
+    <div class="table-action">
+        <{button label="提交" class="btn-primary" type="submit" name="submit"}>
+    </div>
+
+    </form>
+</div>

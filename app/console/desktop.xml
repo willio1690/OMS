@@ -1,0 +1,244 @@
+<desktop>
+    <adminpanel group="desktop_setting" app="console" controller="admin_email" permission="performance" action="index" display='true'>邮箱配置</adminpanel>
+
+    <permissions>
+        <permission id="console_purchase_po">采购订单</permission>
+        <permission id="console_purchase_check">待审核</permission>
+        <permission id="console_purchase_do_eo">待入库</permission>
+        <permission id="console_purchase_eo">入库单</permission>
+        <permission id="console_purchase_polist">采购订单列表</permission>
+        <permission id="console_process_receipts_print_export">发货单导出</permission>
+        <permission id="console_delivery">发货单列表</permission>
+        <permission id="console_delivery_lanshou">揽收列表</permission>
+        <permission id="console_delivery_qianshou">签收列表</permission>
+        <permission id="console_reship">退货单列表</permission>
+        <permission id="console_delivery_back">追回发货单列表</permission>
+         <permission id="console_delivery_cancel">取消发货单列表</permission>
+        <permission id="console_delivery_sync">通知仓库取消列表</permission>
+        <permission id="console_delivery_send">通知仓库新建列表</permission>
+
+        <permission id="console_purchase_returned">采购退货单</permission>
+        <permission id="console_purchase_returnedlist">采购退货单列表</permission>
+        <permission id="console_purchase_supplier">供应商</permission>
+        <!--<permission id="console_purchase_do_need">补货提醒</permission>-->
+        <permission id="console_appropriation" show='ome_roles:show_branch' save='ome_roles:save_role'>调拨单</permission>
+        <permission id="console_material_package" show='ome_roles:show_branch' save='ome_roles:save_role'>加工单列表</permission>
+        <permission id="console_iostockorder_other_instock">入库单列表</permission>
+        <permission id="console_iostockorder_other_outstock">出库单列表</permission>
+        <permission id="console_admin_inventory_apply_index" show='ome_roles:show_branch' >盘点申请</permission>
+        <permission id="console_admin_dailyinventory_index" show='ome_roles:show_branch' >日盘单</permission>
+        <permission id="console_admin_difference_index" show='ome_roles:show_branch' >盘点差异单</permission>
+        <permission id="console_sync_index_index">货品同步</permission>
+        <permission id="console_wms_delivery">WMS发货单</permission>
+        <permission id="console_wms_reship">WMS退货单</permission>
+        <permission id="console_wms_stockin">WMS入库单</permission>
+        <permission id="console_wms_stockout">WMS出库单</permission>
+        <permission id="console_wms_stockchange">WMS异动单</permission>
+        <permission id="console_wms_transferorder">WMS转储单</permission>
+        <permission id="console_wms_storeprocess">WMS加工单</permission>
+        <permission id="console_iostockorder_allocate_instock">调拨入库</permission>
+        <permission id="console_iostockorder_allocate_outstock">调拨出库</permission>
+        <permission id="console_iostockorder_allocate_instocklist">调拨入库列表</permission>
+        <permission id="console_iostockorder_allocate_outstocklist">调拨出库列表</permission>
+        <permission id="console_admin_interface_account_index" show='ome_roles:show_branch' save='ome_roles:save_role'>对账查询</permission>
+        <permission id="console_admin_stockdump_index" show='ome_roles:show_branch' save='ome_roles:save_role'>库内转储</permission>
+        <permission id="console_storage_stock_search" show='ome_roles:show_branch' save='ome_roles:save_role'>库存查询</permission>
+        <permission id="console_storage_stock" show='ome_roles:show_branch' save='ome_roles:save_role'>库存总览</permission>
+        <permission id="console_reset_freeze">重置冻结库存</permission>
+        <permission id="console_branch_storage_stock" show='ome_roles:show_branch' save='ome_roles:save_role'>库存表</permission>
+        <permission id="console_admin_adjustNumber_index" show='ome_roles:show_branch' save='ome_roles:save_role'>调整单列表</permission>
+        <permission id="console_admin_damaged_index"> 报残</permission>
+        <permission id="console_admin_interface_iostocksearchs_index" show='ome_roles:show_branch' save='ome_roles:save_role'>库存异动查询</permission>
+        <permission id="console_admin_useful_life" show='ome_roles:show_branch' save='ome_roles:save_role'>有效期列表</permission>
+        <permission id="console_admin_useful_log" show='ome_roles:show_branch' save='ome_roles:save_role'>有效期出入库详情</permission>
+
+        <permission id="console_vop_inventory_orders">销售订单</permission>
+        <permission id="console_vop_warehouse">仓库管理</permission>
+        <permission id="console_vop_carrier">承运商管理</permission>
+        <permission id="console_vop_setting">唯品会自动规则配置</permission>
+        <permission id="console_vop_purchase">唯品会采购单</permission>
+        <permission id="console_vop_pick">唯品会拣货单</permission>
+        <permission id="console_vop_stockout">唯品会出库单</permission>
+        <permission id="console_vop_sku">唯品会供货价</permission>
+        
+        <permission id="console_stock_freeze">货品预占流水</permission>
+        <permission id="console_stock_arrive">货品在途流水</permission>
+        <permission id="console_stock_artificial_freeze_import">人工库存预占导入</permission>
+        <permission id="console_stock_artificial_freeze_index">人工库存预占列表</permission>
+        <permission id="console_map_goods">TM直送商品关系</permission>
+        <permission id="console_admin_cpfr">配货单列表</permission>
+        <permission id="console_admin_cpfr_downloadCpfrTmpl">渠道库存模板导出</permission>
+
+        <permission id="console_replenish_suggest">补货建议单列表</permission>
+        <permission id="console_replenish_task">补货任务</permission>
+        <permission id="console_product_store">门店店铺商品</permission>
+        <permission id="console_replenish_diff">补货差异单列表</permission>
+        <permission id="console_product_abnormal">库存异常单列表</permission>
+        <permission id="console_inventory_snapshot_index">库存快照</permission>
+        <permission id="console_vop_return">唯品会退供单</permission>
+        <permission id="console_vop_bill">唯品会货款账单</permission>
+        <permission id="console_vop_bill_discount">唯品会满减账单</permission>
+        <!-- <permission id="console_vop_bill_amount">唯品会货款账单</permission> -->
+        <!--<permission id="console_vop_bill_detail">费用项明细</permission>-->
+        <permission id="console_vop_return_get">手动获取退供单</permission>
+        <permission id="console_vop_vopbill_get">手动获取VOP账单</permission>
+        <permission id="difference_inventory" >差异单列表</permission>
+        <permission id="console_admin_dailyinventory_index_storeinv">日盘单</permission>   
+        <permission id='console_o2o_returnnormal' show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>门店退仓单</permission>
+        <permission id='console_o2o_transfer' show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>门店调拔单</permission>
+        <permission id="console_o2o_stockdump_index" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>门店转储单</permission>
+        <permission id="console_o2o_adjust_index" show='ome_roles:show_o2o_branch'>门店调整单</permission>
+ 
+    </permissions>
+
+    <workground name="供应计划" id="console_purchasecenter" order="700" icon="icon-gongyingjihua-01">
+        <menugroup name="采购管理" en="purchase-management">
+            <menu controller='admin_purchase' action='index' permission='console_purchase_po' display='true'>采购列表</menu>
+            <menu controller='admin_purchase' action='checklist' permission='console_purchase_check' display='false' order='1000300'>待审核</menu>
+            <menu controller='admin_purchase' action='eoList' permission='console_purchase_do_eo' display='false' order='1000400'>待入库</menu>
+            <menu controller='admin_eo' action='index' permission='console_purchase_eo' display='false' order='1000500'>入库单</menu>
+            <menu controller='admin_returned_purchase' action='index' params='p[0]:eo' permission='console_purchase_returned' display='true' order='1000600'>采购退货列表</menu>
+            <!-- <menu controller='admin_purchase' action='need' permission='console_purchase_do_need' display='true' order='1000700'>补货提醒</menu>-->
+        </menugroup>
+        <menugroup name="调拨计划" en="appropriation-plan">
+            <menu controller='admin_appropriation' action='index' permission='console_appropriation' display='true' order='3000100'>新建调拨单</menu>
+            <menu controller='admin_iostockorder' action='allocate_iostock' params='io:0' permission='console_iostockorder_allocate_outstock' display='true' order="3000200">调拨出库</menu>
+            <menu controller='admin_iostockorder' action='allocate_iostock' params='io:1' permission='console_iostockorder_allocate_instock' display='true' order="3000300">调拨入库</menu>
+        </menugroup>
+        <menugroup name="出入库计划" en="warehousing-plan">
+            <menu controller='admin_material_package' action='index' permission='console_material_package' display='true' order="4000000">加工单列表</menu>
+            <menu controller='admin_iostockorder' action='other_iostock' params='io:1' permission='console_iostockorder_other_instock' display='true' order="4000100">入库单列表</menu>
+            <menu controller='admin_iostockorder' action='other_iostock' params='io:0' permission='console_iostockorder_other_outstock' display='true' order="5000100">出库单列表</menu>
+    </menugroup>
+        <menugroup name="差异处理" en="difference-disposal">
+            <menu controller='admin_adjust' action='index' permission='console_admin_adjustNumber_index' display='true' order="4000050">调整单列表</menu>
+            <menu controller='admin_difference_inventory' action='index' permission='difference_inventory' display='true' order='5000200'>差异单列表</menu>
+        </menugroup>
+        
+
+        <!-- <menugroup name="唯品会账单" en="vipshop-bill">
+            <menu controller='admin_vopbill' action='index' permission='console_vop_bill' display='true' order="9000080">货款账单</menu>
+
+            <menu controller='admin_vopbill_discount' action='index' permission='console_vop_bill_discount' display='true' order="9000082">满减账单</menu>
+            
+
+        </menugroup> -->
+        <menugroup name="门店补货" en="store-replenishment">
+            <!--
+            <menu controller='admin_replenish_task' action='index' permission='console_replenish_task' display='true' order="9000090">补货任务</menu>-->
+            <menu controller='admin_replenish_suggest' action='index' permission='console_replenish_suggest' display='true' order="9000091">补货申请列表</menu>
+            <menu controller='admin_cpfr' action='index'  permission='console_admin_cpfr' display='true' order="10000101">配货单列表</menu>
+            <!-- <menu controller='admin_cpfr' action='index'  permission='console_admin_cpfr' display='true' order="10000101">补货单列表</menu> -->
+           
+           <!-- <menu controller='admin_product_store' action='normal' permission='console_product_store' display='true' order='9000095'>正价店铺商品</menu>
+            <menu controller='admin_product_store' action='discount' permission='console_product_store' display='true' order='9000096'>奥莱店铺商品</menu>
+            <menu controller='admin_replenish_diff' action='index'  permission='console_replenish_diff' display='true'  order="10000102">补货差异单列表</menu>
+            <menu controller='admin_product_store' action='abnormal' permission='console_product_abnormal' display='true' order="10000103">库存异常单列表</menu>-->
+        </menugroup>
+    </workground>
+    <workground name="仓储管理" id="console_center" order="800" icon="icon-cangchuguanli-01">
+        <menugroup name="物料分配" en="console-material-distributor">
+            <menu controller='admin_goodssync' action='index' permission='console_sync_index_index' display='true'>基础物料分配</menu>
+          <menu controller='admin_map' action='index' permission='console_map_goods' display='true' order="10000602">TM直送商品关系</menu>
+        </menugroup>
+        <menugroup name="人工库存预占" en="manual-inventory-preoccupation">
+            <menu controller='admin_stock_artificial_freeze' action='import' permission='console_stock_artificial_freeze_import' display='true' order='1000100'>库存预占导入</menu>
+            <menu controller='admin_stock_artificial_freeze' action='index' permission='console_stock_artificial_freeze_index' display='true' order='1000101'>库存预占列表</menu>
+        </menugroup>
+        <menugroup name="发退货单" en="return-shipping-order">
+            <menu controller='admin_delivery' action='index' permission='console_delivery' display='true' order='1000599'>发货单列表</menu>
+            <menu controller='admin_reship' action='index' permission='console_reship' display='true' order='1000600'>退货单列表</menu>
+            <menu controller='admin_delivery_back' action='cancel_list' permission='console_delivery_cancel' display='true' order='1000601'>取消发货单列表</menu>
+            <menu controller='admin_delivery_back' action='index' permission='console_delivery_back' display='true' order='1000602'>追回发货单列表</menu>
+            <menu controller='admin_delivery' action='export' permission='console_process_receipts_print_export' display='false' order='1000700'>发货单导出</menu>
+            <menu controller='admin_delivery_send' action='index' permission='console_delivery_send' display='true' order='1000800'>通知仓库新建列表</menu>
+            <menu controller='admin_delivery_sync' action='index' permission='console_delivery_sync' display='true' order='1000900'>通知仓库取消列表</menu>
+            <menu controller='admin_delivery_logistics' action='lanshou' params='view:0' permission='console_delivery_lanshou' display='true'  order='1000931'>揽收列表</menu>
+            <menu controller='admin_delivery_logistics' action='qianshou' params='view:0' permission='console_delivery_qianshou' display='true' order='1000941'>签收列表</menu>
+        </menugroup>
+        <menugroup name="采购单" en="purchase-orders">
+            <menu controller='admin_purchaselist' action='index' permission='console_purchase_polist' display='true' order='1001000'>采购订单列表</menu>
+            <menu controller='admin_returned_purchaselist' action='index' params='p[0]:eo' permission='console_purchase_returnedlist' display='true' order='1001100'>采购退货单列表</menu>  
+        </menugroup>
+        <menugroup name="仓内作业单" en="warehouse-job-sheet">
+            <menu controller='admin_iostockorder' action='allocate_iostocklist' params='io:0' permission='console_iostockorder_allocate_outstocklist' display='true' order="3000200">调拨出库列表</menu>
+            <menu controller='admin_iostockorder' action='allocate_iostocklist' params='io:1' permission='console_iostockorder_allocate_instocklist' display='true' order="3000300">调拨入库列表</menu>
+            <menu controller='admin_stockdump' action='index'  permission='console_admin_stockdump_index' display='true'  order="10000002">库内转储</menu>
+        </menugroup>
+        <menugroup name="盘点单" en="blitem">
+            <menu controller='admin_inventory_apply' action='index'  permission='console_admin_inventory_apply_index' display='true'  order="8000001">盘点申请</menu>
+            <menu controller='admin_difference' action='index' params='p[0]:branch' permission='console_admin_difference_index' display='true'  order="8000002">盘差单</menu>
+            <menu controller='admin_dailyinventory' action='wmsIndex'  permission='console_admin_dailyinventory_index' display='true'  order="8000005">日盘单</menu>
+        </menugroup>
+        <menugroup name="库存" en="stock">
+            <!-- <menu controller='admin_stockaccount'  action='index' permission='console_admin_interface_account_index' display='true' order="10000001">库存对账查询</menu> -->
+            <menu controller='admin_stock' action='search' permission='console_storage_stock_search' display='true' order='10000002'>货品库存查询</menu>
+            <menu controller='admin_branch_product' action='index' permission='console_branch_storage_stock' display='true' order='10000003'>仓库库存列表</menu>
+            <menu controller='admin_stock' action='index' permission='console_storage_stock' display='true' order='10000004'>总库存列表</menu>
+            <menu controller='admin_interface_iostocksearchs'  action='index' permission='console_admin_interface_iostocksearchs_index' display='true' order="10000300">库存异动查询</menu>
+            <menu controller='admin_useful_life'  action='index' permission='console_admin_useful_life' display='true' order="10000005">有效期列表</menu>
+            <menu controller='admin_useful_log'  action='index' permission='console_admin_useful_log' display='true' order="10000006">有效期出入库明细</menu>
+            <menu controller='admin_branch_product_extend' action='index' permission='console_branch_storage_stock' display='true' order='10000900'>仓库库存扩展列表</menu>
+            <menu controller='admin_stock' action='show_store_freeze_list' permission='console_reset_freeze' display='false' order='10000904'>重置冻结库存</menu>
+            <menu controller='admin_inventory_snapshot' action='index' permission='console_inventory_snapshot_index' display='true' order='10000904'>库存快照</menu>
+        </menugroup>
+        <menugroup name="其他事务" en="other-affairs">
+            
+        <!-- <menu controller='admin_adjustNumber' action='adjust' permission='console_admin_adjustNumber_index' display='true' order="10000401">调账</menu> -->
+        <menu controller='admin_damaged' action='index'  permission='console_admin_damaged_index' display='true'  order="10000501">报残</menu>
+        <menu controller='admin_cpfr' action='index'  permission='console_admin_cpfr' display='true'  order="10000502">渠道库存列表</menu>
+        <menu controller='admin_cpfr' action='downloadCpfrTmpl' permission='console_admin_cpfr_downloadCpfrTmpl' display='false' order='1000503'>渠道库存模板导出</menu>
+
+        </menugroup>
+        <menugroup name="货品流水" en="flow-goods">
+            <menu controller='admin_stock_freeze' action='index' permission='console_stock_freeze' display='true' order='10001010'>货品预占流水</menu>
+            <menu controller='admin_stock_arrive' action='index' permission='console_stock_arrive' display='true' order='10001020'>货品在途流水</menu>
+        </menugroup>
+
+
+    </workground>
+    <workground name="门店管理" id="o2o_center" order="1000" icon="icon-mendianguanli-01">
+        <menugroup name="门店单据" en="store-documents-management" order='20'>
+            <menu controller='admin_inventory' action='index' permission='o2o_inventory' display='true' order='10000001'>门店盘点</menu>
+            <menu controller='admin_transfer' action='index' params='p[0]:returnnormal' permission='console_o2o_returnnormal' display='true'  order="10000003">门店退仓单</menu>
+             <menu controller='admin_transfer' action='index' params='p[0]:o2otransfer' permission='console_o2o_transfer' display='true'  order="10000002">门店调拔单</menu>
+            <menu controller='admin_stockdump' action='index'  params='p[0]:store' permission='console_o2o_stockdump_index' display='true'  order="10000002">门店转储单</menu>
+            <menu controller='admin_o2oadjust' action='index'   permission='console_o2o_adjust_index' display='true'  order="10000006">门店调整单</menu>
+        </menugroup>
+       
+    </workground>   
+    <workground  name="接口中心" id="pos_center" order="2500" icon="icon-pos">
+        <menugroup name="WMS单据" en="wms">
+            <menu controller='admin_wms_delivery' action='index' permission='console_wms_delivery' display='true' order='1000600'>发货单</menu>
+            <menu controller='admin_wms_reship' action='index' permission='console_wms_reship' display='true' order='1000700'>退货单</menu>
+            <menu controller='admin_wms_stockin' action='index' permission='console_wms_stockin' display='true' order='1000710'>入库单</menu>
+            <menu controller='admin_wms_stockout' action='index' permission='console_wms_stockout' display='true' order='1000720'>出库单</menu>
+            <menu controller='admin_wms_stockchange' action='index' permission='console_wms_stockchange' display='true' order='1000730'>异动单</menu>
+            <menu controller='admin_wms_transferorder' action='index' permission='console_wms_transferorder' display='true' order='1000740'>转储单</menu>
+            <menu controller='admin_wms_storeprocess' action='index' permission='console_wms_storeprocess' display='true' order='1000750'>加工单</menu>
+        </menugroup>
+    </workground> 
+
+    <workground name="唯品会" id="vopvip" order="2000" icon="icon-weipinguanli">
+        <menugroup name="唯品JIT" en="console-vipshop-jit">
+            <menu controller='admin_inventory_orders' action='index' permission='console_vop_inventory_orders' display='true' order="9000010">销售订单</menu>
+            <menu controller='admin_warehouse' action='index' permission='console_vop_warehouse' display='true' order="9000090">仓库管理</menu>
+            <menu controller='admin_carrier' action='index' permission='console_vop_carrier' display='true' order="9000091">承运商管理</menu>
+            <menu controller='admin_vopsetting' action='index' permission='console_vop_setting' display='true' order="9000092">自动规则配置</menu>
+            <menu controller='admin_vopsku' action='index' permission='console_vop_sku' display='true' order="9000092">供货价</menu>
+            <menu controller='admin_vopurchase' action='index' permission='console_vop_purchase' display='true' order="9000100">采购单</menu>
+            <menu controller='admin_vopick' action='index' permission='console_vop_pick' display='true' order="9000200">拣货单</menu>
+            <menu controller='admin_vopstockout' action='index' permission='console_vop_stockout' display='true' order="9000300">出库单</menu>
+         
+            <menu controller='admin_vopbill' action='sync' permission='console_vop_vopbill_get' display='false' order="9000420">获取退供单</menu>
+        </menugroup>
+    </workground>
+    <workground name="售后管理" id="aftersale_center"  order="300" icon="icon-shouhouguanli-01">
+        <menugroup name="退供管理" en="console-return-bill">
+          
+            <menu controller='admin_vopreturn' action='index' permission='console_vop_return' display='true' order="9000400">退供单</menu>
+            <menu controller='admin_vopreturn' action='sync' permission='console_vop_return_get' display='false' order="9000410">获取退供单</menu>
+            
+        </menugroup>
+    </workground>
+</desktop>

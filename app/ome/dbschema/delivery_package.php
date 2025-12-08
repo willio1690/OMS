@@ -1,0 +1,233 @@
+<?php
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+$db['delivery_package'] = array (
+    'columns' => array (
+        'package_id' => array (
+            'type' => 'int unsigned',
+            'required' => true,
+            'pkey' => true,
+            'editable' => false,
+            'extra' => 'auto_increment',
+            'order' => 1,
+        ),
+        'delivery_id' => array (
+            'type' => 'table:delivery@ome',
+            'required' => true,
+            'editable' => false,
+            'label' => '发货单号',
+            'order' => 10,
+        ),
+        'order_id' => array(
+            'type' => 'int unsigned',
+            'label' => '订单ID',
+            'default' => 0,
+            'editable' => false,
+            'width' => 120,
+            'in_list' => false,
+            'default_in_list' => false,
+        ),
+        'package_bn' => array (
+            'type' => 'varchar(50)',
+            'label' => '京东子单号',
+            'editable' => false,
+            'filtertype' => 'textarea',
+            'filterdefault' => true,
+            'in_list' => true,
+            'default_in_list' => true,
+            'order' => 11,
+        ),
+        'logi_bn' => array (
+            'type' => 'varchar(50)',
+            'label' => '物流公司编码',
+            'editable' => false,
+            'in_list' => true,
+            'default_in_list' => false,
+            'order' => 70,
+        ),
+        'logi_no' => array (
+            'type' => 'varchar(50)',
+            'label' => '物流单号',
+            'filtertype' => 'normal',
+            'filterdefault' => true,
+            'in_list' => true,
+            'default_in_list' => false,
+            'order' => 71,
+        ),
+        'product_id' => array (
+            'type' => 'table:products@ome',
+            'required' => true,
+            'default' => 0,
+            'editable' => false,
+            'order' => 30,
+        ),
+        'bn' => array (
+            'type' => 'varchar(50)',
+            'editable' => false,
+            'label' => '基础物料号',
+            'filtertype' => 'normal',
+            'filterdefault' => true,
+            'in_list' => true,
+            'default_in_list' => true,
+            'order' => 31,
+        ),
+        'outer_sku' => array (
+            'type' => 'varchar(50)',
+            'label' => '外部sku',
+            'editable' => false,
+            'filtertype' => 'normal',
+            'filterdefault' => true,
+            'in_list' => true,
+            'default_in_list' => false,
+            'order' => 32,
+        ),
+        'main_sku_id' => array (
+            'type' => 'varchar(50)',
+            'label' => '关联主sku',
+            'editable' => false,
+            'in_list' => true,
+            'default_in_list' => false,
+            'order' => 35,
+        ),
+        'status' => array (
+            'type' => 'varchar(50)',
+            'label' => '包裹状态',
+            'editable' => false,
+            'in_list' => true,
+            'default_in_list' => true,
+            'filtertype' => 'normal',
+            'filterdefault' => true,
+            'order' => 12,
+        ),
+        'shipping_status' => array (
+            'type' => 'varchar(30)',
+            'label' => '配送状态',
+            'editable' => false,
+            'in_list' => true,
+            'default_in_list' => true,
+            'order' => 13,
+        ),
+        'number' => array (
+            'type' => 'int',
+            'label' => '数量',
+            'editable' => false,
+            'in_list' => true,
+            'default_in_list' => true,
+            'order' => 60,
+        ),
+        'create_time' => array (
+            'type' => 'time',
+            'label' => 'WMS包裹创建时间',
+            'editable' => false,
+            'in_list' => true,
+            'default_in_list' => true,
+            'order' => 99,
+            'filtertype' => 'time',
+            'filterdefault' => true,
+        ),
+        'delivery_time' => array (
+            'type' => 'time',
+            'label' => '发货时间',
+            'editable' => false,
+            'in_list' => true,
+            'default_in_list' => true,
+            'order' => 99,
+            'filtertype' => 'time',
+            'filterdefault' => true,
+        ),
+        'sign_time' => array (
+            'type' => 'time',
+            'label' => '签收时间',
+            'editable' => false,
+            'in_list' => true,
+            'default_in_list' => true,
+            'order' => 99,
+        ),
+        'is_wms_gift' => array(
+            'type' => 'bool',
+            'default' => 'false',
+            'label' => '是否WMS赠品',
+            'editable' => false,
+            'filtertype' => 'normal',
+            'in_list' => true,
+            'default_in_list' => true,
+            'order' => 70,
+        ),
+        'apply_num' => array (
+            'type' => 'number',
+            'default' => 0,
+            'required' => true,
+            'editable' => false,
+            'label' => '申请退货数量',
+            'in_list' => true,
+            'default_in_list' => false,
+            'order' => 80,
+        ),
+        'return_num' => array (
+            'type' => 'number',
+            'default' => 0,
+            'editable' => false,
+            'label' => '已退货数量',
+            'in_list' => true,
+            'default_in_list' => false,
+            'order' => 81,
+        ),
+        'push_kepler' => array(
+            'type' => array(
+                'none' => '未回写',
+                'fail' => '回写失败',
+                'succ' => '回写成功',
+                'retry' => '重试推送',
+            ),
+            'default' => 'none',
+            'label' => '推送云交易',
+            'editable' => false,
+            'in_list' => true,
+            'default_in_list' => false,
+            'order' => 99,
+        ),
+    ),
+    'index' => array (
+        'in_order_id' => array (
+            'columns' => array (
+                0 => 'order_id',
+            ),
+        ),
+        'in_package_bn' => array (
+            'columns' => array (
+                0 => 'package_bn',
+            ),
+        ),
+        'in_status' => array (
+            'columns' => array (
+                0 => 'status',
+            ),
+        ),
+        'ind_create_time' => array(
+            'columns' => array(
+                0 => 'create_time',
+            ),
+        ),
+        'ind_delivery_time' => array(
+            'columns' => array(
+                0 => 'delivery_time',
+            ),
+        ),
+        'ind_logi_no' => array(
+            'columns' => array(
+                0 => 'logi_no',
+            ),
+        ),
+        'index_push_kepler' => array(
+            'columns' => array(
+                0 => 'push_kepler',
+            ),
+        ),
+    ),
+    'comment' => '发货包裹表',
+    'engine' => 'innodb',
+    'version' => '$Rev: 41996 $',
+);

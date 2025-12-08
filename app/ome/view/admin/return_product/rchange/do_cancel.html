@@ -1,0 +1,83 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .jj_refund_th {padding-top: 15px;}
+</style>
+<div class='division'>
+    <form action="index.php?app=ome&ctl=admin_return_rchange&act=checkCancel&p[0]=<{$reship_id}>&finder_id=<{$env.get.finder_id}>" <{if in_array($shop_type, array('taobao','tmall','luban'))}>enctype="multipart/form-data"<{/if}> method="post" id="add_link" isCloseDialog>
+        <input type="hidden" name="reship_id" value="<{$reship_id}>">
+        <input type="hidden" id="cancel_flag" name="cancel_flag" value="0">
+
+        <br />
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" class="girdlist">
+            <{if $reship.shop_type == 'taobao' || $reship.shop_type == 'tmall' || $reship.shop_type == 'luban'}>
+            <tr>
+                <th class="jj_refund_th"><em class="c-red"> * </em>上传凭证：</th>
+                <td class="jj_refund_th">
+                    <{input type="sfile" name="refuse_proof" f_type="public" }>
+                </td>
+            </tr>
+            <{/if}>
+            <{if $refuse_reason}>
+            <tr>
+                <th class="jj_refund_th"><em class="c-red"> * </em>换货原因：</th>
+                <td class="jj_refund_th">
+                    <select name="seller_refuse_reason_id" class="x-input">
+                        <{foreach from=$refuse_reason item=reason}>
+                        <option value="<{$reason.reason_id}>"><{$reason.reason_text}></option>
+                        <{/foreach}>
+                    </select>
+                </td>
+            </tr>
+            <{/if}>
+
+            <tr>
+                <th class="jj_refund_th"><em class="c-red"> * </em>备注：</th>
+                <td class="jj_refund_th">
+                    <textarea name='refuse_message' style="margin: 0px; width: 258px; height: 77px;"  vtype="required" cols="40" rows="5"></textarea>
+                </td>
+            </tr>
+        </table>
+    <div id="forced_cancel" style="display: none">是否强制取消：
+        <input type="radio" name="forced_cancel" value="1"  disabled> 是
+        <input type="radio" name="forced_cancel" value="0" checked disabled> 否
+    </div>
+    <div class="table-action">
+        <button class="btn btn-primary" id="submit_btn" ><span><span><{t}>确定<{/t}></span></span></button>&nbsp;&nbsp;
+        <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+    </form>
+</div>
+<script>
+(function(){
+    var _form = $('add_link');
+    var btn = $('submit_btn');
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    
+    _form.store('target',{
+        onComplete:function(response){
+            var hash_res_obj = JSON.decode(response);
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+                
+                if(_dialogIns){
+                    finder.refresh();
+                    _dialogIns.close();
+                }
+            }else{
+                $('forced_cancel').setStyles('display','block');
+                $$("input[name='forced_cancel']").set('disabled',false);
+            }
+        }
+    });
+    
+    btn.addEvent('click',function(){
+        _form.fireEvent('submit',{stop:$empty});
+    });
+})();
+</script>

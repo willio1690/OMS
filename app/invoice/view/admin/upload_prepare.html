@@ -1,0 +1,58 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+    <form method="POST" action="index.php?app=invoice&ctl=admin_order&act=doUploadTmall" id="form">
+        <table align="center" >
+            <tr>
+                <th>作废或重开原因: </th>
+                <td><input type='radio' name='invoice_action_type' value="2">退货、退款成功</td>
+            </tr>
+            <tr>
+                <th></th>
+                <td><input type='radio' name='invoice_action_type' value="3">电子换纸质</td> 
+            </tr>
+            <tr>
+                <th></th>
+                <td><input type='radio' name='invoice_action_type' value="4">换发票内容（抬头的变化等，其他未归类的情况）</td> 
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <{button class="btn-primary" type="submit" label="确定" id="submit_btn"}>
+                    <input type="hidden" name="id" value="<{$id}>" />
+                    <input type="hidden" name="finder_id" value="<{$env.get.finder_id}>" />
+                </td>
+            </tr>
+        </table>
+    </form>
+    </div>
+</div>
+<script>
+    (function(){
+        var _form = $('form');//表单ID
+        var btn   = $('submit_btn');//按钮ID
+        _form.store('target',{
+            onComplete:function(){
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+                    if(_dialogIns){
+                        _dialogIns.close();
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+            _form.fireEvent('submit',{stop:$empty});
+        });
+    })();
+</script>

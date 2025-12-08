@@ -1,0 +1,34 @@
+<services>
+	<service id="ome_create_order_after">
+        <class>invoice_order</class>
+    </service>
+	
+	<service id="desktop_finder.invoice_mdl_order">
+		<class>invoice_finder_order</class>
+	</service>
+    <service id="desktop_finder.invoice_mdl_order_front">
+		<class>invoice_finder_order_front</class>
+	</service>
+	<service id="desktop_finder.invoice_mdl_order_setting">
+		<class>invoice_finder_order_setting</class>
+	</service>
+    <service id="desktop_finder.invoice_mdl_channel">
+		<class>invoice_finder_channel</class>
+	</service>
+
+    <service id="extend_filter_invoice_mdl_order">
+        <class>invoice_finder_extend_filter_order</class>
+    </service>
+    
+    <service id="desktop_finder.invoice_mdl_content">
+        <class>invoice_finder_content</class>
+    </service>
+    
+    <service id="operation_log">
+     <class>invoice_operation_log</class>
+    </service>
+
+    <service id="data_clear">
+        <class>invoice_service_data_clear</class>
+    </service>
+</services>

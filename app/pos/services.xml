@@ -1,0 +1,20 @@
+<services>
+    <service id="desktop_finder.pos_mdl_orders">
+        <class>pos_finder_orders</class> 
+    </service>
+   <service id="desktop_finder.pos_mdl_aftersale">
+        <class>pos_finder_aftersale</class> 
+    </service>
+    <service id="desktop_finder.pos_mdl_refund">
+        <class>pos_finder_refund</class> 
+    </service>
+    <service id="desktop_finder.pos_mdl_inventory_snapshot">
+        <class>pos_finder_inventory_snapshot</class> 
+    </service>
+    <service id="desktop_finder.pos_mdl_iso">
+        <class>pos_finder_iso</class>
+    </service>
+    <service id="desktop_finder.pos_mdl_syncproduct">
+         <class>pos_finder_syncproduct</class>
+    </service>
+</services>

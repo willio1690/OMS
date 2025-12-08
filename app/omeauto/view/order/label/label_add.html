@@ -1,0 +1,88 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css src="ome.css" app="ome"}>
+<{script src="coms/dropmenu.js"  app='desktop'}>
+<{script src="coms/datapicker.js"  app='desktop'}>
+<{script src="coms/colorpicker.js"  app='desktop'}>
+<{/capture}>
+
+<div class="tableform">
+    新建订单标签：
+    <div class="division">
+    <form id='form' method="post" action="index.php?app=omeauto&ctl=order_labels&act=save">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tbody>
+                <tr>
+                    <th>标签代码：</th>
+                    <td><input name="label_code" type="text" value="<{$data.label_code}>" maxlength="20" vtype="required" onkeyup="this.value=this.value.replace(/[^a-zA-Z0-9]/g,'')" />
+                    &nbsp;&nbsp;<span style="color:red;">*</span>必填项,支持英文字母、数字</td>
+                </tr>
+                <tr>
+                    <th>标签名称：</th>
+                    <td><input name="label_name" type="text" value="<{$data.label_name}>" maxlength="15" vtype="required" />&nbsp;&nbsp;<span style="color:red;">*</span>必填项</td>
+                </tr>
+                <tr>
+                <th>标签颜色：</th>
+                <td><input type="text" name="label_color" id="label_color" readonly="readonly" value="<{$data.label_color}>" vtype="required" style="cursor:pointer; width:56px; color:red;" />&nbsp;&nbsp;<span style="color:red;">*</span>必填项</td>
+                </tr>  
+            </tbody>
+        </table>
+        <{if $data.label_id}>
+        <input type="hidden" name="label_id" value="<{$data.label_id}>">
+        <{/if}>
+    </form>
+    </div>
+</div>
+
+<{area inject=".mainFoot"}>
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td><button class="btn btn-primary" id="submit_btn" ><span><span><{t}>提交<{/t}></span></span></button></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<{/area}>
+<script>
+Ex_Loader("picker",function(){
+    new GoogColorPicker("label_color",{
+        onSelect:function(hex,rgb,el){
+            $("label_color").set("value", hex);
+            el.setStyle("background-color",hex);
+        }
+    })
+});
+
+(function(){
+    var _form = $('form'); //表单ID 
+    var btn   = $('submit_btn'); //提交按钮ID
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    _form.store('target',{
+        onComplete:function(){
+        },
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+
+                if(_dialogIns){
+                    finder.refresh();
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+    
+    btn.addEvent('click',function(){
+        _form.fireEvent('submit',{stop:$empty});
+    });
+})();
+</script>

@@ -1,0 +1,56 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!-- <tr width="10%" align="left" nowrap="nowrap">自定义属性：</tr> -->
+
+<{if($propetyList)}>
+<table border="0" cellspacing="0" cellpadding="0" class="gridlist1">
+    <thead>
+    <tr class="prop_value">
+        <{foreach from=$propetyList item=itemVal key=itemKey}>
+            <td width="10%" align="left" nowrap="nowrap">
+                <{$itemVal.prop_name}>：
+            </td>
+            <td>
+                <{if $itemVal.select}>
+                <select name="property_select[<{$itemVal.prop_id}>]">
+                    <option value="_all_">全部</option>
+                    <{foreach from=$itemVal.select item=selVal key=selKey}>
+                    <option value="<{$selKey}>"><{$selVal}></option>
+                    <{/foreach}>
+                </select>
+                <{/if}>
+            </td>
+        <{/foreach}>
+    </tr>
+    </thead>
+</table>
+<{else}>
+<div class="note">当前分类没有扩展属性</div>
+<{/if}>
+
+<style type="text/css">
+    .gridlist1 {
+        width: 10%;
+        border: 0;
+        margin:10px 0 0 10px;
+    }
+
+    .prop_value td{
+      padding: 0 10px 0 0;
+    }
+
+    .prop_title {
+        padding: 10px 0 0 10px;
+    }
+
+    .prop_time {
+        padding:20px 0 0 10px;
+    }
+
+    .division {
+        padding: 10px 0 0 10px;
+    }
+</style>

@@ -1,0 +1,9 @@
+<services>
+    <service id="openapi.rpc">
+        <class>openapi_entrance</class>
+    </service>
+    
+    <service id="desktop_finder.openapi_mdl_setting">
+        <class>openapi_finder_setting</class>
+    </service>
+</services>

@@ -1,0 +1,45 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="POST" action="index.php?app=finance&ctl=monthend_verification&act=save_memo&p[]=<{$monthly_id}>&p[]=<{$order_bn}>" id="bill-memo-form">
+<div class="tableform">
+	<div class="division">
+		<table width="100%" cellpadding="0" cellspacing="0">
+			<tbody>
+				<tr>
+					<th>备注：</th>
+					<td>
+						<textarea name="memo"></textarea>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+<div class="table-action">
+    <{button type="submit" label="确定"  class="btn-primary" }> &nbsp; &nbsp;
+    <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+</div>
+</form>
+<script type="text/javascript">
+$('bill-memo-form').store('target',{
+    onRequest:function(){
+       $E('#bill-memo-form .btn-primary').set('disabled', 'true');
+       
+    },
+    onComplete:function(jsontext){
+       var json = Json.evaluate(jsontext);
+       if (typeof(json.error) != 'undefined'){
+           $E('#bill-memo-form .btn-primary').set('disabled', '');
+       }else{
+           $E('#bill-memo-form .btn-primary').set('disabled', 'true');
+
+           $('bill-memo-form').getParent('.dialog').retrieve('instance').close();
+
+           finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+       }
+    }
+});
+</script>

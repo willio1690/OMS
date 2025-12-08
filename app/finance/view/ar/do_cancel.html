@@ -1,0 +1,23 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<a href="javascript:void(0)" onclick="do_cancel(<{$ar_id}>)">删除</a>
+<script>
+function do_cancel(e){
+    if(confirm('是否作废')){
+        new Request({
+            url:'index.php?app=finance&ctl=ar&act=do_cancel&id='+e,
+            method:'get',
+            onSuccess:function(json){
+                rs = JSON.decode(json);
+                if(rs.res == 'fail'){
+                    alert(rs.msg);
+                }
+                finderGroup['<{$finder_id}>'].refresh();
+            }
+        }).send();
+    }
+}
+</script>

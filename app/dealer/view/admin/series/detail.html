@@ -1,0 +1,117 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<link href="../../../app/desktop/statics/perfect/main.css" rel="stylesheet" type="text/css">
+<div class="form-layout">
+    <form method="post" id="dealer_series_form" action="index.php?app=dealer&ctl=admin_series&act=toEdit">
+        <input type="hidden" name="sm_id" value="<{$material_info.sm_id}>">
+        <div class="form-layout-block">
+            <h3><{if $history}><em class='c-red'>《快照》</em><{/if}>查看产品线基本信息</h3>
+            <div class="form-layout-fields form-layout-fields-column">
+                <div class="form-field">
+                    <span class="form-field-label">产品线编码：</span>
+                    <{$series_info.series_code}>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">产品线名称：</span>
+                    <{$series_info.series_name}>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">产品线描述：</span>
+                    <{$series_info.description}>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">产品线分类：</span>
+                    <{$series_info.cat_name}>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">产品线备注：</span>
+                    <{$series_info.remark}>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">所属贸易公司：</span>
+                    <select name='betc_id' disabled>
+	                    <option value="">请选择...</option>
+	                    <{foreach from=$betcs item=betc}>
+                            <option value="<{$betc.betc_id}>" title="<{$betc.betc_name}>" <{if $series_info.betc_id == $betc.betc_id}>selected<{/if}>><{$betc.betc_name}></option>
+	                    <{/foreach}>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">基础物料：</span>
+                    <{input type='dealer_object' object='basic_material@material' multiple=true breakpoint='0' name='bm_id' textcol='material_name' value=$bind_bm_ids callback='product_object_callback' replacehtml=$replacehtml emptytext='查看基础物料' style='float:left;width:500px;' filter="" }>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">经销店铺：</span>
+                    <{input type='dealer_object' object='shop@ome' multiple=true breakpoint='0' name='shop_id' textcol='name' value=$bind_shop_ids callback='shop_object_callback' replacehtml=$replacehtml_shop emptytext='查看经销店铺' style='float:left;width:500px;' filter="delivery_mode=shopyjdf" }>
+                </div>
+            </div>
+        </div>
+        <!--
+        <div class="form-layout-block">
+            <h3>操作日志</h3>
+            <div class="form-layout-fields">
+                <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>操作时间</th>
+                        <th>IP</th>
+                        <th>操作人</th>
+                        <th>操作类型</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <{if $data}>
+                    <{foreach from=$data item=log}>
+                    <tr>
+                        <td><{$log.operate_time}></td>
+                        <td><{$log.ip}></td>
+                        <td><{$log.op_name}></td>
+                        <td><{$log.operation}></td>
+                    </tr>
+                    <{/foreach}>
+                    <{else}>
+                    <tr>
+                        <td colspan="5" align="center"><div style="text-align:center; width:100%;">没有相关记录...</div></td>
+                    </tr>
+                    <{/if}>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+         -->
+    </form>
+</div>
+
+<script>
+
+//基础物料明细展示
+function product_selected_show(){
+    new Dialog('index.php?app=dealer&ctl=admin_series&act=showProducts',{
+        ajaxoptions:{data:$('hand-selected-product').getNext('div'),method:'post'}
+    });
+}
+
+//经销店明细展示
+function shop_selected_show(){
+    new Dialog('index.php?app=dealer&ctl=admin_series&act=showShops',{
+        ajaxoptions:{data:$('hand-selected-shop').getNext('div'),method:'post'}
+    });
+}
+
+(function() {
+	window.addEvent('domready', function() {
+		//页面加载埋点
+		
+    });
+})();
+</script>

@@ -1,0 +1,129 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{/capture}>
+
+<div class="division" id="order_items">
+  <h4>分销订单列表</h4>
+  <table class="nosplit gridlist clear" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 1px solid #d5dfe3; border-collapse: separate;">
+    <thead>
+    <tr>
+      <th><{t}>分销订单号<{/t}></th>
+      <th><{t}>基础物料编码<{/t}></th>
+      <th style="display:none;"><{t}>基础物料料名称<{/t}></th>
+      <th><{t}>关联销售物料编码<{/t}></th>
+      <th><{t}>原价<{/t}></th>
+      <th><{t}>销售价<{/t}></th>
+      <th><{t}>优惠额<{/t}></th>
+      <th><{t}>实付金额<{/t}></th>
+      <th><{t}>优惠分摊<{/t}></th>
+      <th><{t}>购买量<{/t}></th>
+      <th><{t}>已发货量<{/t}></th>
+      <th><{t}>已退货量<{/t}></th>
+      <th><{t}>贸易公司<{/t}></th>
+      <th><{t}>子单号<{/t}></th>
+      <th style="white-space: nowrap;width: 130px;"><{t}>创建时间<{/t}></th>
+    </tr>
+    </thead>
+    <tbody>
+    <{if $fenxiaoList}>
+    <{foreach from=$fenxiaoList item=items}>
+        <{if $items.orders}>
+            <{foreach from=$items.orders item=item}>
+            <tr class="ColColorBlue" <{if $item.delete == 'true'}>style="background-color:#DDDDDD;"<{/if}> >
+                <td><{$item.order_bn}></td>
+                <td><{$item.bn}></td>
+                <td style="width:260px; word-spacing:nowrap; display:none;"><a title="<{$item.name}>" class="noLink"><{$item.name}></a></td>
+                <td><{$item.goods_bn}></td>
+                <td><{$item.price}></td>
+                <td><{$item.sale_price|cur}></td>
+                <td><{$item.pmt_price|cur}></td>
+                <td><{$item.divide_order_fee|cur}></td>
+                <td><{$item.part_mjz_discount|cur}></td>
+                <td><{$item.quantity}></td>
+                <td><{$item.sendnum}></td>
+                <td><{$item.return_num}></td>
+                <td><{$item.betc_name}></td>
+                <td><{$item.oid}></td>
+                <td><{$item.download_time|cdate}></td>
+            </tr>
+            <{/foreach}>
+        <{else}>
+          <tr>
+            <td height="45" colspan="15" align="center" style="text-align:center">没有相关信息...</td>
+        </tr>
+        <{/if}>
+    <{/foreach}>
+    <{else}>
+        <tr>
+            <td height="45" colspan="15" align="center" style="text-align:center">没有相关信息...</td>
+        </tr>
+    <{/if}>
+    </tbody>
+ </table>
+</div>
+
+<div class="division" id="order_items">
+  <h4>分销发货单列表</h4>
+  <table class="nosplit gridlist clear" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 1px solid #d5dfe3; border-collapse: separate;">
+    <thead>
+    <tr>
+      <th><{t}>分销发货单号<{/t}></th>
+      <th><{t}>基础物料编码<{/t}></th>
+      <th><{t}>基础物料料名称<{/t}></th>
+      <th><{t}>数量<{/t}></th>
+      <th><{t}>物流公司<{/t}></th>
+      <th><{t}>物流单号<{/t}></th>
+      <th><{t}>仓库<{/t}></th>
+      <th><{t}>发货状态<{/t}></th>
+      <th><{t}>贸易公司<{/t}></th>
+      <th style="white-space: nowrap;width: 130px;"><{t}>创建时间<{/t}></th>
+    </tr>
+    </thead>
+    <tbody>
+    <{if $fenxiaoList}>
+    <{foreach from=$fenxiaoList item=items}>
+        <{if $items.delivery}>
+            <{foreach from=$items.delivery item=item}>
+            <tr class="ColColorBlue">
+                <td><{$item.delivery_bn}></td>
+                <td><{$item.bn}></td>
+                <td style="width:260px; word-spacing:nowrap;"><a title="<{$item.product_name}>" class="noLink"><{$item.product_name}></a></td>
+                <td><{$item.number}></td>
+                <td><{$item.logi_name}>(<{$item.logi_type}>)</td>
+                <td><{$item.logi_no}></td>
+                <td><{$item.branch_name}></td>
+                <td><{$item.delivery_status}></td>
+                <td><{$item.betc_name}></td>
+                <td><{$item.create_time|cdate}></td>
+            </tr>
+            <{/foreach}>
+        <{else}>
+          <tr>
+            <td height="45" colspan="10" align="center" style="text-align:center">没有相关信息...</td>
+        </tr>
+        <{/if}>
+    <{/foreach}>
+    <{else}>
+        <tr>
+            <td height="45" colspan="10" align="center" style="text-align:center">没有相关信息...</td>
+        </tr>
+    <{/if}>
+    </tbody>
+    </tbody>
+ </table>
+</div>
+<style>
+#order_items th {
+    background: url("../app/desktop/statics/css/default/images/tile_bg.png") 0 -296px;
+    height: 22px;
+    line-height: 22px;
+    border-right: 1px solid #c8d6dc;
+}
+.noLink { text-decoration:none; color:#5B5B5B; }
+.noLink:hover { text-decoration:none; color:#5B5B5B; }
+</style>

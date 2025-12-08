@@ -1,0 +1,168 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout">
+    <form>
+        <div class="form-layout-block">
+            <h3>售后类型/订单</h3>
+            <div class="form-layout-fields">
+                <div class="form-field" style="width: 100%">
+                    <span class="form-field-label">选择售后类型：</span>
+                    <div class="form-radios">
+                        <label><input name="sex" type="radio" value="1">售后申请</label>
+                        <label><input name="sex" type="radio" value="1">退款申请单</label>
+                        <label><input name="sex" type="radio" value="1">退货单</label>
+                        <label><input name="sex" type="radio" value="1">换货单</label>
+                    </div>
+                </div>
+                <div class="form-field" style="width: 100%">
+                    <span class="form-field-label">当前订单：</span>
+                    <div class="input-search">
+                        <input style="width: 20%" class="form-input" placeholder="请输入已有订单号" />
+                        <button class="btn-primary">确定</button>
+                        <button class="btn-primary">查找订单</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-layout-block">
+            <h3>货品信息</h3>
+            <div class="form-layout-fields">
+                <div class="form-field" style="width: 100%">
+                    <span class="form-field-label">上传文件：</span>
+                    <div>
+                        <button class="btn-primary">选择文件</button>
+                        <span>未选择任何文件</span>
+                    </div>
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">申请内容：</span>
+                    <textarea class="form-input" placeholder="请输入申请内容（0/150）" style="height: 100px"></textarea>
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">售后答复：</span>
+                    <textarea class="form-input" placeholder="请输入售后答复内容（0/150）" style="height: 100px"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="form-layout-block">
+            <h3>收货人信息</h3>
+            <div class="form-layout-fields">
+            </div>
+        </div>
+
+        <div class="form-layout-block">
+            <h3>Example</h3>
+            <div class="form-layout-fields form-layout-fields-column">
+
+                <!-- 普通输入 -->
+                <div class="form-field">
+                    <span class="form-field-label">名称：</span>
+                    <input class="form-input" placeholder="请输入" />
+                </div>
+
+                <!-- 下拉选择 -->
+                <div class="form-field">
+                    <span class="form-field-label">名称：</span>
+                    <select class="form-input" placeholder="请选择">
+                        <option value="1">张三</option>
+                        <option value="2">李四</option>
+                    </select>
+                </div>
+
+                <!-- 单选 -->
+                <div class="form-field">
+                    <span class="form-field-label">单选：</span>
+                    <div class="form-radios">
+                        <input id="s1" name="sex" type="radio" value="1">
+                        <label for="s1">选项1</label>
+                        <input id="s2" name="sex" type="radio" value="2">
+                        <label for="s2">选项2</label>
+                        <input id="s3" name="sex" type="radio" value="2">
+                        <label for="s3">选项3</label>
+                    </div>
+                </div>
+
+                <!-- 多选 -->
+                <div class="form-field">
+                    <span class="form-field-label">多选：</span>
+                    <div class="form-checkbox">
+                        <input id="c1" name="sex" type="checkbox" value="1">
+                        <label for="c1">选项1</label>
+                        <input id="c2" name="sex" type="checkbox" value="2">
+                        <label for="c2">选项2</label>
+                        <input id="c3" name="sex" type="checkbox" value="2">
+                        <label for="c3">选项3</label>
+                    </div>
+                    <p class="form-remark">选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3</p>
+                </div>
+
+                <!-- 禁用状态 -->
+                <div class="form-field">
+                    <span class="form-field-label">禁用状态：</span>
+                    <input class="form-input form-disabled" placeholder="请输入" />
+                    <p class="form-remark">选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3选项3</p>
+
+                </div>
+
+                <!-- 文本域 -->
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">名称：</span>
+                    <textarea class="form-input" style="height: 100px" placeholder="请输入" ></textarea>
+                </div>
+
+                <!-- 提示信息 -->
+                <div class="form-field">
+                    <span class="form-field-label">提示信息<i class="iconfont icon-question-circle1" title="提示信息"></i>：</span>
+                    <input class="form-input" placeholder="请输入" />
+                </div>
+            </div>
+        </div>
+        <div class="form-actions">
+            <a class="btn btn-default">关闭</a>
+            <button class="btn-primary">保存</button>
+        </div>
+    </form>
+</div>
+
+<style>
+.content-container {
+    background: #EEF5F9;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
+    overflow: auto;
+    padding: 0;
+    box-shadow: none;
+}
+.form-layout .form-layout-fields-column {
+    flex-direction: column;
+}
+.form-layout  .form-layout-fields-column .form-field  {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.form-layout  .form-layout-fields-column .form-remark {
+    font-size: 12px;
+    color: #999999;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 206px;
+    margin-top: 8px;
+}
+.form-layout  .form-layout-fields-column .form-field .form-field-label{
+    width: 200px;
+    text-align: right;
+    margin-bottom: 0;
+    margin-right: 10px;
+}
+.form-layout .form-layout-fields-column .form-field .form-input  {
+    width: 35%;
+}
+</style>

@@ -1,0 +1,239 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{script src="coms/dropmenu.js" app='desktop' }>
+<{script src="coms/autocompleter.js" app='desktop' }>
+<{script src="coms/pager.js" app='desktop' }>
+<{/capture}>
+
+<form method="post" id="fm1" action="index.php?app=console&ctl=admin_vopreturn&act=editSave">
+    <div class="tableform">
+        <h3>编辑退供单</h3>
+        <div class="division">
+
+            <h5 style="margin-top:10px;">退供商品 <span style="color: #666; font-size: 12px; font-weight: normal;">（仅展示手动添加的商品）</span></h5>
+            <{button label="基础物料库频道" id="purchase-find-btn" }>
+
+            <table class="gridlist" id="purchase_table"  style="margin:4px 0;">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" class='selectall' onclick="this.blur()"></th>
+                        <th width="10%">商品条形码</th>
+                        <th width="10%">商品货号</th>
+                        <th width="30%">商品名称</th>
+                        <th>采购单号</th>
+                        <th>退供箱号</th>
+                        <th>运单号</th>
+                        <th>退供数量</th>
+                        <th>价格</th>
+                        <th width="5%">删除</th>
+                    </tr>
+                </thead>
+                <tbody id="dataNode">
+                <{if $list}>
+                <{foreach from=$list item=item}>
+                <tr>
+                    <td><input type="checkbox" class="product_select"></td>
+                    <td><{$item.barcode}></td>
+                    <td><input type="hidden" name="item_id[]" value="<{$item.id}>" /><{$item.material_bn}></td>
+                    <td><{$item.product_name}></td>
+                    <td><input type="text" value="<{$item.po_no}>" name="up[po_no][<{$item.id}>]"  vtype="required"></td>
+                    <td><input type="text" value="<{$item.box_no}>" name="up[box_no][<{$item.id}>]" vtype="required"></td>
+                    <td><input type="text" value="<{$item.storage_box_no}>" name="up[storage_box_no][<{$item.id}>]" vtype="required" ></td>
+                    <td><input type="text" value="<{$item.qty}>" name="up[num][<{$item.id}>]" vtype="unsigned&amp;&amp;required" size="6"></td>
+                    <td><input type="text" value="<{$item.price}>" name="up[price][<{$item.id}>]" vtype="unsigned&amp;&amp;required" size="12"></td>
+                    <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>
+                </tr>
+
+                <{/foreach}>
+                <{else}>
+                <tr id="note">
+                    <td colspan="10" style="padding:0;"><div class="note" style="margin:0;"> 暂无可编辑货品信息 </div></td>
+                </tr>
+                <{/if}>
+                </tbody>
+            </table>
+            <input type="hidden" name="return_id" value="<{$data.id}>" />
+            <{button label="删除选中" class="btn btn-primary" id="purchase-del-btn"}> </div>
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-top:10px;">
+
+        </table>
+        <div id="cc" class="noprint table-action"> <{button type="button" class="btn" id="purchase-save-btn" label="保 存"}> &nbsp; <{button type="button" class="btn" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}></div>
+    </div>
+</form>
+
+<script>
+(function(){
+    var _form = $('fm1');//表单ID
+    var btn   = $('purchase-save-btn');//按钮ID
+    var finder = opener.finderGroup['<{$env.get.finder_id}>'];
+
+    var callurl='index.php?app=console&ctl=admin_vopreturn&act=getProducts',store=[];
+
+    var tpl='<tr key="{product_id}" id="product_{product_id}" title="点击选取/反选此条记录">'+
+        '<td><input type="checkbox" class="product_select"></td>  <td><input type="hidden" name="product_id[]" value="{product_id}" />{material_bn}</td><td class="product-name" name="product_name">{product_name}</td><td name="barcode">{barcode}</td>'+
+        '  <td><input type="text" value="{po_no}" name="at[po_no][{product_id}]" key="po_no" vtype="required" tname="at[_PRIMARY_]" ></td>'+
+        '  <td><input type="text" value="{box_no}" name="at[box_no][{product_id}]" key="box_no" vtype="required" tname="at[_PRIMARY_]" ></td>'+
+        '  <td><input type="text" value="{storage_box_no}" name="at[storage_box_no][{product_id}]" key="storage_box_no" vtype="required" tname="at[_PRIMARY_]" ></td>'+
+        '  <td><input type="text" value="{qty}" name="at[num][{product_id}]" key="num" vtype="unsigned&amp;&amp;required" tname="at[_PRIMARY_]" size="6"></td>'+
+        '  <td><input type="text" value="{price}" name="at[price][{product_id}]" key="num" vtype="unsigned&amp;&amp;required" tname="at[_PRIMARY_]" size="12"></td>'+
+        '  <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>'+
+        '</tr>';
+
+    $('purchase-find-btn').addEvent('click',function(e){
+        var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=console&ctl=admin_vopreturn&act=findMaterial');
+        Ex_Loader('modedialog',function() {
+            new finderDialog(url,{params:{url:callurl,name:'product_id[]'},width:1000,height:660,
+                onCallback:function(rs){
+                    if(!rs)return;
+                    rs=JSON.decode(rs);
+                    appendProducts(rs);
+                }});
+        });
+    });
+
+    function findProduct(arr,PRIMARY){
+        if(!store.length)return arr;
+        store.each(function(a){
+            arr.each(function(b){
+                if(a[PRIMARY]==b[PRIMARY])arr.erase(b);
+            });
+        });
+        return arr;
+    }
+
+    function appendProducts(rs){
+        var tmparr = findProduct(rs,'product_id');
+        if(tmparr.length === 0) {
+            alert('所选商品已存在，请勿重复添加！');
+            return;
+        }
+        
+        // 追加新数据到store
+        store = store.concat(tmparr);
+
+        // 移除提示行
+        var noteRow = $('note');
+        if(noteRow) {
+            noteRow.destroy();
+        }
+
+        // 创建新的行并追加到表格
+        tmparr.each(function(item){
+            var newRow = tpl.replace(/\{(\w+)\}/g, function(match, key){
+                return item[key] || '';
+            });
+            
+            // 创建一个临时的table元素来解析HTML
+            var tempTable = document.createElement('table');
+            tempTable.innerHTML = '<tbody>' + newRow + '</tbody>';
+            var newRowElement = tempTable.getElementsByTagName('tr')[0];
+
+
+            // 添加到表格中
+            $('dataNode').appendChild(newRowElement);
+
+        });
+
+        // 绑定新添加行的事件
+        bindRowEvents();
+    }
+
+    function bindRowEvents(){
+        $$('#dataNode tr').each(function(item){
+            if(item.hasClass('event-bound')) return;
+            
+            item.addClass('event-bound');
+            
+            item.addEvent('click',function(e){
+                if(e.target.tagName === 'INPUT') return;
+                this.toggleClass('selected');
+                var checkbox = this.getElement('.product_select');
+                checkbox.checked = !checkbox.checked;
+            });
+
+            var deleteBtn = item.getElement('.btn-delete-item');
+            if(deleteBtn){
+                deleteBtn.addEvent('click',function(e){
+                    e.stop();
+                    if(confirm('确定要删除该商品吗？')){
+                        var productId = item.get('key');
+                        store = store.filter(function(p) { return p.product_id != productId; });
+                        item.destroy();
+                        if($$('#dataNode tr').length === 0) {
+                            $('dataNode').set('html', '<tr><td colspan="10" style="padding:0;"><div class="note" style="margin:0;"> 暂无可编辑货品信息 </div></td></tr>');
+                        }
+                    }
+                });
+            }
+
+            // 绑定输入框事件
+            item.getElements('input[tname^=at]').each(function(input){
+                input.addEvent('keypress',function(e){
+                    if(e.code==13) $E('#pfba input').focus();
+                });
+            });
+        });
+    }
+
+    // 初始化时绑定事件
+    bindRowEvents();
+
+    // 全选按钮事件
+    // $('purchase-delall-btn').addEvent('click', function(){
+    //     var checked = this.checked;
+    //     $$('#dataNode .product_select').each(function(checkbox){
+    //         checkbox.checked = checked;
+    //     });
+    // });
+
+    // 删除选中按钮事件
+    $('purchase-del-btn').addEvent('click', function(){
+        var selected = $$('#dataNode .product_select:checked');
+        if(selected.length === 0) {
+            alert('请先选择要删除的商品！');
+            return;
+        }
+        
+        if(confirm('确定要删除选中的商品吗？')){
+            selected.each(function(checkbox){
+                var row = checkbox.getParent('tr');
+                var productId = row.get('key');
+                store = store.filter(function(p) { return p.product_id != productId; });
+                row.destroy();
+            });
+            
+            if($$('#dataNode tr').length === 0) {
+                $('dataNode').set('html', '<tr><td colspan="10" style="padding:0;"><div class="note" style="margin:0;"> 暂无可编辑货品信息 </div></td></tr>');
+            }
+        }
+    });
+
+    _form.store('target',{
+        onRequest:function(){
+            btn.setAttribute('disabled', 'disabled');
+        },
+        onComplete:function(){
+            btn.removeAttribute('disabled');
+        },
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                if(finder){
+                    setTimeout(finder.refresh(),3000);
+                }
+
+                setTimeout('window.close()',1000);
+            }
+        }
+    });
+    btn.addEvent('click',function(){
+        _form.fireEvent('submit',{stop:$empty});
+    });
+
+
+})();
+</script>

@@ -1,0 +1,108 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=<{$env.get.app}>&ctl=<{$env.get.ctl}>&act=save&finder_id=<{$env.get.finder_id}>" method="post" id="order_frm">
+
+<div class="tableform">
+    <input type="hidden" name="item[sid]" value="<{$item.sid}>">
+
+    <div class="division">
+    <table border="0" cellpadding="0" cellspacing="0"><tbody>
+<!--         <tr><th>开票内容：</th>
+            <td>
+            <{input type="object" object="content@invoice" name="item[title]" value=$item.title required="true"}>
+            <em class="c-red">&nbsp;*</em>
+            </td>
+        </tr> -->
+        <tr><th>开票方式：</th>
+            <td>
+            <{input type="select" name="item[mode]" value=$item.mode|default:"1" options=array('0'=>'纸质发票','1'=>'电子发票') required="true" }>
+            <em class="c-red">(注：纸质发票设置，只能统一创建一条)</em>
+            </td>
+        </tr>
+    </tbody></table>
+    </div>
+
+    <div id="einvoice-channel"></div>
+
+    <div class="division">
+    <table border="0" cellpadding="0" cellspacing="0"><tbody>
+        <tr><th>开票人：</th>
+            <td><{input vtype="required" type="text" name="item[payee_operator]" value=$item.payee_operator size="32" }><em class="c-red">&nbsp;*</em></td>
+        </tr>
+        <tr><th>收款人：</th>
+            <td><{input vtype="required" type="text" name="item[payee_receiver]" value=$item.payee_receiver size="32" }><em class="c-red">&nbsp;*</em></td>
+        </tr>
+        <tr><th>复核人：</th>
+            <td><{input vtype="required" type="text" name="item[payee_checker]" value=$item.payee_checker size="32" }><em class="c-red">&nbsp;*</em></td>
+        </tr>
+        <tr><th>开票方名称：</th>
+            <td><{input vtype="required" type="text" name="item[payee_name]" value=$item.payee_name size="32" }><em class="c-red">&nbsp;*</em></td>
+        </tr>
+        <tr><th>税率：</th>
+            <td><{input type="number" size="5" maxlength="2" name="item[tax_rate]" required='required' value=$item.tax_rate|default:16}> <em style="font-weight:bold;">%</em><em class="c-red">&nbsp;*</em></td>
+        </tr>
+        <tr><th>开票方税号：</th>
+            <td><{input type="text" size="32" maxlength="32" name="item[tax_no]" required='required' value=$item.tax_no}><em class="c-red">&nbsp;*</em></td>
+        </tr>
+        <tr><th>开票方银行：</th>
+            <td><{input type="text" size="32" maxlength="32" name="item[bank]" required='required' value=$item.bank}><em class="c-red">&nbsp;*</em></td>
+        </tr>
+        <tr><th>开票方银行账号：</th>
+            <td><{input type="number" size="60" name="item[bank_no]" maxlength="30" required='required' value=$item.bank_no}> <em class="c-red">&nbsp;*</em></td>
+        </tr>
+        <tr><th>开票方联系电话：</th>
+            <td><{input type="text" size="32" name="item[telphone]" maxlength="30" required='required' value=$item.telphone}><em class="c-red">&nbsp;*</em></td>
+        </tr>
+        <tr><th>开票方联系地址：</th>
+            <td><{input type="text" name="item[address]"  size="60" required='required'  value=$item.address}><em class="c-red">&nbsp;*</em>
+            <div style="color: #999;">联系地址文字长度，请不要超过255字节</div></td>
+        </tr>
+    </tbody></table>
+    </div>
+
+</div>
+
+    <div class="table-action">
+        <{button label="提交" type="submit" name="submit" class="btn-primary"}>
+        <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+</form>
+
+<script type="text/javascript">
+    (function(){
+        $E('select[name=item[mode]]').addEvent('change',function(){
+            if (this.value != '1') {
+                $('einvoice-channel').removeClass('division');
+                return $('einvoice-channel').empty();
+            }
+
+            W.page('index.php?app=invoice&ctl=admin_order_setting&act=loadChannel&p[0]='+$E('input[name=item[sid]]').getValue(),{
+                update:$('einvoice-channel'),
+                clearUpdateMap:false,
+                onSuccess:function(resp){
+                    resp == '' ? $('einvoice-channel').removeClass('division') : $('einvoice-channel').addClass('division');
+                }
+            });
+        });
+
+        $E('select[name=item[mode]]').fireEvent('change');
+
+        $('order_frm').store('target',{
+            onComplete:function(){
+            },
+            onSuccess:function(response){
+                var resp = JSON.decode(response);
+                if (resp.success){
+                    $('order_frm').getParent('.dialog').retrieve('instance').close();
+                }
+            }
+        });
+
+        if ($E('input[name=item[sid]]').getValue()) {
+            $E('select[name=item[mode]]').set('disabled',true);
+        }
+    })();
+</script>

@@ -1,0 +1,23 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id='pko-selected-body'>
+<{include file="finder/input-row.html" app="inventorydepth"}>
+</div>
+<{area inject=".mainFoot"}>
+<div class='table-action'>
+    <{button label='确定' id='primary-btn' onclick='change_pko();'}>
+</div>
+<{/area}>
+<script>
+function change_pko(){
+    var handle = $('hand-selected-pko').getNext('div');
+    handle.setHTML($('pko-selected-body').innerHTML);
+    var length = $('pko-selected-body').getElements('.row').length;
+    var html = '已选择了'+length+'个多选一商品,'+"<a href='javascript:void(0);' onclick='pko_selected_show();'>查看选中多选一商品.</a>";
+    $('hand-selected-pko').setHTML(html);
+    $('primary-btn').getParent('.dialog').retrieve('instance').close();
+}
+</script>

@@ -1,0 +1,22 @@
+<?php
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+class ome_exportextracolumn_store_freeze extends ome_exportextracolumn_abstract implements ome_exportextracolumn_interface{
+
+    protected $__pkey = 'bm_id';
+
+    protected $__extra_column = 'column_store_freeze';
+
+    public function associatedData($ids){
+        $lib_mbmsf = kernel::single('material_basic_material_stock_freeze');
+        $tmp_array = array();
+        foreach ($ids as $var_bm_id){
+            $tmp_array[$var_bm_id] = $lib_mbmsf->getMaterialStockFreeze($var_bm_id);
+        }
+        return $tmp_array;
+    }
+
+}

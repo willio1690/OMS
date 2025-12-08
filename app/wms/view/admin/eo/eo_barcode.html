@@ -1,0 +1,342 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css src="ome.css" app="ome"}>
+<{script src="coms/pager.js" app='desktop' }>
+<{script src="coms/dropmenu.js" app='desktop' }>
+<{script src="coms/autocompleter.js" app='desktop' }>
+<style type="text/css">
+.btn_pos{position:absolute; left:70px; top:2px;z-index:2;}
+</style>
+<{/capture}>
+
+<form method="post" id="stock_form" action="index.php?app=wms&ctl=admin_eo&act=save_barcode">
+<div class="tableform">
+
+<h3>采购入库 - 条码方式</h3>
+<div class="division">
+<input type="hidden" name="find_id" value="<{$env.get.find_id}>">
+<input type="hidden" id="po_id" name="po_id" value="<{$po_id}>">
+<input type="hidden" name="branch_id" value="<{$branch_id}>">
+
+<!--编码入库 start-->
+<div class="ome-stock-barcode">
+    <div style="margin-bottom:10px;margin-top: 10px">
+        到货单号: <input type="text" name="arrival_no" value="" autocomplete="off" id="arrival_no"/>
+    </div>
+    扫描条码: <input type="text" name="some_name" value="" autocomplete="off" id="find-bn"/> <{button type="button" label="回车键确定" id="add_bn" app="desktop" icon="btn_add.gif"}>
+    &nbsp;&nbsp;&nbsp;<{button type="button" label="切换到传统入库方式" onclick="javascript:window.location='index.php?app=wms&ctl=admin_eo&act=eo_confirm&p[0]={$po_id}&find_id={$env.get.find_id}';" }>
+<div class="ome-stock" style="clear:both">
+    <input type="hidden" name="stock_confirm" id="stock_confirm" value="<{$stock_confirm}>">
+    <input type="hidden" name="stock_cancel" id="stock_cancel" value="<{$stock_cancel}>">
+    <table class="gridlist" width="100%" cellspacing="0">
+        <thead>
+            <tr>
+                <th>基础物料名称</th>
+                <th style="width:10%">基础物料编码</th>
+                <th style="width:10%">条码</th>
+                <th style="width:4%">单位</th>
+                <th style="width:5%">采购数量</th>
+                <th style="width:6%" nowrap>已入库数量</th>
+                <th style="width:9%" nowrap>
+                    <span class="ome-stock-type stat-type-barcode" style="display:none;">&nbsp;<{img src="bundle/manual.gif" app="purchase"}></span>
+                    <span class="ome-stock-type stat-type-manual" >&nbsp;<{img src="bundle/barcode.gif" app="purchase"}></span>
+                    <span id="ome-stock-barcode-arrow" dropmenu="ome-stock-barcode-dropdown" class="lnk">入库数量</span>
+                    <{img src="bundle/arrow-down.gif" app="desktop"}>
+                    <div id="ome-stock-barcode-dropdown" class="x-drop-menu">
+                        <ul class="group">
+                            <li class="item"><{img src="bundle/manual.gif" app="purchase"}>手动输入数量</li>
+                            <li class="item"><{img src="bundle/barcode.gif" app="purchase"}>扫描输入数量</li>
+                        </ul>
+                        <span class="notice-inline">(按照扫描次数计算数量)</span>
+                    </div>
+                </th>
+                <th style="width:13%">操作</th>
+            </tr>
+        </thead>
+        <tbody id='dataNode'>
+        </tbody>
+    </table>
+</div>
+
+    <div class="table-action" style="display:none;">
+    <{button type="button" id="confirm_btn" label="收货入库" }>
+    <{button type="button" id="close_btn" label="关闭页面" }>
+    </div>
+    <h3>提示：</h3>
+    <div>
+        <ul>
+            <li>输入条码 <b>"<{$stock_confirm}>"</b> 可实现收货入库操作</li>
+            <li>输入条码 <b>"<{$stock_cancel}>"</b> 可实现关闭页面操作</li>
+        </ul>
+    </div>
+
+</div>
+
+</div>
+</div>
+</form>
+<script>
+    function visibility(e,type){
+        var visiTips = new Tips({
+            onShow:function(tip,el){
+                el.addClass('active');
+                tip.setStyle('display','block');
+            },
+            text: function(element){
+                if(type == 1 && element.get('instock_storagelife')){
+                    var jsontext = element.get('instock_storagelife');
+                    var ex_bm_info = Json.evaluate(jsontext);
+                    var show_str = '';
+                    if(ex_bm_info){
+                        ex_bm_info.each(function(item){
+                            show_str += '批次号：'+item.expire_bn+'，数量：'+item.nums+'<br/>';
+                        });
+                    }
+                    return show_str;
+                }
+                else if(type == 2 && element.get('text').toInt() > 0 && element.getParent('td').getNext('td').getElement('a')){
+                    var jsontext = element.getParent('td').getNext('td').getElement('a').get('expire_bm_info');
+                    var ex_bm_info = Json.evaluate(jsontext);
+                    var show_str = '';
+                    if(ex_bm_info){
+                        ex_bm_info.each(function(item){
+                            show_str += '批次号：'+item.expire_bn+'，数量：'+item.in_num+'<br/>';
+                        });
+                    }
+                    return show_str;
+                }else{
+                    return '';
+                }
+            }
+        });
+
+        var e  = new Event(e), el = e.target;
+        if ((type == 1 && el.get('instock_storagelife'))|| (type == 2 && el.get('text').toInt() > 0))
+        {
+            visiTips.attach(el);
+                el.addEvent('mouseleave',function(){
+                el.removeClass('active');
+            });
+            el.fireEvent('mouseenter',e);
+        }
+    }
+
+(function(){
+    var dataNode = $('dataNode');
+
+    //关闭页面
+    $('close_btn').addEvent('click', function(){
+        window.close();
+    });
+
+    $('find-bn').focus();
+
+    var dp = $('ome-stock-barcode-arrow'),
+        dpMenu = $('ome-stock-barcode-dropdown'),
+        dpTypes = dp.getParent().getElements('.ome-stock-type');
+
+    dpMenu.getElements('li').each(function(item, index){
+        item.addEvent('click', function(){
+            dpTypes.hide();
+            dpTypes[index].show();
+            var type=index?'barcode':'manual';
+            if (type=='barcode'){
+                $ES(".table-action").hide();
+            }else{
+                var childNote = $('dataNode').getChildren();
+                if ( childNote!='' ){
+                    $ES(".table-action").show();
+                }
+            }
+            dpMenu.store('type', type);
+            if(pag)    pag.goPage(1);
+        });
+    });
+
+    new DropMenu(dp, {offset:{y:18}});
+
+    var tpl='<tr id="tween-{item_id}" key="{item_id}"><td class="product-name"><input type="hidden" name="submit_flag[]" value="true"/>{name}</td>'
+           +'<td>{bn}</td><td>{barcode}</td><td>{unit}</td><td>{num}</td><td onmouseover="visibility(event,1);" instock_storagelife={instock_storagelife}>{in_num}</td>'
+           +'<td state="{state}" use_expire="{use_expire}"><span class="manual" id="bm_num_{product_id}" onmouseover="visibility(event,2);">{entry_num}</span><input type="text" size="4" name="entry_num[{item_id}]" value="{entry_num}" />'
+           +'<span class="notice" style="display:none">+1</span><input type="hidden" name="ids[]" value="{item_id}" /></td><td class="btn">{button}</td>'
+
+
+    var store=[],pag;
+    $('add_bn').addEvent('click',function(e){
+        var ipt=$('find-bn');
+        if(!ipt.value.trim().length){
+            return new MessageBox('请输入条码.',{type:'error',autohide:true});
+        }
+        if(inStore(ipt.value))return;
+        new Request.JSON({url:'index.php?app=wms&ctl=admin_eo&act=get_po_info&barcode='+ipt.value.trim()+'&po_id='+<{$po_id}>,
+            onSuccess:function(data){
+                var obj_id,np,state=false;
+                if(!$splat(data).length)return new MessageBox('没找到相关货品.',{type:'error',autohide:true});
+                store.each(function(d){
+                    var enObj = $E('[name="entry_num['+d.item_id+']"]');
+                    if(enObj) {
+                        d['entry_num'] = enObj.getParent('tr').getElement('.manual').getHTML();
+                        d.button = enObj.getParent('tr').getElement('.btn').getHTML();
+                    }
+                });
+                if(isset(data['item_id'])){
+                    ipt.value='';
+                    store.each(function(d){
+                        if(d['item_id']==data['item_id']){
+                            if(dpMenu.retrieve('type','barcode')=='barcode'){obj_id=d['item_id'];}
+                            if(d['num']-d['in_num'] > d['entry_num']){
+                                if(d['use_expire'] != 1){
+                                    d['entry_num']=d['entry_num']+1;
+                                }
+
+                                state=true;
+                            }else{
+                                new MessageBox('采购数量已满.',{type:'error',autohide:true});
+                            }
+                            
+                        }
+                    });
+                }else{
+                    store.push(data);
+                    ipt.value='';
+                }
+
+                pag=new Pager(tpl,store,{'updateMain':$('dataNode'),'pageNum':20,'format':function(d){
+                        if(!d['state'])d['state']=dpMenu.retrieve('type','barcode');
+                        d['manual']=d['state']=='barcode'?'':'none';
+                        var list=[];
+                        d['pos_item']=list.join('');
+                    },'onShow':function(){
+                        var type=dpMenu.retrieve('type','manual');
+                        var obj=type=='barcode'?$ES('#dataNode input,.btn_pos'):$ES('#dataNode .manual');
+                        obj['setStyle']('display','none');
+                        stock.storeInit();
+                        store.each(function(d){
+                            if(d['use_expire'] == 1){
+                                $("tween-"+d['item_id']).getElements('td')[6].getChildren('span')[0].setStyle('display','block');
+                                $("tween-"+d['item_id']).getElements('td')[6].getChildren('input').setStyle('display','none');
+                            }
+                        });
+
+                        $$('.instock_sl').removeEvents('click').addEvent("click",function(){
+                            var po_id = $('po_id').value;
+                            var bm_id = this.get('bm_id');
+                            var has_expire_bm_info = this.get('expire_bm_info');
+                            new Dialog('index.php?ctl=admin_eo&act=storage_life_instock&app=wms',{width:700,height:500,title:'关联保质期',ajaxoptions:{data:{po_id:po_id,bm_id:bm_id,has_expire_bm_info:has_expire_bm_info},method:'post'}});
+                        });
+                    }
+                });
+
+                if(obj_id&&!state){
+                    log($('tween-'+obj_id));
+                    var index=pag.data.each(function(d,i){if(d['item_id']==obj_id)return i});
+
+                    if ($("tween-"+obj_id)){
+                        var sp=$("tween-"+obj_id).getElement('span.notice').show().setOpacity(0);
+                        var myFx = new Fx.Tween(sp,{link:'chain',duration:'long'});
+                        myFx.start('opacity',0,1).start('opacity',1,0);
+                    }
+                }
+
+                $$('.instock_sl').removeEvents('click').addEvent("click",function(){
+                    var po_id = $('po_id').value;
+                    var bm_id = this.get('bm_id');
+                    var has_expire_bm_info = this.get('expire_bm_info');
+                    new Dialog('index.php?ctl=admin_eo&act=storage_life_instock&app=wms',{width:700,height:500,title:'关联保质期',ajaxoptions:{data:{po_id:po_id,bm_id:bm_id,has_expire_bm_info:has_expire_bm_info},method:'post'}});
+                });
+            }
+        }).send();
+    });
+
+    $('find-bn').addEvent('keyup',function(e){
+        if(e.code==13)$('add_bn').fireEvent('click');
+    });
+
+    function inStore(bn){
+        if($('stock_confirm').value==bn){
+
+            var value = '';
+            $$('.instock_sl').each(function(item){
+                if(item.getParent('td').getElement("input[name=expire_bm_info[]]")){
+                    item.getParent('td').getElement("input[name=expire_bm_info[]]").destroy();
+                }
+                value = item.get('expire_bm_info');
+                new Element('input[type=hidden]', {'name': 'expire_bm_info[]', value: value}).inject(item.getParent('td'));
+            });
+
+            $('stock_form').fireEvent('submit',{stop:$empty});
+            return true;
+        }
+        if($('stock_cancel').value==bn){
+            if(confirm('是否关闭本窗口？')) window.close();
+        }
+        return false;
+    };
+
+    function isset(id){
+        return store.some(function(d){
+                    return d['item_id']==id;
+                });
+    };
+
+    var stock={
+        storeInit:function(){
+            $ES('[name^=pos_name[]').each(function(handle,i){
+                $ES('[name^=entry_num[],.ome-stock-store-input').addEvent('keyup',function(e){
+                    if(this.getNext('.error')) this.getNext('.error').destroy();
+                    if(e.code!==13)return;
+                    $('find-bn').focus();
+                });
+
+            });
+        }
+    };
+
+    $('stock_form').store('target',{
+        onRequest:function(){
+          if (!$$('input[name=submit_flag[]]')){
+              $('confirm_btn').set('disabled', 'true');
+              $('confirm_btn').getElements('span')[1].set('text','正在入库');
+          }
+        },
+        onComplete:function(jsontext){
+          var json = JSON.decode(jsontext);
+          if (typeof(json.error) != 'undefined'){
+            dataNode.getElements('tr:key').removeClass('highlight');
+            if(json.product_id){
+              dataNode.getElements('tr:key').each(function(tr,i){
+                json.product_id.each(function(v,i){
+                  if(tr.get('key') == v){
+                    var error = tr.getElement('span.error') || new Element('span.error').injectAfter(tr.getElement('input.ome-stock-store-input'));
+                    error.setHTML('货位不存在');
+                    if(i===0) tr.getElement('input.ome-stock-store-input').focus();
+                    tr.addClass('highlight');
+                  }
+                });
+              });
+            }
+            $('confirm_btn').set('disabled', false);
+            $('confirm_btn').getElements('span')[1].set('text','收货入库');
+          }else{
+            if (!$$('input[name^=submit_flag]')){
+               $('confirm_btn').set('disabled', true);
+               $('confirm_btn').getElements('span')[1].set('text','正在入库');
+            }
+            if (json.flag != 'true'){
+                location.reload();
+            }
+          }
+
+        }
+      });
+
+      $('confirm_btn').addEvent('click',function(e){
+            $('stock_form').fireEvent('submit',e);
+      });
+
+})();
+</script>

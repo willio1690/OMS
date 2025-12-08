@@ -1,0 +1,230 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../app/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<div class="tableform" id="saleinfo">
+<h4><{if $deliveryinfo.is_encrypt}><a class="delivery-sensitive-btn data-hide" href="javascript:void(0);"></a><{/if}>基本信息</h4>
+<div class="division">
+    <table border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>商品总额：</th>
+            <td><{if $show_sale_price}><{$sales.total_amount|cur}><{else}>-<{/if}></td>
+            <th>店铺名称：</th>
+            <td><{$sales.shopname}></td>
+            <th>会员名：</th>
+            <td><span sensitive-field="uname"><{$sales.uname|ciphertext:'delivery','uname',$deliveryinfo.shop_type}></span></td>
+        </tr>
+
+        <tr>
+            <th>销售金额：</th>
+            <td><{if $show_sale_price}><{$sales.sale_amount|cur}><{else}>-<{/if}></td>
+            <th>销售单号：</th>
+            <td><{$sales.sale_bn}></td>
+            <th>操作员：</th>
+            <td><{$sales.operator}></td>
+        </tr>
+
+        <tr>
+            <th>优惠金额：</th>
+            <td><{if $show_sale_price}><{$sales.discount|cur}><{else}>-<{/if}></td>
+            <th>订单号：</th>
+            <td><{$sales.order_bn}></td>
+        </tr>
+        <tr>
+            <th>结算金额：</th>
+            <td><{if $show_sale_price}><{$sales.settlement_amount|cur}><{else}>-<{/if}></td>
+            <th>发货单号：</th>
+            <td><{$sales.delivery_bn}></td>
+        </tr>
+        <tr>
+            <th>客户实付：</th>
+            <td><{if $show_sale_price}><{$sales.actually_amount|cur}><{else}>-<{/if}></td>
+            <th>物流运单号：</th>
+            <td><{$sales.logi_no}></td>
+        </tr>
+        <tr>
+            <th>配送费用：</th>
+            <td><{$sales.cost_freight|cur}></td>
+            <th>物流公司：</th>
+            <td><{$sales.logi_name}></td>
+        </tr>
+        <tr>
+            <th>附加费：</th>
+            <td><{$sales.additional_costs|cur}></td>
+            <th>销售时间：</th>
+            <td><{$sales.sale_time}></td>
+        </tr>
+        <tr>
+            <th>预存款：</th>
+            <td><{$sales.deposit|cur}></td>
+            <th>销售数量：</th>
+            <td><{$sales.nums}></td>
+        </tr>
+        <tr>
+            <th>支付优惠金额：</th>
+            <td><{if $show_sale_price}><{$sales.platform_pay_amount|cur}><{else}>-<{/if}></td>
+            <th>支付方式：</th>
+            <td><{$sales.payment|default:'-'}></td>
+        </tr>
+        <tr>
+            <th>平台承担金额：</th>
+            <td><{if $show_sale_price}><{$sales.platform_amount|cur}><{else}>-<{/if}>（不包含支付优惠）</td>
+            <{if $sales.is_service_order == 'true'}>
+            <th>服务订单费：</th>
+            <td><{$sales.service_price|cur}></td>
+            <{/if}>
+        </tr>
+    </table>
+</div>
+
+<h4>收货人信息：</h4>
+
+<div class="goods-spec-cell" id='goods-spec-product'>
+<table cellspacing="0" cellpadding="0" border="0" class="gridlist">
+     <thead>
+     <tr>
+				<th orderkey="bn"><{t}>收货人姓名<{/t}></th>
+                <th orderkey="store"><{t}>收货人地区<{/t}></th>
+                <th orderkey="store"><{t}>收货人地址<{/t}></th>
+                <th orderkey="weight"><{t}>收货人邮编<{/t}></th>
+                <th orderkey="store"><{t}>收货人固定电话<{/t}></th>
+                <th orderkey="unit"><{t}>收货人Email<{/t}></th>
+				<th orderkey="unit"><{t}>收货人手机<{/t}></th>
+	 </tr>
+	</thead>
+	<tbody>
+	<tr id="consigneeinfo">
+	  <td><span sensitive-field="ship_name"><{$deliveryinfo.ship_name|ciphertext:'delivery','ship_name',$deliveryinfo.shop_type}></span></td>
+	  <td><{$deliveryinfo.ship_province}>-<{$deliveryinfo.ship_city}>-<{$deliveryinfo.ship_district}></td>
+	  <td><span sensitive-field="ship_addr"><{$deliveryinfo.ship_addr|ciphertext:'delivery','ship_addr',$deliveryinfo.shop_type}></span></td>
+	  <td><{$deliveryinfo.ship_zip}></td>
+	  <td><span sensitive-field="ship_tel"><{$deliveryinfo.ship_tel|ciphertext:'delivery','ship_tel',$deliveryinfo.shop_type}></span></td>
+	  <td><{$deliveryinfo.ship_email}></td>
+	  <td><span sensitive-field="ship_mobile"><{$deliveryinfo.ship_mobile|ciphertext:'delivery','ship_mobile',$deliveryinfo.shop_type}></span></td>
+	</tr>
+
+	</tbody>
+</table>
+</div>
+
+
+<h4>销售明细：</h4>
+
+<div class="goods-spec-cell" id='goods-spec-product'>
+    <table cellspacing="0" cellpadding="0" border="0" class="gridlist">
+     <thead>
+     <tr>
+       <th orderkey="bn"><{t}>销售物料编码<{/t}></th>
+        <th orderkey="store"><{t}>物料类型<{/t}></th>
+				<th orderkey="bn"><{t}>物料编码<{/t}></th>
+                <th orderkey="store"><{t}>物料名称<{/t}></th>
+                <th orderkey="store"><{t}>商品规格<{/t}></th>
+                <th orderkey="weight"><{t}>吊牌价<{/t}></th>
+                <th orderkey="unit"><{t}>数量<{/t}></th>
+                <th orderkey="store"><{t}>货品优惠<{/t}></th>
+                <th orderkey="weight"><{t}>销售总价<{/t}></th>
+                <th orderkey="store"><{t}>平摊优惠<{/t}></th>
+				<th orderkey="unit"><{t}>销售金额<{/t}></th>
+                <th orderkey="unit"><{t}>支付优惠金额<{/t}></th>
+                <th orderkey="unit"><{t}>客户实付<{/t}></th>
+				<th orderkey="unit"><{t}>平台承担<{/t}></th>
+				<th orderkey="unit"><{t}>结算金额<{/t}></th>
+				<th orderkey="unit"><{t}>平台商品ID<{/t}></th>
+				<th orderkey="unit"><{t}>平台SkuID<{/t}></th>
+                <{foreach from=$propsTitle item=item}>
+                <th><{$item.col_name}></th>
+                <{/foreach}>
+	 </tr></thead><tbody>
+ <{foreach from=$dataitems item=dataitem}>
+	<tr>
+      <td><{$dataitem.sales_material_bn|default:'-'}></td>
+      <td><{$dataitem.type_name|default:'-'}></td>
+	  <td><{$dataitem.bn}></td>
+	  <td><{$dataitem.name}></td>
+      <td><{$dataitem.spec_name|default:'-'}></td>
+	  <td><{$dataitem.price|cur}></td>
+      <td><{$dataitem.nums}></td>
+      <td><{if $show_sale_price}><{$dataitem.pmt_price|cur}><{else}>-<{/if}></td>
+      <td><{if $show_sale_price}><{$dataitem.sale_price|cur}><{else}>-<{/if}></td>
+      <td><{if $show_sale_price}><{$dataitem.apportion_pmt|cur}><{else}>-<{/if}></td>
+	  <td><{if $show_sale_price}><{$dataitem.sales_amount|cur}><{else}>-<{/if}></td>
+      <td><{if $show_sale_price}><{$dataitem.platform_pay_amount|cur}><{else}>-<{/if}></td>
+      <td><{if $show_sale_price}><{$dataitem.actually_amount|cur}><{else}>-<{/if}></td>
+	  <td><{if $show_sale_price}><{$dataitem.platform_amount|cur}><{else}>-<{/if}></td>
+	  <td><{if $show_sale_price}><{$dataitem.settlement_amount|cur}><{else}>-<{/if}></td>
+      <td><{$dataitem.shop_goods_id}></td>
+      <td><{$dataitem.shop_product_id}></td>
+      <{foreach from=$propsTitle item=item}>
+      <th><{$dataitem.props[$item.col_key]}></th>
+      <{/foreach}>
+    </tr>
+    <{if $dataitem.order_items}>
+        <{foreach from=$dataitem.order_items item=item}>
+        <tr class="ColColorBlue" <{if $item.delete == 'true'}>style="background-color: rgb(216, 216, 216);"<{/if}> >
+
+          <td></td>
+          <td>-</td>
+          <td><{$item.bn}></td>
+          <td> <{$item.name}> </td>
+          <td> - </td>
+          <td><{$item.price}></td>
+          <td><{$item.nums}></td>
+          <td><{if $show_sale_price}><{$item.pmt_price|cur}><{else}>-<{/if}></td>
+          <td><{if $show_sale_price}><{$item.sale_price|cur}><{else}>-<{/if}></td>
+          <td><{if $show_sale_price}><{$item.apportion_pmt|cur}><{else}>-<{/if}></td>
+          <td><{if $show_sale_price}><{$item.amount|cur}><{else}>-<{/if}></td>
+        </tr>
+        <{/foreach}>
+    <{/if}>
+<{/foreach}>
+
+</tbody>
+</table>
+</div>
+
+
+<{if $selling_agent_info}>
+    <div class="tableform">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" class="finderInform">
+            <tbody>
+            <tr>
+                <td colspan="5"><strong>代销人信息</strong></td>
+            </tr>
+            <tr>
+                <td>用户名：<{$selling_agent_info.member_info.uname}></td>
+                <td>姓名：<{$selling_agent_info.member_info.name}></td>
+                <td>性别：<{if $selling_agent_info.member_info.sex == 'male'}>男<{else}>女<{/if}></td>
+                <td>出生日期：<{$selling_agent_info.member_info.birthday}></td>
+                <td>E-mail：<{$selling_agent_info.member_info.email}>  QQ:<{$selling_agent_info.member_info.qq}></td>
+            </tr>
+            <tr>
+                <td>地区：<{$selling_agent_info.member_info.area|region}></td>
+                <td>详情地址：<{$selling_agent_info.member_info.addr}></td>
+                <td>邮编：<{$selling_agent_info.member_info.zip}></td>
+                <td>手机：<{$selling_agent_info.member_info.mobile}></td>
+                <td>固定电话：<{$selling_agent_info.member_info.tel}></td>
+            </tr>
+            <tr>
+                <td>网站名称：<{$selling_agent_info.website.name}></td>
+                <td>网站域名：<{$selling_agent_info.website.domain}></td>
+                <td colspan="3">网站LOGO：<{if $selling_agent_info.website.logo}><a href="<{$selling_agent_info.website.logo}>" target="_blank">查看</a><{/if}></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+<{/if}>
+
+</div>
+</div>
+<script type="text/javascript">
+  // 敏感数据处理
+if ($defined($E('.delivery-sensitive-btn')))
+  $E('.delivery-sensitive-btn').addEvent('click',function(e){
+        Ex_Loader('security',function(){new Security({url:'index.php?app=console&ctl=admin_delivery&act=showSensitiveData&p[0]=<{$deliveryinfo.delivery_id}>',clickElement:$(e.target)}).desHtml($('saleinfo')); });
+  });
+</script>

@@ -1,0 +1,227 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="./common.css" />
+  <link rel="stylesheet" type="text/css" href="./work_space.css" />
+  <script src="./axios.min.js"></script>
+  <script src="./flexible.js"></script>
+</head>
+
+<body>
+  <div class="page flex-col">
+    <!-- heder -->
+    <div class="section_1">
+      <div class="text-wrapper_1 flex-row align-center justify-between">
+        <img src="./icon-back.png" class="icon-back">
+        <span class="text_1">工作台</span>
+        <span></span>
+        <!-- <img src="./icon-refresh.png" class="icon-refresh"> -->
+      </div>
+    </div>
+    <div class="main">
+      <!-- goodsInfo -->
+      <div class="section_4 flex-col">
+        <div class="list-item">
+          <div class="list-item wspace-info">
+            <div class="text-wrapper_5 flex-row justify-between">
+              <span class="text_11">订单号：</span>
+              <span class="text_12">6942287127788887</span>
+            </div>
+             <div class="text-wrapper_5 flex-row justify-between">
+              <span class="text_11">门店：</span>
+              <span class="text_12">上海DESCEMTE</span>
+            </div>
+             <div class="text-wrapper_5 flex-row justify-between">
+              <span class="text_11">渠道：</span>
+              <span class="text_12">抖音</span>
+            </div>
+             <div class="text-wrapper_5 flex-row justify-between">
+              <span class="text_11">发票单号：</span>
+              <span class="text_12">2542287127788887</span>
+            </div>
+             <div class="text-wrapper_5 flex-row justify-between">
+              <span class="text_11">下单时间：</span>
+              <span class="text_12">2025-05-07 18:22:22</span>
+            </div>
+          </div>
+          <div class="section_6 flex-row">
+            <img class="image_2" referrerpolicy="no-referrer"
+              src="https://lanhu-oss.lanhuapp.com/SketchPng347d1d203f86e105cbef42b744b03da47241ba9d50ca664284da54791756c794" />
+            <div class="text-group_1 flex-col">
+              <div class="status-info"> <span class="text_28 flex-shrink-1">MAX&nbsp;MARA女士薄款全羊毛LOGO围巾&nbsp;绿色</span>
+                <!-- <span class="status-returned">已退货</span> -->
+              </div>
+              <span class="text_29">商户货号：787876756454</span>
+              <span class="text_30">子订单号：787876756454</span>
+              <span class="text_30">1件；颜色：绿色；尺寸：M</span>
+            </div>
+          </div>
+          <div class="section_6 justify-between flex-wrap">
+            <div class="mrg-side-4">
+              <span class="text_36">买家</span
+              ><span class="text_37">￥1000.23</span>
+            </div>
+            <div class="mrg-side-4">
+              <span class="text_36">优惠</span
+              ><span class="text_37">￥1000.23</span>
+            </div>
+            <div class="mrg-side-4">
+              <span class="text_36">商家</span
+              ><span class="text_37">￥1000.23</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wspace-footer justify-between">
+      <button class="modal-btn modal-cancle">返回</button>
+      <button class="modal-btn modal-confirm" onclick="submitDelivery()">确认核销</button>
+    </div>
+  </div>
+  <div class="mask" id="mask"></div>
+  <div class="toast" id="toast"></div>
+  <!-- 弹窗组件 -->
+  <!-- 弹窗组件模板 -->
+  <div class="modal" id="commonModal" style="display: none;">
+    <div class="modal-mask"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"></h3>
+        <span class="modal-close">×</span>
+      </div>
+      <div class="modal-content">
+        <!-- 动态内容区域 -->
+      </div>
+      <div class="modal-footer justify-between">
+        <button class="modal-btn modal-cancle">取消</button>
+        <button class="modal-btn modal-confirm">确定</button>
+      </div>
+    </div>
+  </div>
+  <!-- 引入共用的js -->
+  <script src="./common.js"></script>
+  <script>
+    // 初始化弹窗实例
+    const modal = new Modal();
+    // API 方法封装
+    const api = {
+      // 发货
+      delivery(params) {
+        return request.post('/delivery', params);
+      },
+      // 打印
+      print(params) {
+        return request.post('/print', params);
+      }
+    };
+    // 生成取件时间选项
+    document.addEventListener('DOMContentLoaded', function () {
+      const selectBox = document.getElementById('express_time');
+      const now = new Date();
+      const startHours = 9;
+      const endHours = 21;
+
+      for (let h = 0; h <= endHours; h++) {
+        const h_str = h.toString().padStart(2, '0');
+        // 判断是否需要禁用
+        const disabled_0 = h < startHours  ? 'disabled' : '';
+        const disabled_30 = (h < startHours || h === endHours) ? 'disabled' : '';
+        if (!disabled_0) {
+          selectBox.innerHTML += `<option value="${h_str}:00" ${disabled_0}>${h_str}:00</option>`;
+        }
+        if (!disabled_30) {
+          selectBox.innerHTML += `<option value="${h_str}:30" ${disabled_30}>${h_str}:30</option>`;
+        }
+      }
+    })
+
+    // 发货
+    async function submitDelivery() {
+      const formData = {};
+      const form = document.querySelector('.group_2');
+      const inputs = form.querySelectorAll('input, select');
+
+      let isValid = true;
+
+      // 遍历所有输入框和下拉框
+      inputs.forEach(input => {
+        const value = input.value.trim();
+        const name = input.getAttribute('name');
+
+        // 验证必填项
+        if (!value) {
+          showToast(`请填写${input.getAttribute('placeholder') || '必填项'}`);
+          isValid = false;
+          return;
+        }
+
+        formData[name] = value;
+      });
+      console.log("🚀🚀🚀 ~ file: new_delivery.html:567 ~ submitDelivery ~ formData:", formData)
+
+      if (!isValid) {
+        return;
+      }
+
+      if (formData.express_print === '1') {
+        // 发送打印请求
+        try {
+          const printRes = await api.print(formData);
+        } catch (error) {
+          console.error('打印失败:', error);
+          showToast('打印失败');
+          return;
+        }
+        showLoading('正在打印中...');
+        // 轮询检查打印状态
+        let printSuccess = false;
+        let retryCount = 0;
+        const maxRetries = 3; // 最多轮询30次
+
+        while (!printSuccess && retryCount < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 1000)); // 等待1秒
+          try {
+            const checkRes = await api.print({ ...formData, check: true });
+            if (checkRes.status === 'success') {
+              printSuccess = true;
+              showToast('打印成功');
+              break;
+            }
+          } catch (err) {
+            console.error('检查打印状态失败:', err);
+          }
+          retryCount++;
+        }
+
+        if (!printSuccess) {
+          showToast('打印超时,请重试');
+          // throw new Error('打印超时,请重试'); // 如果打印不成功，不能发货，需要放开这个
+        }
+        hideLoading()
+      }
+
+      // 无论是否打印成功，都调用发货接口
+      try {
+        // 调用发货API
+        await api.delivery(formData);
+        showToast('发货成功');
+        // 关闭弹窗
+        modal.hide();
+      } catch (error) {
+        console.error('发货失败:', error);
+        showToast('发货失败');
+      }
+    }
+  </script>
+</body>
+
+</html>

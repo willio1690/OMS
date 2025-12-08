@@ -1,0 +1,76 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    #form-channel select{
+        width: 204px;
+    }
+</style>
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=logisticsmanager&ctl=admin_channel&act=saveNetsite" id="form-channel">
+            <div class="step-1">
+            <table>
+                <tr>
+                    <th>渠道名称：</th>
+                    <td><{input type="text" name="name" size="30" vtype="required"}></td>
+                </tr>
+                <tr>
+                    <th>渠道平台：</th>
+                    <td>
+                        <select class="x-input-select inputstyle" name="channel_type" id="channel_type" vtype="required" >
+                            <option value="">请选择</option>
+                            <option value="youzan">有赞电子面单</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            </div>
+            <!-- 获取店铺 -->
+            <div class="step-2">
+                
+            </div>
+        </form>
+    </div>
+</div>
+
+<{area inject='.mainFoot'}>
+<div class="table-action">
+	<{button type="button" class="btn-primary" label="保存" id="btn-add-channel"}>
+    <{button type="botton" class="btn-secondary" label="关闭"  isCloseDialogBtn="true" }>
+</div>
+<{/area}>
+
+<script>
+(function(){
+    $('channel_type').addEvent('change',function(){
+        if (!this.value) {
+            $E('#form-channel .step-2').empty();
+            return true
+        }
+
+        W.page('index.php?app=logisticsmanager&ctl=admin_channel&act=queryNetsiteShop&channel_type='+this.value,{
+            update:$E('#form-channel .step-2'),
+            clearUpdateMap:false,
+        });
+    });
+
+    $('btn-add-channel').addEvent('click', function(){
+        $('form-channel').fireEvent('submit', {stop:$empty});
+    });
+    $('form-channel').store('target', {
+        onComplete:function(resp){
+        
+            resp = JSON.parse(resp);
+
+            if (resp.success){
+                $('form-channel').getParent('.dialog').retrieve('instance').close();
+
+                finderGroup['<{$env.get.finder_id}>'].refresh();
+            }
+        }
+    });
+})();
+</script>

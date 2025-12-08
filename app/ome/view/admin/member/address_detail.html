@@ -1,0 +1,263 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.division table tr{height:20px; line-height:30px;}
+#edit_address tr th{text-align:right;width:12%;}
+#edit_address tr td{text-align:left;}
+#edit_address td input{height:24px; line-height:24px;}
+#edit_address tr th,#edit_address tr td{padding:7px 5px;}
+h5{margin-bottom:12px;color:#305c89;}
+#edit_address input{vertical-align:middle;}
+</style>
+
+<div class="division">
+  <form action="index.php?app=ome&ctl=admin_customer&act=doEdit" method="post" id="newMemForm">
+    <h5>编辑地址</h5>
+    <table border="0" class="gridlist" id='edit_address'>
+      <tbody>
+        <tr>
+          <th><em class="c-red">*</em>所在地址：</td>
+          <td id="regionselect">
+           <{input id='region' type='region' app='eccommon' name="ship_area" vtype="area" value=$member_detail.area}>
+          </td>
+        </tr>
+
+        <tr>
+          <th><em class="c-red">*</em>详细地址：</td>
+          <td>
+            <textarea id='ship_addr' name='ship_addr' style='top: 0px;width: 200px;height: 90px;' vtype="required"><{$member_detail.addr}></textarea>
+          </td>
+        </tr>
+        <tr>
+          <th><em class="c-red">*</em>收件人：</td>
+          <td>
+            <input id='ship_name' type='text' name='ship_name'  value='<{$member_detail.ship_name}>' vtype="required">
+          </td>
+        </tr>
+
+        <tr>
+          <th><em class="c-red">*</em>手机：</td>
+          <td>
+            <input id="ship_mobile" type='text' name='ship_mobile'  value='<{$member_detail.ship_mobile}>'>
+          </td>
+        </tr>
+
+        <tr>
+          <th>固定电话：</td>
+          <td>
+            <input id="ship_tel" type='text' name='ship_tel'  value='<{$member_detail.ship_tel}>'>
+          </td>
+        </tr>
+        <tr>
+          <th>邮编：</td>
+          <td>
+            <input id="ship_zip" type='text' name='ship_zip'  value='<{$member_detail.ship_zip}>'>
+          </td>
+        </tr>
+
+        <tr>
+          <th>邮箱：</td>
+          <td>
+            <input id='ship_email' type='text' name='ship_email'  value='<{$member_detail.ship_email}>'>
+          </td>
+        </tr>
+        <tr>
+          <th>设置为默认：</th>
+          <td>
+           <input type='checkbox' id="is_default" name='is_default' value='1'>
+          </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <input type='hidden' id='address_id' name='address_id' value=''>
+    <input type='hidden' id='member_id' name='member_id' value=<{$member_id}>>
+    <div class="table-action">
+      <{button label="确定" class="btn-primary" type="button" id="btnMemSubmit"}> &nbsp; &nbsp;
+      <{button label="重置" class="btn-secondary" id='btnReset'}>
+    </div>
+  </form>
+
+<h5>地址库</h5>
+
+<table class="gridlist">
+     <thead>
+        <tr>
+          <th>收件人</th>
+          <th>地区</th>
+          <th>详细地址</th>
+          <th>固定电话</th>
+          <th>手机</th>
+          <th>Email</th>
+          <th>邮编</th>
+          <th>是否默认</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      </tbody>
+        <{foreach from=$address_detail item=detail}>
+       <tr id='<{$detail.address_id}>'>
+          <td><{$detail.ship_name|default:'-'}></td>
+          <td><{$detail.ship_area|default:'-'}></td>
+          <td><{$detail.ship_addr|default:'-'}></td>
+          <td><{$detail.ship_tel|default:'-'}></td>
+          <td><{$detail.ship_mobile|default:'-'}></td>
+           <td><{$detail.ship_email|default:'-'}></td>
+          <td><{$detail.ship_zip|default:'-'}></td>
+          <td><{if $detail.is_default=='1'}>是<{else}>否<{/if}></td>
+          <td><a onclick=editAddress(<{$detail.address_id}>)>修改</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a onclick='deleteAddress(this)'>删除</a></td>
+        </tr>
+       <{/foreach}>
+    </tbody>
+    </table>
+
+    <div class="table-action">
+        <{button label="关闭" class="btn-secondary" id='btnclose'}>
+    </div>
+</div>
+
+<script>
+function editAddress(address_id){
+    var _data = {'address_id':address_id};
+    new Request({
+        url : "index.php?app=ome&ctl=admin_customer&act=getAddress",
+        method : "post",
+        data: _data,
+        onComplete:function(result){
+            address = JSON.decode(result);
+            $('ship_addr').set('value',address.ship_addr);
+            $('ship_zip').set('value',address.ship_zip);
+            $('ship_email').set('value',address.ship_email);
+            $('ship_name').set('value',address.ship_name);
+            $('ship_mobile').set('value',address.ship_mobile);
+            $('ship_tel').set('value',address.ship_tel);
+            $('address_id').set('value',address.address_id);
+            $('regionselect').set('html',address.regionhtml);
+            if(address.is_default=='1'){
+              $('is_default').set('checked',true);
+            }else{
+              $('is_default').set('checked',false);
+            }
+        }
+    }).send();
+}
+
+function deleteAddress(e){
+    if (!confirm('删除后无法恢复，确定要删除吗？')){
+        return;
+    }
+    var address_id = e.getParent('tr').get('id');
+
+    new Request({url:'index.php?app=ome&ctl=admin_customer&act=del_address&address_id='+address_id,
+        onComplete:function(rs){
+            var json = Json.evaluate(rs);
+            if (typeof(json.error) != 'undefined'){
+                alert('删除失败');
+            }else{
+                alert('删除成功');
+                e.getParent('tr').set('style','display:none');
+            }
+    }}).send();
+}
+
+$('btnclose').addEvent('click',function(e){
+    setTimeout('window.close()',120);
+});
+
+$('btnReset').addEvent('click',function(e){
+    //$('region').set('value','');
+    $('ship_addr').set('value','');
+    $('ship_zip').set('value','');
+    $('ship_email').set('value','');
+    $('ship_name').set('value','');
+    $('ship_mobile').set('value','');
+    $('ship_tel').set('value','');
+    $('address_id').set('value','');
+    $('is_default').set('checked','');
+    new Request({
+        url : "index.php?app=ome&ctl=admin_customer&act=getDefaultAddress",
+        method : "post",
+        onComplete:function(result){
+            address = JSON.decode(result);
+           
+            $('regionselect').set('html',address.regionhtml);
+            
+        }
+    }).send();
+});
+
+(function(){
+
+    function is_phone(str){
+        var partten = /^[\d-]+$/;
+        if(partten.test(str)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    function is_mobile(str){
+     var partten = /^\d{8,15}$/;
+        if(partten.test(str)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    $('btnMemSubmit').addEvent('click',function(){
+        var _this=this;
+        var form = this.getParent('form');
+        if(! validate(form)) return;
+        var gd_tel,mobile;
+        gd_tel = $('ship_tel').value.replace(" ","");
+        mobile = $('ship_mobile').value.replace(' ','');
+        if (!gd_tel && !mobile){
+            alert('固定电话与手机号码必需填写一项');
+            $('telephone').focus();
+            return false;
+        }
+
+        if (gd_tel){
+            if (is_phone(gd_tel) === false){
+                alert('请填写正确的固定电话');
+                $('telephone').focus();
+                return false;
+            }
+        }
+
+        if (mobile){
+            if ( is_mobile(mobile) === false){
+                alert('请输入正确的手机号码');
+                $('mobile').focus();
+                return false;
+            }
+            if (mobile[0] == '0'){
+                alert('手机号码前请不要加0');
+                $('mobile').focus();
+                return false;
+            }
+        }
+
+        new Request({url:form.action,method:'post',data:form.toQueryString(),
+            onRequest:function(){
+                MessageBox.show('正在提交表单');
+            },
+            onComplete:function(json){
+                json = JSON.decode(json);
+                if(json.rsp='fail'){
+                    alert(json.msg);
+                }else{
+                    alert(json.msg);
+                }
+                window.location='index.php?app=ome&ctl=admin_customer&act=edit_address&member_id=<{$member_id}>&finder_id=<{$env.get.finder_id}>';
+            }
+        }).send();
+    });
+
+})()
+</script>

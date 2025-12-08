@@ -1,0 +1,88 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=openapi&ctl=admin_export&act=save" id="frm">
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th>名称：</th>
+                        <td><{input type='text' vtype='required' name='name'}></td>
+                    </tr>
+                    <tr>
+                        <th>类型：</th>
+                        <td><{input type='text' vtype='required' name='property'}></td>
+                    </tr>
+                    <tr>
+                        <th>报表时间：</th>
+                        <td><{input type='time' vtype='required' name='bill_time'}></td>
+                    </tr>
+                    <tr>
+                        <th>开始时间：</th>
+                        <td><{input type='time' vtype='required' name='start_time'}></td>
+                    </tr>
+                    <tr>
+                        <th>结束时间：</th>
+                        <td><{input type='time' vtype='required' name='end_time'}></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' label='保存' }>
+                    <{button type="button" id='close_btn' label='关闭' }>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = opener.finderGroup['<{$env.get.finder_id}>'];
+        $('close_btn').addEvent('click', function(){
+            if(finder){
+                setTimeout(finder.refresh(),30000);
+            }
+            setTimeout('window.close()',200);
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    if(finder){
+                        setTimeout(finder.refresh(),30000);
+                    }
+                    setTimeout('window.close()',200);
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+    })();
+</script>

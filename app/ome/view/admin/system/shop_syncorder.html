@@ -1,0 +1,65 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $config.is_config eq 'off'}> 
+    <div class="tableform">
+        <span class="red"><{$config.error_msg}></span>
+    </div>
+<{else}>
+
+ 
+
+  <div class="tableform">
+    <input type="hidden" name="shop_id" value="<{$shop_id}>" />
+<input type="hidden" name="order_type" id="order_type" value="<{$order_type}>" />
+
+    <div class="division">
+       
+        <table width="auto" cellspacing="0" cellpadding="0" border="0" >
+            <tr>
+              
+                <td>订单号:<{input vtype="required" name="order_id" value="" id="order_bn"}><{button type="submit" label="立即获取订单详情" class="btn-secondery" id="btn_manual"}></td>
+                
+            </tr>
+        </table>
+       
+    </div>
+</div>
+<{if $shop_detail.node_type == 'weimobv'}>
+<div class="tableform">
+    <h4>微盟接收门店订单设置</h4>
+    <div class="division">
+        <form action="index.php?<{$env.server.QUERY_STRING}>" method="post">
+        <table width="auto" cellspacing="0" cellpadding="0" border="0" >
+            <tr>
+                <td>门店id：<textarea name="store_conf" id="store_conf"><{$weimobvconf.store_conf}></textarea><{button type='submit' label='保存'}><font color='red'>多个门店编码以,号分隔 如 222,333,此处设置门店编码id,只接收 设置了对应门店编码店铺订单</font></td>
+               
+            </tr>
+        </table>
+        </form>
+    </div>
+</div>
+<{/if}>
+<script>
+
+  if($("btn_manual")){
+   $("btn_manual").addEvent("click",function(e){
+        new Request({
+        url:'index.php?app=ome&ctl=admin_shop&act=sync_order',
+        data:'order_id='+$("order_bn").value+"&shop_id="+"<{$shop_id}>&order_type="+$("order_type").value,
+        method:'post',
+        onSuccess:function(response){
+        	var resp =  JSON.decode(response);
+        	if(resp.rsp=="fail"){
+    				var msg = resp.msg ? resp.msg : resp.res;
+    				MessageBox.error(msg);
+        	}else{ MessageBox.success("获取成功");}
+		    }
+      }).send();
+   });
+  }
+
+</script>
+<{/if}>

@@ -1,0 +1,69 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<script>
+var item_i=1;
+</script>
+<h5>费用项管理</h5>
+<table class="gridlist" style="width:80%;cellspacing:0; cellpadding:0;margin-left:10%">
+    <tr>
+        <td>费用类</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <{foreach from=$fee_item key=type_id item=item}>
+    <tr>
+        <td><{$item.name}></td>
+        <td></td>
+        <td><a href="javascript:void(0)" onclick="additem(<{$type_id}>)">增加费用项</a></td>
+    </tr>
+    <{foreach from=$item.item key=name item=items}>
+    <tr class="type_<{$type_id}>">
+        <td></td>
+        <td><{$items.name}></td>
+        <td><{if $items.inlay != 'true'}><a href="javascript:void(0)" onclick="delitem(this,<{$name}>)">删除</a><{/if}></td>
+    </tr>
+    <{/foreach}>
+    <{/foreach}>
+</table>
+<script>
+function additem(e){
+    var i = item_i++;
+    var tpl="<td></td><td><input type='text' name='additem' id='add_"+e+'_'+i+"'><span style='color:red' id='show_"+e+'_'+i+"'></span></td><td><a href='javascript:void(0)' id='button_"+e+'_'+i+"' onclick='do_additem("+e+","+i+")'>确定</a></td>";
+    var location =$$('.type_'+e).getLast();
+    new Element('tr.type_'+e,{html:tpl}).injectAfter(location);
+}
+function do_additem(type_id,tmp_id){
+    var name = $('add_'+type_id+'_'+tmp_id).value;
+    new Request({url:'index.php?app=finance&ctl=bill_setting&act=do_additem',method:'post',data:'name='+name+'&fee_type_id='+type_id,
+        onSuccess:function(json){
+            rs = JSON.decode(json);
+            if(rs.rsp == 'fail'){
+                $('show_'+type_id+'_'+tmp_id).set('html',rs.msg);
+            }else if(rs.rsp == 'succ'){
+                $('add_'+type_id+'_'+tmp_id).getParent('td').set('html',rs.fee_item+"<span style='color:red' id='show_"+rs.fee_item_id+"'></span>");
+                $('button_'+type_id+'_'+tmp_id).getParent('td').set('html','<a href="javascript:void(0)" onclick="delitem(this,'+rs.fee_item_id+')">删除</a>');
+            }
+        }
+    }).send();
+}
+function delitem(obj,fee_item_id){
+    if(confirm('否删除费用项')){
+        new Request({url:'index.php?app=finance&ctl=bill_setting&act=do_delitem',method:'post',data:'fee_item_id='+fee_item_id,
+            onSuccess:function(json){
+                rs = JSON.decode(json);
+                if(rs.rsp == 'fail'){
+                    return MessageBox.error(rs.msg);
+                }else if(rs.rsp == 'succ'){
+                    obj.getParent('tr').remove();
+                }
+            }
+        }).send();
+    }else{
+        return;
+    }
+
+}
+</script>

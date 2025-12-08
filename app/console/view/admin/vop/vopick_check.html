@@ -1,0 +1,317 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<style>
+    .finder-detail{
+        background:#eee;
+        padding:5px;
+        margin:5px 0;
+        border:1px solid #bbb;
+    }
+    .finder-detail td{
+        background:#fff;
+
+    }
+    .gridlist tr.waring, .gridlist td.waring {
+        background:none repeat scroll 0 0 #9999ff;
+        color:#333333;
+    }
+    .gridlist tr.masterorder, .gridlist tr.masterorder td, .gridlist td.masterorder {
+        color: #000000;
+        font-weight: 700;
+        font-size : 12px;
+        background:#f0f6fe
+    }
+    .gridlist tr.memberorder, .gridlist tr.memberorder td, .gridlist td.memberorder tr.addressorder, .gridlist tr.addressorder td, .gridlist td.addressorder {
+        background: none repeat scroll 0 0 #e2effe;
+        color: #000000;
+        font-weight: 400;
+        font-size : 12px;
+    }
+</style>
+<form id="fm1" name="form1" action="index.php?app=console&ctl=admin_vopick&act=doCheck" method="POST">
+<input type="hidden" name="bill_id" value="<{$pickInfo.bill_id}>" />
+<div class="tableform">
+    <h3>审核拣货订单</h3>
+    <div class="division">
+        <h5>基础信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+            <tr>
+              <td width="10%" align="right" nowrap="nowrap">拣货单号:</td>
+                <td nowrap="nowrap"><b><{$pickInfo.pick_no}></b><span id="default_pick_id" style="display:none;"><input type="checkbox" name="bill_id" checked="checked" value="<{$pickInfo.bill_id}>" /></span></td>
+          <td align="right">采购单号:</td>
+                <td><{$pickInfo.po_bn}></td>
+            </tr>
+            <tr>
+                <td align="right">拣货数量:</td>
+              <td><{$pickInfo.pick_num}></td>
+                <td align="right" nowrap="nowrap">创建时间：</td>
+                <td><{$pickInfo.create_time}></td>
+            </tr>
+            
+            <{if $pickInfo.branch_send_num}>
+            <tr>
+                <td align="right"><b>已出库数量:</b></td>
+                <td><span style="color:red;"><{$pickInfo.branch_send_num}></span></td>
+                <td align="right" nowrap="nowrap">&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <{/if}>
+            
+            <tr>
+                <td align="right">出库仓：</td>
+                <td><span>
+                    <select name="out_branch_id" id="out_branch_id" onchange="reWriteProductNode()">
+                        <option value="">=请选择=</option>
+                        <{foreach from=$branchList item=item}>
+                        <option value="<{$item.branch_id}>"><{$item.name}></option>
+                        <{/foreach}>
+                    </select>
+                </span></td>
+                <td align="right" nowrap="nowrap">入库仓：</td>
+                <td><{$pickInfo.in_branch_name}></td>
+              </tr>
+            </thead>
+        </table>
+    </div>
+
+<{if $combinePicks}>
+<div class="division">
+    <h5>同仓拣货单</h5>
+    <div class="finder-detail">
+        <div id="pick_lists">
+            <table class="nosplit gridlist clear" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <thead>
+                    <tr>
+                        <th style="nowarp:true;background:#9ec9fb; text-align:center;"><input class="sellist" name="checkAll" id="checkAll" type="checkbox" value=""></th>
+                        <th style="background:#9ec9fb;">拣货单号</th>
+                        <th style="background:#9ec9fb;">采购单号</th>
+                        <th style="background:#9ec9fb;">拣货数量</th>
+                        <th style="background:#9ec9fb;">创建时间</th>
+                    </tr>
+                </thead>
+                <tbody id="orderNode">
+                <{foreach from=$combinePicks item=item}>
+                    <tr>
+                        <td class="orderbn" style="text-align:center;"><input type="checkbox" name="bill_ids[]" value="<{$item.bill_id}>" onclick="reWriteProductNode()" /></td>
+                        <td class="orderbn"><{$item.pick_no}></td>
+                        <td class="orderbn"><{$item.po_bn}></td>
+                        <td class="orderbn"><{$item.pick_num}></td>
+                        <td class="orderbn"><{$item.create_time|date_format:"%Y-%m-%d %H:%M:%S"}></td>
+                    </tr>
+               <{/foreach}>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<{/if}>
+
+    <div class="division">
+        <h5>拣货明细</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+                <tr>
+                    <th style='text-align:left;padding-left:5px;'>货号</th>
+                    <th style='text-align:left;padding-left:5px;'>条形码</th>
+                    <th style='text-align:left;padding-left:5px;'>货品名称</th>
+                    <th style='text-align:left;padding-left:5px;'>尺寸</th>
+                    <th style='text-align:left;padding-left:5px;'>数量</th>
+                    <th style='text-align:left;padding-left:5px;'>可用库存</th>
+                    <th style='text-align:left;padding-left:5px;'>原价</th>
+                    <th style='text-align:left;padding-left:5px;'>市场价</th>
+                    <th style='text-align:left;padding-left:5px;'>标记</th>
+                </tr>
+            </thead>
+            <tbody id="pickProductNode">
+            </tbody>
+        </table>
+    </div>
+
+    <div id="cc" class="noprint table-action"> <{button type="button" class="btn" id="purchase-save-btn" label="审 核"}> &nbsp; <{button type="button" class="btn" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}></div>
+</div>
+</form>
+<script>
+(function(){
+    var pag;
+    
+    $('purchase-save-btn').addEvent('click',function(e)
+    {
+        var _this=this;
+        var form=this.getParent('form');
+        var out_branch_id    = $("out_branch_id").value;
+        
+        if(out_branch_id == "")
+        {
+            alert("请选择出库仓");
+            return false;    
+        }
+        
+        form.store('target',{
+            onRequest:function(){
+                _this.disabled=true;
+            },
+            onComplete:function(jsontext){
+                try{
+                    var json = JSON.decode(jsontext);
+                    if (typeof(json.error)!='undefined'){
+                        _this.disabled=false;
+                    }else{
+                        _this.disabled=true;
+                        if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                        setTimeout('window.close()',200);
+                    }
+                }catch(e){}
+            }
+        });
+        
+        form.fireEvent('submit',e);
+    });
+})();
+
+
+var gOrders = <{$jsonCombinePicks}>;
+
+//获取选中的拣货单ID
+function getCombineOrders()
+{
+    var orderRow = $$('#default_pick_id input, #pick_lists input').filter( function(item, i) {
+        return item.checked;
+    });
+    
+    return orderRow;
+}
+
+//获取拣货单货品
+function getProducts(orderId) {
+    for (id in gOrders) {
+        if (orderId == id) {
+            var products = gOrders[id]['items'];
+            
+            createGoodsHtml(products);
+        }
+    }
+}
+
+//加载拣货单上货品
+function createGoodsHtml(goods) {
+    for (itemId in goods) {
+        createGoodsItemHtml(goods[itemId]);
+    }
+}
+
+//创建货品数据
+function createGoodsItemHtml(product)
+{
+    var barcode    = product['barcode'];
+    
+    if(!orderItems[barcode])
+    {
+        orderItems[barcode] = new Array();
+        
+        orderItems[barcode]['bn'] = product['bn'];
+        orderItems[barcode]['barcode'] = product['barcode'];
+        orderItems[barcode]['product_name'] = product['product_name'];
+        orderItems[barcode]['size'] = product['size'];
+        orderItems[barcode]['num'] = parseFloat(product['num']);
+        orderItems[barcode]['price'] = parseFloat(product['price']);
+        orderItems[barcode]['market_price'] = parseFloat(product['market_price']);
+        orderItems[barcode]['branch_store'] = product['branch_store'];
+        orderItems[barcode]['order_label'] = product['order_label'];
+    }
+    else
+    {
+        orderItems[barcode]['num']    = parseFloat(orderItems[barcode]['num']) + parseFloat(product['num']);
+        orderItems[barcode]['price']    = parseFloat(orderItems[barcode]['price']) + parseFloat(product['price']);
+        orderItems[barcode]['market_price']    = parseFloat(orderItems[barcode]['market_price']) + parseFloat(product['market_price']);
+        orderItems[barcode]['order_label'] = orderItems[barcode]['order_label'] + product['order_label'];
+    }
+}
+
+//创建货品列表html
+function itemHtmlData()
+{
+    var html = '';
+    var branch_id = $("out_branch_id").value;
+    
+    for (var bn in orderItems)
+    {
+        if(orderItems[bn]['num'] > 0)
+        {
+            html = html + '<tr>';
+            html = html + '<td style="text-align:left;padding-left:5px;">'+ orderItems[bn]['bn'] +'</td>';
+            html = html + '<td style="text-align:left;padding-left:5px;">'+ orderItems[bn]['barcode'] +'</td>';
+            html = html + '<td style="text-align:left;padding-left:5px;">'+ orderItems[bn]['product_name'] +'</td>';
+            html = html + '<td style="text-align:left;padding-left:5px;">'+ orderItems[bn]['size'] +'</td>';
+            html = html + '<td style="text-align:left;padding-left:5px;">'+ orderItems[bn]['num'] +'</td>';
+            
+            if(branch_id)
+            {
+                if(orderItems[bn]['branch_store'])
+                {
+                    var branch_store = orderItems[bn]['branch_store'][branch_id] ? orderItems[bn]['branch_store'][branch_id] : 0;
+                    
+                    html = html + '<td style="text-align:left;padding-left:5px;">'+ branch_store +'</td>';
+                }
+                else
+                {
+                    html = html + '<td style="text-align:left;padding-left:5px;">0</td>';
+                }
+            }
+            else
+            {
+                html = html + '<td style="text-align:left;padding-left:5px;"> - </td>';
+            }
+            
+            html = html + '<td style="text-align:left;padding-left:5px;">'+ orderItems[bn]['price'] +'</td>';
+            html = html + '<td style="text-align:left;padding-left:5px;">'+ orderItems[bn]['market_price'] +'</td>';
+            if (orderItems[bn]['order_label']) {
+                html = html + '<td style="text-align:left;padding-left:5px;">'+ orderItems[bn]['order_label'] +'</td>';
+            } else {
+                html = html + '<td style="text-align:left;padding-left:5px;"></td>';
+            }
+            html = html + '</tr>';
+        }
+    }
+    
+    return html;
+}
+
+//加载需拣货的订单货品
+function reWriteProductNode ()
+{
+    var orders = getCombineOrders();
+    var orderIds = new Array();
+    var html = '';
+    
+    orderItems = new Array();
+    for (i=0; i<orders.length; i++)
+    {
+        getProducts(orders[i].value);
+        orderIds[i] = orders[i].value;
+    }
+    
+    html = itemHtmlData();
+    
+    $('pickProductNode').set('html', html);
+}
+
+reWriteProductNode();
+
+if($('checkAll')){
+    $('checkAll').addEvent('click',function(){
+        $ES('#pick_lists input[type=checkbox]').set('checked', this.checked == true ? true : false);
+        
+        reWriteProductNode();
+    });
+}
+</script>

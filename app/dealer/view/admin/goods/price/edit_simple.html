@@ -1,0 +1,225 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <{if $history}>
+    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; margin-bottom: 15px; border-radius: 3px;">
+        <h4 style="margin: 0 0 10px 0; color: #856404;">历史快照 - 只读模式</h4>
+        <p style="margin: 0; color: #856404;">此页面显示的是历史快照数据，仅供查看，不可编辑。</p>
+    </div>
+    <{/if}>
+    
+    <div class="division">
+        <{if !$history}>
+        <form method="post" action="index.php?app=dealer&ctl=admin_goods_price&act=save" id="frm">
+        <{/if}>
+            <input type="hidden" name="id" value="<{$data.id}>">
+            <input type="hidden" name="bm_id" value="<{$data.bm_id}>">
+            
+            <!-- 物料信息（只读） -->
+            <div style="background-color: #f9f9f9; border: 1px solid #ddd; padding: 10px; margin-bottom: 15px; border-radius: 3px;">
+                <h4 style="margin: 0 0 10px 0; color: #666;">物料信息</h4>
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                    <tbody>
+                        <tr>
+                            <th width="120">基础物料编码：</th>
+                            <td><{$material.material_bn}></td>
+                        </tr>
+                        <tr>
+                            <th>基础物料名称：</th>
+                            <td><{$material.material_name}></td>
+                        </tr>
+                        <{if $material.specifications}>
+                        <tr>
+                            <th>规格：</th>
+                            <td><{$material.specifications}></td>
+                        </tr>
+                        <{/if}>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 可编辑信息 -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tbody>
+                    <tr>
+                        <th><em class="c-red">*</em>经销商：</th>
+                        <td>
+                            <{if $history}>
+                                <{if $diff_data.bs_id}>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <span style="display: inline-block; padding: 4px 8px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 3px; color: #999; text-decoration: line-through; font-family: inherit;">
+                                        <{$diff_data.bs_id.old_value}>
+                                    </span>
+                                    <span style="display: inline-block; padding: 4px 8px; background-color: #fff5f5; border: 1px solid #f56565; border-radius: 3px; color: #e53e3e; font-weight: bold; font-family: inherit;">
+                                        <{$diff_data.bs_id.new_value}>
+                                    </span>
+                                </div>
+                                <{else}>
+                                <span style="display: inline-block; padding: 4px 8px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 3px; color: #495057; font-family: inherit;"><{$dealerOptions[$data.bs_id]}></span>
+                                <{/if}>
+                            <{else}>
+                            <select name="bs_id" id="bs_id" issearch="fuzzy-search">
+                                <{foreach from=$dealerOptions key=key item=item}>
+                                <option value="<{$key}>" <{if $key == $data.bs_id}>selected<{/if}>><{$item}></option>
+                                <{/foreach}>
+                            </select>
+                            <{/if}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><em class="c-red">*</em>采购价：</th>
+                        <td>
+                            <{if $history}>
+                                <{if $diff_data.price}>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <span style="display: inline-block; padding: 4px 8px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 3px; color: #999; text-decoration: line-through; font-family: inherit;">
+                                        <{$diff_data.price.old_value}>
+                                    </span>
+                                    <span style="display: inline-block; padding: 4px 8px; background-color: #fff5f5; border: 1px solid #f56565; border-radius: 3px; color: #e53e3e; font-weight: bold; font-family: inherit;">
+                                        <{$diff_data.price.new_value}>
+                                    </span>
+                                </div>
+                                <{else}>
+                                <span style="display: inline-block; padding: 4px 8px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 3px; color: #495057; font-family: inherit;"><{$data.price}></span>
+                                <{/if}>
+                            <{else}>
+                            <input type="text" id="price" name="price" value="<{$data.price}>" vtype="required">
+                            <{/if}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>价格单位：</th>
+                        <td>
+                            <{if $history}>
+                                <{if $diff_data.price_unit}>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <span style="display: inline-block; padding: 4px 8px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 3px; color: #999; text-decoration: line-through; font-family: inherit;">
+                                        <{$diff_data.price_unit.old_value}>
+                                    </span>
+                                    <span style="display: inline-block; padding: 4px 8px; background-color: #fff5f5; border: 1px solid #f56565; border-radius: 3px; color: #e53e3e; font-weight: bold; font-family: inherit;">
+                                        <{$diff_data.price_unit.new_value}>
+                                    </span>
+                                </div>
+                                <{else}>
+                                <span style="display: inline-block; padding: 4px 8px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 3px; color: #495057; font-family: inherit;"><{$data.price_unit}></span>
+                                <{/if}>
+                            <{else}>
+                            <input type="text" id="price_unit" name="price_unit" value="<{$data.price_unit}>" size="8">
+                            <{/if}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>生效时间：</th>
+                        <td>
+                            <{if $history}>
+                                <{if $diff_data.start_time}>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <span style="display: inline-block; padding: 4px 8px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 3px; color: #999; text-decoration: line-through; font-family: inherit;">
+                                        <{$diff_data.start_time.old_value}>
+                                    </span>
+                                    <span style="display: inline-block; padding: 4px 8px; background-color: #fff5f5; border: 1px solid #f56565; border-radius: 3px; color: #e53e3e; font-weight: bold; font-family: inherit;">
+                                        <{$diff_data.start_time.new_value}>
+                                    </span>
+                                </div>
+                                <{else}>
+                                <span style="display: inline-block; padding: 4px 8px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 3px; color: #495057; font-family: inherit;"><{$start_time_formatted}></span>
+                                <{/if}>
+                            <{else}>
+                            <{input type="date" vtype="date" name="start_time" style="width:96px; font-family:arial;" value=$start_time_formatted}>
+                            <{/if}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>过期时间：</th>
+                        <td>
+                            <{if $history}>
+                                <{if $diff_data.end_time}>
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <span style="display: inline-block; padding: 4px 8px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 3px; color: #999; text-decoration: line-through; font-family: inherit;">
+                                        <{$diff_data.end_time.old_value}>
+                                    </span>
+                                    <span style="display: inline-block; padding: 4px 8px; background-color: #fff5f5; border: 1px solid #f56565; border-radius: 3px; color: #e53e3e; font-weight: bold; font-family: inherit;">
+                                        <{$diff_data.end_time.new_value}>
+                                    </span>
+                                </div>
+                                <{else}>
+                                <span style="display: inline-block; padding: 4px 8px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 3px; color: #495057; font-family: inherit;"><{$end_time_formatted}></span>
+                                <{/if}>
+                            <{else}>
+                            <{input type="date" vtype="date" name="end_time" style="width:96px; font-family:arial;" value=$end_time_formatted}>
+                            <{/if}>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <{if !$history}>
+            <div class="table-action">
+                <{button class="btn-primary" type="button" id='submit_btn' label='确定' }>
+                <{button class="btn-secondary" type="button" label='关闭' isCloseDialogBtn="true" }>
+            </div>
+            </form>
+            <{/if}>
+    </div>
+</div>
+
+<{if !$history}>
+<script type="text/javascript">
+(function(){
+    var _form = $('frm');//表单ID 
+    var btn   = $('submit_btn');//按钮ID
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    
+    _form.store('target',{
+        onRequest:function(){
+            btn.setAttribute('disabled', 'disabled');
+        },
+        onComplete:function(){
+            btn.removeAttribute('disabled');
+        },
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+
+                if(_dialogIns){
+                    setTimeout(finder.refresh(),30000);
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+
+    btn.addEvent('click',function(){
+        // 验证逻辑
+        var bs_id = $('bs_id').value.trim();
+        var price = $('price').value.trim();
+        if(!bs_id){
+            MessageBox.error('请选择经销商');
+            return;
+        }
+        if(!price || parseFloat(price) < 0){
+            MessageBox.error('请输入有效的采购价');
+            return;
+        }
+        
+        _form.fireEvent('submit',{stop:$empty});
+    });
+
+    // 初始化下拉搜索
+    if (typeof tail !== 'undefined') {
+        tail.select('select[issearch="fuzzy-search"]', {
+            search: true,
+            width: 150,
+            height: 660,
+            searchMinLength: 0
+        });
+    }
+})();
+</script>
+<{/if}>

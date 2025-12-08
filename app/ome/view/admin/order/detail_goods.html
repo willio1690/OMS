@@ -1,0 +1,88 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{/capture}>
+
+
+<{foreach from=$item_list item=objs key=obj_type}>
+    <{if empty($configlist.$obj_type) }>
+        <{include app="ome" file="admin/order/products/goods_view.html"}>
+    <{else}>
+        <{include app="{$configlist.$obj_type.app}" file="{$configlist.$obj_type.html}"}>
+    <{/if}>
+<{/foreach}>
+
+<{if $shop_type == 'vop' and $check_items}>
+    <{include app="ome" file="admin/order/products/check_items.html"}>
+<{/if}>
+
+<{if $split_oid}>
+<div class="division">
+    <h4><{t}>京东拆情况<{/t}></h4>
+    <{if $order.process_status == 'splited'}>
+    <{button id="sync_oid" label="同步拆分子单"}>
+    <{elseif $order.process_status == 'splitting'}>
+    <{button id="reback_oid" label="撤销拆分子单"}>
+    <{/if}>
+    <table width="100%" class="gridlist" border="0" cellspacing="0" cellpadding="0">
+        <thead>
+            <tr>
+                <th><{t}>拆分子单<{/t}></th>
+                <th><{t}>销售物料编码<{/t}></th>
+            </tr>
+        </thead>
+        <tbody>
+        <{foreach from=$split_oid item=item key=key}>
+        <tr>
+            <td><{$key}></td>
+            <td><{$item|implode:','}></td>
+        </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    (function () {
+        if($('sync_oid')) {
+            $('sync_oid').addEvent('click', function(){
+                new Request.JSON({
+                    url: 'index.php?app=ome&ctl=admin_order_platformsplit&act=sync&order_id=<{$order.order_id}>',
+                    onRequest: function () {
+                        new MessageBox(LANG_Dialog['loading'], {autohide: true});
+                    },
+                    onComplete: function(json) {
+                        if(json.rsp != 'succ') {
+                            new MessageBox.error(json.msg);
+                            return;
+                        }
+                        var finder = finderGroup['<{$env.get.finder_id}>'];
+                        if(finder) {
+                            finder.refresh();
+                        }
+                    }
+                }).send();
+            });
+        }
+        if($('reback_oid')) {
+            $('reback_oid').addEvent('click', function(){
+                new Request.JSON({
+                    url: 'index.php?app=ome&ctl=admin_order_platformsplit&act=doBack&order_id=<{$order.order_id}>',
+                    onRequest: function () {
+                        new MessageBox(LANG_Dialog['loading'], {autohide: true});
+                    },
+                    onComplete: function(json) {
+                        var finder = finderGroup['<{$env.get.finder_id}>'];
+                        if(finder) {
+                            finder.refresh();
+                        }
+                    }
+                }).send();
+            });
+        }
+    })();
+</script>
+<{/if}>

@@ -1,0 +1,70 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form id="ipsettingform" action="index.php?ctl=ipsetting&act=save" method="post">
+
+  <div class="tableform">
+    <h3>IP地址白名单管理<em class="red">（默认情况下无设置，没有IP登录限制）</em><{$helpLink}></h3>
+    <div class="division">
+
+      <table cellspacing="0" cellpadding="0" width="100%">
+        <tbody>
+          <tr>
+          <th><{t}>设置IP地址：<{/t}></th>
+          <td><textarea name="ip_addr" style="height:100px;width:200px;text_align:left" ><{$ip_addr}></textarea>
+          <p class="red">（多个IP地址之间请用回车符号隔开）</p>
+          </td>
+          
+          </tr>
+          <tr>
+          <th><{t}>上次操作角色：<{/t}></th>
+          <td>
+            <{if $user_name}><{$user_name}><{else}>无<{/if}>
+           </td>
+          </tr>
+          <tr>
+          <th><{t}>上次设置时间：<{/t}></th>
+          <td>
+            <{if $lasttime}><{$lasttime}><{else}>无<{/if}>
+           </td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+      <tr>
+        	<td><{button class="btn-primary" style="margin-left:50%" id="ipsettingform-submit" type="submit" label=$___b2c="确定"|t:'b2c'}></td>
+          </tr>
+    </div>
+  </div>
+</form>
+
+<script>
+(function(){
+	var _form = $('ipsettingform');
+	var btn =$('ipsettingform-submit');
+	var finder = finderGroup['<{$env.get.finder_id}>'];
+	_form.store('target',{
+	  onComplete:function(){
+	  },
+	  onSuccess:function(response){
+		var hash_res_obj = JSON.decode(response);
+		if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+		  try{
+			var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+		  }catch(e){}
+
+		  if(_dialogIns){
+			_dialogIns.close();
+
+		  }
+		}
+	  }
+	});
+
+	btn.addEvent('click',function(){
+	  _form.fireEvent('submit',{stop:$empty});
+	});
+})();
+</script>

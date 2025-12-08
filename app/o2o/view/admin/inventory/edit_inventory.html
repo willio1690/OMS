@@ -1,0 +1,246 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<style>
+    .notice-inline.error  {background-image:none;margin-left:25px}    
+</style>
+<form method="post" action="index.php?app=o2o&ctl=admin_inventory&act=doEdit">
+    <input type="hidden" name="inventory_id" id="inventory_id" value="<{$inv_info.inventory_id}>" />
+    <input type="hidden" name="branch_id" id="branch_id" value="<{$inv_info.branch_id}>" />
+    <div class="tableform">
+      <h3>盘点编辑</h3>
+      <div class="division">
+        <h5>基本信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+        <thead>
+            <tr>
+                <td>盘点单编号：<{$inv_info.inventory_bn}></td>
+                <td>盘点类型：<{$inv_info.inventory_type_text}></td>
+           </tr>
+            <tr>
+                <td>申请人：<{$inv_info.op_name}></td>
+                <td>盘点人：<{$inv_info.confirm_op_name}></td>
+            </tr>
+            <tr>
+                <td>门店：<{$inv_info.store_name}></td>
+                <td>申请时间: <{$inv_info.createtime_format}></td>
+            </tr>
+            <tr>
+              <td>盘点时间：<{$inv_info.confirm_time_format}></td>
+            </tr>
+          </thead>
+      </table>
+      <h5 style="margin-top:10px;">盘点明细</h5>
+      <span id='pfba'>
+          <label>按物料编码索引：</label>
+          <input type="text" />
+      </span> 
+      <span id='pfba2'>
+          <label>按物料名称索引：</label>
+          <input type="text" size="35"/>
+      </span>
+      <table class="gridlist" style="margin:4px 0;">
+          <thead>
+            <tr>
+              <th style="width:240px;">物料名称</th>
+              <th>物料编码</th>
+              <th>规格</th>
+              <th>线上帐面数量</th>
+              <th>共享帐面数量</th>
+              <th>线上实际数量</th>
+              <th>共享实际数量</th>
+              <th>线上盈(+)亏(-)</th>
+              <th>共享盈(+)亏(-)</th>
+              <th style="width:30px;" >删除</th>
+            </tr>
+          </thead>
+          <tbody id="dataNode">
+              <tr>
+                  <td colspan="9" style="padding:0;"><div class="note" style="margin:0;"> 暂无盘点货品明细 </div></td>
+              </tr>
+          </tbody>
+      </table>
+      </div>  
+      <div id="cc" class="noprint table-action">
+          <{button type="button" id="purchase-save-btn" label="保 存"}> &nbsp;
+      </div>
+    </div>
+</form>
+<script>
+(function(){
+
+    var callurl='index.php?app=o2o&ctl=admin_inventory&act=getItems&inventory_id='+<{$inv_info.inventory_id}>+'&branch_id='+<{$inv_info.branch_id}>,store=[];
+    var options={
+        'getVar':'bn',
+        'fxOptions':false,
+        callJSON:function(){return window.autocompleter_json;},
+        injectChoice:function(json){
+            var choice = new Element('li', {'html': this.markQueryValue(json[this.options.getVar])});
+            choice.store('_data',json);
+            choice.inputValue = json[this.options.getVar];
+            this.addChoiceEvents(choice).inject(this.choices);
+        },
+        onHide:function(){
+            if(!this.selected)return;
+            var json=this.selected.retrieve('_data');
+            json=$splat(json);
+            init(json);
+            MessageBox.success('加载商品成功!!');
+        },
+        onFocus:function(ipt){
+            ipt.value='';
+        }
+    };
+    
+    new Autocompleter.script($E('#pfba input'),callurl, options);
+    new Autocompleter.script($E('#pfba2 input'),callurl,$merge(options,{'getVar':'name'}));
+
+   var tpl='<tr key="{product_id}" id="product_{product_id}">'+
+    '  <td>{bn}</td>'+
+    '  <td class="product-name">{name}</td>'+
+    '  <td>{spec_info}</td>'+
+    '  <td><input type="text" value="{accounts_num}" key="accounts_num"  tname="an[_PRIMARY_]" size="6">'+
+    '  <td><input type="text" value="{accounts_share_num}" key="accounts_share_num" tname="as[_PRIMARY_]" size="6"></td>'+
+    '  <td class="actual_num">{actual_num}</td>'+
+    '  <td class="actual_share_num">{actual_share_num}</td>'+
+    '  <td class="short_over" >{short_over}</td>'+
+    '  <td class="share_short_over">{share_short_over}</td>'+
+    '  <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>'+
+    '</tr>';
+    
+    var pag;
+    function emptyData(){
+        var noData='<tr>'+
+            '<td colspan="9" style="padding:0;"><div class="note" style="margin:0;"> 暂无盘点货品明细 </div></td>'+
+            '</tr>';
+        $('dataNode').set('html',noData);
+    }
+
+    var _next_key = next_key =  product_id = last_key = null;
+    function createProduct(data){
+        pag=new PageData(tpl,data,{'updateMain':$('dataNode'),'pageNum':10000,
+            'format': function(d) {
+            },
+            'onShow':function(){
+                var _this=this;
+                $$('#dataNode input[tname$="[_PRIMARY_]"]').each(function(item){
+                    item.store('initval',item.value).addEvent('change',function(e){
+                        var patten, parent = this.getParent('tr'), pid= parent.get('key'), value= this.value.trim();
+                        if (/^an\[/.test(this.get('tname')) || /^as\[/.test(this.get('tname'))){
+                            patten = /^[0-9]\d*$/;
+                        }
+                        if(!value){
+                            value = 0;
+                            this.value = 0;
+                        }
+                        _this.editData(pid,[this.get('key'),value]);
+                        //验证必须是>=0的数字
+                        if(!patten.test(value)){
+                            this.focus();
+                            return MessageBox.error('输入格式有误！');
+                        }
+                        //线上帐面数量变动 更新 线上盈(+)亏(-)
+                        if(this.get('key') == "accounts_num"){
+                            var actual_num = parent.getElement('td.actual_num');
+                            var actual_num_text = actual_num.getText();
+                            var short_over = parent.getElement('td.short_over');
+                            var update_short_over = value - actual_num_text
+                            short_over.set('text', update_short_over);
+                        }
+                        //共享帐面数量变动 更新 共享盈(+)亏(-)
+                        if(this.get('key') == "accounts_share_num"){
+                            var actual_share_num = parent.getElement('td.actual_share_num');
+                            var actual_share_num_text = actual_share_num.getText();
+                            var share_short_over = parent.getElement('td.share_short_over');
+                            var update_share_short_over = value - actual_share_num_text
+                            share_short_over.set('text', update_share_short_over);
+                        }
+                    });
+                });
+                
+                $$('#dataNode tr').each(function(item,i){
+                    item.addEvent('click',function(e){
+                        if(_next_key){
+                            $E('#product_'+_next_key).set('style','');
+                            delete _next_key;//马上删除这个临时变量
+                        }
+                        //this.toggleClass('selected');
+                        _this.selectData(this.get('key')).selected = _this.selectData(this.get('key')).selected && _this.selectData(this.get('key')).selected === true ? false : true;
+                        var selectflag = _this.selectData(this.get('key')).selected;
+                        //var selectproduct = item.getElement('.product_select');
+                        //if (selectflag){
+                        //    selectproduct.set('checked','checked');
+                        //}else{
+                        //    selectproduct.set('checked','');
+                        //}
+                    });
+                    //删除的绑定 然后执行
+                    item.getElement('.btn-delete-item').addEvent('click',function(e){
+                        e.stop();
+                        product_id = 'product_'+item.get('key');
+                        _next_key = $$('#'+product_id+'+tr').get('key');
+                        if(_this.selectData(item.get('key')) && confirm('确定要删除 '+ _this.selectData(item.get('key'))['name'] +' 吗？')){
+                          _this.delData(item.get('key'));
+                          product_id =  next_key = null;
+                        }
+                        if(!$E('#dataNode tr')) emptyData();
+                    });
+                });
+                
+
+            }
+        });
+    }
+
+    function init(rs){
+        var tmparr=findProduct(rs,'product_id');
+         store.unshift.apply(store,tmparr);
+         createProduct(store);
+    }
+    
+    function findProduct(arr,PRIMARY){
+        if(!store.length)return arr;
+        store.each(function(a){
+            arr.each(function(b){
+                if(a[PRIMARY]==b[PRIMARY])arr.erase(b);
+            });
+        });
+        return arr;
+    }
+    
+    $('purchase-save-btn').addEvent('click',function(e){
+        var _this=this;
+        var form=this.getParent('form');
+        if(pag){
+            var data=pag.toHideInput($('dataNode').getElement('tr'));
+            form.store('target',{extraData:data,
+                onRequest:function(){
+                    _this.disabled=true;
+                },
+                onComplete:function(jsontext){
+                    try{
+                        var json = JSON.decode(jsontext);
+                        if (typeof(json.error)!='undefined'){
+                            _this.disabled=false;
+                        }else{
+                            _this.disabled=true;
+                            if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                            setTimeout('window.close()',200);
+                        }
+                    }catch(e){}
+                }
+            });
+        }
+        form.fireEvent('submit',e);
+    });
+})();
+
+</script>

@@ -1,0 +1,11 @@
+<services>
+<service id="desktop_finder.ediws_mdl_reship">
+    <class>ediws_finder_reship</class>
+</service> 
+<service id="desktop_finder.ediws_mdl_account_orders">
+    <class>ediws_finder_accountorders</class>
+</service> 
+<service id="desktop_finder.ediws_mdl_refundinfo">
+    <class>ediws_finder_refundinfo</class>
+</service> 
+</services>

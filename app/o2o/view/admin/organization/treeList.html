@@ -1,0 +1,93 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="" id="catEditor" method="post" target="">
+  <div class="gridlist-action">
+    
+  </div>
+  <table cellspacing="0" cellpadding="0" class="gridlist">
+    <col class="Colauto"></col>
+    <col class="Coloption_1b"></col>
+    <thead>
+      <th><{t}>组织名称<{/t}></th>
+      <th><{t}>操作<{/t}></th>
+
+    </thead>
+    <tbody>
+      <{foreach from=$organization item=item key=iLoop name="item"}>
+      <tr parentid="<{$item.org_id}>" class="provice-bg">
+        <td style="text-align:left; width:320px;">
+          <div style="padding-left:<{$item.step*25}>px">
+            <{if $item.child_count>0}>
+            <span class="imgTree" onclick="clickTree(this);" id="<{$item.org_id}>" data-parent='true' data-orgid="<{$item.org_id}>"> &nbsp;&nbsp; </span>
+            <{else}>
+            <span class="imgTree tree_open"> &nbsp;&nbsp; </span>
+            <{/if}>
+            <span style="font-weight:700; color:#000; text-decoration:none;padding-right:15px;" ><{$item.org_name}></span>
+          </div>
+        </td>
+        <td style="width:350px">
+           
+        </td>
+      </tr>
+      <{/foreach}>
+    </tbody>
+  </table>
+</form>
+
+<script>
+function clickTree(el){
+    var el=$(el), obj = el.getParent('[parentid]');
+    
+    var org_id = el.get("data-orgid");
+    var is_parent = false;
+    if(el.get("data-parent")){
+        is_parent = (el.get("data-parent") == 'true' ? true : false);
+    }
+    
+    if(!el.hasClass("tree_open")){
+        if(!obj.getNext() || !obj.getNext().get('readstatus')){
+            var tr=new Element('tr[readstatus=1]').injectAfter(obj).setHTML('<td colspan="5" style="border:0;padding:0;"></td>');
+            W.page('index.php?app=o2o&ctl=admin_store&act=getChildNode',{update:tr.firstChild,method:'post',data:'orgId='+el.id});
+        }
+        obj.getNext().show();
+        el.addClass("tree_open");
+        
+        if(is_parent){
+            $("show_all_but_"+ org_id).addClass('show_tree');
+            $("show_all_but_"+ org_id).set('html', '隐藏全部');
+        }
+        
+    }else{
+        obj.getNext().hide();
+        el.removeClass("tree_open");
+        
+        if(is_parent){
+            $("show_all_but_"+ org_id).removeClass('show_tree');
+            $("show_all_but_"+ org_id).set('html', '展开全部');
+        }
+        
+    }
+}
+function spreadAll(el){
+    var el=$(el), obj = el.getParent('[parentid]');
+    var org_id = el.get("data-orgid");
+    if(!el.hasClass("show_tree")){
+        if(!obj.getNext() || !obj.getNext().get('readstatus')){
+            var tr=new Element('tr[readstatus=1]').injectAfter(obj).setHTML('<td colspan="5" style="border:0;padding:0;"></td>');
+            W.page('index.php?app=o2o&ctl=admin_store&act=getAllChildNode',{update:tr.firstChild,method:'post',data:'orgId='+org_id});
+        }
+        obj.getNext().show();
+        el.setHTML('隐藏全部');
+        el.addClass("show_tree");
+        $(org_id).addClass('tree_open');
+    }else{
+        obj.getNext().remove();
+        el.removeClass("show_tree");
+        el.setHTML('展开全部');
+        $(org_id).removeClass('tree_open');
+    }
+}
+</script>

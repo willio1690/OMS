@@ -1,0 +1,35 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table class="tableform">
+    <tbody>
+    <tr>
+        <th>订单确认小组：</th>
+        <td>
+            <{input class="dailog-batch-ipt" type="select" name='new_group_id' rows=$groups valueColumn="group_id" labelColumn="name"}>
+        </td>
+    </tr>
+    <tr>
+        <th>订单操作员：</th>
+        <td><{input class="dailog-batch-ipt" type="select" name='new_op_id'}></td>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+(function(){
+    $E('select[name=new_group_id]').addEvent('change',function(){
+        var group_id = this.value;
+        var selected_op_id = $E('select[name=new_op_id]').value;
+
+        W.page('index.php?app=ome&ctl=admin_group&act=get_op&p[0]='+group_id+'&p[1]='+selected_op_id+'&p[2]=true',{
+            update:$E('select[name=new_op_id]'),
+            onRequest:function(){
+                $E('select[name=new_op_id]').empty();
+            }
+        });
+    });
+})();
+</script>

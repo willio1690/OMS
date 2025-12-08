@@ -1,0 +1,20 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+#widgets_productinfo tr{ height:30px;line-height:30px;color:#333;width:100%;}
+#widgets_productinfo tr th{text-align:left;width:100px;}
+#widgets_productinfo tr td{text-align:left;font-weight:normal;}
+</style>
+<div class="clearfix dashbd-row">
+    <table id="widgets_productinfo" cellpadding="0" cellspacing="0">
+    <{foreach from=$data item=item}>
+        <tr>
+            <th><{$item.label}>：</th>
+           <td><{$item.value}></td>
+        </tr>
+    <{/foreach}>
+    </table>
+</div>

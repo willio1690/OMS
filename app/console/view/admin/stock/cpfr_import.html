@@ -1,0 +1,44 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="POST" action="index.php?app=console&ctl=admin_cpfr&act=importCpfrData&finder_id=<{$env.get.finder_id}>"  enctype="multipart/form-data" id="import-form">
+    <div class="tableform" id="upload">
+        <div class="division">
+            <table border="0" cellpadding="0" cellspacing="0" class="gridlist">
+               
+                <tr>
+                    <td style="width:100px;height:30px;text-align:right;">
+                        导入xls文件：
+                    </td>
+                    <td style="text-align:left;">
+                        <input type='file' name='import_file' id='ImportCSV' />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-action">
+        <input type='hidden' id="import_type" name='import_type' value='add'/>
+        <{button label=$___desktop="导入"|t:'desktop' id="ImportBtn"  type="submit"}>
+        <{button label=$___desktop="关闭"|t:'desktop' id="stopBtn"  class="btn-secondary" type="button" isCloseDialogBtn="true" }>
+    </div>
+
+    <div class="error" style="display: none;"></div>
+</form>
+<script>
+    (function(){
+        var state;
+        $('ImportBtn').addEvent('click',function(e){
+            if(state||!$('ImportCSV').value.length)return false;
+            state=true;
+            this.style.cursor='not-allowed';
+        });
+        $('ImportCSV').addEvent('change',function(e){
+            state=false;
+            $('ImportBtn').style.cursor='pointer';
+        });
+    })();
+</script>

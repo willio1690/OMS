@@ -1,0 +1,25 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    #con_m_list li {width:90px; overflow: hidden; float: left; margin-bottom: 10px; font-size: 12px; line-height: 20px;}
+</style>
+
+<ul id="con_m_list">
+    <{foreach from=$order_type item=item key=key}>
+    <li><label for="m_<{$key}>"><span><input type="checkbox" value="<{$key}>" id="m_<{$key}>" name="order_type[]" <{if is_array($init.content.order_type) && $key|in_array:$init.content.order_type}>checked<{/if}>/> <{$item}></span></label></li>
+    <{/foreach}>
+</ul>
+
+<script>
+    $$('#con_m_list input[type=checkbox]').addEvent('click',function(e){
+        this.blur();
+        this.getParent()[this.checked?'addClass':'removeClass']('current-set');
+    });
+    $$('#con_m_list input[type=checkbox]').each(function(item){
+        item.blur();
+        item.getParent()[item.checked?'addClass':'removeClass']('current-set');
+    });
+</script>

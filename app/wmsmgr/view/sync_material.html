@@ -1,0 +1,154 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .processBarBg {
+        border: 1px solid #999999;
+        width: 98%;
+        margin: 5px;
+        height: 25px;
+        line-height: 25px;
+        padding: 1px;
+        background: #EEEEEE;
+    }
+    .processBar {
+        background: #3366cc;
+        width: 0px;
+        padding-bottom: 1px;
+        overflow: hidden;
+    }
+</style>
+<div class="division">
+    <table class="tableform">
+        <tbody>
+        <input type="hidden" name="channel_id" value="<{$channel_id}>" id="channel_id">
+        <tr>
+            <th>修改时间:</th>
+            <td>
+                <{input type="date" id="start_time" name="start_time" value=$pre_time}>~<{input type="date" id="end_time"  name="end_time" value=$now_time}>
+            </td>
+        </tr>
+        <tr>
+            <th>基础物料:</th>
+            <td>
+                <input  type="radio"  name="type"  value="基础物料" checked >
+            </td>
+        </tr>
+        <tr>
+            <th>是否初始化物料:</th>
+            <td>
+                是 <input type="radio"  checked name="is_init" vlaue='on'>
+                否 <input type="radio"  name="is_init" value='off'>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div class="division">
+    <h4>当前共<span id="mtotal"></span>个基础物料</h4>
+    <div class="division" style="display:none;" id="information">
+        已经处理 <span id="iTotal" style="color:#083E96"></span> 个基础物料，<br/>
+        其中 <span id="iFail" style="color:#083E96"></span> 个基础物料未新增成功，<br/>
+        其中 <span id="ForeignSucc" style="color:#083E96"></span> 个基础物料与WMS关联成功，<br/>
+        其中 <span id="ForeignError" style="color:#083E96"></span> 个基础物料与WMS关联失败<br/>
+    </div>
+    <div id="processBarBg" class="processBarBg">
+        <div id="processBar" class="processBar">
+            &nbsp;
+        </div>
+    </div>
+    <div class="table-action">
+        <{button label="开始" class="btn-primary" name="Start" id="btn-run"}>
+        <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true" }>
+    </div>
+    <div id="showError"></div>
+</div>
+
+<{if $notice}><div class="notice"><{$notice}></div><{/if}>
+
+<script>
+    (function(){
+        $('btn-run').addEvent('click', function(){
+            doRun();
+        });
+        var doTotal, doFail, total, channelId, startTime, endTime, isInit, addForeignSucc,addForeignError;
+        function doRun(){
+            //禁用开始按钮
+            doTotal = total = doFail = addForeignError = addForeignSucc = 0;
+            displayProcessInfo();
+            $('information').style.display ='';
+            $('btn-run').disabled = true;
+            $('btn-run').set('html', '<span><span>数据处理中，请稍候！</span></span>');
+            channelId = $('channel_id').value;
+            startTime = $('start_time').value;
+            endTime = $('end_time').value;
+            isInit = $ES("input[name='is_init']:checked").get('value');
+
+            doAjaxProcess('');
+        }
+
+        /**
+         * 执行一次AJAX调用
+         */
+        function doAjaxProcess(scrollId) {
+            new Request({url:'index.php?app=wmsmgr&ctl=admin_wms&act=ajaxSyncMaterial',
+                method:'post',
+                data: {
+                    scrollId: scrollId,
+                    channelId: channelId,
+                    startTime: startTime,
+                    endTime: endTime,
+                    isInit: isInit[0]
+                },
+                onComplete:function(result){
+                    if(!result) {
+                        $('showError').setHTML('可能超时了，请重试');
+                        return;
+                    }
+                    var ret = JSON.decode(result);
+                    if(ret['err_msg']) {
+                        $('showError').setHTML(ret['err_msg']);
+                        // return;
+                    }
+                    var scrollId = ret['scrollId'];
+                    total = ret['total'];
+                    doTotal += ret['itotal'];
+                    doFail += ret['ifail'];
+                    addForeignSucc += ret['add_foreign_succ'];
+                    addForeignError += ret['add_foreign_error'];
+                    displayProcessInfo();
+                    if(scrollId) {
+                        $('processBar').setStyle('width', (doTotal*100/(total)) + '%');
+                        doAjaxProcess(scrollId);
+                    } else {
+                        $('processBar').setStyle('width', '100%');
+                        // 判断是否弹框
+                        var dailogEl = $('btn-run').getParent('.dialog')
+                        if ($defined(dailogEl)) {
+                            var dailog = dailogEl.retrieve('instance');
+
+                            dailog.close.delay(3000,dailog);
+
+                        <{if $env.get.finder_id}>
+                            finderGroup['<{$env.get.finder_id}>'].refresh.delay(3000,finderGroup['<{$env.get.finder_id}>']);
+                        <{/if}>
+                            }
+                        }
+                    }
+                }).send();
+        }
+
+        /**
+         * 显示信息进度
+         */
+        function displayProcessInfo() {
+            $('iTotal').set('html', doTotal);
+            $('iFail').set('html', doFail);
+            $('mtotal').set('html', total);
+            $('ForeignSucc').set('html', addForeignSucc);
+            $('ForeignError').set('html', addForeignError);
+        }
+    }());
+</script>

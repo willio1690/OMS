@@ -1,0 +1,98 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{/capture}>
+
+<form method="post" id="bind_product_form" action="index.php?app=tbo2o&ctl=admin_shop_skus&act=bind_product&p[0]=<{$data.id}>">
+    <div class="tableform">
+      <h3>关联后端商品</h3>
+      <div class="division">
+        <h5>基本信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+        <thead>
+            <tr>
+                <td width="10%" align="right" nowrap="nowrap">
+                    店铺货号：
+                </td>
+                <td><input type="text" name="shop_product_bn" size="30" disabled="disabled" value="<{$data.shop_product_bn}>" /><input name="id" type="hidden" id="id" value="<{$data.id}>" /></td>
+            </tr>
+            <tr>
+                <td width="10%" align="right" nowrap="nowrap">
+                    店铺货品名称：
+                </td>
+                <td>
+                    <input type="text" name="shop_title" size="60" disabled="disabled" value="<{$data.shop_title}>" />
+                </td>
+            </tr>
+
+            <tr id="bind_basic_tbo2o">
+                <td width="10%" align="right">关联后端商品：</td>
+                <td>
+                    <{input type='tbo2o_object' object='shop_products@tbo2o' breakpoint='0' name='product_id' textcol='name' value=$bind_product_id callback='product_object_callback' replacehtml=$replacehtml emptytext='选取后端商品' style='float:left;width:200px;' }>
+                </td>
+            </tr>
+          </thead>
+        </table>
+    </div>
+
+      <div id="cc" class="noprint table-action">
+          <{button type="button" id="bind_product_btn" label="保 存"}> &nbsp;
+          <{button type="button" class="btn-secondary" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}>
+      </div>
+    </div>
+</form>
+<script>
+(function() {
+    window.addEvent('domready', function() {
+        
+        $('bind_product_btn').addEvent('click',function(e){
+            var _this=this;
+            var form=this.getParent('form');
+            form.store('target',{
+                    onRequest:function(){
+                        _this.disabled=true;
+                    },
+                    onComplete:function(jsontext){
+                        try{
+                            var json = JSON.decode(jsontext);
+                            if (typeof(json.error)!='undefined'){
+                                _this.disabled=false;
+                            }else{
+                                _this.disabled=true;
+                                if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                                setTimeout('window.close()',200);
+                            }
+                        }catch(e){}
+                    }
+            });
+            form.fireEvent('submit',e);
+        });
+    });
+})();
+
+function product_object_callback(rs,handle)
+{
+    var p_node = handle.getParent('div');
+    var html = '已选择了1个商品,'+"<a href='javascript:void(0);' onclick='product_selected_show();'>查看关联的后端商品.</a>";
+    if ($defined($('hand-selected-product')))
+    {
+        $('hand-selected-product').setHTML(html);
+    } else {
+        var div = new Element('div',{'html':html,'id':'hand-selected-product'});
+        div.injectAfter(p_node); 
+    }
+}
+
+function product_selected_show()
+{
+    new Dialog('index.php?app=tbo2o&ctl=admin_shop_skus&act=showProducts',{
+        ajaxoptions:{data:$('hand-selected-product').getPrevious('div'),method:'post'}
+    });
+}
+</script>

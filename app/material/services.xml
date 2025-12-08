@@ -1,0 +1,38 @@
+<services>
+    <service id="desktop_finder.material_mdl_basic_material"> 
+        <class>material_finder_basic_material</class>
+    </service>
+    <service id="desktop_finder.material_mdl_sales_material"> 
+        <class>material_finder_material_sales</class>
+    </service>
+    <service id="desktop_finder.material_mdl_barcode"> 
+        <class>material_finder_barcode</class>
+    </service>
+    <service id="html_input">
+        <class>material_view_input</class>
+    </service>
+    <service id="desktop_finder.material_mdl_basic_material_storage_life">
+        <class>material_finder_basic_material_storage_life</class>
+    </service>
+   
+    <service id="extend_filter_material_mdl_basic_material">
+        <class>material_finder_extend_filter_basic_material</class>
+    </service>
+    <service id="extend_filter_material_mdl_sales_material">
+        <class>material_finder_extend_filter_sales_material</class>
+    </service>
+    <service id="desktop_finder.material_mdl_basic_material_channel">
+        <class>material_finder_basic_material_channel</class>
+    </service>
+    <service id="desktop_finder.material_mdl_fukubukuro_combine">
+        <class>material_finder_fukubukuro_combine</class>
+    </service>
+    <service id="set_pagecols_setting">
+        <class>material_sales_setting</class>
+    </service>
+    
+    <service id="desktop_finder.material_mdl_customer_classify">
+        <class>material_finder_customer_classify</class>
+    </service>
+</services>
+

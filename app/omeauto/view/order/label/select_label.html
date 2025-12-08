@@ -1,0 +1,124 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app='omeauto' src="style.css"}>
+<{/capture}>
+<style>
+#sel_label_form li {width:135px; overflow: hidden; float: left; margin-bottom: 10px; font-size: 12px; height:24px; line-height:24px;}
+.current-set {color: red; font-weight: 700;}
+</style>
+<div class="tableform">
+    <div class="division">
+        <form action="index.php?app=omeauto&ctl=order_labelrule&act=createLabel" method="post" id="sel_label_form">
+            <input type="hidden" id='org_id' name="org_id" value="<{$org_id}>">
+            <table width="100%" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <th width="80" style="width:80px;"><label for="dom_el_bc">选择标签：</label> </th>
+                        <td>
+                        <div id="label_list_div" style="min-height:300px;">
+                            <ul id="label_list_ul" class="label_list_ul">
+                                <{foreach from=$labelList item=labelItem key=labelKey}>
+                                <li style="overflow:hidden;">
+                                <span title="<{$labelItem.label_name}>"><input name="label_id" type="radio" value="<{$labelItem.label_id}>" /> <{$labelItem.label_name}>
+                                <span style="background-color:<{$labelItem.label_color}>;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
+                                </li>
+                                <{/foreach}>
+                            </ul>
+                        </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center">
+                            <{button class="btn-primary" label="确定" type="button" id="saveLabelBtn"}>&nbsp;&nbsp;
+                            <{button class="btn-primary" label="取消" type="button" id="cancelLabelBtn"}>&nbsp;&nbsp;
+                            <{button class="btn-primary" label="添加自定义标签" type="button" id="addLabelBut"}>&nbsp;&nbsp;
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<script>
+(function() {
+    //添加自定义标签
+    $('addLabelBut').addEvent("click",function(){
+        new Dialog('index.php?app=omeauto&ctl=order_labelrule&act=addLabel',{width:500,height:300,title:'新建订单标签',ajaxoptions:{method:'post'}});
+    });
+    
+    //关闭按钮
+    $('cancelLabelBtn').addEvent('click', function(){
+        $('cancelLabelBtn').getParent('.dialog').retrieve('instance').close();
+    });
+    
+    //保存按钮
+    $('saveLabelBtn').addEvent('click', function()
+    {
+        var is_check = false;
+        $ES("input[name^='label_id']").each(function(item){
+            if(item.checked){
+                is_check = true;
+            }
+        });
+        
+        if(!is_check){
+            alert("请先选择标签");
+            return false;    
+        }
+        
+        $('sel_label_form').fireEvent('submit', {
+            stop: function() {
+            }
+        });
+    });
+    
+    $('sel_label_form').removeEvents('submit').addEvent('submit', function(e)
+    {
+        e.stop();
+        new Request.JSON ({
+            url:this.action,
+            onRequest: function () {
+                $('saveLabelBtn').set('disabled', 'true');
+                $('cancelLabelBtn').set('disabled', 'true');
+            },
+            onSuccess: function(result) {
+                json = JSON.decode(result);
+                
+                if (result.res =='succ') {
+                    //成功
+                    createLabel(result.labelInfo);
+                    
+                    $('saveLabelBtn').getParent('.dialog').retrieve('instance').close();
+                } else {
+                    $('saveLabelBtn').set('disabled', '');
+                    $('cancelLabelBtn').set('disabled', '');
+                    
+                    //提示信息
+                    alert(result.error_msg);
+                }
+            }
+        })[this.method](this);
+    });
+    
+    function createLabel(labelInfo)
+    {
+        var label_id = labelInfo.label_id;
+        
+        var htmlStr = '<div><input name="label_id" type="radio" id="label_id_'+ label_id +'" value="'+ label_id +'" checked="checked"> '+ labelInfo.label_name +'&nbsp;<span style="background-color:'+ labelInfo.label_color +';">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>';
+        htmlStr += '<span><a class="label_del" href="javascript:void(0);">删除</a></span>';
+        
+        var addItem = new Element('li', {html:htmlStr}).inject('selLabelList');
+        addItem.id = 'sel_label_id_'+ label_id;
+        
+        addItem.getElement('.label_del').addEvent("click",function(){
+            if (confirm("你确定要删除当前标签吗？")) {
+                this.getParent().getParent().destroy();
+            }
+        });
+    }
+})();
+</script>

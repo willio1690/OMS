@@ -1,0 +1,45 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<input type="button" id='selectaddress' name='selectaddress' value='选择退货地址'>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="girdlist">
+    <tr>
+        <th>退货地址:</th>
+        <td id='address'>
+        <{$data.address}>
+        </td>
+    </tr>
+    <tr>
+        <th>审核原因:</th>
+        <td>
+            <select name="approve_reason">
+                <{foreach from=$approve_reasons item=item}>
+                <option value="<{$item.code}>"><{$item.name}></option>
+                <{/foreach}>
+            </select>
+        </td>
+    </tr>
+</table>
+<input type='hidden' id='contact_id' name='contact_id' value='<{$data.contact_id}>'>
+<script>
+$("selectaddress").addEvent('click',function(e){
+        var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=ome&ctl=admin_return_address&act=findAddress&singleselect=1&filter[shop_id]=<{$data.shop_id}>');
+       var callurl='index.php?app=ome&ctl=admin_return_address&act=getAddressById';
+    	Ex_Loader('modedialog',function() {
+			new finderDialog(url,{params:{url:callurl,name:'id'},width:1000,height:660,
+				onCallback:function(rs){
+					if(!rs)return;
+					rs=JSON.decode(rs);
+                    
+					$('contact_id').set('value',rs.contact_id);
+                    $('address').set('html',rs.address);
+				}
+			});
+		});
+	});
+
+    
+</script>
+

@@ -1,0 +1,57 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<div class="tableform">
+    <{if $shop_id}>
+    <div class="division">
+        <input type="hidden" name="shop_id" value="<{$shop_id}>" />
+        <table>
+            <tr>
+                <th>是否开启智能客服修改地址</th>
+                <td>
+                    <input type="radio" name="cloudkefu_conf" value='1'  <{if $cloudkefu_conf=='1'}>checked<{/if}>> 是
+                    <input type="radio" name="cloudkefu_conf" value='0' <{if $cloudkefu_conf=='0' || $cloudkefu_conf==''}>checked<{/if}>> 否
+                    <span class="red">开启后，将同步千牛修改地址信息</span>
+                </td>
+            </tr>
+        </table>
+        <div class="division">
+            <{button type="submit" label="保存" class="btn-secondery" id="btn_manual"}>
+        </div>
+    </div>
+    <{else}>
+        <span class="red">仅淘系店铺支持智能客服修改地址</span>
+    <{/if}>
+
+</div>
+
+<script>
+
+if($("btn_manual")){
+    $("btn_manual").addEvent("click",function(e){
+        var cloudkefu_conf= $E('input[type=radio]:checked').get('value');
+
+        new Request({
+        url:'index.php?app=ome&ctl=admin_shop&act=cloudkefu',
+        data:"&shop_id="+"<{$shop_id}>&cloudkefu_conf="+cloudkefu_conf,
+        method:'post',
+        onSuccess:function(response){
+            var resp =  JSON.decode(response);
+            if(resp.rsp=="fail"){
+                var msg = resp.msg ? resp.msg : resp.res;
+                MessageBox.error(msg);
+            }else{
+                MessageBox.success("保存成功");
+            }
+        }
+      }).send();
+   });
+}
+</script>
+

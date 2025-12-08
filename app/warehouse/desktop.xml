@@ -1,0 +1,16 @@
+<desktop>
+
+   <permissions>
+       <permission id="warehouse_iostockorder">转仓单</permission>
+   </permissions>
+
+	<workground name="供应计划" id="console_purchasecenter" order="510">
+	    <menugroup name="出入库计划" en="warehousing-plan">
+            <menu controller='admin_iostockorder' action='index' permission='warehouse_iostockorder' display='true' order='5000110'>转仓单</menu>
+        </menugroup>
+	</workground>
+
+</desktop>
+
+
+

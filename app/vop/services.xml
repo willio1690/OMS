@@ -1,0 +1,14 @@
+<services>
+    <service id="desktop_finder.vop_mdl_sales">
+        <class>vop_finder_sales</class>
+    </service>
+     <service id="desktop_finder.vop_mdl_bill">
+        <class>vop_finder_bill</class>
+    </service>
+     <service id="desktop_finder.vop_mdl_vreturn_diff">
+        <class>vop_finder_vreturn_diff</class>
+    </service>
+    <service id="operation_log">
+        <class>vop_operation_log</class>
+    </service>
+</services>

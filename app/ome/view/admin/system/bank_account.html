@@ -1,0 +1,63 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+    <form method="POST" action="index.php?app=ome&ctl=admin_setting&act=do_add_bank_account" id="form">
+        <{input type="hidden" name="item[ba_id]" value=$item.ba_id}>
+        <table align="center" >
+            <tr>
+                <th>开户银行: </th>
+                <td><{input type="text" name="item[bank]" value=$item.bank placeholder="开户银行" vtype="required"}></td>
+            </tr>
+            <tr>
+                <th>银行账号: </th>
+                <td><{input type="text" name="item[account]" value=$item.account placeholder="银行账号" vtype="required"}></td>
+            </tr>
+            <tr>
+                <th>开户人: </th>
+                <td><{input type="text" name="item[holder]" value=$item.holder placeholder="开户人" vtype="required"}></td>
+            </tr>
+            <tr>
+                <th>银行预留号码: </th>
+                <td><{input type="text" name="item[phone]" value=$item.phone placeholder="银行预留号码" vtype="required"}></td>
+            </tr>
+            <tr>
+                <td></td><td><{button class="btn-primary" type="submit" label="确定" id="submit_btn"}></td>
+            </tr>
+        </table>
+
+    </form>
+    </div>
+</div>
+<script>
+    (function(){
+        var _form = $('form');//表单ID
+        var btn   = $('submit_btn');//按钮ID
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+        _form.store('target',{
+            onComplete:function(){
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+
+                    if(_dialogIns){
+                        finder.refresh();
+                        _dialogIns.close();
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+            _form.fireEvent('submit',{stop:$empty});
+        });
+    })();
+</script>
+

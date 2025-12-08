@@ -1,0 +1,29 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+    <h4>库位信息</h4>
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+        <thead>
+        <tr>
+            <th>名称</th>
+            <th>类型</th>
+            <th>库位</th>
+        </tr>
+        </thead>
+        <tbody>
+     
+        <{foreach from=$branchs item=branch}>
+        <tr>
+            <td><{$branch.branch_bn}></td>
+            <td><{$branch.branch_type_text}></td>
+            <td><{$branch.storage_code}></td>
+        </tr>
+        <{/foreach}>
+       
+        </tbody>
+    </table>
+</div>
+

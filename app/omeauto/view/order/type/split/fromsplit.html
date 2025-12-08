@@ -1,0 +1,39 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="m10">
+    第二层拆分类型：<{input type="select" id='split_type_2' name="split_config[split_type_2]" value=$data.split_config.split_type_2 options=$special_data.split_type}>
+    <div id="split_type_2_text" style="padding-top: 10px;padding-bottom: 10px"></div>
+    第三层拆分类型：<{input type="select" id='split_type_3' name="split_config[split_type_3]" value=$data.split_config.split_type_3 options=$special_data.split_type}>
+    <div id="split_type_3_text" style="padding-top: 10px"></div>
+</div>
+<script type="text/javascript">
+    (function(){
+        $('split_type_2').addEvent('change', function () {
+            var _this = this;
+            new Request.HTML({
+                url: 'index.php?app=omeauto&ctl=order_split&act=getSplitSpecial&sid=<{$env.get.sid}>',
+                update: $('split_type_2_text'),
+                data: {
+                    split_type: _this.value,
+                    from: "split"
+                }
+            }).send();
+        });
+        $('split_type_2').fireEvent('change');
+        $('split_type_3').addEvent('change', function () {
+            var _this = this;
+            new Request.HTML({
+                url: 'index.php?app=omeauto&ctl=order_split&act=getSplitSpecial&sid=<{$env.get.sid}>',
+                update: $('split_type_3_text'),
+                data: {
+                    split_type: _this.value,
+                    from: "split"
+                }
+            }).send();
+        });
+        $('split_type_3').fireEvent('change');
+    })();
+</script>

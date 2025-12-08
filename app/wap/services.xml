@@ -1,0 +1,6 @@
+<services>
+    <service id="autotask">
+        <class>wap_misc_task</class>
+    </service>
+</services>
+

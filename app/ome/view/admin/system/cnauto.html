@@ -1,0 +1,40 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<div class="tableform">
+<{if $shopData.shop_type == 'taobao'}>
+<form action="index.php?<{$env.server.QUERY_STRING}>" id="shop_dly_crop" method="post">
+    <div class="division">
+        <input type="hidden" name="shop_id" value="<{$shop_id}>" />
+        <table>
+            <tr>
+                <th>菜鸟流转订单仓库设置</th>
+                <td>
+                <select name="branch_id">
+                <option value="">请选择</option>
+                <{foreach from=$branch_list item=branch}>
+                    <option value="<{$branch.branch_id}>" <{if $branch.branch_id==$auto_branch_id}>selected<{/if}>><{$branch.name}></option>
+                    <{/foreach}>
+
+                </select>
+                    <span class="red">选择后菜单流转订单会指定为此仓库确认生成发货单会推向对应WMS</span>
+                </td>
+            </tr>
+        </table>
+        <div class="division">
+            <{button type="submit" label="保存" class="btn-secondery" id="btn_manual"}>
+        </div>
+    </div>
+    <{else}>
+     <span class="red">仅淘系店铺支持菜鸟流转订单仓库设置</span>
+    <{/if}>
+</form>
+</div>
+
+

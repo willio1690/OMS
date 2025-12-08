@@ -1,0 +1,44 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form class="tableform" id="form-order" method='post' action='index.php?app=brush&ctl=admin_memo&act=do_batch_order'>
+    <input type='hidden' name='order_id' value='<{$order_id}>' />
+    <div class="tableform">
+        <div class="division">
+            <table width="100%" >
+                <tbody>
+                    <tr>
+                        <th>备注内容：</th>
+                        <td><textarea name="mark_text" cols="80" rows="5" vtype="required" id='mark_text'></textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div  id='error'></div>
+        <div class="table-action">
+            <{button label="提交" type="submit" id="btn_memo"}>
+            <{button label="关闭" type="button" isCloseDialogBtn="true" }>
+        </div>
+    </div>
+</form>
+
+<script>
+    $('form-order').store('target', {
+        onRequest: function () {
+            $('btn_memo').set('disabled', 'true');
+        },
+        onComplete: function (responseText) {
+            var result = JSON.decode(responseText);
+            if (result.success) {
+                document.getElementById("error").innerHTML = "<span style='color:green'>处理已完成，本窗口将在3秒后自动关闭！</span>";
+                setTimeout("$('btn_memo').getParent('.dialog').retrieve('instance').close();finderGroup['<{$env.get.finder_id}>'].refresh();", 2000);
+            } else {
+                $('btn_memo').set('disabled', '');
+                var sMsg = result.error ? result.error : '设置失败';
+                document.getElementById("error").innerHTML = "<span style=\"color:red\">" + sMsg + "</span>";
+            }
+        }
+    });
+</script>

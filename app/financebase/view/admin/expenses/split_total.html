@@ -1,0 +1,158 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style type="text/css">
+    .search_result .items li {float: left;width: 320px;overflow: hidden;white-space: nowrap;}
+    .search_result .items li div {display: inline-block;padding: 5px}
+    .bill_category {width: 100px;overflow: clip;white-space: nowrap;}
+</style>
+<h3>拆分结果汇总</h3>
+<div class="division" id="tradeSearch">
+    <label>账单日期:&nbsp;</label>
+    <{input type="date" vtype="date" name="time_from" id="time_from" style="width:66px; font-family:arial;" value=$time_from}>&nbsp;&nbsp;至&nbsp;&nbsp;
+    <{input type="date" vtype="date" name="time_to" id="time_to" style="width:66px; font-family:arial;" value=$time_to}>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <label>具体类别:</label>
+    <select name="bill_category" id="bill_category">
+        <option value="">全部</option>
+        <{foreach from=$billCategory item=val}>
+        <option value="<{$val.bill_category}>"><{$val.bill_category}></option>
+        <{/foreach}>
+    </select>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <label>选择店铺:</label>
+    <select name="shop_id" id="shop_id">
+        <option value="">全部</option>
+        <{foreach from=$shopdata item=val}>
+        <option value="<{$val.shop_id}>" <{if $shop_id == $val.shop_id}>selected="selected"<{/if}> ><{$val.name}></option>
+        <{/foreach}>
+    </select>
+    <{input type="hidden" name="url_type" value="trade"}>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <{button class="filterBtn btn-thirdly checkBtn" label='查询'}>&nbsp;
+    <{button class="filterBtn btn-thirdly exportBtn" label='导出'}>&nbsp;
+</div>
+<div class="division search_result" id="tradeSearchShow">
+    <div class="total"></div>
+    <ul class="items"></ul>
+</div>
+<div style="clear: both;"></div>
+<script type="text/javascript">
+    (function(){
+        var oTradeDiv = $('tradeSearch');
+        var tradeTpl = '<div title="{bill_category}" class="bill_category">{bill_category}:</div><div style="color:black">{total_money}</div><div style="color:green">{split_money}</div><div style="color:red">{unsplit_money}</div>'
+        var trandeTotalTpl = '账期总费用：<span style="color:black">{total_money}</span>&nbsp;&nbsp;&nbsp;&nbsp;账期已拆分费用：<span style="color:green">{split_money}</span>&nbsp;&nbsp;&nbsp;&nbsp;账期未拆分费用：<span style="color:red">{unsplit_money}</span>&nbsp;&nbsp;&nbsp;&nbsp;';
+        $E('.checkBtn', oTradeDiv).addEvent('click', function() {
+            new Request.JSON({ 
+                url: 'index.php?app=financebase&ctl=admin_expenses_splittotal&act=tradeSearch',
+                data: oTradeDiv.toQueryString(),
+                onRequest: function() {
+                    new MessageBox('请求中...',{type:'notice'});
+                },
+                onComplete: function(rsp) {
+                    MessageBox.success('请求完成');
+                    $E('.total', $('tradeSearchShow')).empty();
+                    $E('.items', $('tradeSearchShow')).empty();
+                    if(rsp.total && rsp.total.total_money) {
+                        var sHtml = trandeTotalTpl.substitute(rsp.total);
+                    } else {
+                        var sHtml = '没有数据';
+                    }
+                    $E('.total', $('tradeSearchShow')).adopt(new Element('span',{html:sHtml}));
+                    if(rsp.items.length) {
+                        Object.each(rsp.items, function(item) {
+                            var sHtml = tradeTpl.substitute(item);
+                            var oLi = new Element('li', {
+                                html: sHtml
+                            });
+                            $E('.items', $('tradeSearchShow')).adopt(oLi);
+                        })
+                    }
+                }
+            }).send();
+        });
+        $E('.exportBtn', oTradeDiv).addEvent('click', function() {
+            new Dialog('index.php?app=financebase&ctl=admin_expenses_splittotal&act=export',{
+                ajaxoptions:{
+                    data:oTradeDiv.toQueryString(),
+                    method: 'post'
+                },width:"200px",height:"100px"
+            });
+        });
+    })();
+</script>
+<div class="division" id="splitSearch">
+    <label>拆分日期:&nbsp;</label>
+    <{input type="date" vtype="date" name="split_time_from" style="width:66px; font-family:arial;" value=$time_from}>&nbsp;&nbsp;至&nbsp;&nbsp;
+    <{input type="date" vtype="date" name="split_time_to" style="width:66px; font-family:arial;" value=$time_to}>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <label>具体类别:</label>
+    <select name="bill_category" id="bill_category">
+        <option value="">全部</option>
+        <{foreach from=$billCategory item=val}>
+        <option value="<{$val.bill_category}>"><{$val.bill_category}></option>
+        <{/foreach}>
+    </select>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <label>选择店铺:</label>
+    <select name="shop_id" id="shop_id">
+        <option value="">全部</option>
+        <{foreach from=$shopdata item=val}>
+        <option value="<{$val.shop_id}>" <{if $shop_id == $val.shop_id}>selected="selected"<{/if}> ><{$val.name}></option>
+        <{/foreach}>
+    </select>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <{input type="hidden" name="url_type" value="split"}>
+    <{button class="filterBtn btn-thirdly checkBtn" label='查询'}>&nbsp;
+    <{button class="filterBtn btn-thirdly exportBtn" label='导出'}>&nbsp;
+</div>
+<div class="division search_result" id="splitSearchShow">
+    <div class="total"></div>
+    <ul class="items"></ul>
+</div>
+<script type="text/javascript">
+    (function(){
+        var oSplitDiv = $('splitSearch');
+        var splitTpl = '<div title="{bill_category}" class="bill_category">{bill_category}:</div><div>{total_money}</div>'
+        var splitTotalTpl = '拆分总费用：<span>{total_money}</span>';
+        $E('.checkBtn', oSplitDiv).addEvent('click', function() {
+            new Request.JSON({ 
+                url: 'index.php?app=financebase&ctl=admin_expenses_splittotal&act=splitSearch',
+                data: oSplitDiv.toQueryString(),
+                onRequest: function() {
+                    new MessageBox('请求中...',{type:'notice'});
+                },
+                onComplete: function(rsp) {
+                    MessageBox.success('请求完成');
+                    $E('.total', $('splitSearchShow')).empty();
+                    $E('.items', $('splitSearchShow')).empty();
+                    if(rsp.total && rsp.total.total_money) {
+                        var sHtml = splitTotalTpl.substitute(rsp.total);
+                    } else {
+                        var sHtml = '没有数据';
+                    }
+                    $E('.total', $('splitSearchShow')).adopt(new Element('span',{html:sHtml}));
+                    if(rsp.items.length) {
+                        Object.each(rsp.items, function(item) {
+                            var sHtml = splitTpl.substitute(item);
+                            var oLi = new Element('li', {
+                                html: sHtml
+                            });
+                            $E('.items', $('splitSearchShow')).adopt(oLi);
+                        })
+                    }
+                }
+            }).send();
+        });
+        $E('.exportBtn', oSplitDiv).addEvent('click', function() {
+            new Dialog('index.php?app=financebase&ctl=admin_expenses_splittotal&act=export',{
+                ajaxoptions:{
+                    data:oSplitDiv.toQueryString(),
+                    method: 'post'
+                },width:"200px",height:"100px"
+            });
+        });
+    })();
+</script>

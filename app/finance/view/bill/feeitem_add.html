@@ -1,0 +1,36 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="post" action="index.php?app=finance&ctl=bill_setting&act=do_additem" id='feeitem'>
+    <input type="hidden" name="fee_type_id" value="<{$fee_type_id}>">
+    <div class="table-form">
+        <div class="division">
+            <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <th><font color='red'>*</font><{t}>费用项名称:<{/t}>
+                        <td><input type="text" value="" name="name" required="true" vtype='required' class='x-input'/></td>
+                    </tr>
+
+                </table>
+            </div>
+
+
+        </div>
+        <div class="table-action">
+            <{button label="保存" type="submit" }>
+        </div>
+    </form>
+    <script>
+    $('feeitem').store('target', {
+        onComplete: function(jsontext) {
+            var result = eval("(" + jsontext + ")");
+            if( result.status == 'succ' ){
+                parent.W.page('index.php?app=finance&ctl=bill_setting&act=index');
+                $('feeitem').getParent('.dialog').retrieve('instance').close();
+            }
+        }
+    });
+    </script>
+

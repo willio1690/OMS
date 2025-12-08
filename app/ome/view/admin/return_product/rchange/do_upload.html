@@ -1,0 +1,52 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form enctype="multipart/form-data" action="index.php?app=ome&ctl=admin_return_rchange&act=upload_file&p[0]=<{$reship_id}>&finder_id=<{$env.get.finder_id}>" method="post" id="add_link" target="upload" isCloseDialog>
+<input type="hidden" name="reship_id" value="<{$reship_id}>">
+<div style="color:#ff0000;"><span style="font-weight:bold;">温馨提示：</span>抖音平台拒绝退货时,需要上传拒绝退货图片。</div>
+<br />
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <th width="100" nowrap="nowrap"><{t}>上传拒绝退货图片：<{/t}></th>
+      <td>
+        <{if $file_url}>
+        <a href="<{$file_url}>" target="_blank">查看附件</a>
+        <{else}>
+        <{input type="sfile" name="attachment" f_type="public" }>
+        <{/if}>
+      </td>
+    </tr>
+    <tr>
+      <th>&nbsp;</th>
+      <td>&nbsp;</td>
+    </tr>
+</table>
+</form>
+
+<{area inject=".mainFoot"}>
+<div class="table-action">
+  <{button label="确定" id="btn-cancel" class="btn-primary" onclick="sub_form(event);"}> &nbsp; &nbsp;
+  <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+</div>
+<{/area}>
+<script>
+
+function sub_form(event)
+{
+    $('add_link').fireEvent('submit',new Event(event));
+}
+
+$('add_link').store('target',{
+    onComplete:function(){
+        if($('add_link').getParent('.dialog')){
+            finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+            $('add_link').getParent('.dialog').retrieve('instance').close();
+        }
+
+        
+    }
+});
+</script>    
+

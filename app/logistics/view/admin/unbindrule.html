@@ -1,0 +1,62 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division" id='support-shops'>
+    <form method='post' action='index.php?app=logistics&ctl=admin_rule&act=doUnbindRule&finder_id=<{$finder_id}>'>
+                <h4>解除以下仓的复用规则</h4>
+        <div class="tableform">
+           <table width="100%" border="0" class="girdlist">
+  <tr>
+    <th><em class="c-red">*</em> 选择仓库:</th>
+    <td>
+        <{input type='object' name='branch' object='branch@ome' multiple=true filter=array('is_deliv_branch'=>'true','skip_permission'=>true,'branch_id|notin'=>$rule_branch_id)}>
+                    
+            </td>
+  </tr>
+</table>
+        </div>
+     
+  
+   <div class="table-action">
+            <{button label="确定" type="button" id='copy-rule'}><{button class="btn-secondary" label="取消" type="button" id='cancel-rule'}>
+        </div>
+  </form>
+</div>
+
+<script>
+$('copy-rule').addEvent('click',function(e){
+    var form=this.getParent('form');
+    var _this=this;
+  
+    form.store('target',{
+          onRequest:function(){
+                _this.disabled=true;
+            },
+            onComplete:function(jsontext){
+            try{
+                    var json = Json.evaluate(jsontext);
+                    if (typeof(json.error) != 'undefined'){
+                        _this.disabled=false;
+                    }else{
+
+                        _this.getParent('.dialog').retrieve('instance').close();
+                        window.finderGroup['<{$env.get.finder_id}>'].refresh(true);
+ 
+                    }
+                 }catch(e){}
+            }
+        });
+        form.fireEvent('submit',e);
+
+
+
+});
+
+$('cancel-rule').addEvent('click',function(e){
+var _this=this;
+_this.getParent('.dialog').retrieve('instance').close();
+
+});
+</script>

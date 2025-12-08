@@ -1,0 +1,38 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+	<{css app="ome" src="ome.css"}>
+<{/capture}>
+
+<div class="division">
+    <h4>保质期操作日志</h4>
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+        <thead>
+            <tr>
+                <th>操作时间</th>
+                <th>操作人</th>
+                <th>行为</th>
+                <th>操作内容</th>
+            </tr>
+        </thead>
+        <tbody>
+        <{if $history}>
+            <{foreach from=$history item=his}>
+            <tr>
+                <td><{$his.operate_time}></td>
+                <td><{$his.op_name}></td>
+                <td><{$his.operation}></td>
+                <td><{$his.memo}></td>
+            </tr>
+            <{/foreach}>
+        <{else}>
+            <tr>
+            	<td colspan="4" style="text-align:center;">没有相关日志...</td>
+            </tr>
+        <{/if}>
+        </tbody>
+    </table>
+</div>

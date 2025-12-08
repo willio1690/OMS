@@ -1,0 +1,119 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+#num_rules {list-style:none;margin:0;padding:0;}
+#num_rules label{cursor:pointer;}
+#num_rules li{color:#999;padding:3px 0;background:#EFEFEF;}
+#num_rules li.active{color:#000;background:#FFc;}
+</style>
+
+<form method="POST" action="index.php?app=crm&ctl=admin_gift_rule&act=save_rule" class="" id="form_member_lv">
+
+    <{input type="hidden" name="id" value=$rule.id }>
+
+    <h3 class="head-title">赠品规则</h3>
+    <{include file='admin/gift/rule_edit_1.html' app="crm" }>
+
+    <h3 class="head-title">规则应用</h3>
+    <{include file='admin/gift/rule_edit_apply.html' app="crm" }>
+    
+</form>
+
+<div class="table-action">
+    <{button type="button" label="确认保存" id="rule_save" style="display:;"}>
+    <{button class="btn-secondary" label="返回" id="cancel-btn"}>
+</div>
+
+<script>
+
+(function(){
+    $('cancel-btn').addEvent('click',function(){
+        W.page('index.php?app=crm&ctl=admin_gift_rule&act=index&finder_vid=<{$finder_vid}>');
+    });
+
+    var status = '<{$rule.status}>';
+    $$('input[name="status"][value='+status+']').set('checked','checked');
+    //保存规则
+    $('rule_save').addEvent('click', function(){
+        if(chk_form() == false) return false;
+        $('form_member_lv').fireEvent('submit',{stop:$empty});
+    });
+
+    var _form = $('form_member_lv');
+
+    _form.store('target',{
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+        
+            if (hash_res_obj.success != undefined && hash_res_obj.success != "")
+            {
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+                
+                if(_dialogIns)
+                {    
+                    _dialogIns.close();
+                    window.finderGroup['<{$env.get.finder_id}>'].refresh();
+                }
+            }
+        }
+    });
+
+})();
+
+//检测必填项
+function chk_form(){
+    var _form = $('form_member_lv');
+
+    if($('title').get('value')==''){
+        alert('请输入规则名称');
+        $('title').focus();
+        return false;
+    }
+    
+    if($('time_type').get('value')==''){
+        alert('请选择时间类型');
+        $('time_type').focus();
+        return false;
+    }
+    
+    if($('start_time').get('value')==''){
+        alert('请输入生效时间');
+        $('start_time').focus();
+        return false;
+    }
+    
+    if($('end_time').get('value')==''){
+        alert('请输入结束时间');
+        $('end_time').focus();
+        return false;
+    }
+
+    if($$('[name="filter_arr[id][]"]').length < 1) {
+        alert('请选择赠品规则');
+        return false;
+    }
+
+    if($('gift_trigger_mode').get('value') == 'order_complete'){
+        if($('gift_bufa_days').get('value') == ''){
+            alert('请填写延迟天数');
+            $('gift_bufa_days').focus();
+            return false;
+        }
+
+        is_exclude = $$('input[name="is_exclude"]:checked').get('value');
+        if(is_exclude != '1'){
+            alert('订单完成后延迟补发赠品，必须选择【排他】模式');
+            $('gift_bufa_days').focus();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+</script>

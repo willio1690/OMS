@@ -1,0 +1,67 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form id="saveForm" action="index.php?app=material&ctl=admin_customer_classify&act=save"  method="post">
+    <input type="hidden" name="class_id" value="<{$dataInfo.class_id}>">
+    <div class="tableform">
+        <div class="division">
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th><{t}>客户分类编码：<{/t}></th>
+                    <td>
+                        <{if $dataInfo.class_bn}>
+                        <input autocomplete="off" class="x-input " type="text" name="class_bn" value="<{$dataInfo.class_bn}>" id="class_bn" readonly="readonly" style="border:0px;"><em><font color='red'>*编码不允许修改</font></em>
+                        <{else}>
+                        <{input type="text" name="class_bn" value=$dataInfo.class_bn vtype="required"}><em><font color='red'>*</font></em>
+                        <{/if}>
+                    </td>
+                </tr>
+                <tr>
+                    <th><{t}>客户分类名称：<{/t}></th>
+                    <td><{input type="text" name="class_name" value=$dataInfo.class_name vtype="required"}><em><font color='red'>*</font></em></td>
+                </tr>
+                <tr>
+                    <th><{t}>是否屏蔽：<{/t}></th>
+                    <td>
+                        <input type="radio" name="disabled" value="false" <{if $dataInfo.disabled != 'true'}>checked="checked"<{/if}> />
+                        <label for="type1">否</label>
+                        <input type="radio" name="disabled" value="true" <{if $dataInfo.disabled == 'true'}>checked="checked"<{/if}> />
+                        <label for="type2">是</label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    
+        <div class="table-action">
+            <{button type="submit" id="btn-save" label="保存"}>
+            <{button type='button' label='关闭' isCloseDialogBtn="true"}>
+        </div>
+    </div>
+</form>
+<script>
+$('saveForm').store('target',{
+    onRequest:function(){
+        $('btn-save').set('disabled', 'true');
+    },
+    onComplete:function(jsontext){
+        var json = Json.evaluate(jsontext);
+    
+        console.log(json);
+    
+        if (typeof(json.error) != 'undefined'){
+            console.log('aaaaaaaaaa')
+            console.log(json.error)
+    
+            $('btn-save').set('disabled', '');
+        }else{
+            $('btn-save').set('disabled', 'true');
+    
+            if($('saveForm').getParent('.dialog')){
+                $('saveForm').getParent('.dialog').retrieve('instance').close();
+            }
+        }
+    }
+});
+</script>

@@ -1,0 +1,22 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=monitor&ctl=admin_email&act=doTestemail" method="POST" id="MailTestForm">
+    <table>
+      <tr><td width='260px;'><{t}>测试接收邮箱:<{/t}><input type="text" name="acceptor" value="<{$acceptor}>" size=30></td><td>
+      	<{button label=$___desktop="测试"|t:'desktop' type="submit"}></td></tr>
+    </table>
+</form>
+<script>
+$('MailTestForm').addEvent('submit',function(e){
+   e.stop();
+   var action = this.action;
+   new Request({url:action,method:'post',data:$('MailTestForm'),onRequest:function(){$('mailloginfo').setHTML('Loading....');},onComplete:function(re){
+      $('mailloginfo').setHTML(re);
+   }}).send();   
+});    
+</script>
+<div id="mailloginfo">
+</div>

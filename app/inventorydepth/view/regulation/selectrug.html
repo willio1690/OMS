@@ -1,0 +1,65 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class='division'>
+<h3><{$title}></h3>
+<form method='post' id='regulation-form'>
+<input type="hidden" name="task_id" value="<{$task_id}>">
+    <input type='hidden' name='ids' value='<{$ids}>'>
+    <div class='tableform'>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+               
+                <tr>
+                    <th><span class="red">*</span> 应用规则:</th>
+                    <td><select name="regulation_id" id="regulation_id">
+                    <{foreach from=$regulation_list item=regulation}>
+                    <option value="<{$regulation.id}>"><{$regulation.heading}></option>
+
+                    <{/foreach}>
+                    </select></td>
+                </tr>
+               
+               
+            </tbody>
+        </table>
+    </div>
+
+</form>
+</div>
+
+<div class='table-action'>
+        <{button type='button' label='确认' id='regulation-submit'}>
+        <{button type='button' label='取消' id='closeBut'}>
+    </div>
+<script>
+
+
+    $('regulation-submit').addEvent('click',function(){
+        var regulation_id = $('regulation_id').value;
+        if(regulation_id == ''){
+            return MessageBox.error('请选择规则!');
+
+        }
+        new Request({url:'index.php?app=inventorydepth&ctl=regulation_skus&act=saveRegulation',method:'post',data:$('regulation-form').toQueryString(),
+                onSuccess:function(json){
+                    if(!json) return;
+                    rs=JSON.decode(json);
+                    if(rs.rsp=='fail') MessageBox.error(rs.msg);
+                    else MessageBox.success(rs.msg);
+                    $('regulation-submit').getParent('.dialog').retrieve('instance').close();
+                    window.finderGroup['<{$env.get.finder_id}>'].refresh(true);
+
+                }
+            }).send();
+        
+    });
+
+    $('closeBut').addEvent('click', function(event){
+    $('closeBut').getParent('.dialog').retrieve('instance').close();
+    window.finderGroup['<{$env.get.finder_id}>'].refresh(true);
+});
+
+</script>

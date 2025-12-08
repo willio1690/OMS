@@ -1,0 +1,74 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division" id="order_items">
+   <h4><{t}><{if $obj_type=='pkg'}>组合<{elseif $obj_type=='gift'}>赠品<{else}>普通<{/if}>商品明细<{/t}></h4>
+      <table class="nosplit gridlist clear" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 1px solid #d5dfe3; border-collapse: separate;">
+        <thead>
+        <tr>
+          <th><{t}>物料编码<{/t}></th>
+          <th><{t}>物料名称<{/t}></th>
+          <th><{t}>商品类型<{/t}></th>
+          <th><{t}>原价<{/t}></th>
+          <th><{t}>销售价<{/t}></th>
+          <th><{t}>优惠额<{/t}></th>
+          <th><{t}>实付金额<{/t}></th>
+          <th><{t}>优惠分摊<{/t}></th>
+          <th><{t}>购买量<{/t}></th>
+          <th><{t}>已发货量<{/t}></th>
+          <th><{t}>已退货量<{/t}></th>
+          <th><{t}>支付状态<{/t}></th>
+          <th><{t}>子单状态<{/t}></th>
+          <th><{t}>子单号<{/t}></th>
+        </tr>
+      </thead>
+      <tbody>
+        <{foreach from=$objs item=obj}>
+        <tr <{if $obj.delete == 'true'}>style="background-color:#AAAAAA;"<{/if}> >
+          <td><strong><{$obj.bn}></strong></td>
+          <td><strong><{$obj.name}></strong></td>
+          <td><strong><{if $obj.obj_type=='pkg'}>组合<{elseif $obj.obj_type=='gift'}>赠品<{else}>普通<{/if}></strong></td>
+          <td><{$obj.price}></td>
+          <td><{$obj.sale_price|cur}></td>
+          <td><{$obj.pmt_price|cur}></td>
+          <td><{$obj.divide_order_fee|cur}></td>
+          <td><{$obj.part_mjz_discount|cur}></td>
+          <td><{$obj.quantity}></td>
+          <td> - </td>
+          <td> - </td>
+          <td><span <{if $obj.pay_status == '5'}>style="color: #ffcccc;font-weight: bold;"<{elseif $obj.pay_status == '6'}>style="color: #ffee99;font-weight: bold;"<{/if}> ><{$obj.pay_name}></span></td>
+          <td><{$obj.ship_name}></td>
+          <td><{$obj.plat_oid}></td>
+        </tr>
+          <{foreach from=$obj.order_items item=item}>
+          <tr class="ColColorBlue" <{if $item.delete == 'true'}>style="background-color:#DDDDDD;"<{/if}> >
+            <td><{$item.bn}></td>
+            <td><{$item.name}></td>
+            <td> - </td>
+            <td><{$item.price}></td>
+            <td><{$item.sale_price|cur}></td>
+            <td><{$item.pmt_price|cur}></td>
+            <td><{$item.divide_order_fee|cur}></td>
+            <td><{$item.part_mjz_discount|cur}></td>
+            <td><{$item.nums}></td>
+            <td><{$item.sendnum}></td>
+            <td><{$item.return_num}></td>
+            <td> - </td>
+            <td><{$item.ship_name}></td>
+            <td> - </td>
+          </tr>
+          <{/foreach}>
+        <{/foreach}>
+      </tbody>
+     </table>
+</div>
+<style>
+  #order_items th {
+    background: url("../app/desktop/statics/css/default/images/tile_bg.png") 0 -296px;
+    height: 22px;
+    line-height: 22px;
+    border-right: 1px solid #c8d6dc;
+  }
+</style>

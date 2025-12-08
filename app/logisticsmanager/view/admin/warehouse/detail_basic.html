@@ -1,0 +1,80 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+    <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">       
+<{/capture}>
+<div class="division">
+    <h4>同步前端店铺记录</h4>
+
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+        <thead>
+        <tr>
+            <th>店铺名称</th>
+            <th>外部区域仓ID</th>
+           <th>区域仓同步状态</th>
+           <th>绑定地址同步状态</th>
+        </tr>
+        </thead>
+        <tbody>
+       <{foreach from=$warehouselist item=warehouse}>
+        <tr>
+            <td><{$warehouse.shop_name}></td>
+            <td><{$warehouse.outwarehouse_id}></td>
+            <td>
+                <{if $warehouse.sync_warehouse == 0}>
+                未同步
+                <{elseif $warehouse.sync_warehouse == 1}>
+                已同步
+                <{elseif $warehouse.sync_warehouse == 2}>
+                失败
+                <{/if}>
+                
+            </td>
+            <td>
+                <{if $warehouse.sync_status == 0}>
+                未同步
+                <{elseif $warehouse.sync_status == 1}>
+                已同步
+                <{elseif $warehouse.sync_status == 2}>
+                失败
+                <{/if}>
+            </td>
+        </tr>
+        <{/foreach}>
+      
+        </tbody>
+    </table>
+</div>
+
+<div class="division">
+    <h4>库存查询默认地址列表</h4>
+
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+        <thead>
+        <tr>
+            <th>省</th>
+           <th>市</th>
+           <th>区</th>
+           <th>地址</th>
+        </tr>
+        </thead>
+        <tbody>
+       <{foreach from=$addressList item=address}>
+        <tr>
+            <td><{$address.province}></td>
+            <td><{$address.city}></td>
+            <td><{$address.street}></td>
+            <td><{$address.address}></td>
+            
+        </tr>
+        <{/foreach}>
+      
+        </tbody>
+    </table>
+</div>
+
+
+

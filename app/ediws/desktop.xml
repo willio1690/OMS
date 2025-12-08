@@ -1,0 +1,34 @@
+<desktop>
+    <permissions>
+       
+        <permission id="ediwms_account_orders" display='true'>实销实结明细</permission>
+        <permission id="ediwms_account_settlement" display='true'>结算单列表</permission>
+        <permission id="ediwms_account_settlementorder" display='true'>结算单明细列表</permission>
+        <permission id="ediwms_reship" display='true'>主库退货单</permission>
+        <permission id="ediws_refundinfo" display='true'>退货单</permission>
+    </permissions>
+    <workground name='京东自营' id='ediws_center' order="2006" icon="icon-fahuoguanli-01">
+         <menugroup name="销售单据" en="ediws-bills">
+            
+            <menu controller='admin_account_orders' action='index' permission='ediwms_account_orders' display='true' order='1110'>实销实结明细</menu>
+        </menugroup>
+         <menugroup name="财务单据" en="ediws-finance">
+            <menu controller='admin_account_settlement_orders' action='index' permission='ediwms_account_settlementorder' display='true' order='1200'>结算单列表</menu>
+            <menu controller='admin_account_settlement' action='index' permission='ediwms_account_settlement' display='true' order='1210'>结算单任务</menu>
+            
+        </menugroup>
+         <menugroup name="退供单据" en="ediws-return">
+            
+            <menu controller='admin_reship' action='index' permission='ediwms_reship' display='true' order='1200'>主库退货单</menu>
+
+        </menugroup>
+    </workground>
+
+     <workground name="售后管理" id="aftersale_center"  order="300" icon="icon-shouhouguanli-01">
+        <menugroup name="退供管理" en="console-return-bill">
+          
+            <menu controller='admin_refundinfo' action='index' permission='ediws_refundinfo' display='true' order="9000400">退货单</menu>
+           
+        </menugroup>
+    </workground>
+</desktop>

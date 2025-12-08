@@ -1,0 +1,186 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+   <div style="padding-left: 60px; font-size: 1.5em;font-weight: 700;">
+       扫码入库
+   </div>
+   <div id="main" class="division">
+   <form method="post" action="index.php?app=wms&ctl=admin_check&act=check" id='delivery-check-form'>
+       <input type="hidden" id="checkType" name="checkType" value="<{$checkType}>" />
+       <table width="100%" cellspacing="0" cellpadding="0" border="0">
+           <tbody>
+           <tr>
+               <td width="30px">&nbsp;</td>
+               <td>
+                   <span style="font-size: 16px;font-weight: bold;">请选择仓库：</span><br />
+                   <select id="branch_id" onchange="change_branch();" style="margin-top:10px;font-size:14px;height:30px;line-height:30px;width:268px;padding-left:5px">
+		                <option value="">-请选择-</option>
+		                <{foreach from=$branch_list item=item}>
+		                <option value='<{$item.branch_id}>'><{$item.name}></option>
+		                <{/foreach}>
+		            </select>
+                </td>
+            </tr>
+            <tr>
+               <td width="30px">&nbsp;</td>
+               <td>
+                   <span style="font-size: 16px;font-weight: bold;">基础物料编码：</span><br />
+                   <input type="text" id="basic_material_bn" style="padding-left:5px;margin-top: 10px;background: none repeat scroll 0 0 #FAFAFA;border: 2px solid #CCCCCC;border-radius: 10px 10px 10px 10px;color: #069CBC;font-size: 20px;height: 35px;line-height: 35px;width:260px;" >
+                </td>
+            </tr>
+            <tr>
+               <td width="30px">&nbsp;</td>
+               <td>
+                                        注：1.如果手动输入唯一码，完成后需按回车键。<br />
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.在输入过程中请不要加入空格或其他符号。<br />
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.当存在唯一码信息时，更换仓库，唯一码信息会自动清空。<br />
+                        <h3 style="margin:5px 0px 0px 0px; padding:0px;">请输入唯一码<span class="fb" style="color: #069CBC;">(已扫码数量<b id="numEntry">0</b>)</span>： <span class="num">(建议使用条码枪扫描)</span></h3>
+               </td>
+            </tr>
+            <tr>
+               <td width="30px">&nbsp;</td>
+               <td>
+                    <input id="serialOneStep" style="padding-left:5px;background: none repeat scroll 0 0 #FAFAFA;border: 2px solid #CCCCCC;border-radius: 10px 10px 10px 10px;color: #069CBC;font-size: 16px;height: 35px;line-height: 35px;width:260px;" type="text" />
+                    <span id="dataNode" class="red fb"></span>
+               </td>
+            </tr>
+          <tr>
+            <td width="30px">&nbsp;</td>
+            <td><textarea id="batchSerial" style="padding-left:5px;background: none repeat scroll 0 0 #FAFAFA;border: 2px solid #CCCCCC;border-radius: 10px 10px 10px 10px;color: #069CBC;font-size: 16px;height: 160px;line-height:28px;width:260px;"  cols="40" rows="16" ></textarea></td>
+          </tr>
+           <tr>
+           <td width="30px">&nbsp;</td>
+            <td><button type="button" id="btn_submit" style="font-size:3.0em;font-weight: 700; height: 50px; width:120px;cursor: pointer;display: -moz-inline-stack;line-height: 40px;overflow: visible;text-decoration: none;vertical-align: middle;" ><span><span>确定</span></span></button></td>
+          </tr>
+          </tbody>
+        </table>
+    </form>
+    </div>
+</div>
+
+<script>
+
+function dataNode(flag,str,fcolor){
+    if(flag=='0'){
+        var msg = "错误提示：";
+        str = str + '&nbsp;&nbsp;<{img src="bundle/attention.gif" app="desktop"}>';
+    }else if(flag=='1'){
+        var msg = "正确提示：";
+        str = str + '&nbsp;&nbsp;<{img src="bundle/visible.gif" app="desktop"}>';
+    }
+    $('dataNode').set('html','<font style="font-size:14px;color:'+fcolor+'">'+msg+str+'</font>');
+    if(flag=='0'){
+        return MessageBox.error('唯一码有异常');
+    }
+}
+
+function change_branch(){
+	var batch_value = $('batchSerial').value.replace(/^[\s\n\r]*|[\s\n\r]*$/,'').split(/[\n\r\s,]+/);
+	if(batch_value == ""){
+	}else{
+		$('batchSerial').set('value','');
+		$('serialOneStep').set('value','');
+	}
+}
+
+$('serialOneStep').addEvent('keyup',function(e){
+    if(e.code==13){
+    	$('dataNode').set('html','');
+    	var branch_id_index = $('branch_id').selectedIndex;
+    	var branch_id = $('branch_id').options[branch_id_index].value;
+    	if(branch_id == ""){
+    		dataNode('0','请选择仓库','red');
+    		return false;
+    	}
+    	var basic_material_bn = $('basic_material_bn').value.replace(/[\s]+/g, '');
+    	if(basic_material_bn == ""){
+    		dataNode('0','请填写基础物料编码','red');
+    		return false;
+    	}
+        var input_value = $('serialOneStep').value.replace(/[\s]+/g, '');
+        if(input_value == ''){
+        	dataNode('0','没有输入唯一码','red');
+        	return false;
+        }
+        var batch_value = $('batchSerial').value.replace(/^[\s\n\r]*|[\s\n\r]*$/,'').split(/[\n\r\s,]+/);
+        if(batch_value.indexOf(input_value) != '-1'){
+            dataNode('0', "唯一码："+input_value+"已经存在！" ,'red');
+            $('serialOneStep').value = '';
+            return false;
+        }
+        new Request({url:'index.php?app=wms&ctl=admin_product_serial&act=ajax_batchCheck',method:'post',data:'serial_number='+input_value+'&branch_id='+branch_id+'&basic_material_bn='+basic_material_bn,
+            onComplete:function(json){
+                json = JSON.decode(json);
+                if(json.result == "fail"){
+                	$('serialOneStep').set('value','');
+                    dataNode('0',json.msg,'red');
+                }else{
+                	$('batchSerial').value += input_value+'\n';
+                    $('basic_material_bn').set('disabled','disabled');
+                    $('serialOneStep').set('value','');
+
+                    updateNumEntry();
+                }
+            }
+        }).send();
+    }
+});
+
+$('btn_submit').addEvent('click',function(e){
+	$('dataNode').set('html','');
+	var batch_value = $('batchSerial').value.replace(/^[\s\n\r]*|[\s\n\r]*$/,'').split(/[\n\r\s,]+/);
+	if(batch_value == ""){
+		dataNode('0','没有唯一码信息','red');
+        return false;
+	}
+	var branch_id_index = $('branch_id').selectedIndex;
+    var branch_id = $('branch_id').options[branch_id_index].value;
+    if(branch_id == ""){
+        dataNode('0','请选择仓库','red');
+        return false;
+    }
+    var basic_material_bn = $('basic_material_bn').value.replace(/[\s]+/g, '');
+    if(basic_material_bn == ""){
+        dataNode('0','请填写基础物料编码','red');
+        return false;
+    }
+    new Request({url:'index.php?app=wms&ctl=admin_product_serial&act=doScavenging',method:'post',data:'batch_value='+batch_value+'&branch_id='+branch_id+'&basic_material_bn='+basic_material_bn,
+        onComplete:function(json){
+            json = JSON.decode(json);
+            if(json.result == "fail"){
+                dataNode('0',json.msg,'red');
+            }else{
+            	$('dataNode').set('html','');
+            	MessageBox.success('执行成功！');
+            	window.location.reload();
+            }
+        }
+    }).send();
+});
+
+function updateNumEntry(){
+    var numArr = $("batchSerial").get('value').split("\n").filter(function (item, index) {
+        return item != "";
+    });
+
+    if (numArr.length > 0) {
+        $("numEntry").set("text", numArr.length)
+    }
+}
+
+</script>
+
+<script>
+    $('basic_material_bn').addEvents({
+        'keyup': function (e) {
+            if (e.code == 13) {
+                $('serialOneStep').focus();
+                $('serialOneStep').select();
+            }
+            return false;
+        }
+    });
+</script>

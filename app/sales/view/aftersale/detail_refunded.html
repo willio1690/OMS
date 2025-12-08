@@ -1,0 +1,91 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../app/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<div class="tableform">
+    <div class="division">
+        <table border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>店铺名:</th>
+            <td ><{$aftersales.shop_id|default:'-'}></td>
+            <th>订单号：</th>
+            <td ><{$aftersales.order_id|default:'-'}></td>
+            <th >售后申请单号：</th>
+            <td ><{$aftersales.return_id|default:'-'}></td>
+            <th >退换货单号：</th>
+            <td ><{$aftersales.reship_id|default:'-'}></td>
+            <th >退款申请单号：</th>
+            <td ><{$aftersales.return_apply_id|default:'-'}></td>
+        </tr> 
+        <tr>
+            <th>退款金额：</th>
+            <td><{$aftersales.refundmoney|cur}></td>
+            <th >支付类型：</th>
+            <td ><{$aftersales.pay_type|default:'-'}></td>
+            <th >收款账号：</th>
+            <td ><{$aftersales.account|default:'-'}></td>
+            <th >收款银行：</th>
+            <td ><{$aftersales.bank|default:'-'}></td>
+            <th >支付账户：</th>
+            <td ><{$aftersales.pay_account|default:'-'}></td>
+        </tr>
+        <tr>
+            <th >退款申请金额：</th>
+            <td ><{$aftersales.refund_apply_money|cur}></td>
+            <th >退款支付方式：</th>
+            <td ><{$aftersales.paymethod|default:'-'}></td>
+            <th >退款申请创建时间：</th>
+            <td ><{$aftersales.refund_apply_time|cdate:'SDATE_FTIME'}></td>
+            <th >支付完成时间：</th>
+            <td ><{$aftersales.refundtime|cdate:'SDATE_FTIME'}></td>
+        </tr>
+
+        </table>
+    </div>
+    <{if is_array($items) && ($items) > 0}>
+        <{if is_array($items.refuse) && count($items.refuse)>0}>
+        <div class="division">
+            <h4><{t}>退款明细:<{/t}></h4>
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" class="gridlist">
+                <thead>
+                <tr>
+                    <th><{t}>基础物料编码<{/t}></th>
+                    <th><{t}>基础物料名称<{/t}></th>
+                    <th><{t}>退入物料单价<{/t}></th>
+                    <th><{t}>退入数量<{/t}></th>
+                    <th><{t}>申请退款金额<{/t}></th>
+                    <th><{t}>已退款金额<{/t}></th>
+                    <th><{t}>销售金额<{/t}></th>
+                    <th><{t}>仓库<{/t}></th>
+                    <th><{t}>平台商品ID<{/t}></th>
+                    <th><{t}>平台SkuID<{/t}></th>
+                </tr>
+                </thead>
+                <{foreach from=$items.refuse item=aProduct}>
+                <tbody>
+                <tr>
+                    <{assign var="total_price" value=$aProduct.price*$aProduct.num}>
+                    <td><{$aProduct.bn}></td>
+                    <td><{$aProduct.product_name}></td>
+                    <td><{$aProduct.price}></td>
+                    <td><{$aProduct.num}></td>
+                    <td><{$aProduct.money|default:$total_price}></td>
+                    <td><{$aProduct.refunded|default:$total_price}></td>
+                    <td><{$aProduct.saleprice|default:'0'}></td>
+                    <td><{$aProduct.branch_id}></td>
+                    <td><{$aProduct.shop_goods_id}></td>
+                    <td><{$aProduct.shop_product_id}></td>
+                </tr>
+                </tbody>
+                <{/foreach}>
+            </table>
+        </div>
+        <{/if}>
+    <{/if}>
+
+</div>

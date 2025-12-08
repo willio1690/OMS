@@ -1,0 +1,182 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout-block">
+    <h3>订单自动审核设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">是否开启系统自动审核：</span>
+            <div class="form-radios">
+                <input id="ome_order_is_auto_combine_on" type="radio" name="set[ome.order.is_auto_combine]" value="true" <{if $setData.ome_order_is_auto_combine == 'true'}> checked<{/if}> >
+                <label for="ome_order_is_auto_combine_on">开启</label>
+                <input id="ome_order_is_auto_combine_off" type="radio" name="set[ome.order.is_auto_combine]" value="false" <{if $setData.ome_order_is_auto_combine == 'false'}> checked<{/if}>>
+                <label for="ome_order_is_auto_combine_off" >关闭</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">执行时间：</span>
+            <div class="form-radios">
+                <input id="ome_order_auto_timer_on" type="radio" class="auto_timer_radio" name="set[ome.order.auto_timer]" value="1" <{if $setData.ome_order_auto_timer != '2'}> checked<{/if}> >
+                <label for="ome_order_auto_timer_on">所有时间</label>
+                <input id="ome_order_auto_timer_off" type="radio" class="auto_timer_radio" name="set[ome.order.auto_timer]" value="2" <{if $setData.ome_order_auto_timer == '2'}> checked<{/if}> >
+                <label for="ome_order_auto_timer_off" >指定时间</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label"></span>
+            <div id="timerNode" style="display:none">
+                <{if !empty($setData.ome_order_auto_exec_timer)}>
+                <input type="hidden" value="<{$count_auto_exec_timer}>" id="count_auto_exec_timer"/>
+                <{foreach from=$setData.ome_order_auto_exec_timer key=key item=timer}>
+                <div class="auto_exec_timer">
+                    <span>时间段：</span>
+                    <span>
+                           <select name="set[ome.order.auto_exec_timer][<{$key}>][start_hour]">
+                            <{foreach from=$c_hours key=key_sh item=shourVal}>
+                                <option <{if $timer.start_hour == $shourVal}>selected<{/if}> ><{$shourVal}></option>
+                               <{/foreach}>
+                            </select>
+                            <select name="set[ome.order.auto_exec_timer][<{$key}>][start_minute]">
+                            <{foreach from=$c_minutes key=key_sm item=sminuteVal}>
+                                <option <{if $timer.start_minute == $sminuteVal}>selected<{/if}> ><{$sminuteVal}></option>
+                                <{/foreach}>
+                            </select>&nbsp;到&nbsp;
+                           <select name="set[ome.order.auto_exec_timer][<{$key}>][end_hour]">
+                            <{foreach from=$c_hours key=key_eh item=ehourVal}>
+                                <option <{if $timer.end_hour == $ehourVal}>selected<{/if}> ><{$ehourVal}></option>
+                               <{/foreach}>
+                            </select>
+                            <select name="set[ome.order.auto_exec_timer][<{$key}>][end_minute]">
+                            <{foreach from=$c_minutes key=key_em item=eminuteVal}>
+                                <option <{if $timer.end_minute == $eminuteVal}>selected<{/if}> ><{$eminuteVal}></option>
+                                <{/foreach}>
+                            </select>
+                        </span>
+                    <{if $key == "1"}>
+                    <span>&nbsp;&nbsp;<{button type="button" label="添加更多" class="btn-secondery" id="btn_add_hour"}></span>
+                    <{else}>
+                    <span>&nbsp;&nbsp;<{img class='address_del_icon' src="bundle/delete.gif" app="desktop" onclick="delSelfTimerRange(this);"}>
+                            <{/if}>
+                </div>
+                <{/foreach}>
+                <{else}>
+                <input type="hidden" value="1" id="count_auto_exec_timer"/>
+                <div class="auto_exec_timer">
+                    <span>时间段：</span>
+                    <span>
+	                            <select name="set[ome.order.auto_exec_timer][1][start_hour]">
+                                <{foreach from=$c_hours key=key_sh item=shourVal}>
+                                    <option><{$shourVal}></option>
+                                <{/foreach}>
+                                </select>
+                                <select name="set[ome.order.auto_exec_timer][1][start_minute]">
+                                <{foreach from=$c_minutes key=key_sm item=sminuteVal}>
+                                    <option><{$sminuteVal}></option>
+                                <{/foreach}>
+                                </select>&nbsp;到&nbsp;
+                               <select name="set[ome.order.auto_exec_timer][1][end_hour]">
+                                <{foreach from=$c_hours key=key_eh item=ehourVal}>
+                                    <option><{$ehourVal}></option>
+                                <{/foreach}>
+                                </select>
+                                <select name="set[ome.order.auto_exec_timer][1][end_minute]">
+                                <{foreach from=$c_minutes key=key_em item=eminuteVal}>
+                                    <option><{$eminuteVal}></option>
+                                <{/foreach}>
+                                </select>
+	                        </span>
+                    <span>&nbsp;&nbsp;<{button type="button" label="添加更多" class="btn-secondery" id="btn_add_hour"}></span>
+                </div>
+                <{/if}>
+            </div>
+            <span class="form-remark" style="color: red">开启：所有时间 关闭：指定时间 | 默认为所有时间。选择指定时间后：请确认后者的时间必须大于前者，并且多个时间段之间不能存在交集。</span>
+            <span class="form-remark" style="color: red">注：开启后，前端店铺订单进入OMS后系统会自动进行审单操作（手工同步前端店铺订单不支持自动审单），暂时不支持订单自动合并生成发货单。</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">提前获取仓库：</span>
+            <div class="form-radios">
+                <input id="ome_order_pre_sel_branch_on" type="radio" name="set[ome.order.pre_sel_branch]" value="true" <{if $setData.ome_order_pre_sel_branch == 'true'}> checked<{/if}> >
+                <label for="ome_order_pre_sel_branch_on">开启</label>
+                <input id="ome_order_pre_sel_branch_off" type="radio" name="set[ome.order.pre_sel_branch]" value="false" <{if $setData.ome_order_pre_sel_branch == 'false'}> checked<{/if}> >
+                <label for="ome_order_pre_sel_branch_off" >关闭</label>
+            </div>
+            <span class="form-remark" style="color: red">启用：订单创建时获取仓库并冻结，无需等待审单</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">系统获取订单：</span>
+            <div class="form-radios">
+                <input id="ome_order_is_auto_ordertaking_on" type="radio" name="set[ome.order.is_auto_ordertaking]" value="true" <{if $setData.ome_order_is_auto_ordertaking == 'true'}> checked<{/if}> >
+                <label for="ome_order_is_auto_ordertaking_on">开启</label>
+                <input id="ome_order_is_auto_ordertaking_off" type="radio" name="set[ome.order.is_auto_ordertaking]" value="false" <{if $setData.ome_order_is_auto_ordertaking == 'false'}> checked<{/if}> >
+                <label for="ome_order_is_auto_ordertaking_off" >关闭</label>
+            </div>
+            <span class="form-remark" style="color: red">启用：无需人工获取订单池订单，系统自动获取；开启自动审单时，配置无效</span>
+        </div>
+    </div>
+</div>
+<style type="text/css">
+.auto_exec_timer { width:auto; height:30px; line-height:30px; }
+</style>
+<script>
+
+(function(){
+	
+	if($$('input[name=set[ome.order.auto_timer]]:checked').get('value') == 2){
+        $("timerNode").show();
+    }
+    
+    $$('.auto_timer_radio').addEvent('click',function(e){
+        $("timerNode").hide();
+        if($$('input[name=set[ome.order.auto_timer]]:checked').get('value') == 2){
+            $("timerNode").show();
+        }
+    });
+	
+	$('btn_add_hour').addEvent('click',function(e){
+		var count_auto_exec_timer = $("count_auto_exec_timer").getValue();
+		count_auto_exec_timer++;
+		
+		var c_hours_list = <{$json_c_hours}>;
+	    var hours_data = eval(c_hours_list);
+		var c_minutes_list = <{$json_c_minutes}>;
+	    var minutes_data = eval(c_minutes_list);
+		
+		var html = '<span>时间段：</span> ';
+		html += '<span><select name="set[ome.order.auto_exec_timer]['+count_auto_exec_timer+'][start_hour]">';
+		for(var h in hours_data){
+			if(!isNaN(h) && h<24){
+				html += '<option>'+ hours_data[h] +'</option>';
+			}
+	    }
+		html += '</select> <select name="set[ome.order.auto_exec_timer]['+count_auto_exec_timer+'][start_minute]">'
+		for(var m in minutes_data){
+			if(!isNaN(m) && m<60){
+				html += '<option>'+ minutes_data[m] +'</option>';
+			}
+        }
+		html += '</select>&nbsp;到&nbsp; <select name="set[ome.order.auto_exec_timer]['+count_auto_exec_timer+'][end_hour]">';
+		for(var h in hours_data){
+            if(!isNaN(h) && h<24){
+                html += '<option>'+ hours_data[h] +'</option>';
+            }
+        }
+		html += '</select> <select name="set[ome.order.auto_exec_timer]['+count_auto_exec_timer+'][end_minute]">';
+		for(var m in minutes_data){
+            if(!isNaN(m) && m<60){
+                html += '<option>'+ minutes_data[m] +'</option>';
+            }
+        }
+		html += '</select></span><span> &nbsp;&nbsp;<{img class="address_del_icon" src="bundle/delete.gif" app="desktop" onclick="delSelfTimerRange(this);"}></span>';
+	    new Element('div.auto_exec_timer',{html:html}).inject($('timerNode'));
+	    $("count_auto_exec_timer").value = count_auto_exec_timer;
+	});
+	
+})();
+
+function delSelfTimerRange(self){
+	self.getParent('.auto_exec_timer').remove();
+}
+
+</script>

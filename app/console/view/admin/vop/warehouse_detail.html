@@ -1,0 +1,38 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form name="form1" method="POST" action="index.php?app=wms&ctl=admin_receipts_print&act=doDetail&finder_id=<{$finder_id}>">
+<div class="tableform">
+    <h4>仓库信息:</h4>
+    <div class="division">
+        <table border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <th>仓库编号：</th>
+                <td ><{$branch.branch_bn}></td>
+                <th>联系人：</th>
+                <td ><{$branch.uname}></td>
+                <th >手机：</th>
+                <td ><{$branch.mobile}></td>
+                <th >电话：</th>
+                <td ><{$branch.phone}></td>
+            </tr>
+            <tr>
+                <th >仓库名称：</th>
+                <td ><{$branch.branch_name}></td>
+                <th>Email：</th>
+                <td><{$branch.email}></td>
+                <th >邮编：</th>
+                <td ><{$branch.zip}></td>
+                <th >省/市/地区：</th>
+                <td ><{$branch.area|region}></td>
+            </tr>
+            <tr>
+                <th >地址：</th>
+                <td colspan="7" ><{$branch.address}></td>
+            </tr>
+        </table>
+    </div>
+</div>
+</form>

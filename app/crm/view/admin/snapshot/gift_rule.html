@@ -1,0 +1,31 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform1">
+
+    <{if($logs)}> 
+            <table class="gridlist" width="100%" border="0" cellspacing="0" cellpadding="0">
+            <thead>
+                <tr>  
+                    <th><{t}>快照内容<{/t}></th>
+                    <th><{t}>操作人<{/t}></th>
+                </tr>
+            </thead>
+            <tbody>
+                <{foreach from=$logs item=data key=k}>
+                 <tr>
+                     <td style="text-align:left;">赠品规则于 <{$data.create_time}> 被更改， <a target="dialog::{title:'查看促销规则', width:800, height:400}" href="index.php?app=crm&ctl=admin_gift_rule<{if $data.type == '3'}>base<{/if}>&act=view_rule&snapshot_id=<{$data.id}>">查看快照</a></td>
+                     <td><{$data.op_user}></td>
+                 </tr>
+                <{/foreach}>
+            </tbody>
+            </table>
+            <{$pager}>
+    <{else}>
+            <div style="font-weight:bold;font-size:14px;padding:20px;color:#666;">没有相关快照</div>     
+    <{/if}>
+
+    
+</div>

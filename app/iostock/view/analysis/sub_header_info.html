@@ -1,0 +1,16 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="ColColorOrange clearfix">
+    <{foreach from=$detail key=key item=item name="info"}>
+     <div class="span-auto" title="<{$key}>" info="<{$item.memo}>"> 	
+        <a><{if $item.icon}><{img src="bundle/{$item.icon}" app='desktop'}><{/if}></a> 
+        <span class="f-12"><{$key}>:</span><strong class="f-18"><{$item.value}></strong>
+     </div>
+     <{if $item.br == true}>
+     <div class='clear' style='padding:5px;'></div>
+     <{/if}>
+    <{/foreach}>
+</div>

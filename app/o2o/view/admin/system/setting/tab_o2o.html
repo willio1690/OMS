@@ -1,0 +1,65 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style type="text/css">
+.tab_o2o th{width:170px;}
+</style>
+<div class="form-layout-block">
+    <h3>门店设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field" >
+            <span class="form-field-label">门店优选模式：</span>
+            <select class="form-input"  name="set[o2o.autostore.type]">
+                <{foreach from=$setData.autostore_modes item=mode}>
+                <option value="<{$mode.type}>" <{if $setData.o2o_autostore_type == $mode.type}>selected="selected"<{/if}>><{$mode.name}></option>
+                <{/foreach}>
+            </select>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">是否开启展示百度地图线路：</span>
+            <div class="form-radios">
+                <input id="o2o_baidumap_show_on" type="radio" name="set[o2o.baidumap.show]" value="true" <{if $setData.o2o_baidumap_show == 'true'}> checked<{/if}> >
+                <label for="o2o_baidumap_show_on">开启</label>
+                <input id="o2o_baidumap_show_off" type="radio" name="set[o2o.baidumap.show]" value="false" <{if $setData.o2o_baidumap_show == 'false'}> checked<{/if}> >
+                <label for="o2o_baidumap_show_off" >关闭</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">开启百度地图 密钥（ak）：</span>
+            <input type="text" class="form-input" placeholder="请输入开启百度地图 密钥（ak）" name="set[o2o.baidumap.ak]" size=30 value="<{$setData.o2o_baidumap_ak}>"/>
+            <span class="form-remark" style="color:red;">请到百度地图api官网申请密钥（ak）</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">sn校验方式（sk）：</span>
+            <input type="text" class="form-input" placeholder="请输入sn校验方式（sk）" name="set[o2o.baidumap.sk]" size=30 value="<{$setData.o2o_baidumap_sk}>"/>
+            <span class="form-remark"  style="color:red;">请到百度地图api应用详情中选择sn校验方式查看（sk）</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">是否开启销单校验码：</span>
+            <div class="form-radios">
+                <input id="o2o_delivery_confirm_code_on" type="radio" name="set[o2o.delivery.confirm.code]" value="true" <{if !$sms_active}> disabled <{/if}> <{if $setData.o2o_delivery_confirm_code == 'true'}> checked<{/if}> >
+                <label for="o2o_delivery_confirm_code_on">开启</label>
+                <input id="o2o_delivery_confirm_code_off" type="radio" name="set[o2o.delivery.confirm.code]" value="false" <{if $setData.o2o_delivery_confirm_code == 'false'}> checked<{/if}> >
+                <label for="o2o_delivery_confirm_code_off" >关闭</label>
+            </div>
+            <span class="form-remark"  style="color:red;">开启此功能需开通短信服务</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">发货超时时间设置(分钟)：</span>
+            <input type="text" class="form-input" placeholder="请输入发货超时时间设置(分钟)" name="set[o2o.delivery.dly_overtime]"  value="<{$setData.o2o_delivery_dly_overtime}>" id="dly_overtime" size="6" maxlength="5" vtype="required" onkeyup="this.value=this.value.replace(/\D/g,'')"  />
+            <span class="form-remark" style="color:red;">*默认0为不开启（注：按生成发货单的时间来计算超时）</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">是否管控门店供货关系：</span>
+            <div class="form-radios">
+                <input id="o2o_ctrl_supply_relation_on" type="radio"  name="set[o2o.ctrl.supply.relation]" value="true" <{if $setData.o2o_ctrl_supply_relation == 'true'}> checked<{/if}> >
+                <label for="o2o_ctrl_supply_relation_on">开启</label>
+                <input id="o2o_ctrl_supply_relation_off" type="radio"  name="set[o2o.ctrl.supply.relation]" value="false" <{if $setData.o2o_ctrl_supply_relation == 'false'}> checked<{/if}> >
+                <label for="o2o_ctrl_supply_relation_off" >关闭</label>
+            </div>
+            <span class="form-remark"  style="color:red;">*默认为不开启，优先级高于门店配置(注：当不开启的时候，订单审核到门店、门店履约全流程都不管控供货关系以及门店实际库存)</span>
+        </div>
+    </div>
+</div>

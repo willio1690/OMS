@@ -1,0 +1,75 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <h3>明细信息</h3>
+    <div class="division">
+        <table>
+            <tbody>
+                <tr>
+                <{assign var='counter' value=0}>
+                <{assign var='cols_per_row' value=$cols_per_row|default:5}>
+                <{foreach from=$data.header item=col key=hk}>
+                    <{if !$col.in_list}> <{continue}> <{/if}>
+
+                    <{assign var='counter' value=$counter+1}>
+                    <th><{$col.label}>：</th>
+
+                    <{assign var='dd' value=$data.body}>
+                    <td><{$dd[$hk]}></td>
+                    <{if $counter % $cols_per_row == 0}>
+                        </tr><tr>
+                    <{/if}>
+                <{/foreach}>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="division">
+
+    <table class="gridlist">
+        <thead>
+            <tr>
+                <{foreach from=$lines.header item=h key=hk}>
+                <{if !$h.in_list}> <{continue}> <{/if}>
+                <th><{$h.label}></th>
+                <{/foreach}>
+            </tr>
+        </thead>
+        <tbody>
+            <{foreach from=$lines.body item=b}>
+            <tr>
+                <{foreach from=$lines.header item=h key=hk}>
+                <{if !$h.in_list}> <{continue}> <{/if}>
+                <td>
+                    <{if $h.filtertype == 'image'}>
+                    
+                        <{if is_array($b[$hk]) }>
+                            <{foreach from=$b[$hk] item=img}>
+                                <img src="<{$img}>" style="max-width: 20px; max-height: 20px;" />
+                            <{/foreach}>
+                        <{else}>
+                            <img src="<{$b[$hk]}>" style="max-width: 20px; max-height: 20px;" />
+                        <{/if}>
+                    <{else}>
+                        <{$b[$hk]}>
+                    <{/if}>
+                </td>
+                <{/foreach}>
+            </tr>
+            <{/foreach}>
+        </tbody>
+    </table>
+    </div>
+</div>
+
+<style>
+    .gridlist tbody td {
+        /* 内容超出宽度时显示滚动条 */
+        overflow: auto;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>

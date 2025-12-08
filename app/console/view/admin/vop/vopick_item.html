@@ -1,0 +1,166 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">
+  <{script src="coms/autocompleter.js" app="desktop"}>
+  <{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<style type="text/css">
+.item_del { background-color: rgb(216, 216, 216); }
+.item_quality_check { background-color: rgb(226, 208, 243); }
+</style>
+<div class="tableform">
+    <h4>拣货单明细</h4>
+    <div class="division">
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+                <tr>
+                    <th style='text-align:left;padding-left:5px;'>货号</th>
+                    <th style='text-align:left;padding-left:5px;'>条形码</th>
+                    <th style='text-align:left;padding-left:5px;'>货品名称</th>
+                    <th style='text-align:left;padding-left:5px;'>尺寸</th>
+                    <th style='text-align:left;padding-left:5px;'>数量</th>
+                    <{if $is_stockout}>
+                    <th style='text-align:left;padding-left:5px;'>已出库数量</th>
+                    <{/if}>
+                    <th style='text-align:left;padding-left:5px;'>原价</th>
+                    <th style='text-align:left;padding-left:5px;'>供货价(含税)</th>
+                    <th style='text-align:left;padding-left:5px;width:80px;'>标记</th>
+                </tr>
+            </thead>
+            <!-- <tbody id="dataNode"> -->
+            <tbody>
+                <{if $dataList}>
+                    <{foreach from=$dataList item=item}>
+                    <tr>
+                        <td style="text-align:left;padding-left:5px;"><{$item.bn}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.barcode}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.product_name}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.size}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.num}></td>
+                        <{if $is_stockout}>
+                        <td style="text-align:left;padding-left:5px;"><{$item.send_num}></td>
+                        <{/if}>
+                        <td style="text-align:left;padding-left:5px;"><{$item.price}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.market_price}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.order_label}></td>
+                    </tr>
+                    <{/foreach}>
+                <{else}>
+                <tr>
+                  <td colspan="8" style="text-align:center;"><div class="note" style="margin:0;"> 暂无拣货单明细 </div></td>
+                </tr>
+                <{/if}>
+            </tbody>
+        </table>
+    </div>
+
+    <{if $checkDataList}>
+    <h4>重点检查明细</h4>
+    <div class="division">
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+                <tr>
+                    <th style='text-align:left;padding-left:5px;'>订单号</th>
+                    <th style='text-align:left;padding-left:5px;'>发货仓</th>
+                    <th style='text-align:left;padding-left:5px;'>货号</th>
+                    <th style='text-align:left;padding-left:5px;'>条形码</th>
+                    <th style='text-align:left;padding-left:5px;'>会员反馈途径</th>
+                    <th style='text-align:left;padding-left:5px;'>问题描述</th>
+                    <th style='text-align:left;padding-left:5px;'>一级分类</th>
+                    <th style='text-align:left;padding-left:5px;'>二级分类</th>
+                    <th style='text-align:left;padding-left:5px;'>三级分类</th>
+                    <th style='text-align:left;padding-left:5px;'>订单标签</th>
+                    <th style='text-align:left;padding-left:5px;'>图片信息</th>
+                    <th style='text-align:left;padding-left:5px;'>视频信息</th>
+                </tr>
+            </thead>
+            <!-- <tbody id="checkDataNode"> -->
+            <tbody>
+                <!-- <{if $checkDataList}> -->
+                    <{foreach from=$checkDataList item=item}>
+                    <tr class="item_quality_check">
+                        <td style="text-align:left;padding-left:5px;"><{$item.order_sn}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.delivery_warehouse}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.bn}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.barcode}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.channel}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.problem_desc}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.first_classification}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.second_classification}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.third_classification}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.order_label}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.image_list}></td>
+                        <td style="text-align:left;padding-left:5px;"><{$item.video_list}></td>
+                    </tr>
+                    <{/foreach}>
+                <!-- <{else}>
+                <tr>
+                  <td colspan="12" style="text-align:center;"><div class="note" style="margin:0;"> 暂无重点检查明细 </div></td>
+                </tr>
+                <{/if}> -->
+            </tbody>
+        </table>
+    </div>
+    <{/if}>
+</div>
+<script>
+/*
+var tpl = '<tr>'+
+        '<td style="text-align:left;padding-left:5px;">{bn}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{barcode}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{product_name}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{size}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{num}</td>';
+
+<{if $is_stockout}>
+tpl += '<td style="text-align:left;padding-left:5px;">{send_num}</td>';
+<{/if}>
+
+tpl += '<td style="text-align:left;padding-left:5px;">{price}</td>'+
+       '<td style="text-align:left;padding-left:5px;">{market_price}</td>'+
+       '<td style="text-align:left;padding-left:5px;">{order_label}</td>'+
+       '</tr>';
+
+var check_items = '<tr>'+
+        '<td style="text-align:left;padding-left:5px;">{order_sn}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{delivery_warehouse}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{bn}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{barcode}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{channel}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{problem_desc}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{first_classification}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{second_classification}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{third_classification}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{order_label}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{image_list}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{video_list}</td>'+
+        '</tr>';
+
+var store=[],pag,check_store=[],pag_item;
+new Request({url:'index.php?app=console&ctl=admin_vopick&act=getPickBillsItems&p[0]=<{$pick_info.bill_id}>',
+onComplete:function(rs){
+    rs=JSON.decode(rs);
+    store.combine(rs);
+    createProduct(store);
+}}).send();
+
+function createProduct(data){
+    pag=new PageData(tpl,data,{'updateMain':$('dataNode'),'pageNum':1000});
+}
+
+new Request({url:'index.php?app=console&ctl=admin_vopick&act=getPickBillsCheckItems&p[0]=<{$pick_info.bill_id}>',
+onComplete:function(rs){
+    rs=JSON.decode(rs);
+    check_store.combine(rs);
+    createCheck(check_store);
+}}).send();
+
+function createCheck(data){
+    pag_item=new PageData(check_items,data,{'updateMain':$('checkDataNode'),'pageNum':1000});
+}
+*/
+</script>

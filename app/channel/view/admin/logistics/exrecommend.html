@@ -1,0 +1,240 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style type="text/css">
+#system-setting .nt{color:red;padding-left: 20px;}
+#system-setting .nt2{color:#D73535;padding-left: 20px;}
+#system-setting em{color:red;}
+#system-setting .on-off {float: left;cursor:pointer;}
+#system-setting .on-off .on{
+    background: url("<{$env.BASE_URL}>/app/desktop/statics/images/setting/on.png") no-repeat;
+    background-size: 50px 26px;
+    width: 50px;
+    height:26px;
+    display:block;
+}
+#system-setting .on-off .off{
+    background: url("<{$env.BASE_URL}>/app/desktop/statics/images/setting/off.png") no-repeat;
+    background-size: 50px 26px;
+    width: 50px;
+    height:26px;
+    display:block;
+}
+#system-setting .subpart{
+    background-color:#DCE6F1;
+    margin-top: 8px;
+    width:95%;
+	font-size:15px;
+}
+#system-setting .subtitle{
+    color: #7493D4;
+    font-size:20px;
+    text-align: left;
+}
+#system-setting .ssubtitle{
+    color: #7493D4;
+    font-size:21px;
+    /*text-align: left;*/
+}
+#system-setting .subblock{
+    background-color: #FAFAFA;
+    margin-bottom: 20px;
+}
+#system-setting table{
+    margin-bottom: 10px;
+}
+#system-setting table th{
+    width: 20%;
+}
+#system-setting .subpart table th{
+    width:120px;
+}
+#system-setting .subblock ul li {
+    padding: 10px 5px 5px 10px;
+    background-color: #DCE6F1;
+    width: 70%;
+}
+#system-setting ul li label{
+    width: 150px;
+    display:inline-block;
+    text-align: right;
+}
+</style>
+
+<div style='border:0px solid;width:900px;height:800px;'>
+   <form method="post" action="index.php?app=channel&ctl=admin_logistics_exrecommend&act=set_exrecommend" id="form-setting">
+        <div style='border:0px solid;width:880px;height:720px;margin-left:3px;margin-top:10px;position:absolute;'>
+            <div class="subtitle"><span  style='font-size:28px;color:blue;'>智选物流 </span></div>
+            <div id='system-setting' style="margin-left:50px">
+    
+            <div class="tableform" >
+                <table cellspacing="0" cellpadding="0" border="0">
+                    <tbody style="font-size:18px;" >  
+		               	<{foreach from=$service_info item=info key=k}>
+                    		<{if $k =='service_off'}>
+						       <{foreach from=$info item=v key=bu}>
+						       		<tr>
+									    <td  width="14%" style="text-align:center"  ><span style="font-size:25px;color:red;width:10px">未开通</span></td><!--设置横跨两行-->
+								        <td width='20%'><{$v.name}></td>
+								        <td><a target="_blank"  href='<{$v.url}>'style="color:blue">点击购买</a></td>
+						           </tr>
+						       <{/foreach}>
+						    <{else}>
+								<{foreach from=$info item=v key=bu}>
+							       	<tr>
+									    <td  width='14%' style="text-align:center" width="14%" ><span style="font-size:25px;color:green;width:10px">已开通</span></td><!--设置横跨两行-->  
+								        <td width='20%'><{$v.name}></td>
+								        <td ><a target="_blank"><{if $v.exrecommend_expiration_time}>到期时间：<{$v.exrecommend_expiration_time}><{/if}></a></td>
+							        </tr>
+							     <{/foreach}>
+                    		<{/if}>	
+		                <{/foreach}>
+                    </tbody>
+               </table>
+            </div>
+            <{if $exrecommend_service}>         
+               <div class="tableform">
+                  <div class="subtitle">物流智选设置</div>
+                  <div class="subblock">
+                      <table cellspacing="0" cellpadding="0" border="0">
+                            <tbody>
+                                <tbody>
+                                    <tr><th>智选物流：</th>
+                                        <td> 
+                                        <input type="radio" class="cn_autoset" name="set[set_exrecommend_service]"  value="1" <{if $set_exrecommend_service=='1'}>checked<{/if}>>开启
+                                        <input type="radio" class="cn_autoset" name="set[set_exrecommend_service]"  value="0" <{if $set_exrecommend_service=='0' || $set_exrecommend_service==''}>checked<{/if}>> 关闭
+                                            
+                                           
+                                       <div class="clear"></div>
+                                       <!--子部分S-->
+                                        <div id="subpart" class="subpart">
+                                            <div class="set-content">
+                                                <table cellspacing="0" cellpadding="0" border="0">
+                                                    <tbody>
+                                                    <tr>
+			                                            <th>智选物流提供方：</th>
+										                <td >
+										                  
+										                    <input type="radio" class='exrecommend_souce'    <{if $service_info.service_off.taobao }>disabled="disabled"<{/if}> value="taobao"   name="set[exrecommend_souce]"  <{if $set_exrecommend_souce=='taobao'}>checked<{/if}> />菜鸟智选物流 &nbsp;(<span  style='font-size:12px;'>菜鸟支持6大快递＋邮政</span>) 
+										                 </td>
+			                                       </tr>
+                                                        <tr>
+                                                            <th>同步运费模板：</th>
+                                                            <td><a style="text-decoration:underline;"  onclick="template_upload();">同步运费模板</a> <font color='red'>&nbsp;&nbsp;当仓库、物流公司、运费发生变化时，需要进行同步</font></td>
+                                                       </tr>
+                                                        <tr>
+                                                            <th>智选物流策略：</th>
+                                                            <td>
+                                                                <select id='set_exrecommend_type' style="width:25%;"  name="set[set_exrecommend_type]">
+                                                                	<{if $set_exrecommend_souce}>
+                                                                		<{foreach from=$all_exrecommend_types item=type key=k}>
+	                                                                        <option   value="<{$k}>" <{if $set_exrecommend_type == $k}> selected="selected" <{/if}> > <{$type}></option>
+                                                                        <{/foreach}>
+                                                                	
+                                                                	<{/if}>
+                                                                
+                                                                </select>
+                                                               &nbsp;&nbsp;<a   style='display:none'  id='taobao_url' target="_blank"  href='https://z.cainiao.com/delivery/officialconfig/sdeStrategyConfigPage.htm'>更多设置，请到菜鸟物流管家设置</a>
+                                                            </td>
+                                                       </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!--子部分E-->
+                                     </td>
+                                 </tr> 
+                            </tbody>
+                       </table>
+                   </div>
+               </div>      
+        
+              <div class="table-action">
+                     <{button label="提交" type="submit" name="submit" id="btn-setting"}>
+              </div>  
+            </div>
+ 
+         
+        <{/if}>
+    </form>
+</div>
+    <!--  显示在右侧看板的历史日志-->
+    <{if $exrecommend_history_logs}>
+        <div style='border:0px solid;width:360px;height:720px;margin-left:910px;margin-top:10px;position:absolute;background:#f6f6f6'>
+               <{foreach from=$exrecommend_history_logs item=data key=k}>
+               <span  style='font-size:14px;margin-left:10px;'>
+                  <{$data.create_time}> &nbsp; <{$data.op_user}> 设置：<{if $data.op_type ==1}> 同步运费模板<{else}><{$data.exrecommend_type_name}><{/if}></p>
+               </span>
+               <{/foreach}>
+        </div>
+    <{/if}>
+</div>
+
+<script>
+(function(){
+    var set_exrecommend_souce = "<{$set_exrecommend_souce}>";
+    if(set_exrecommend_souce == 'taobao')$('taobao_url').show();
+})();
+    function template_upload(){
+    	 var obj = $E("input[type=radio][name = set[exrecommend_souce]]:checked");
+         if(!obj){
+            alert('请先选择智选物流提供方');return false;
+         }
+         var exrecommend_souce = obj.value;
+         var exrecommend_souce_disabled = obj.disabled;
+         if(exrecommend_souce_disabled){
+           alert('当前智选物流提供方需要先购买！');return false;
+         }
+         new Dialog('index.php?app=channel&ctl=admin_logistics_exrecommend&act=template_upload',{'title':'<{t}>同步运费模板<{/t}>',width:500,height:200,ajaxoptions:{data:{'exrecommend_souce':exrecommend_souce},method:'post'}});
+    }
+
+   
+   
+   $ES('.exrecommend_souce').addEvent('click',function(){
+   		 var selected_exrecommend_souce = $E("input[type=radio][name = set[exrecommend_souce]]:checked").value;
+   		 if(!selected_exrecommend_souce){
+   		 	alert('请选择智选物流提供方');return true;
+   		 }
+   	     if(selected_exrecommend_souce =='taobao'){
+              $('taobao_url').show();
+         }else if(selected_exrecommend_souce =='hqepay'){
+              $('taobao_url').hide();
+         }   
+   		 get_exrecommend_type(selected_exrecommend_souce);
+   });
+	function get_exrecommend_type(souce_type){
+	    new Request({
+	    	url:'index.php?app=channel&ctl=admin_logistics_exrecommend&act=ajax_get_exrecommend_type',
+	   		method:'post',
+	   		data:'souce_type='+souce_type,
+	   		async:false,
+	        onComplete:function(jsonodata){
+	        	var rs = JSON.decode(jsonodata);
+	        	var html = '';
+	        	for(var key in rs){
+					html +="<option value='"+key+"'>"+rs[key]+"</option>";
+			    }
+			    $('set_exrecommend_type').set('html',html);
+	        }
+	    }).send();
+	    return status;
+	} 
+
+  if($$('.cn_autoset').length>0){
+    cnautoset($$('input[name=set[set_exrecommend_service]]:checked').get('value'));
+    $$('.cn_autoset').addEvent('click',function(e){
+        cnautoset(this.value);
+
+
+    });
+}
+function cnautoset(value){
+    if(value=='1'){
+        $$('.subpart').setStyle('display','');
+    }else{
+        $$('.subpart').setStyle('display','none');
+    }
+}
+</script>

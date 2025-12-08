@@ -1,0 +1,161 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform" style="background:#FFF;">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" >
+        <tr>
+          <th><em class="c-red">*</em><{t}>规则名称：<{/t}></th>
+          <td><{input id="title" type="text" name="title" value=$rule.title size="25" vtype="required" }></td>
+        </tr>
+        <tr>
+            <th><em class="c-red">*</em><{t}>起止时间：<{/t}></th>
+            <td>
+                <{input id="start_time" size="30" type='date' name='start_time' value=$rule.start_time vtype="required" }> 
+                <{input type='select' name='start_time_hour' value=$rule.start_time_hour vtype="required" options=$conf_hours }>
+               :<{input type='select' name='start_time_minitue' value=$rule.start_time_minitue vtype="required" options=$conf_minitue }>
+               :<{input type='select' name='start_time_second' value=$rule.start_time_second vtype="required" options=$conf_second }>
+                &nbsp; &nbsp; &nbsp;到&nbsp; &nbsp; &nbsp;
+                <{input id="end_time" size="30" type='date' name='end_time' value=$rule.end_time vtype="required" }> 
+                <{input type='select' name='end_time_hour' value=$rule.end_time_hour vtype="required" options=$conf_hours }>
+                :
+                <{input type='select' name='end_time_minitue' value=$rule.end_time_minitue vtype="required" options=$conf_minitue }>
+                :
+                <{input type='select' name='end_time_second' value=$rule.end_time_second vtype="required" options=$conf_second }>
+            </td>
+        </tr>  
+        <tr>
+            <th><em class="c-red">*</em><{t}>时间类型：<{/t}></th>
+            <td>
+                <{assign var="opt" value=array('createtime'=>'订单下单时间','pay_time'=>'订单付款时间')}>
+                <{input type="select" id="time_type" name="time_type" options=$opt value=$rule.time_type}>
+            </td>
+        </tr>
+        <tr>
+            <th><em class="c-red">*</em><{t}>是否排他：<{/t}></th>
+            <td>
+                <label><input type="radio" value="1" name="is_exclude" <{if $rule.is_exclude != '2'}>checked<{/if}> /> 是</label>&nbsp;&nbsp;
+                <label><input type="radio" value="2" name="is_exclude" <{if $rule.is_exclude=='2'}>checked<{/if}> /> 否</label>&nbsp;&nbsp;
+                <{help}><{t}>
+                                        说明：1.规则是以优先级由高到低、创建时间由新到旧的顺序来逐一匹配。2.会先匹配店铺级规则，再匹配商品级规则。3.选择“是”就是排他，匹配此规则的话，就不再匹配其他的规则。选择“否”就是不排他，匹配此规则的话，就看是否有匹配的其他规则，如有并且此规则本身也是不排他的做叠加处理。
+                <{/t}><{/help}>
+            </td>
+        </tr>
+        <tr>
+            <th><em class="c-red">*</em><{t}>状　　态：<{/t}></th>
+            <td>
+                <label>
+                    <input type="radio" value="1" name="status" /> 开启
+                </label>
+                　　　　　　
+                <label>
+                    <input type="radio" value="0" name="status" /> 关闭
+                </label>
+            </td>
+        </tr>
+
+        <tr id='apply-range'>
+            <th><span class="red">*</span> 应用范围:</th>
+            <td>
+                <input type='checkbox' name='shop_ids[]' value='_ALL_'  onclick='allShop(this);'  <{if $rule.shop_ids.0 == '_ALL_'}>checked<{/if}>>所有店铺
+
+                <ul id='shops'  <{if $rule.shop_ids.0 == '_ALL_'}>style="display:none;"<{/if}>>
+                <{foreach from=$shops item=value key=key}>
+                <li class='span-auto' style='min-width: 118px;margin-bottom:5px;'>
+                    <input type='checkbox' name='shop_ids[]' value="<{$key}>"  <{if is_array($rule.shop_ids) && in_array($key,$rule.shop_ids)}>checked<{/if}> onchange="javascript:if(this.checked){this.getNext('span').setStyle('color','red');}else{this.getNext('span').setStyle('color','');}"/>
+                    <span <{if is_array($rule.shop_ids) && in_array($key,$rule.shop_ids)}>style='font-size:14px;font-weight:bold;color:red;' <{else}>style='font-size:14px;font-weight:bold;'  <{/if}> ><{$value}></span>
+                </li>
+                <{/foreach}>
+                </ul>
+            </td>
+        </tr>
+
+        <tr>
+            <th><{t}>指定收货区域：<{/t}></th>
+            <td>
+                <input type='checkbox' name='filter_arr[province][]' value='_ALL_'  onclick='allArea(this);'  <{if $rule.filter_arr.province.0 == '_ALL_'}>checked<{/if}>>所有区域
+
+
+                <{foreach from=$big_region item=v key=k}>
+                    &nbsp;&nbsp;<input type='checkbox' class="big_region" name='<{$k}>' value="<{$v}>" ><{$v}>
+                <{/foreach}>
+
+
+                <ul id='area'  <{if $rule.filter_arr.province.0 == '_ALL_'}>style="display:none;"<{/if}>>
+                <{foreach from=$provinces item=value key=key}>
+                <li class='span-auto' style='min-width: 118px;margin-bottom:5px;'>
+                    <input type='checkbox' name='filter_arr[province][]' value="<{$key}>" class='<{$provinces_new.$key}>'  <{if is_array($rule.filter_arr.province) && in_array($key,$rule.filter_arr.province)}>checked<{/if}> onchange="javascript:if(this.checked){this.getNext('span').setStyle('color','red');}else{this.getNext('span').setStyle('color','');}"/>
+                    <span <{if is_array($rule.filter_arr.province) && in_array($key,$rule.filter_arr.province)}>style='font-size:14px;font-weight:bold;color:red;' <{else}>style='font-size:14px;font-weight:bold;'  <{/if}> ><{$value}></span>
+                </li>
+                <{/foreach}>
+                </ul>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script>
+    function allShop(el){
+        if (el.checked)
+        {
+            $('shops').hide();
+            $('shops').getElements('input').set('disabled',true);
+        }else{
+            $('shops').show();
+            $('shops').getElements('input').set('disabled',false);
+        }
+    }
+    function allArea(el){
+        if (el.checked)
+        {
+            $('area').hide();
+            $('area').getElements('input').set('disabled',true);
+        }else{
+            $('area').show();
+            $('area').getElements('input').set('disabled',false);
+        }
+    }
+
+</script>
+<script>
+(function(){
+    if ($$('.big_region')){
+        $$('.big_region').addEvent('click',function(e){
+
+            var role_menu = this.name;
+            var checked = this.checked;
+            var _this=this;
+
+            $$('.'+role_menu+'').each(function(role){
+                role.set('checked',checked);
+                if (checked == true) {
+                    role.getNext('span').setStyle('color','red');
+                }else{
+                    role.getNext('span').setStyle('color','');
+                }
+            });
+
+            $$('.'+role_menu+'').addEvent('click',function(item){
+                if (checked == true){
+                    checked = false;
+                    _this.set('checked',false);
+                }
+            });
+
+        });
+    }
+
+    //延迟几天,系统自动补发赠品
+    if($("gift_trigger_mode")){
+        $("gift_trigger_mode").addEvent('change',function(){
+            var modeVal = $("gift_trigger_mode").value;
+            if(modeVal == "order_complete"){
+                $("gift_bufa_type").setStyle('display', '');
+            }else{
+                $("gift_bufa_type").setStyle('display', 'none');
+            }
+        });
+    }
+})();
+</script>

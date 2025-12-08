@@ -1,0 +1,55 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+    <h4>礼盒物料</h4>
+    <table width="100%" class="gridlist" border="0" cellspacing="0" cellpadding="0">
+        <thead>
+            <tr>
+                <th>物料编码</th>
+                <th>物料名称</th>
+                <th>数量</th>
+                <th>入库数量</th>
+                <th>出库数量</th>
+            </tr>
+        </thead>
+        <tbody>
+        <{foreach from=$items item=item}>
+            <tr>
+                <td><{$item.bm_bn}></td>
+                <td><{$item.bm_name}></td>
+                <td><{$item.number}></td>
+                <td><{$item.in_number}></td>
+                <td><{$item.out_number}></td>
+            </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+</div>
+<div class="division">
+    <h4>普通物料</h4>
+    <table width="100%" class="gridlist" border="0" cellspacing="0" cellpadding="0">
+        <thead>
+            <tr>
+                <th>物料编码</th>
+                <th>物料名称</th>
+                <th>数量</th>
+                <th>入库数量</th>
+                <th>出库数量</th>
+            </tr>
+        </thead>
+        <tbody>
+        <{foreach from=$details item=item}>
+            <tr>
+                <td><{$item.bm_bn}></td>
+                <td><{$item.bm_name}></td>
+                <td><{$item.number}></td>
+                <td><{$item.in_number}></td>
+                <td><{$item.out_number}></td>
+            </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+</div>

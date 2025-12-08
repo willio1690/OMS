@@ -1,0 +1,99 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+#num_rules {list-style:none;margin:0;padding:0;}
+#num_rules label{cursor:pointer;}
+#num_rules li{color:#999;margin:8px 0 0 0;padding:3px 0;background:#EFEFEF;}
+#num_rules li.active{color:#000;background:#FFc;}
+</style>
+
+<form method="POST" action="index.php?app=crm&ctl=admin_gift_rule&act=priority" class="tableform" id="form_member_lv">
+
+    <{input type="hidden" name="id" value=$rule.id size="25" }>
+
+	<div class="division1" style="background:#FFF;">
+		<br/>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+            <tr>
+			  <th><em class="c-red">*</em><{t}>规则名称：<{/t}></th>
+			  <td><{$rule.title}></td>
+			</tr>
+            <tr>
+	            <th><em class="c-red">*</em><{t}>生效时间：<{/t}></th>
+	            <td>
+                    <{$rule.start_time}>
+                    至
+                    <{$rule.end_time}>
+                </td>
+	        </tr> 
+            <tr>
+                <th><em class="c-red">*</em><{t}>规则优先级：<{/t}></th>
+                <td>
+                    <select id="priority" name="priority" class="x-input">
+                        <option value="0">0(最低)</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10(最高)</option>
+                    </select>
+                    * 数字越大越优先                    
+                    
+                    <div style="color:gray;line-height:2em;">注： 设置赠品促销规则的优先级，仅在商家在赠品设置中启用“赠品规则进行排他”设置时才起作用。
+                    </div>
+
+                </td>
+            </tr>
+		</table>
+	</div>
+
+</form>
+
+<{area inject='.mainFoot'}>
+    <div class="table-action">
+        <{button type="button" label="保存" id="rule_save"}>
+    </div>
+<{/area}>
+
+<script>
+var priority = '<{$rule.priority}>';
+
+(function(){
+
+    $('priority').set('value', priority);
+    
+    $('rule_save').addEvent('click', function(){
+        $('form_member_lv').fireEvent('submit',{stop:$empty});
+    });
+    
+    var _form = $('form_member_lv');
+
+    _form.store('target',{
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+        
+            if (hash_res_obj.success != undefined && hash_res_obj.success != "")
+            {
+                try{
+                    var _dialogIns = $('rule_save').getParent('.dialog').retrieve('instance');
+                }catch(e){}
+                
+                if(_dialogIns)
+                {	
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+    
+})();
+</script>
+

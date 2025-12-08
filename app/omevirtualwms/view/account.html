@@ -1,0 +1,135 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<script>
+	var item_i = 1;
+ </script>
+ <div class="tableform">
+	<h3>库存对账结果回传</h3>
+    <div class="division">
+	 <form action="index.php?app=omevirtualwms&ctl=admin_wms&act=doSubmit" method="post" id="form-inventory" >
+	  <input type="hidden" name='flag' value='account' />
+      <input type="hidden" name='account_bn' value='<{$accoutn_bn}>' />
+	  <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tbody>
+			<tr>
+				<th>单据号</th>
+				<td><input type="text" name="order_code" id="pbn" ><span id='product_exits'></span></td>
+			  </tr>
+			  <tr>
+				<th>第三方仓储</th>
+				<td>
+					<select name="node_id" onchange="set_branch(this.options[this.selectedIndex].value)">
+						<{foreach from=$wms item=wms}>
+							<option value="<{$wms.node_id}>"><{$wms.wms_name}></option>
+						<{/foreach}>
+					</select>
+				</td>
+				</tr>
+				<tr>
+				<th>仓库名称</th>
+				<td>
+				<div id="branch_select">
+					<select name="warehouse" required="true">
+						<{foreach from=$branchs item=branch}>
+							<option value="<{$branch.branch_bn}>"><{$branch.name}></option>
+						<{/foreach}>
+					</select>
+				</div>
+				</td>
+			  </tr>
+			  
+			  
+			  <!--
+			  <tr>
+				<th>库存数量</th>
+				<td><input name="num" id="num"  value=""></td>
+			  </tr>
+			  -->
+			  <tr>
+				<th>对账类型</th>
+				<td>
+					<select name="type">
+						<option value="true">良品</option>
+						<option value="false">不良品</option>
+					</select>
+				</td>
+			  </tr>
+			  <tr>
+				<th>task</th>
+				<td><input type="text" name="task" value="<{$task}>"></td>
+			  </tr>
+            </tbody>
+        </table>
+		
+		<div class="tableform">
+			<div><span style="font-weight:bold;">异动明细:</span><span class="sysiconBtn addorder"  style="float:right;margin-right:150px;height:1.5em;" onclick="addInventory();">添加商品</span></div>
+			<div id="listArea" class="division"></div>
+		</div>
+		
+        <div class="table-action">
+            <{button label="提交" type="submit" name="submit" id="btn-inventory"}>
+        </div>
+	</form>
+  </div>
+</div>
+<script>
+
+function addInventory(){
+	var i = item_i++;
+	var content='\
+		<div id="inventory_'+i+'" style="margin-bottom:3px;border:1px solid #ccc;">\
+			<table width="100%" cellspacing="0" cellpadding="0" border="0">\
+				<tr><th>货品编号'+i+'</th>\
+				<td><input type="text" vtype="required" name="product['+i+'][]"></td>\
+				<th style="width:70px;">库存数量'+i+'</th>\
+				<td><input type="text" value="0" name="num['+i+'][]"></td>\
+				<td><span onclick="delInventory(\'inventory_'+i+'\');" style="cursor:pointer;color:red;margin-left:100px;">X</span></td> \
+				</tr>\
+			<table>\
+		</div>\
+	';
+	$E('#listArea').adopt(new Element('div').set('html',content).getFirst());
+	
+}
+delInventory=function(o){
+  $(o).remove();
+}
+
+
+
+function set_branch(node_id){
+	new Request.HTML({
+	url:'<{link app="omevirtualwms" ctl="admin_wms" act="back_branch"}>',
+	update:$('branch_select'),
+	method:'post',
+	data:'node_id='+encodeURIComponent(node_id)
+	}).send();
+}
+(function(){
+	 $('pbn').addEvent('blur',function(){
+		var bn = $('pbn').value;
+		
+		new Request({
+			url:'<{link app="omevirtualwms" ctl="admin_wms" act="get_stock"}>',
+			method:'post',
+			data:'product_bn='+encodeURIComponent(bn),
+			onRequest:function(){},
+			onComplete:function(e){
+				//alert(e.contains('null'));
+				if(e == 'null'){
+
+					$('num').set('value','');
+					$('product_exits').set('html','商品货号不存在')
+				}else{
+					$('product_exits').set('html','')
+					$('num').set('value',e);
+				}
+				
+			}
+		}).send();
+    });
+})();
+</script> 

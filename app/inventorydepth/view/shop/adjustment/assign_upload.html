@@ -1,0 +1,41 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<form id="sync-bn-form" action="index.php?app=inventorydepth&ctl=shop_adjustment&act=ajaxAssignUpload&p[0]=<{$env.get.shop_id}>" method="post">
+<div class="division">
+    <table>
+        <tr>
+            <th>商品条码</th>
+            <td>
+                <textarea name="bn" rows="14" cols="50" placeholder="请输入货号，多个以回车键分隔"></textarea>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="table-action">
+    <{button label="确认" class="btn-primary" type="submit"}>
+    <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true" }>
+</div>
+</form>
+</div>
+
+<script type="text/javascript">
+$('sync-bn-form').store('target',{
+    onRequest:function(){
+       $E('.btn-primary').set('disabled', 'true');
+    },
+    onComplete:function(jsontext){
+        var json = JSON.decode(jsontext);
+        if (typeof(json.error) != 'undefined'){
+            $E('.btn-primary').set('disabled', '');
+        }else{
+            $E('.btn-primary').set('disabled', 'true');
+
+            $('sync-bn-form').getParent('.dialog').retrieve('instance').close();
+        }
+    }
+});
+</script>

@@ -1,0 +1,73 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<form id="branch-flow-form" method="POST" action="index.php?app=ome&ctl=admin_branch_flow&act=save">
+<input type="hidden" name="id" value="<{$flow.id}>">
+
+<div class="division">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <th>单据类型：</th>
+                <td>
+                    <select name="flow_type" <{if $flow}>disabled<{/if}> >
+                        <{foreach from=$flowTypes item=item key=key}>
+                            <option value="<{$key}>" <{if $key==$flow.flow_type}>selected<{/if}> ><{$item}></option>
+                        <{/foreach}>
+                    </select>
+                </td>
+            </tr>
+           
+        </tbody>
+    </table>
+</div>
+<div class="division" id="content">
+    
+</div>
+</form>
+</div>
+<{area inject='.mainFoot'}>
+<div class="table-action">
+    <{button label="保存" class="btn-primary"}>
+
+    <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true" }>
+</div>
+<{/area}>
+
+<script>
+(function(){
+    $E('.btn-primary').addEvent('click', function(){
+        $('branch-flow-form').fireEvent('submit', {stop:$empty})
+    })
+
+    $('branch-flow-form').store('target', {
+        onComplete:function(resp){
+            resp = JSON.decode(resp)
+
+            if (resp.error) {return}
+
+            $('branch-flow-form').getParent('.dialog').retrieve('instance').close();
+
+            finderGroup["<{$env.get.finder_id}>"].refresh();
+        }
+    })
+    $E("select[name=flow_type]").addEvent('change',function(){
+        new Request.HTML({
+            url:'index.php?app=ome&ctl=admin_branch_flow&act=loadFlow&p[]='+$E('input[name=id]').get('value')+'&p[]='+this.value,
+            update:'content'
+        }).send()
+        
+        // W.page('index.php?app=ome&ctl=admin_branch_flow&act=loadFlow&p[]='+$E('input[name=id]').get('value')+'&p[]='+this.value,{
+        //     update:'content',
+        //     clearUpdateMap:false
+        // })
+    });
+
+    window.addEvent('domready',function(){
+         $E("select[name=flow_type]").fireEvent('change',{stop:$empty});
+    })
+})();
+</script>

@@ -1,0 +1,71 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.shop-name{
+    color:red;font-weight:bold;
+}
+.rules{
+  margin-bottom: 5px;
+}
+.rules select{
+  margin-right: 5px;
+}
+.rule_tr{
+  margin: 10px 0;
+}
+</style>
+<div class="tableform">
+  <div class="division">
+    <form method="post" action="index.php?app=financebase&ctl=admin_shop_settlement_rules&act=saveCategory" id="form-rule">
+      <input type="hidden" name="rule_id" value="<{$rule_info.rule_id}>">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" id="rule-section">
+        <tbody>
+          <tr>
+            <th><em class="c-red">*</em>具体类别</th>
+            <td><input type="text" name="bill_category"  value="<{$rule_info.bill_category}>" vtype="required"/>
+             </td>
+          </tr>
+          <tr>
+            <th><em class="c-red">*</em> 优先级：</th>
+            <td><input style="width:50px;" type="number" name="ordernum" vtype="required" value="<{$rule_info.ordernum}>">
+            数字越小，优先级越高！
+            </td>
+          </tr>
+
+          
+          </table>
+         
+
+      <div class="table-action">  <{button label="提交" type="submit" name="submit" id="btn-rule"}> &nbsp;&nbsp; <{button isCloseDialogBtn="true" label="关闭" onclick="javascript:void(window.close());" class="btn-secondary" type="button"}></div>
+   
+    </form>
+  </div>
+</div>
+<script>
+
+
+
+$('form-rule').store('target',{
+    onRequest:function(){
+       $('btn-rule').set('disabled', 'true');
+       
+    },
+    onComplete:function(jsontext){
+       var json = Json.evaluate(jsontext);
+       if (typeof(json.error) != 'undefined'){
+           $('btn-rule').set('disabled', '');
+       }else{
+           $('btn-rule').set('disabled', 'true');
+           parent.finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,parent.finderGroup['<{$env.get.finder_id}>']);
+           window.close();
+           $('form-rule').getParent('.dialog').retrieve('instance').close();
+       }
+    }
+});
+
+
+
+</script>

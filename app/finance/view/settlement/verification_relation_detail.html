@@ -1,0 +1,40 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+           <div class="division">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0">
+
+        <tbody>
+  
+      <tr>
+         <td > 单据编号 </td>
+         <td > 业务订单号 </td>
+         <td > 关联应收/应退单据号 </td>
+         <td > 核销费用金额 </td>
+         <td > 核销方式 </td>
+         <td > 核销类型 </td>
+         <td > 备注 </td>
+ 
+         
+       </tr>
+
+            <{foreach from=$list item=item}>
+       <tr>
+         <td><{$item.bill_bn}></td>
+         <td><{$item.order_bn}></td>
+         <td><{$item.ar_bn}></td>
+         <td><{$item.money|cur}></td>
+         <td><{if $item.auto_flag}> 自动 <{else}> 人工核销 <{/if}> </td>
+         <td><{if $item.verification_status == 1}> 正常核销 <{elseif $item.verification_status == 2}> 差异核销 <{else}> 强制核销 <{/if}> </td>
+
+         <td><{$item.memo}></td>
+       </tr>
+        <{/foreach}>
+        </tbody>
+      </table>
+    
+
+  </div>  </div>

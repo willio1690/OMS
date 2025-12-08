@@ -1,0 +1,1286 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.gridlist th{
+  width:140px;
+}
+<{if $reship_data.return_type eq 'change'}>
+.tabs-wrap .is_display {
+  display: block;
+}
+<{else}>
+.tabs-wrap .is_display {
+  display: none;
+}
+<{/if}>
+
+.reship-detail .gridlist tr th{text-align:right;width:120px;}
+.reship-detail .gridlist tr td{text-align:left;width:170px;}
+.gridlist thead tr th{text-align:left;}
+.gridlist tbody tr td{text-align:left;}
+    #address_box {
+        display: none;
+    }
+    #table-action {
+        display: none;
+    }
+</style>
+<div class="form-layout">
+    <form action="index.php?ctl=admin_return_rchange&act=add_rchange&app=ome&finder_id=<{$env.get.finder_id}>" method="post" id="return-apply">
+        <input type="hidden" name="reship_id" value="<{$reship_data.reship_id}>" />
+        <input type="hidden" name="reship_bn" value="<{$reship_data.reship_bn}>" />
+        <input type="hidden" name="source" value="<{$source}>">
+        <input type="hidden" name="is_protect" value="<{$reship_data.is_protect}>" />
+        <input type="hidden" name="shop_id" value="<{$reship_data.shop_id}>" id="shop_id" />
+        <input type="hidden" name="member_id" value="" />
+        <input type="hidden" name="logi_name" value="<{$reship_data.logi_name}>" />
+        <input type="hidden" name="logi_id" value="" />
+        <input type="hidden" name="delivery" value="<{$reship_data.delivery}>" />
+        <{if $reship_data.return_id}>
+        <input type="hidden" name="return_id" value="<{$reship_data.return_id}>" />
+        <{/if}>
+        <div class="form-layout-block">
+            <h3><{if $reship_data.reship_id}>编辑退换货单<{else}>新建退换货单<{/if}></h3>
+            <div class="form-layout-fields">
+                <{if $reship_data.return_id}>
+                <div class="form-layout-fields">
+                    <div class="form-field" style="width: 100%">
+                        <span class="form-field-label">售后标题：</span>
+                        <{$reship_data.title}>
+                    </div>
+                </div>
+                <{/if}>
+                <div class="form-field" style="width: 100%">
+                    <span class="form-field-label">退换货类型：</span>
+                    <div class="form-radios">
+                        <{foreach from=$return_type item=item key=key}>
+                            <label><input name="return_type" type="radio" onchange="show_return_type(this);" <{if !$reship_data.return_type && $key == 'return'}>checked<{/if}> <{if $reship_data.return_type==$key}>checked<{/if}> value="<{$key}>"><{$item}></label>
+                        <{/foreach}>
+                    </div>
+                </div>
+                <div class="form-field" style="width: 100%">
+                    <span class="form-field-label">销售单：</span>
+                    <{if $reship_data.reship_id}>
+                        <{$reship_data.order_bn}>
+                        <input type="hidden" name="order_id" id="order_id" value="<{$reship_data.order_id}>"/>
+                    <{else}>
+                        <div class="input-search" id="auto_supp">
+                            <input style="width: 20%" class="form-input x-input" placeholder="请输入已有订单号" type="text"
+                                   id="supplier" value="" name="supplier" />
+                            <input type="hidden" name="order_id" id="order_id" value="<{$reship_data.order_id}>"/>
+                            <button class="pointer btn btn_find_order" title="查看订单列表">查找订单</button>
+                        </div>
+                    <{/if}>
+                </div>
+            </div>
+        </div>
+        <div class="form-layout-block">
+            <h3>基本信息</h3>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">物流单号：</span>
+                    <{if $reship_data.reship_id}>
+                        <{$reship_data.logi_no|default:'-'}>
+                    <{else}>
+                        <input type="text" id="dly_logi_no" value="<{$reship_data.logi_no}>" name="logi_no" class="x-input form-input" placeholder="请输入物流单号" />
+                    <{/if}>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">物流公司：</span>
+                    <span id="logi_name"><{$reship_data.logi_name|default:'-'}></span>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">会员名：</span>
+                    <span id="member_id"><{$reship_data.member_id|default:'-'|ciphertext:'delivery','ship_name',$reship_data.shop_type}></span>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">创建日期：</span>
+                    <span id="createtime"><{if $reship_data.createtime!=''}><{$reship_data.createtime|cdate}><{else}>-<{/if}></span>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"><{if $page_configs.return_logi_name.is_required == '1'}><span style="color:red;">*</span><{/if}>退回物流公司：</span>
+                    <input type="text" class="x-input" value="<{$reship_data.return_logi_name}>" name="return_logi_name" <{if $page_configs.return_logi_name.is_required == '1'}>vtype="required"<{/if}> />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"><{if $page_configs.return_logi_no.is_required == '1'}><span style="color:red;">*</span><{/if}>退回物流单号：</span>
+                    <input type="text" class="x-input form-input" name="return_logi_no" value="<{$reship_data.return_logi_no}>" placeholder="请输入退回物流单号" <{if $page_configs.return_logi_no.is_required == '1'}>vtype="required"<{/if}> >
+                </div>
+                <div class="form-field shipping-info">
+                    <span class="form-field-label">收货人姓名：</span>
+                    <input type="text" class="x-input form-input" name="ship_name" value="<{$reship_data.ship_name}>" placeholder="请输入收货人姓名">
+                </div>
+                <div class="form-field shipping-info" >
+                    <span class="form-field-label">收货人地区：</span>
+                    <span id="ship_area"><{input app='eccommon' class="x-input" type="region" name="ship_area" id="region" value="{$reship_data.ship_area}" }></span>
+                </div>
+                <div class="form-field shipping-info">
+                    <span class="form-field-label">收货人地址：</span>
+                    <input type="text" class="x-input form-input" name="ship_addr" value="<{$reship_data.ship_addr}>" placeholder="请输入收货人地址">
+                </div>
+                <div class="form-field shipping-info">
+                    <span class="form-field-label">收货人邮编：</span>
+                    <input type="text" class="x-input form-input" name="ship_zip" value="<{$reship_data.ship_zip}>" placeholder="请输入收货人邮编">
+                </div>
+                <div class="form-field shipping-info">
+                    <span class="form-field-label">收货人固定电话：</span>
+                    <input type="text" class="x-input form-input" name="ship_tel" value="<{$reship_data.ship_tel}>" placeholder="请输入收货人固定电话">
+                </div>
+                <div class="form-field shipping-info">
+                    <span class="form-field-label">收货人Email：</span>
+                    <input type="text" class="x-input form-input" name="ship_email" value="<{$reship_data.ship_email}>" placeholder="请输入收货人Email">
+                </div>
+                <div class="form-field shipping-info">
+                    <span class="form-field-label">收货人手机：</span>
+                    <input type="text" class="x-input form-input" name="ship_mobile" value="<{$reship_data.ship_mobile}>" placeholder="请输入收货人手机">
+                </div>
+                <div class="form-field shipping-info">
+                    <span class="form-field-label">配送方式：</span>
+                    <span id="delivery"><{$reship_data.delivery|default:'-'}></span>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">仓库：</span>
+                    <{if $branchtype=='branch'}>
+                        <{if $reship_data.is_check=='11'}>
+                            <{$reship_data.branch_name}>
+                        <{else}>
+                            <select class="form-input" id="branchs" name="branch_id" placeholder="请选择仓库">
+                                <{foreach from=$branch_list item=branch}>
+                                    <option value="<{$branch.branch_id}>" <{if $reship_data.branch_id==$branch.branch_id}>selected<{/if}>><{$branch.name}></option>
+                                <{/foreach}>
+                            </select>
+                        <{/if}>
+                    <{else}>
+                        <span id="showbranch_id"><{$reship_data.branch_name}></span>
+                        <input type="hidden" name="branch_id" value="<{$reship_data.branch_id}>">
+                    <{/if}>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"><{if $page_configs.flag_type.is_required == '1'}><span style="color:red;">*</span><{/if}>售后类型：</span>
+                    <span> 
+                        <{if $page_configs.flag_type.is_required == '1'}>
+                            <!-- 必填时，不设置默认值，让用户自己选择 -->
+                            <input type="radio" name="flag_type_text" value="kt" <{if $reship_data && $reship_data.flag_type == 0}>checked<{/if}> vtype="requiredradio"> 客退
+                            <input type="radio" name="flag_type_text" value="ydt" <{if $reship_data.flag_type & ome_reship_const::__LANJIE_RUKU}>checked<{/if}> vtype="requiredradio"> 原单退
+                        <{else}>
+                            <!-- 非必填时，根据配置的默认值设置 -->
+                            <{assign var="default_flag_type" value=$page_configs.flag_type.default_value|default:'kt'}>
+                            <input type="radio" name="flag_type_text" value="kt" <{if $reship_data && $reship_data.flag_type == 0}>checked<{elseif !$reship_data && $default_flag_type == 'kt'}>checked<{/if}> vtype="requiredradio"> 客退
+                            <input type="radio" name="flag_type_text" value="ydt" <{if $reship_data.flag_type & ome_reship_const::__LANJIE_RUKU}>checked<{elseif !$reship_data && $default_flag_type == 'ydt'}>checked<{/if}> vtype="requiredradio"> 原单退
+                        <{/if}>
+                    </span>
+                </div>
+                <div class="form-field" style="width: 100%">
+                    <span class="form-field-label">退换货类型：</span>
+                    <div class="form-radios">
+                        <{foreach from=$problem_type item=item key=key}>
+                            <label style=" font-weight:bold; color:#3C5283;"><input name="problem_id" type="radio" <{if $reship_data.problem_id eq $item.problem_id}>checked<{elseif $key eq 0}>checked<{/if}> value="<{$item.problem_id}>"  ><{$item.problem_name}></label>
+                        <{/foreach}>
+                    </div>
+                </div>
+                <div class="form-field" style="width: 50%">
+                    <span class="form-field-label">备注：</span>
+                    <textarea class="x-input form-input" style="height: 100px" placeholder="请输入" name="memo" cols="190" rows="2" ><{$reship_data.memo}></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="form-layout-block" id='order-payinfo'>
+            <h3>订单信息</h3>
+            <div class="form-layout-fields">
+                <div class="form-field" style="width: 100%">
+                    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="gridlist">
+                        <thead>
+                            <tr >
+                                <th>物料总额:</th>
+                                <th>配送费用:</th>
+                                <th>保价费用:</th>
+                                <th>支付费用</th>
+                                <th>税金:</th>
+                                <th>折扣:</th>
+                                <th>商品促销优惠:</th>
+                                <th>订单促销优惠:</th>
+                                <th>订单总额:</th>
+                                <th>已支付金额:</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id='cost_item'><{$order.cost_item|cur}></td>
+                                <td id='cost_shipping'><{$order.shipping.cost_shipping|cur}></td>
+                                <td id='cost_protect'><{$order.shipping.cost_protect|cur}></td>
+                                <td id='cost_payment'><{$order.payinfo.cost_payment|cur}></td>
+                                <td id='cost_tax'><{$order.cost_tax|cur}></td>
+                                <td id='discount'><{$order.discount|cur}></td>
+                                <td id='pmt_goods'><{$order.pmt_goods|cur}></td>
+                                <td id='pmt_order'><{$order.pmt_order|cur}></td>
+                                <td id='total_amount'><{$order.total_amount|cur}></td>
+                                <td id='payed'><{$order.payed|cur}></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field diff-div" style="width: 100%">
+                    <span class="form-field-label" <{if $reship_data.return_type != 'change'}>style='padding-bottom:5px;display:none;color:#cc6600;'<{else}>style='padding-bottom:5px;color:#cc6600;'<{/if}> id='change-formula'>公式计算: 合计退款金额=应退商品金额&nbsp;+&nbsp;补偿费用&nbsp;+&nbsp;补差价费用&nbsp;-&nbsp;换出商品金额&nbsp;-&nbsp;折旧(其他费用)&nbsp;-&nbsp;已退金额&nbsp;-&nbsp;买家承担的邮费</span>
+                    <span class="form-field-label" <{if $reship_data.return_type == 'change'}> style='padding-bottom:5px;display:none;color:#cc6600;'<{else}>style='padding-bottom:5px;color:#cc6600;'<{/if}> id='return-formula'>公式计算: 合计退款金额=应退商品金额&nbsp;+&nbsp;补偿费用&nbsp;-&nbsp;折旧(其他费用)&nbsp;-&nbsp;已退金额&nbsp;-&nbsp;买家承担的邮费</span>
+                    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="gridlist">
+                        <thead>
+                            <th>应退商品金额</th>
+                            <th>补偿费用</th>
+                            <th <{if $reship_data.return_type != 'change'}>style='display:none;'<{/if}> class='change-money-info'>换出商品金额</th>
+                            <th>折旧(其他费用)</th>
+                            <th>已退金额</th>
+                            <th>买家承担的邮费</th>
+                             <th>卖家退款的邮费</th>
+                            <th <{if $reship_data.return_type != 'change' || !$reship_data.diff_order_bn}>style='display:none;'<{/if}> class='change-money-info diff-order-info'> 补差价费用</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><div id='tmoney'><{$reship_data.tmoney|cur}></div></td>
+                                <td><input type="text" size='5' name='bcmoney' value='<{$reship_data.bcmoney|default:0}>'></td>
+                                <td <{if $reship_data.return_type != 'change'}>style='display:none;'<{/if}> class='change-money-info'>
+                                    <div id='change_amount'><{$reship_data.change_amount|cur}></div>
+                                </td>
+                                <td><{input type="text" name="bmoney" size=5 value=$reship_data.bmoney id="bmoney" }></td>
+                                <td><{input type="text" name="had_refund" size=5 value=$reship_data.had_refund id="had_refund" }></td>
+                                <td><{input type="text" name="cost_freight_money" size=5 value=$reship_data.cost_freight_money id="cost_freight_money" vtype='unsigned'}></td>
+                                <td><{input type="text" name="refund_shipping_fee" size=5 value=$reship_data.refund_shipping_fee id="refund_shipping_fee" vtype='unsigned'}></td>    
+                                <td <{if $reship_data.return_type != 'change' || !$reship_data.diff_order_bn}>style='display:none;'<{/if}> class='change-money-info diff-order-info'>
+                                    <div id="diff-order-btn" <{if $reship_data.diff_order_bn}>style="display:none;"<{/if}> > <{button label='添加补差价订单' id='select-diff-order'}> </div>
+                                    <div id="diff-order-bn-td" <{if !$reship_data.diff_order_bn}>style="display:none;"<{/if}> >
+                                        订单：<span id='difforderbn'><{$reship_data.diff_order_bn}></span><br/>
+                                        金额：<span id='diffmoney'><{$reship_data.diff_money|cur}></span>
+                                        <input type='hidden' id='diff_order_bn' name='diff_order_bn' value='<{$reship_data.diff_order_bn}>'>
+                                        <input type='hidden' id='diff_money' name='diff_money' value='<{$reship_data.diff_money|default:0}>'>
+                                        <a style='color:#0066ff' onclick='cancelDiffOrder();'>取消</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan='6' style='text-align:right;'>
+                                    <b id='totalmoney-title'>合计退款金额:</b>
+                                    <span id="totalmoney" style='color:red;'><{$reship_data.totalmoney|cur}></span>
+                                    <b><{button type='button' label='计算差价' onclick="calculate();"}>
+                                        <i class="iconfont icon-question-circle1" title="说明:
+1.'合计金额'如果大于0,表示系统需要退还给用户的金额;
+2.如果等于0,表示彼此不用退还.
+3.售后服务如果包含捆绑商品请重新核对退款金额"></i>
+                                    </b>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="form-layout-block">
+            <{tabber}>
+                <{tab name="退入商品"}>
+                    <div class="clear division" id="rcchangeone">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0"  class="gridlist">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" class="selectall" id="selectall" onclick="select_all(this)"></th>
+                                    <th><{t}>基础物料编码<{/t}></th>
+                                    <th><{t}>基础物料名称<{/t}></th>
+                                    <th><{t}>规格<{/t}></th>
+                                    <th><{t}>价格<{/t}></th>
+                                    <th><{t}>可退入数量<{/t}></th>
+                                    <th><{t}>申请数量<{/t}></th>
+                                    <th><{t}>金额小计<{/t}></th>
+                                    <th><{t}>良品<{/t}></th>
+                                    <th><{t}>不良品<{/t}></th>
+                                    <th><{t}>仓库<{/t}></th>
+                                </tr>
+                            </thead>
+                            <{foreach from=$reship_data.return item=aGoods name="item" key=key}>
+                                <tbody>
+                                    <input type="hidden" name="return[product_id][<{$aGoods.order_item_id}>]" value="<{$aGoods.product_id}>">
+                                    <input type='hidden' id='effective<{$aGoods.order_item_id}>' name='return[effective][<{$aGoods.order_item_id}>]' value='<{$aGoods.effective}>'>
+                                    <input type='hidden' id='normal_num<{$aGoods.order_item_id}>' name='return[normal_num][<{$aGoods.order_item_id}>]' value='<{$aGoods.normal_num}>'>
+                                    <input type='hidden' id='defective_num<{$aGoods.order_item_id}>' name='return[defective_num][<{$aGoods.order_item_id}>]' value='<{$aGoods.defective_num}>'>
+                                    <input type="hidden" name="return[item_id][<{$aGoods.order_item_id}>]" value="<{$aGoods.item_id}>">
+                                    <input type="hidden" name="return[bn][<{$aGoods.order_item_id}>]" value="<{$aGoods.bn}>">
+                                    <tr key="<{$aGoods.order_item_id}>">
+                                        <td>
+                                            <{if $reship_data.is_check=='10' || ($reship_data.is_check=='11' && ($aGoods.normal_num != 0 || $aGoods.defective_num != 0)) || $reship_data.is_check=='9'}>
+                                            <input type="hidden" shouhou="return" id="goods_bn" name="return[goods_bn][]" value='<{$aGoods.order_item_id}>'>
+                                            <{else}>
+                                            <input type="checkbox" shouhou="return" checked  id="goods_bn" name="return[goods_bn][]" value='<{$aGoods.order_item_id}>'>
+                                            <{/if}>
+                                        </td>
+                                        <td><{$aGoods.bn}></td>
+                                        <td><{$aGoods.product_name}> <input type="hidden" name="return[goods_name][<{$aGoods.order_item_id}>]" value="<{$aGoods.product_name}>"></td>
+                                        <td><{$aGoods.spec_info}> <input type="hidden" name="return[spec_info][<{$aGoods.spec_info}>]" value="<{$aGoods.spec_info}>"></td>
+                                        <td>
+                                            <{if $reship_data.is_check=='10' || $reship_data.is_check=='11' || $reship_data.is_check=='9'}>
+                                                <{$aGoods.price}>
+                                                <input type='hidden' name='return[price][<{$aGoods.order_item_id}>]' value='<{$aGoods.price}>' size='6'>
+                                            <{else}>
+                                                <input type='text' id="price-<{$aGoods.order_item_id}>" onchange="changeGoodsAmount(this)" name='return[price][<{$aGoods.order_item_id}>]' value='<{$aGoods.price}>' size='6'>
+                                            <{/if}>
+                                        </td>
+                                        <td><{$aGoods.effective}></td>
+                                        <td>
+                                            <{if $reship_data.is_check=='10' || $reship_data.is_check=='11' || $reship_data.is_check=='9'}>
+                                            <input type='hidden' id='num-<{$aGoods.order_item_id}>' class="num" name='return[num][<{$aGoods.order_item_id}>]' price='<{$aGoods.price}>' class="hidden_money" value='<{$aGoods.num}>' size='6'>
+                                            <{$aGoods.num}>
+                                            <{else}>
+                                            <input type='text' id='num-<{$aGoods.order_item_id}>'  onchange="changeGoodsAmount(this)" name='return[num][<{$aGoods.order_item_id}>]' price='<{$aGoods.price}>' class="hidden_money" value='<{$aGoods.num}>' size='6'>
+                                            <{/if}>
+                                        </td>
+                                        <td>
+                                            <{if $reship_data.is_check=='10' || $reship_data.is_check=='11' || $reship_data.is_check=='9'}>
+                                            <input type='hidden' id='amount-<{$aGoods.order_item_id}>' name='return[amount][<{$aGoods.order_item_id}>]' price='<{$aGoods.price}>' class="hidden_money" value='<{$aGoods.amount}>' size='6'>
+                                            <{$aGoods.amount}>
+                                            <{else}>
+                                            <input type='text' id='amount-<{$aGoods.order_item_id}>' class="amount" name='return[amount][<{$aGoods.order_item_id}>]' price='<{$aGoods.price}>' class="hidden_money" value='<{$aGoods.amount}>' size='6'>
+                                            <{/if}>
+                                        </td>
+                                        <td><{$aGoods.normal_num}></td>
+                                        <td><{$aGoods.defective_num}></td>
+                                        <{if $branch_mode=='single'}>
+                                            <{$aGoods.branch_name}>
+                                            <input type="hidden" value="<{$aGoods.branch_id}>" />
+                                            <input type="hidden" value="<{$aGoods.bn}>" />
+                                            <input name="return[branch_id][<{$aGoods.bn}>]" type="hidden" value="<{$aGoods.branch_id}>"/>
+                                            <span id="canpay<{$aGoods.bn}>"></span>
+                                        <{else}>
+                                            <td>
+                                                <input name="return[branch_id][<{$aGoods.bn}>]" type="hidden" value="<{$aGoods.branch_id}>" class="x-pdt-chk-<{$aGoods.bn}>"/><{$aGoods.branch_name}>
+                                                <span id="canpay<{$aGoods.bn}>"></span>
+                                            </td>
+                                        <{/if}>
+                                    </tr>
+                                </tbody>
+                            <{/foreach}>
+                            <{if $order_item}>
+                                <{foreach from=$order_item item=aGoods name="item" key=key}>
+                                    <{if $aGoods.sendnum > '0'}>
+                                        <input type="hidden" name="return[goods_name][<{$aGoods.order_item_id}>]" value="<{$aGoods.name}>">
+                                        <input type="hidden" name="return[product_id][<{$aGoods.order_item_id}>]" value="<{$aGoods.product_id}>">
+                                        <input type="hidden" name="return[bn][<{$aGoods.order_item_id}>]" value="<{$aGoods.bn}>">
+                                        <input type='hidden' id='effective<{$aGoods.order_item_id}>' name='return[effective][<{$aGoods.order_item_id}>]' value='<{$aGoods.effective}>'>
+                                        <tbody>
+                                            <tr id=s<{$aGoods.bn}>  onmouseover='showtips(this,event,"<{$aGoods.ref}>");' >
+                                                <td>
+                                                    <{if $aGoods.effective>0}><input type="checkbox" shouhou="return" id="goods_bn" name="return[goods_bn][]" value='<{$aGoods.order_item_id}>'><{/if}>
+                                                </td>
+                                                <td><{$aGoods.bn}></td>
+                                                <td>
+                                                    <{if $aGoods.obj_type=='pkg'}>
+                                                    <span style='width:18px;padding:2px;height:16px;background-color:<{$aGoods.color|default:"red"}>;'><span style='color:#eeeeee;'>捆绑</span></span>
+                                                    <{$aGoods.name|visibility:$aGoods.product_id}>
+                                                    <{else}>
+                                                    <{$aGoods.name}>
+                                                    <{/if}>
+                                                </td>
+                                                <td> <{$aGoods.spec_value}></td>
+                                                <td><input type='text' name='return[price][<{$aGoods.order_item_id}>]' value='<{$aGoods.sale_price/$aGoods.nums}>' size='6'></td>
+                                                <td><{$aGoods.effective}></td>
+                                                <td><{if $aGoods.effective>0}><input type='text' id='num<{$aGoods.order_item_id}>' name='return[num][<{$aGoods.order_item_id}>]' value='<{$aGoods.effective}>' size='6'><{/if}></td>
+                                                <td></td><td></td>
+                                                <{if $branch_mode=='single'}>
+                                                    <{$aGoods.branch.0.branch_name}>
+                                                    <input type="hidden" value="<{$aGoods.branch.0.branch_id}>" />
+                                                    <input type="hidden" value="<{$aGoods.bn}>" />
+                                                    <input name="return[branch_id][<{$aGoods.bn}>]" type="hidden" value="<{$aGoods.branch.0.branch_id}>"/>
+                                                    <span id="canpay<{$aGoods.bn}>"></span>
+                                                <{else}>
+                                                    <td>
+                                                        <{foreach from=$aGoods.branch item=branch key=keys}>
+                                                        <input name="return[branch_id][<{$aGoods.bn}>]" type="hidden" value="<{$branch.branch_id}>" class="x-pdt-chk-<{$aGoods.bn}>"/><{$branch.branch_name}>
+                                                        <{/foreach}>
+                                                        <span id="canpay<{$aGoods.bn}>"></span>
+                                                    </td>
+                                                <{/if}>
+                                            </tr>
+                                        </tbody>
+                                    <{/if}>
+                                <{/foreach}>
+                            <{/if}>
+                            <input type="hidden" name="total_return_filter" value="<{$total_return_filter}>">
+                        </table>
+                    </div>
+                    <h4>优惠方案</h4>
+                    <div class="clear division" id="pmt_detail">
+                        <{if $pmts}>
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0"  class="gridlist">
+                                <thead>
+                                <tr>
+                                    <th><{t}>优惠方案<{/t}></th>
+                                    <th><{t}>优惠金额<{/t}></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <{foreach from=$pmts item=pmt}>
+                                        <tr>
+                                            <td><{$pmt.pmt_describe}></td>
+                                            <td><{$pmt.pmt_amount}></td>
+                                        </tr>
+                                    <{/foreach}>
+                                </tbody>
+                            </table>
+                        <{/if}>
+                    </div>
+                <{/tab}>
+
+                <{tab name="换出商品" class="is_display"}>
+                    <div class="clear division" id="rcchangetwo">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0"  class="gridlist">
+                            <input type="hidden" name="total_change_filter" value="<{$total_change_filter}>">
+                        </table>
+                        <h4>
+                            <{if $not_edit == true}>
+                                <input type="hidden" name="changebranch_id" value="<{$reship_data.changebranch_id}>">
+                            <{else}>
+                                <{button label="新增换出销售物料" id="change-find-btn" rtype="change" }>&nbsp;&nbsp;
+                                <font color='red' weight="bold">选择换货仓库</font>:
+                                <select onchange="clean_change_filter();" name="changebranch_id" id="changebranch">
+                                    <{foreach from=$branch_list item=changebranch}>
+                                        <option value="<{$changebranch.branch_id}>" <{if $reship_data.changebranch_id==$changebranch.branch_id}>selected<{/if}>><{$changebranch.name}></option>
+                                    <{/foreach}>
+                                </select>
+                            <{/if}>
+                        </h4>
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0"  class="gridlist">
+                            <thead>
+                                <tr>
+                                    <th style="width:30px;">操作</th>
+                                    <th><{t}>销售物料编码<{/t}></th>
+                                    <th><{t}>销售物料名称<{/t}></th>
+                                    <th><{t}>销售物料类型<{/t}></th>
+                                    <th><{t}>库存数量<{/t}></th>
+                                    <th><{t}>申请数量<{/t}></th>
+                                    <th><{t}>销售物料售价<{/t}></th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataNode_change">
+                            </tbody>
+                        </table>
+                    </div>
+                <{/tab}>
+                <{tab name="支付/退款明细" class='is_display bill-info'}>
+                <div class="clear division" id="pay_detail">
+                    <{include file="admin/return_product/rchange/paydetail.html" app="ome"}>
+                </div>
+                <{/tab}>
+            <{/tabber}>
+        </div>
+        <{if $addressList}>
+            <div class="form-layout-block">
+                <h3>选择退货地址信息</h3>
+                <div class="form-layout-fields" id="address_list">
+                    <div class="form-field" style="width: 100%">
+                        <table width="100%" border="0" cellpadding="2" cellspacing="0" class="girdlist">
+                            <{foreach from=$addressList item=itemVal}>
+                            <tr>
+                                <td>
+                                    <{if $select_address_id}>
+                                    <input type="radio" <{if $select_address_id == $itemVal['contact_id']}>checked="checked"<{/if}> name="address_id" value="<{$itemVal.contact_id}>">
+                                    <{else}>
+                                    <input type="radio" <{if $itemVal['cancel_def']=='true'}>checked="checked"<{/if}> name="address_id" value="<{$itemVal.address_id}>">
+                                    <{/if}>
+                                </td>
+                                <td><{$itemVal.contact_name}></td>
+                                <td><{if $itemVal.mobile_phone}><{$itemVal.mobile_phone}><{else}><{$itemVal.phone}><{/if}></td>
+                                <td><{$itemVal.province}> <{$itemVal.city}> <{$itemVal.country}></td>
+                                <td><div style="width:260px; overflow:hidden; text-overflow:ellipsis; white-space: nowrap;"><a title="<{$itemVal.addr}>"><{$itemVal.addr}></a></div></td>
+                            </tr>
+                            <{/foreach}>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        <{/if}>
+        <div class="table-action">
+            <{if $not_edit}>
+            <{button_permission label="确认收货" permission='aftersale_rchange_check' type="button" id="reship-check"}> &nbsp;&nbsp;
+<!--            <{button label="取消" class="btn-secondary" isCloseDialogBtn="true" onclick="this.getParent('.dialog').retrieve('instance').close();"}>-->
+            <{else}>
+            <{button_permission label="确认并审核" permission='aftersale_rchange_check' type="button" id="reship-check"}> &nbsp;&nbsp;
+            <{button_permission label="确定并保存" permission='aftersale_rchange_edit' class="btn-primary" type="button"}> &nbsp; &nbsp;
+<!--            <{button label="取消" class="btn-secondary" isCloseDialogBtn="true" onclick="this.getParent('.dialog').retrieve('instance').close();"}>-->
+            <{button_permission label="返 回"  class="btn-secondary" type="button" onclick="location.href=window.frameElement.src;"}> &nbsp; &nbsp;
+            <{/if}>
+        </div>
+    </form>
+</div>
+
+<script>
+
+<{if $reship_data.return_type}>
+$$('.tabs-wrap .bill-info').setStyle('display','block');
+<{/if}>
+var branchtype ="<{$branchtype}>";
+display_shipping_info("<{$reship_data.return_type|default:'return'}>");
+function display_shipping_info(return_type){
+
+    if (return_type=='change')
+    {
+        $ES('.shipping-info').show();
+    }else{
+        $ES('.shipping-info').hide();
+    }
+}
+
+function check_totalmoney(totalmoney){
+      var return_type = "<{$reship_data.return_type}>";
+        if ($defined($E('select[name="return_type"]')))
+        {
+            return_type = $E('select[name="return_type"] option:selected').get('value');
+        }
+      if (totalmoney<0)
+      {
+        $('totalmoney-title').set('html','还需用户补款:');
+        $('totalmoney').set('html','￥'+totalmoney*-1);
+        $('totalmoney').setStyle('color','#3333ff');
+
+        if (return_type=='change')
+        {
+            $ES('.diff-order-info').show();
+        }
+      }else{
+        $('totalmoney-title').set('html','需退还用户:');
+        $('totalmoney').set('html','￥'+totalmoney);
+        if ($('diff_order_bn').get('value') == '')
+        {
+            $ES('.diff-order-info').hide();
+        }
+      }
+}
+var _totalmoney = "<{$reship_data.totalmoney|default:0.00}>";
+check_totalmoney(_totalmoney);
+
+
+function cancelDiffOrder(){
+    $('difforderbn').set('html','');
+    $('diffmoney').set('html','');
+    $('diff_order_bn').set('value','');
+    $('diff_money').set('value','');
+    $('diff-order-bn-td').hide();
+    $('diff-order-btn').show();
+    calculate();
+}
+
+/*选择补差价订单*/
+$('select-diff-order').addEvent('click',function(e){
+    new Dialog('index.php?app=ome&ctl=admin_return_rchange&act=selectDiffOrder&p[0]='+$('order_id').get('value'),{
+        title:'选择补差价订单',
+        width:1100,
+        height:500
+    });
+});
+
+$E('#return-apply #reship-check').addEvent('click',function(e){
+    var _this = this;
+    _this.set('disabled',true);
+    var return_type = "<{$reship_data.return_type}>";
+    if ($defined($E('select[name="return_type"]')))
+    {
+        return_type = $E('select[name="return_type"] option:selected').get('value');
+    }
+
+    /*差价判断*/
+    var money = calculate();
+    if(money == false) {_this.set('disabled',false);return false;}
+
+    if (money.mvalue.totalmoney>0) {
+        if (!confirm('还需退还用户'+money.totalmoney)) {
+          _this.set('disabled',false);
+          return false;
+        }
+    }else if (money.mvalue.totalmoney<0) {
+        if (!$('diff_order_bn').get('value') && return_type=='change')
+        {
+            if (confirm('用户还需支付￥'+money.mvalue.totalmoney*-1+',是否要使用补差价订单进行补差！'))
+            {
+                $('select-diff-order').fireEvent('click');
+                _this.set('disabled',false);
+                return false;
+            }
+        }else{
+            if (!confirm('用户还需支付￥'+money.mvalue.totalmoney*-1)) {
+              _this.set('disabled',false);
+              return false;
+            }
+        }
+    }
+
+    if (return_type=='change')
+    {
+        if(!validate(_this.form)){
+            e.stop();
+            _this.set('disabled',false);
+            return false;
+        }
+    }
+
+  var _data = _this.form.toQueryString().replace(/\+/g,"%2B");
+  
+  _data += "&is_confirm=true"; //确认并审核标识
+  
+  new Request.JSON({
+      url:_this.form.get('action'),
+      data:_data,
+      onComplete:function(resp){
+          if (resp.error)
+          {
+              _this.set('disabled',false);
+              MessageBox.error(resp.error);return;
+          }
+          if (resp.reship_id)
+          {
+            var reship_id = resp.reship_id;
+          }else{
+            var reship_id = _this.form.getElement('input[name="reship_id"]').get('value');
+          }
+          var sign = 1;
+          new Request.JSON({
+            url:'index.php?ctl=admin_return_rchange&act=save_check&app=ome&p[0]='+reship_id+'&p[1]='+sign,
+            onComplete:function(resp){
+              if (resp.error) {
+                MessageBox.error(resp.error);return;
+              }
+
+              MessageBox.success(resp.success);
+              W.page(resp.redirect);
+            }
+          }).send();
+
+      }
+  }).send();
+
+});
+
+if($E('#return-apply .btn-primary'))
+{
+    $E('#return-apply .btn-primary').addEvent('click',function(){
+        var _this = this;_this.set('disabled',true);
+
+        var return_type = "<{$reship_data.return_type}>";
+
+        if ($defined($E('select[name="return_type"]')))
+        {
+            return_type = $E('select[name="return_type"] option:selected').get('value');
+        }
+        /*差价判断*/
+        var money = calculate();
+        if(money == false) {_this.set('disabled',false); return false;}
+
+        if (money.mvalue.totalmoney>0) {
+          if (!confirm('还需退还用户'+money.totalmoney)) {
+            _this.set('disabled',false);
+            return false;
+          }
+        }else if (money.mvalue.totalmoney<0) {
+
+            if (!$('diff_order_bn').get('value') && return_type=='change')
+            {
+                if (confirm('用户还需支付￥'+money.mvalue.totalmoney*-1+',是否要使用补差价订单进行补差！'))
+                {
+                    $('select-diff-order').fireEvent('click');
+                    _this.set('disabled',false);
+                    return false;
+                }
+            } else {
+                if (!confirm('用户还需支付￥'+money.mvalue.totalmoney*-1)) {
+                    _this.set('disabled',false);
+                    return false;
+                }
+            }
+        }
+
+        if (return_type=='change')
+        {
+            if(!validate(_this.form)){
+                e.stop();
+                _this.set('disabled',false);
+                return false;
+            }
+        }
+
+        var _data = _this.form.toQueryString().replace(/\+/g,"%2B");
+        new Request.JSON({
+            url:_this.form.get('action'),
+            data:_data,
+            onComplete:function(resp){
+                if (resp.error)
+                {
+                    _this.set('disabled',false);
+                    MessageBox.error(resp.error);return;
+                }
+
+                MessageBox.success(resp.succ);
+                W.page(resp.redirect);
+                // finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+                // _this.getParent('.dialog').retrieve('instance').close();
+            }
+        }).send();
+    });
+}
+
+$ES('.hidden_money').addEvent('click',function(){
+    $ES('.hidden_money').each(function(item){
+        console.info(item.value);
+    });
+
+});
+
+
+var store_change = [];
+
+<{if $not_edit}>
+    var tpl_change = '<tr  key="{product_id}" id="product_{product_id}">';
+    tpl_change += '<td>&nbsp;</td>';
+    tpl_change += '<td>{bn}</td>';
+    tpl_change += '<td class="product-name" visibility="{visibility}">{name}<input type="hidden" name="{type}[{item_type}][name][{bn}]" value="{name}"></td>';
+    tpl_change += '<td>{item_type_name}</td>';
+
+
+    tpl_change += '<td id="sale_store_{bn}">{sale_store}</td><input name="{type}[{item_type}][sale_store][{bn}]" id="product_sale_store_{bn}" type="hidden" value="{sale_store}">';
+    tpl_change += '<td><input type="text" readonly="readonly" value="{num}" key="num" name="{type}[{item_type}][num][{bn}]" vtype="unsigned&amp;&amp;required" tname="at[_PRIMARY_]" size="6" ></td>';
+    tpl_change += '<td><input type="text" readonly="readonly" vtype="number&amp;&amp;required"  tname="pr[_PRIMARY_]" key="price" value="{price}" name="{type}[{item_type}][price][{bn}]" size="8">元</td>';
+    tpl_change += '<input type="hidden" name="{type}[{item_type}][item_id][{bn}]" value="{item_id}">';
+    tpl_change += '<input type="hidden" name="{type}[{item_type}][product_id][{bn}]" value="{product_id}">';
+    tpl_change += '<input type="hidden" name="{type}[{item_type}][bn][]" value="{bn}">';
+
+    tpl_change += '</tr>{item_detail}';
+<{else}>
+    var tpl_change = '<tr  key="{product_id}" id="product_{product_id}" title="删除">';
+    tpl_change += '<td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>';
+    tpl_change += '<td>{bn}</td>';
+    tpl_change += '<td class="product-name" visibility="{visibility}">{name}<input type="hidden" name="{type}[{item_type}][name][{bn}]" value="{name}"></td>';
+    tpl_change += '<td>{item_type_name}</td>';
+
+
+    tpl_change += '<td id="sale_store_{bn}">{sale_store}</td><input name="{type}[{item_type}][sale_store][{bn}]" id="product_sale_store_{bn}" type="hidden" value="{sale_store}">';
+    tpl_change += '<td><input type="text" value="{num}" key="num" name="{type}[{item_type}][num][{bn}]" vtype="unsigned&amp;&amp;required" tname="at[_PRIMARY_]" size="6" onchange="rchange_bn_number(this, {product_id})"></td>';
+    tpl_change += '<td><input type="text" vtype="number&amp;&amp;required"  tname="pr[_PRIMARY_]" key="price" value="{price}" name="{type}[{item_type}][price][{bn}]" size="8">元</td>';
+    tpl_change += '<input type="hidden" name="{type}[{item_type}][item_id][{bn}]" value="{item_id}">';
+    tpl_change += '<input type="hidden" name="{type}[{item_type}][product_id][{bn}]" value="{product_id}">';
+    tpl_change += '<input type="hidden" name="{type}[{item_type}][bn][]" value="{bn}">';
+
+    tpl_change += '</tr>{item_detail}';
+<{/if}>
+
+        var tplHd = '';
+
+        var tplItem='<tr class="itemDetail basic_material_sm_id_{sm_id}" style="background:#eef4fb" key="{bm_id}"><td>{lbr_input}</td><td >{material_bn}</td><td >{material_name}<input type="hidden" name="basic_number_{sm_id}_{bm_id}" value="{number}" id="basic_number_{sm_id}_{bm_id}" ></td><td >{type_name}</td><td>{store}</td><td id="basic_rchange_num_{sm_id}_{bm_id}">{change_num}</td><td >&nbsp;</td></tr>';
+
+        var item_detail='';
+
+if($('change-find-btn'))
+{
+    $('change-find-btn').addEvent('click',function(e){
+        add_Product();
+    });
+}
+
+//默认加载显示换货明细
+<{if ($reship_data.return_type) == 'change'}>
+new Request({url:'index.php?app=ome&ctl=admin_return_rchange&act=getchangeProducts&p[0]=<{$reship_data.reship_id}>&changebranch_id='+<{$reship_data.changebranch_id|default:0}>,
+    onComplete:function(rs){
+        rs=JSON.decode(rs);
+        store_change.combine(rs);
+        createProduct(store_change);
+
+    }}).send();
+<{/if}>
+//
+function add_Product(){
+
+    var rtype = $('change-find-btn').get('rtype');
+    var order_id    = $('order_id').get('value');
+
+    filter = $ES('input[name=total_change_filter]').getValue();
+   var changebranch = $E('select[name="changebranch_id"] option:selected').get('value');
+    var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=ome&ctl=admin_return_rchange&act=getGoods&p[0]='+filter+'&source=<{$source}>&order_id='+order_id);
+    var callurl='index.php?app=ome&ctl=admin_return_rchange&act=getProducts&type='+rtype+'&source=<{$source}>&changebranch_id='+changebranch+'&order_id='+order_id;
+
+    Ex_Loader('modedialog',function() {
+    new finderDialog(url,{params:{url:callurl,name:'product_id[]'},width:1000,height:660,
+      onCallback:function(rs){
+        if(!rs)return;
+        rs=JSON.decode(rs);
+        init(rs);
+      }
+    });
+  });
+
+}
+
+function init(rs){
+  var tmparr=findProduct(rs,'product_id',store_change);
+   store_change.unshift.apply(store_change,tmparr.reverse());
+   createProduct(store_change);
+}
+
+function findProduct(arr,PRIMARY,obj){
+    if(!store_change.length)return arr;
+    store_change.each(function(a){
+        arr.each(function(b){
+            if(a[PRIMARY]==b[PRIMARY]){
+              arr.erase(b);
+            }
+        });
+    });
+    return arr;
+}
+
+function delProduct(obj,arr){
+    arr.each(function(d){obj.delData(d);});
+}
+
+var pag;
+function createProduct(data){
+  var type = 'dataNode_change';
+  pag=new PageData(tpl_change,data,{'updateMain':$(type),'pageNum':10000,
+    'onShow':function(){
+      var _this=this;
+
+      $$('#'+type+' tr').each(function(item,i){
+      if ( item.getElement('.btn-delete-item'))
+      {
+       item.getElement('.btn-delete-item').addEvent('click',function(e){
+
+              e.stop();
+              if(_this.selectData(item.get('key')) && confirm('确定要删除 '+ _this.selectData(item.get('key'))['bn'] +' 吗？')){
+                _this.delData(item.get('key'));
+                //执行删除
+
+              }
+          });
+      }
+
+      });
+    },
+    'format':function(d){
+        item_detail='';
+        if(d.items){
+            item_detail+=tplHd;
+
+            d.items.each(function(v){
+
+               item_detail+=tplItem.substitute(v);
+            });
+        }else{
+
+            d.hasItem='none';
+        }
+        d['item_detail'] = item_detail;
+        },
+  });
+}
+
+var callurlpkg='index.php?app=ome&ctl=admin_return_rchange&act=getPkgGoods', store=[];
+
+
+/* 整个页面提交*/
+$('return-apply').store('target',{
+  onComplete:function(data){
+    var rs =JSON.decode(data);
+    if( rs && rs.success ){
+      if($('return-apply').getParent('.dialog')){
+        if ('<{$env.get.finder_id}>')
+        {
+            window.finderGroup['<{$env.get.finder_id}>'].refresh();
+        }
+
+        $('return-apply').getParent('.dialog').retrieve('instance').close();
+      }
+    }
+  }
+});
+
+
+function show_return_type(obj){
+
+    display_shipping_info(obj.value);
+
+    if(obj.value == 'change'){
+      $$('.tabs-wrap .is_display').setStyle('display','block');
+      $ES('.change-money-info').show();
+      $('select-diff-order').show();
+      $('return-formula').hide();
+      $('change-formula').show();
+    }else{
+      $$('.tabs-wrap .is_display').setStyle('display','none');
+      $$('.tabs .is_display').setStyle('display','none');
+      $ES('.change-money-info').hide();
+      $E('input[name="diff_order_bn"]').set('value','');
+      $E('input[name="diff_money"]').set('value','');
+      //$E('input[name="use_diff_order"]').checked=false;
+      $('select-diff-order').hide();
+      $('diff-order-bn-td').hide();
+
+      $('return-formula').show();
+      $('change-formula').hide();
+    }
+}
+
+/* 销售订单快速搜索之补全搜索*/
+var options={
+    'getVar':'bn',
+    'fxOptions':false,
+    callJSON:function(){return window.autocompleter_json;},
+    injectChoice:function(json){
+        var choice = new Element('li', {'html': this.markQueryValue(json[this.options.getVar])});
+        choice.store('_data',json);
+        choice.inputValue = json[this.options.getVar];
+        this.addChoiceEvents(choice).inject(this.choices);
+    },
+    onHide:function(){
+        if(!this.selected)return;
+        var json=this.selected.retrieve('_data');
+        json=$splat(json);
+        init(json);
+        MessageBox.success('加载销售订单信息成功!!');
+    },
+    onFocus:function(ipt){
+        ipt.value='';
+    }
+};
+
+if ($defined($E('#auto_supp input[type=text]')))
+{
+    new Autocompleter.script($E('#auto_supp input[type=text]'),"index.php?app=ome&ctl=admin_return_rchange&act=getOrderinfo&source=<{$source}>", $merge(options,{
+        'getVar':'order_bn',
+        selectFirst:false,
+        injectChoice:function(json){
+          var order_id=json["order_id"]?"("+json["order_id"]+")":"";
+          var choice = new Element('li', {'html': this.markQueryValue(json[this.options.getVar]+order_id)});
+          choice.store('_data',json);
+          choice.inputValue = json[this.options.getVar];
+          this.addChoiceEvents(choice).inject(this.choices);
+        },
+        onHide:function(){
+          if(!this.selected)return;
+          var json=this.selected.retrieve('_data');
+          $('order_id').set("value",json["order_id"]);
+          _callback_orderinfo(json["order_id"]);
+        },
+        onFocus:$empty
+    }));
+}
+
+/* 销售订单快速搜索之通过dialog查找*/
+if ($defined($E(".btn_find_order")))
+{
+
+  $E(".btn_find_order").addEvent('click',function(e){
+    var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent("index.php?app=ome&ctl=admin_return&act=getOrders&singleselect=1&ship_status=1&status=active&source=<{$source}>");
+      Ex_Loader('modedialog',function(){
+      new finderDialog(url,{params:{url:'index.php?app=ome&ctl=admin_return_rchange&act=getOdersById&fullRefund=1&source=<{$source}>',name:'id',type:'radio'},handle:'supplier',width:1000,height:500,onCallback:function(e){
+        _callback_orderinfo($('order_id').getValue());
+      }});
+    });
+  });
+}
+if ($('dly_logi_no')){
+    $('dly_logi_no').addEvent('keydown', function(e) {
+        if(e.code != 13) {
+            return;
+        }
+        var oVal = this.value;
+        new Request.JSON({
+            url:'index.php?app=ome&ctl=admin_return_rchange&act=getOrderIds&logi_no='+oVal,
+            onComplete:function(json) {
+                if(json.rsp != 'succ') {
+                    alert('获取失败:'+json.msg);
+                } else {
+                    if(json.data.length == 1) {
+                        _callback_orderinfo(json.data[0].order_id, oVal);
+                    } else {
+                        var oDiv = document.createElement('div');
+                        oDiv.addClass('tableform');
+                        var sHtml = '<table>';
+                        Object.each(json.data, function(item){
+                            sHtml += '<tr><td><input type="radio" name="selectOrderId" value="'+item.order_id+'">'+item.order_bn+'</td></tr>';
+                        });
+                        sHtml += '</table>';
+                        oDiv.setHTML(sHtml);
+                        new Dialog(oDiv, {'title':'选取订单'});
+                        $$('[name="selectOrderId"]', oDiv).each(function(item){
+                            item.addEvent('click', function(){
+                                _callback_orderinfo(this.value, oVal);
+                                this.getParent('.dialog').retrieve('instance').close();
+                            });
+                        });
+                    }
+                }
+            }
+        }).send();
+    });
+}
+
+/* 通过order_id获取订单信息*/
+function _callback_orderinfo(rs, dly_logi_no){
+    var request = new Request({
+     url : 'index.php?app=ome&ctl=admin_return_rchange&act=ajax_getOrderinfo&source=<{$source}>',
+     method : 'post',
+     data : 'order_id='+rs+'&dly_logi_no='+dly_logi_no,
+     onComplete : function(res){
+            var response = JSON.decode(res);
+
+            if(response.rsp == 'succ'){
+                var msg = response.msg;
+
+                $('createtime').set('html',msg.createtime);
+                $('member_id').set('html',msg.member_uname);
+                $E('input[name=member_id]').set('value',msg.member_id);
+                $('logi_name').set('html',msg.logi_name);
+                $('delivery').set('value',msg.delivery);
+                $('ship_area').set('html',msg.ship_area);
+                //$('tmoney').set('html',msg.total_amount);
+                //$E('input[name=tmoney]').set('value',msg.total_amount);
+                $E('input[name=logi_no]').set('value',msg.logi_no);
+                $E('input[name=logi_no]').setAttribute('readonly','readonly');
+                $E('input[name=supplier]').set('value',msg.order_bn);
+                $E('input[name=order_id]').set('value',msg.order_id);
+                $E('input[name=logi_name]').set('value',msg.logi_name);
+                $E('input[name=logi_id]').set('value',msg.logi_id);
+                $E('input[name=ship_name]').set('value',msg.ship_name);
+                $E('input[name=delivery]').set('value',msg.delivery);
+                //$E('input[name=ship_area]').set('value',msg.ship_area);
+                $E('input[name=ship_addr]').set('value',msg.ship_addr);
+                $E('input[name=ship_zip]').set('value',msg.ship_zip);
+                $E('input[name=ship_tel]').set('value',msg.ship_tel);
+                $E('input[name=ship_email]').set('value',msg.ship_email);
+                $E('input[name=ship_mobile]').set('value',msg.ship_mobile);
+                $E('input[name=is_protect]').set('value',msg.is_protect);
+                $('shop_id').set('value',msg.shop_id);
+                //支付金额等信息
+                $('cost_item').set('html',msg.cost_item);
+                $('cost_shipping').set('html',msg.shipping.cost_shipping);
+                $('cost_protect').set('html',msg.shipping.cost_protect);
+                $('cost_payment').set('html',msg.payinfo.cost_payment);
+                $('cost_tax').set('html',msg.cost_tax);
+                $('discount').set('html',msg.discount);
+                $('pmt_goods').set('html',msg.pmt_goods);
+                $('pmt_order').set('html',msg.pmt_order);
+                $('total_amount').set('html',msg.total_amount);
+                $('payed').set('html',msg.payed);
+
+                //仓库选项
+                if (branchtype!='branch')
+                {
+                    $('showbranch_id').set('html',msg.branch_name);
+                    $E('input[name=branch_id]').set('value',msg.branch_id);
+                    if(msg.branch_id && msg.branch_list){
+                        //默认电商仓list 因为加入订单门店仓履约的售后 这里需要重新加载仓库option (换货仓库)
+                        var branch_list_html = "";
+                        msg.branch_list.each(function(item, i){
+                            branch_list_html += '<option value='+item.branch_id+'>'+item.name+'</option>';
+                        });
+                        $('changebranch').innerHTML = branch_list_html;
+                        //选中当前电商仓或者门店仓
+                        var opts = $('changebranch').options;
+                        if( inArray(msg.branch_id, opts)){
+                            $('changebranch').getElement('option[value='+msg.branch_id+']').selected=true;
+                        }
+                    }
+                }else{
+                    if (msg.branch_id && msg.branch_list){
+                        //默认电商仓list 因为加入订单门店仓履约的售后 这里需要重新加载仓库option
+                           var branch_list_html = "";
+                        msg.branch_list.each(function(item, i){
+                            branch_list_html += '<option value='+item.branch_id+'>'+item.name+'</option>';
+                        });
+                        $('branchs').innerHTML = branch_list_html; //仓库
+                        $('changebranch').innerHTML = branch_list_html; //换货仓库
+                        //选中当前电商仓或者门店仓
+                        var opts = $('branchs').options;
+                        if( inArray(msg.branch_id, opts)){
+                            $('branchs').getElement('option[value='+msg.branch_id+']').selected=true;
+                        }
+                    }
+                }
+                response_paydetail(rs);
+                if(confirm('是否带出销售订单商品数据')){
+                  response_one(rs, dly_logi_no);
+                  response_pmt(rs);
+                  //response_paydetail(rs);
+                  //response_two(rs);
+                }
+            }
+
+         }
+      }).send();
+}
+
+/* 返回支付/退款明细信息*/
+function response_paydetail(val){
+    var request = new Request.HTML({
+       url : 'index.php?app=ome&ctl=admin_return_rchange&act=ajax_paydetail&source=<{$source}>',
+       method : 'post',
+       data : 'order_id='+val,
+       evalScripts : true,
+       update : $('pay_detail'),
+       onComplete:function(){
+            $$('.tabs-wrap .bill-info').setStyle('display','block');
+       }
+    }).send();
+}
+
+/* 返回退入商品页面*/
+function response_one(val, dly_logi_no){
+    var request = new Request.HTML({
+       url : 'index.php?app=ome&ctl=admin_return_rchange&act=ajax_getProductinfo_one&source=<{$source}>',
+       method : 'post',
+       data : 'order_id='+val+'&dly_logi_no='+dly_logi_no,
+       evalScripts : true,
+       update : $('rcchangeone')
+    }).send();
+}
+
+/* 返回优惠方案信息*/
+function response_pmt(val){
+    var request = new Request.HTML({
+       url : 'index.php?app=ome&ctl=admin_return_rchange&act=ajax_getPmts&source=<{$source}>',
+       method : 'post',
+       data : 'order_id='+val,
+       evalScripts : true,
+       update : $('pmt_detail')
+    }).send();
+}
+
+
+/* 返回换出商品页面*/
+function response_two(val){
+    var request = new Request.HTML({
+       url : 'index.php?app=ome&ctl=admin_return_rchange&act=ajax_getProductinfo_two&source=<{$source}>',
+       method : 'post',
+       data : 'order_id='+val,
+       evalScripts : true,
+       update : $('rcchangetwo')
+    }).send();
+}
+
+
+function choose_branch(obj,branch_id,product_id){
+    var request = new Request({
+       url : 'index.php?app=ome&ctl=admin_return_rchange&act=ajax_showStore&source=<{$source}>',
+       method : 'post',
+       data : 'branch_id='+branch_id+'&product_id='+product_id,
+       onComplete : function(rs){
+            var resp = JSON.decode(rs);
+
+            if(resp.res == 'succ'){
+              bn = obj.get('bn');
+              $('sale_store_'+bn).set('html',resp.msg);
+              $('product_sale_store_'+bn).set('value',resp.msg);
+            }
+       }
+    }).send();
+}
+
+function changeGoodsAmount(obj) {
+    let order_item_id = obj.getParent('TR').get('key');
+    let price = $('price-'+order_item_id).value;
+    let num = $('num-'+order_item_id).value;
+    $('amount-'+order_item_id).setAttribute('value', (num*price).toFixed(2));
+}
+</script>
+
+<script>
+
+/*补差价*/
+function calculate(){
+
+  var data = $E('.diff-div');
+  var is_check = '<{$reship_data.is_check}>';
+  var post = data.toQueryString()+'&'+$('rcchangeone').toQueryString()+'&'+$('rcchangetwo').toQueryString()+'&order_id='+$('order_id').get('value')+'&is_check='+is_check;
+  var reship_id = $('return-apply').getElement('input[name="reship_id"]').get('value');
+  var return_type = "<{$reship_data.return_type}>";
+    if ($defined($E('select[name="return_type"]')))
+    {
+        return_type = $E('select[name="return_type"] option:selected').get('value');
+    }
+  post = post.replace(/\+/g,"%2B");
+  var money = '';
+  new Request.JSON({
+    url:'index.php?app=ome&ctl=admin_return_rchange&act=calDiffAmount&p[0]='+reship_id+'&p[1]='+return_type+'&source=<{$source}>',
+    data:post,
+    async:false,
+    onSuccess:function(resp){
+      if (resp.error) {
+        MessageBox.error(resp.error);return false;
+      }
+      check_totalmoney(resp.mvalue.totalmoney);
+
+      $('tmoney').set('html',resp.tmoney);
+      $('bmoney').set('value',resp.mvalue.bmoney);
+      $('had_refund').set('value',resp.mvalue.had_refund);
+      $('cost_freight_money').set('value',resp.mvalue.cost_freight_money);
+      $('diffmoney').set('html',resp.diff_money);
+      $('change_amount').set('html',resp.change_amount);
+      money = resp;
+    }
+  }).send();
+
+  return money;
+}
+
+function inArray(value, arr){
+    for(var i=0; i<arr.length; i++){
+        if(value == arr[i].value){
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function rchange_bn_number(obj, sm_id)
+{
+    var sm_num    = parseInt(obj.value);
+    if(sm_num < 1)
+    {
+        alert("申请数量不能小于1");
+        return false;
+    }
+
+    var basic_material_tr    = "basic_material_sm_id_" + sm_id;
+
+    $ES("." + basic_material_tr).each(function(item, i)
+    {
+        var bm_id    = parseInt(item.get("key"));
+
+        if(bm_id)
+        {
+            var basic_number    = $("basic_number_"+ sm_id +"_"+ bm_id).value;
+            basic_number    = parseInt(basic_number);
+
+            var change_number    = sm_num * basic_number;
+
+            $("basic_rchange_num_"+ sm_id +"_"+ bm_id).set('html', change_number);
+        }
+    });
+}
+
+//当切换了换货仓库 保证所有销售物料可重新选择
+function clean_change_filter(){
+    $ES('input[name=total_change_filter]').set("value","");
+}
+
+if($('selectLogisticsName'))
+{
+    $('selectLogisticsName').addEvent('click', function() {
+        var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent("index.php?app=ome&ctl=admin_dly_corp&act=index&singleselect=1");
+        Ex_Loader('modedialog',function(){
+            new finderDialog(url,{params:{url:'index.php?app=ome&ctl=admin_return_rchange&act=getCorpNameById',name:'id',type:'radio'},handle:'returnLogisticsName',width:1000,height:500});
+        });
+    });
+}
+
+function select_all(el){
+    var do_check = el.checked;
+    $$(document.getElementsByName("return[goods_bn][]")).each(function (e) {
+        e.checked = do_check;
+    });
+}
+</script>

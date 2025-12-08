@@ -1,0 +1,24 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    面单来源：<{input type="select" options=$logistics_type id="logistics_type"}>
+</div>
+<div id="logistics_type_cfg"></div>
+<script type="text/javascript">
+    (function(){
+        var finder_id = '<{$env.get.finder_id}>';
+        $('logistics_type').addEvent('change', function(){
+            new Request.HTML({
+                url: 'index.php?app=logisticsmanager&ctl=admin_express_cainiao&act=syncTpl',
+                update: $("logistics_type_cfg"),
+                data: {finder_id:finder_id,logisticsType:$('logistics_type').value},
+                method: 'get',
+                onSuccess: function (response) {
+                }
+            }).send();
+        });
+    })();
+</script>

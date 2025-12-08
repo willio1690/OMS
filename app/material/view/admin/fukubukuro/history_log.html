@@ -1,0 +1,86 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<style>
+    .notice-inline.error  {background-image:none;margin-left:25px}
+    #fm1 .division td label ,#fm1 .division div label {vertical-align:top;}
+</style>
+
+    <input type="hidden" name="bm_id" value="<{$material_info.bm_id}>">
+    <div class="tableform">
+        <h3>查看快照</h3>
+        <div class="division">
+            <h5>基本信息</h5>
+            <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+                <thead>
+                <tr>
+                    <td width="10%" align="right" nowrap="nowrap">福袋组合编码：</td>
+                    <td><{$data.combine_bn}></td>
+                    <td width="10%" align="right" nowrap="nowrap">创建日期：</td>
+                    <td><{$data.create_time|cdate:'FDATE_STIME'}></td>
+                </tr>
+                <tr>
+                    <td width="10%" align="right" nowrap="nowrap">福袋组合名称：</td>
+                    <td><{$data.combine_name}></td>
+                    <td width="10%" align="right" nowrap="nowrap">最后更新日期：</td>
+                    <td><{$data.last_modified|cdate:'FDATE_STIME'}></td>
+                </tr>
+                <tr>
+                    <td width="10%" align="right" nowrap="nowrap">选择其中：</td>
+                    <td><{$data.selected_number}> 个基础物料</td>
+                    <td  width="10%" align="right" nowrap="nowrap">分别包含：</td>
+                    <td><{$data.include_number}> 件 </td>
+                </tr>
+                </thead>
+            </table>
+            <br />
+            <div id="warn_div">
+                <h5 style="margin-top:10px;">组合关联基础物料</h5>
+                <table class="gridlist" id="material_table"  style="margin:4px 0;">
+                <thead>
+                <tr>
+                    <th>基础物料编码</th>
+                    <th style="width:240px;">基础物料名称</th>
+                    <th>基础物料规格</th>
+                    <th>零售价</th>
+                    <th>成本价</th>
+                    <th>选中比例(%)</th>
+                </tr>
+                </thead>
+                
+                <{if $data.items}>
+                <tbody id="dataNode">
+                    <{foreach from=$data.items item=item}>
+                    <tr key="1252" id="bm_1252" title="点击选取/反选此条记录">
+                        <td><{$item.material_bn}></td>
+                        <td class="material-name"><{$item.material_name}></td>
+                        <td><{$item.specifications}></td>
+                        <td><{$item.retail_price}></td>
+                        <td><{$item.cost}></td>
+                        <td><{$item.ratio_str}></td>
+                    </tr>
+                    <{/foreach}>
+                </tbody>
+                <{else}>
+                <tbody id="dataNode">
+                    <tr>
+                        <td colspan="6" style="padding:0;"><div class="note" style="margin:0;"> 暂无基础物料信息 </div></td>
+                    </tr>
+                </tbody>
+                <{/if}>
+            </table>
+            </div>
+
+            <div id="cc" class="noprint table-action">
+                <{button type="button" class="btn-secondary" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}>
+            </div>
+        </div>
+

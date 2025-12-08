@@ -1,0 +1,133 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.shop-name{
+    color:red;font-weight:bold;
+}
+</style>
+<div class="tableform">
+  <h3>唯品会仓库添加/编辑</h3>
+  <div class="division">
+    <form method="post" action="index.php?app=console&ctl=admin_warehouse&act=save" id="form-branch">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+          <tr>
+            <th><em class="c-red">*</em> 仓库编号：</th>
+            <td><input type="text" name="branch_bn" id="branch_bn" value="<{$data.branch_bn}>" vtype="required"/></td>
+          </tr>
+          <tr>
+            <th><em class="c-red">*</em> 仓库名称：</th>
+            <td><input type="text" name="branch_name"  value="<{$data.branch_name}>" vtype="required"/><{help}><{t}>仓库在系统中的中文名称标识<{/t}><{/help}></td>
+          </tr>
+          <tr>
+            <th>联系人姓名：</th>
+            <td><input name="uname" type="text" value="<{$data.uname}>" size="12" maxlength="30" vtype="required"/>
+              <{help}><{t}>仓库负责人的姓名<{/t}><{/help}> </td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <th>手机：</th>
+            <td colspan="2"><input name="mobile" type="text" value="<{$data.mobile}>" size="12" maxlength="30"/>
+              <{help}><{t}>仓库负责人的移动联系方式<{/t}><{/help}> </td>
+          </tr>
+          <tr>
+            <th>电话：</th>
+            <td colspan="2"><input name="phone" type="text" value="<{$data.phone}>" size="15" maxlength="30"/>
+              <{help}><{t}>仓库的固定电话<{/t}><{/help}> </td>
+          </tr>
+          <tr>
+            <th>Email</th>
+            <td colspan="2"><input name="email" type="text" value="<{$data.email}>" size="30" maxlength="80" vtype="required"/>
+             <{help}><{t}>仓库的Email<{/t}><{/help}> 
+            </td>
+          </tr>
+          <tr>
+            <th>邮编：</th>
+            <td colspan="2"><input name="zip" type="text" value="<{$data.zip}>" size="8" maxlength="6" vtype="required"/>
+             <{help}><{t}>仓库所在地的邮政编码<{/t}><{/help}> 
+            </td>
+          </tr>
+          <tr>
+            <th>地区：</th>
+            <td><{input type='region' app='ectools' name="area" value=$data.area vtype="area" }>
+            <{help}><{t}>仓库所在地区<{/t}><{/help}>
+            </td>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <th>地址：</th>
+            <td colspan="2"><input name="address" type="text" value="<{$data.address}>" size="50" maxlength="80" vtype="required"/>
+              <{help}><{t}>仓库所在城市的详细地址<{/t}><{/help}> </td>
+          </tr>
+        </tbody>
+      </table>
+       
+      <div class="table-action"><{button label="提交" type="submit" name="submit" id="btn-branch"}> &nbsp;&nbsp; <{button label="关闭" onclick="javascript:void(window.close());" class="btn-secondary" type="button"}></div>
+      <{if $data.branch_id}>
+      <input type="hidden" name="branch_id" value="<{$data.branch_id}>">
+      <{/if}>
+    </form>
+  </div>
+</div>
+<script>
+$('btn-branch').addEvent('click', function()
+{
+    var tels = $ES('input[name="phone"]').get('value');
+    var mobiles = $ES('input[name="mobile"]').get('value');
+    
+    if(mobiles == '' && tels == '')
+    {
+        alert('手机号、电话号码必须填写一项');
+        return false;
+    }
+    
+    if(mobiles != '' && is_mobile(mobiles) === false)
+    {
+        alert('请填写正确的手机号码');
+        return false;
+    }
+    
+    if(tels != '' && is_tel(tels) === false)
+    {
+        alert('请填写正确的固定电话');
+        return false;
+    }
+});
+
+$('form-branch').store('target',{
+    onRequest:function(){
+       $('btn-branch').set('disabled', 'true');
+    },
+    onComplete:function(jsontext){
+       var json = Json.evaluate(jsontext);
+       if (typeof(json.error) != 'undefined'){
+           $('btn-branch').set('disabled', '');
+       }else{
+           $('btn-branch').set('disabled', 'true');
+           opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,opener.finderGroup['<{$env.get.finder_id}>']);
+           window.close();
+       }
+    }
+});
+
+function is_mobile(str){
+    var partten = /^\d{11}$/;
+    if(partten.test(str)){
+        return true;
+    }else{
+        return false;
+    }
+}
+function is_tel(str){
+    var partten = /(^(0\d{2})-(\d{6,8})$)|(^(0\d{3})-(\d{6,8})$)|(^(0\d{2})-(\d{6,8})-(\d+)$)|(^(0\d{3})-(\d{6,8})-(\d+)$)|(^\d{6,8}$)|(^\d{6,8}$)/;
+    if(partten.test(str)){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+</script>

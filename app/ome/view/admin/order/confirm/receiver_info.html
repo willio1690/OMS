@@ -1,0 +1,20 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<h3 style="border-bottom:none;" ><{if $order.is_encrypt}><a class="data-hide order-sensitive-btn" href="javascript:void(0);"></a><{/if}>收货人信息 <{if !$order.is_jy}><a href="javascript:void(0);" id="other_delivery">使用其他收货人信息</a><{/if}>
+</h3>
+<div class="finder-detail" style="margin-top:10px;">
+    <{include file="admin/order/confirm/member_confirm.html"}>
+    <div id="normal_delivery" class="finder-detail">
+        <table class="gridlist" >
+            <tbody>
+                <tr>
+                    <td id="delivery_info"> <{include file="admin/order/confirm/delivery_info.html"}></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+

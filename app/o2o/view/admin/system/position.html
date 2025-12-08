@@ -1,0 +1,95 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <form method="post" action="index.php?app=o2o&ctl=admin_store&act=saveposition" id="store-form">
+       
+        <input type="hidden" name="store_id" value="<{$stores.store_id}>">
+
+        <h4>基本信息</h4>
+        <div class="division">
+            <table>
+                <tbody>
+                    <tr>
+                        <th><em class="c-red">*</em>门店编码：</th>
+                        <td>
+                            <{$stores.store_bn}>
+                        </td>
+                        <th>
+                           
+                        </th>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><em class="c-red">*</em>库位编码：</th>
+                        <td>
+                            <{input type="text&&required" name="storage_code"}>
+                        </td>
+                        <th>
+                           
+                        </th>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <em class="c-red">*</em>库位类型：
+                        </th>
+                        <td>
+                            <{input type="radio" vtype="requiredradio" name="branch_type" value="exhibit" options=$typeoptions separator="&nbsp;"}>
+                        </td>
+                        <th>
+                            
+                        </th>
+                        <td>
+                           
+                        </td>
+                    </tr>
+                   
+                  
+                   
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="table-action">
+          <{button class="btn-primary" type="button" id="savestore" name="submit" label="提交"}>
+          <{button class="btn-secondary" type="button" isCloseDialogBtn="true" label="取消"}>
+        </div>
+    </form>
+</div>
+
+
+<script>
+
+$('savestore').addEvent('click',function(event){
+    if (!validate($('store-form'))){
+        return ;
+    }
+
+    $('store-form').fireEvent('submit', {stop:$empty});
+});
+
+$('store-form').store('target',{
+    onRequest:function(){
+       $('savestore').set('disabled', 'true');
+    },
+    onComplete:function(resp){
+        resp = JSON.decode(resp)
+
+        $('savestore').set('disabled', '');
+        if (resp.error) return ;
+
+        $('store-form').getParent('.dialog').retrieve('instance').close();
+
+        finderGroup['<{$env.get.finder_id}>'].refresh();
+    }
+});
+
+</script>

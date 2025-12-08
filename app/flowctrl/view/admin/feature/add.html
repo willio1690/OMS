@@ -1,0 +1,81 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <form action="" method="post" id="feature_manage"> 
+        <div class="division">
+                <table width="100%" cellspacing="0" cellpadding="0">
+                    <tbody>
+                        <tr>
+                            <th width="60"><label for="dom_el_bc">特性名称：</label> </th>
+                            <td ><{input type="text&&required" name="name"}></td>
+                        </tr>
+                        <tr>
+                            <th width="60"><label for="dom_el_bc">事件节点：</label> </th>
+                            <td ><{input type="select" id="node" name="node" vtype="required" rows=$nodes valueColumn="code" labelColumn="name" default="-1"}></td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
+
+        <div class="division" id="conf_item">
+            <{include file="admin/feature/conf_item.html"}>
+        </div>
+
+        <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td colspan="2" align="center">
+                    <{button class="btn-primary" label="确定" type="button" id="msaveBtn"}>
+                    <{button class="btn-primary" label="取消" type="button" id="mcancelBtn"}>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+    </form>
+</div>
+<script> 
+    (function() {
+        var form = $('feature_manage');
+        //关闭按钮
+        $('mcancelBtn').addEvent('click', function(){
+            $('mcancelBtn').getParent('.dialog').retrieve('instance').close();
+        });
+
+        //保存按钮
+        $('msaveBtn').addEvent('click', function(){
+            new Request ({
+                url:'index.php?app=flowctrl&ctl=admin_feature&act=toAdd',
+                method:'post',
+                data:form.toQueryString(),
+                onRequest: function () {
+                    $('msaveBtn').set('disabled', 'true');
+                    $('mcancelBtn').set('disabled', 'true');
+                },
+                onSuccess: function(result) {
+                    if (result =='SUCC') {
+                        finderGroup["<{$env.get.finder_id}>"].refresh.delay(400,finderGroup["<{$env.get.finder_id}>"]);
+                        $('msaveBtn').getParent('.dialog').retrieve('instance').close();
+                    } else {
+                        $('msaveBtn').set('disabled', '');
+                        $('mcancelBtn').set('disabled', '');
+                        //提示信息
+                        alert(result);
+                    }
+                }
+            }).send();
+        });
+
+        $('node').addEvent('change',function() {
+            new Request.HTML({
+                url:'index.php?app=flowctrl&ctl=admin_feature&act=getNodesCnfByFeature',
+                method:'post',
+                update:$('conf_item'),
+                data:{'node':this.value},
+            }).send();
+        });
+    })();
+
+</script>

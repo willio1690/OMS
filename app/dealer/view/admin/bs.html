@@ -1,0 +1,608 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+  <h5><{if $history}><em class='c-red'>《快照》</em>经销商编辑<{/if}></h5>
+  <div class="division">
+    <form method="post" action="index.php?app=dealer&ctl=admin_bs&act=save" id="frm">
+      <table border="0" cellspacing="0" cellpadding="0" >
+        <input type="hidden" name="bs_id" value="<{$bs_info.bs_id}>">
+        <tbody>
+          <tr>
+            <th><em class='c-red'>*</em>经销商编码：</th>
+            <td>
+              <{if $bs_info}>
+                <{input type="text" name="bs_bn" value=$bs_info.bs_bn title=$bs_info.bs_bn readonly='readonly'}><em class='c-red'> *添加后不可编辑</em>
+              <{else}>
+                <{input type="text" name="bs_bn" value=$bs_info.bs_bn title=$bs_info.bs_bn vtype="alphaint&&required" placeholder="英文字母或数字"}><em class='c-red'> *添加后不可编辑</em>
+              <{/if}>
+            </td>
+          </tr>
+
+          <tr>
+            <th><em class='c-red'>*</em>经销商名称：</th>
+            <td>
+              <{if $history}>
+                <{input type="text" name="name" value=$bs_info.name title=$bs_info.name readonly='readonly'}>
+              <{else}>
+                <{input type="text" name="name" value=$bs_info.name title=$bs_info.name vtype="required"}>
+              <{/if}>
+            </td>
+          </tr>
+
+          <tr>
+            <th><em class='c-red'>*</em>经销商客户编码：</th>
+            <td>
+              <{if $history}>
+                <{input type="text" name="customer_code" value=$bs_info.customer_code title=$bs_info.customer_code readonly='readonly' vtype="alphanum"}>
+              <{else}>
+                <{input type="text" name="customer_code" value=$bs_info.customer_code title=$bs_info.customer_code vtype="alphanum&&required" placeholder="英文字母、数字、下划线、中划线"}>
+              <{/if}>
+            </td>
+          </tr>
+
+          <tr>
+            <th><em class='c-red'>*</em>销售办公室编码：</th>
+            <td>
+              <{if $history}>
+                <{input type="text" name="salesoffice_code" value=$bs_info.salesoffice_code title=$bs_info.salesoffice_code readonly='readonly' vtype="alphanum"}>
+              <{else}>
+                <{input type="text" name="salesoffice_code" value=$bs_info.salesoffice_code title=$bs_info.salesoffice_code vtype="alphanum&&required" placeholder="英文字母、数字、下划线、中划线"}>
+              <{/if}>
+            </td>
+          </tr>
+
+          <tr>
+            <th><em class='c-red'>*</em>产品组编码：</th>
+            <td>
+              <{if $history}>
+                <{input type="text" name="division_code" value=$bs_info.division_code title=$bs_info.division_code readonly='readonly' vtype="alphanum"}>
+              <{else}>
+                <{input type="text" name="division_code" value=$bs_info.division_code title=$bs_info.division_code vtype="alphanum&&required" placeholder="英文字母、数字、下划线、中划线"}>
+              <{/if}>
+            </td>
+          </tr>
+
+          <tr>
+            <th><em class='c-red'>*</em>销售组织：</th>
+            <td>
+              <{if $history}>
+                <{input type="text" name="salesgroup_code" value=$bs_info.salesgroup_code title=$bs_info.salesgroup_code readonly='readonly' vtype="alphanum"}>
+              <{else}>
+                <{input type="text" name="salesgroup_code" value=$bs_info.salesgroup_code title=$bs_info.salesgroup_code vtype="alphanum&&required" placeholder="英文字母、数字、下划线、中划线"}>
+              <{/if}>
+            </td>
+          </tr>
+
+          <tr>
+            <th><em class='c-red'>*</em>经销商状态：</th>
+            <td>
+              <{if $history}>
+                <{if $bs_info.status == 'active'}>
+                  <label><input type="radio" name="status" value="active" checked disabled> 激活</label>
+                  <label style="margin-left: 20px;"><input type="radio" name="status" value="close" disabled> 关闭</label>
+                <{else}>
+                  <label><input type="radio" name="status" value="active" disabled> 激活</label>
+                  <label style="margin-left: 20px;"><input type="radio" name="status" value="close" checked disabled> 关闭</label>
+                <{/if}>
+              <{else}>
+                <label><input type="radio" name="status" value="active" <{if !$bs_info || $bs_info.status == 'active'}>checked<{/if}>> 激活</label>
+                <label style="margin-left: 20px;"><input type="radio" name="status" value="close" <{if $bs_info && $bs_info.status == 'close'}>checked<{/if}>> 关闭</label>
+              <{/if}>
+            </td>
+          </tr>
+
+          <tr>
+            <th>选择所属贸易公司：</th>
+            <td>
+              <div id="goods-transfer-wrap" class="transfer-wrap" style="display:block">
+                  <div class="transfer-panel left-panel">
+                      <div class="transfer-panel__header">
+                          <div class="colum1">
+                            <input id="left-all2" type='checkbox' name='unselect-store' onchange="changeLeftAll2(this)" <{if $history}>disabled="disabled"<{/if}> />
+                          </div>
+                          <div class="colum4">贸易公司名称（可选）</div>
+                      </div>
+                      <div class="transfer-panel__body">
+                        <{foreach from=$betc_list item=item}>
+                          <div class="transfer-panel__item">
+                            <div class="colum1"><input type="checkbox" value="<{$item.betc_id}>"  <{if $history}>disabled="disabled"<{/if}> /></div>
+                            <div class="colum4" title="<{$item.betc_name}>(<{$item.betc_code}>)"><{$item.betc_name}>(<{$item.betc_code}>)</div>
+                          </div>
+                        <{/foreach}>
+                      </div>
+                  </div>
+                  <div class="transfer-buttons">
+                      <span class="btn-item" onclick="handleTransferDataToLeft2(this)"><</span>
+                      <span class="btn-item" onclick="handleTransferDataToRight2(this)">></span>
+                  </div>
+                  <div class="transfer-panel right-panel">
+                      <div class="transfer-panel__header">
+                        <div class="colum1">
+                          <input id="right-all2" type='checkbox' name='select-store' onchange="changeRightAll2(this)" <{if $history}>disabled="disabled"<{/if}> />
+                        </div>
+                          <div class="colum4">贸易公司名称（已选）</div> 
+                      </div>
+                      <div class="transfer-panel__body">
+                        <{foreach from=$betc_selected item=item}>
+                          <div class="transfer-panel__item">
+                            <div class="colum1"><input type="checkbox" value="<{$item.betc_id}>" <{if $history}>disabled="disabled"<{/if}> /></div>
+                            <div class="colum4" title="<{$item.betc_name}>(<{$item.betc_code}>)"><{$item.betc_name}>(<{$item.betc_code}>)</div>
+                          </div>
+                        <{/foreach}>
+                      </div>
+                  </div>
+
+                  <input type='hidden' id="betc_id" name='betc_id' value="">
+              </div>
+            </td>
+          </tr>
+
+          <{if !$history}>
+          <tr>
+            <th>联系人姓名：</th>
+            <td>
+              <{input type="text" name="contact_name" value=$bs_info.contact_name title=$bs_info.contact_name }>
+            </td>
+          </tr>
+
+          <tr>
+            <th>联系人电话：</th>
+            <td>
+              <{input type="text" name="contact_mobile" value=$bs_info.contact_mobile title=$bs_info.contact_mobile }>
+            </td>
+          </tr>
+
+          <tr>
+            <th>联系人地址：</th>
+            <td>
+              <{input type="text" name="contact_address" value=$bs_info.contact_address title=$bs_info.contact_address }>
+            </td>
+          </tr>
+          <{else}> <!-- 快照展示 -->
+            <tr>
+              <th>联系人姓名：</th>
+              <td>
+                <{input type="text" name="contact_name" value=$bs_info.contact_name title=$bs_info.contact_name readonly='readonly'}>
+              </td>
+            </tr>
+
+            <tr>
+              <th>联系人电话：</th>
+              <td>
+                <{input type="text" name="contact_mobile" value=$bs_info.contact_mobile title=$bs_info.contact_mobile readonly='readonly'}>
+              </td>
+            </tr>
+
+            <tr>
+              <th>联系人地址：</th>
+              <td>
+                <{input type="text" name="contact_address" value=$bs_info.contact_address title=$bs_info.contact_address readonly='readonly'}>
+              </td>
+            </tr>
+          <{/if}>
+        </tbody>
+      </table>
+    </form>
+  </div>
+</div>
+<{area inject=".mainFoot"}>
+
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td>
+          <{if !$history}>
+          <{button class="btn-primary" type="button" id='submit_btn' label='确定' }>
+          <{button class="btn-secondary" type="button" id='close_btn' label='关闭' }>
+          <{/if}>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<{/area}>
+<script type="text/javascript">
+  (function(){
+    var _form = $('frm');//表单ID 
+    var btn   = $('submit_btn');//按钮ID
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    $('close_btn').addEvent('click', function(){
+      try{
+        var _dialogIns = this.getParent('.dialog').retrieve('instance');
+      }catch(e){}
+
+      if(_dialogIns){
+        // setTimeout(finder.refresh(),30000);
+        _dialogIns.close();
+      }
+    });
+    _form.store('target',{
+      onRequest:function(){
+        btn.setAttribute('disabled', 'disabled');
+      },
+      onComplete:function(){
+        btn.removeAttribute('disabled');
+      },
+      onSuccess:function(response){
+        var hash_res_obj = JSON.decode(response);
+        if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+          try{
+            var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+          }catch(e){}
+
+          if(_dialogIns){
+            setTimeout(finder.refresh(),30000);
+            _dialogIns.close();
+          }
+        }
+      }
+    });
+
+    btn.addEvent('click',function(){
+      // 检查是否是编辑模式且状态为关闭
+      var bsId = $('frm').getElement('input[name="bs_id"]').value;
+      var statusValue = $('frm').getElements('input[name="status"]:checked')[0].value;
+      
+      if (bsId && statusValue === 'close') {
+        if (!confirm('关闭经销商，经销商下的所有门店也会一并关店，是否继续？')) {
+          return false;
+        }
+      }
+      
+      _form.fireEvent('submit',{stop:$empty});
+    });
+
+    var d = $('goods-transfer-wrap');
+    initData()
+    function initData() {
+      var leftNodes = d.getElementsByClassName('left-panel')[0].getElementsByClassName('transfer-panel__item')
+      for (var i=0; i<leftNodes.length; i++) {
+          leftNodes[i].getElementsByTagName('input')[0].addEventListener('change', changeLeftStoreStatus)
+      }
+      var rightNodes = d.getElementsByClassName('right-panel')[0].getElementsByClassName('transfer-panel__item')
+      for (var i=0; i<rightNodes.length; i++) {
+          rightNodes[i].getElementsByTagName('input')[0].addEventListener('change', changeRightStoreStatus)
+      }
+      resetVal()
+    }
+
+    this.handleTransferDataToLeft2 = handleTransferDataToLeft;
+    this.handleTransferDataToRight2 = handleTransferDataToRight;
+    this.changeLeftAll2 = changeLeftAll;
+    this.changeRightAll2 = changeRightAll;
+
+    function changeLeftStoreStatus () {
+        var nodes = this.getParent().getParent().getParent().children
+        var checkedLen = 0
+        for (var i=0; i<nodes.length; i++) {
+            if (nodes[i].getElementsByTagName('input')[0].checked) {
+                checkedLen++
+            }
+        } 
+
+        if (checkedLen > 0) {
+            d.getElementById('left-all2').checked = checkedLen == nodes.length
+            d.getElementsByClassName('transfer-buttons')[0].children[1].classList.add('active');
+        } else {
+            d.getElementById('left-all2').checked = false
+            d.getElementsByClassName('transfer-buttons')[0].children[1].classList.remove('active');
+        }
+    }
+
+    function changeRightStoreStatus () {
+        var nodes = this.getParent().getParent().getParent().children
+        var checkedLen = 0
+        for (var i=0; i<nodes.length; i++) {
+            if (nodes[i].getElementsByTagName('input')[0].checked) {
+                checkedLen++
+            }
+        } 
+        if (checkedLen > 0) {
+            d.getElementById('right-all2').checked = checkedLen == nodes.length
+            d.getElementsByClassName('transfer-buttons')[0].children[0].classList.add('active');
+        } else {
+            d.getElementById('right-all2').checked = false
+            d.getElementsByClassName('transfer-buttons')[0].children[0].classList.remove('active');
+        }
+    }
+
+    function handleTransferDataToLeft () {
+        var nodes = d.getElementsByClassName('right-panel')[0].getElementsByClassName('transfer-panel__item')
+        var parentNode = d.getElementsByClassName('left-panel')[0].getElementsByClassName('transfer-panel__body')[0]
+        var leftParentNode = d.getElementsByClassName('right-panel')[0].getElementsByClassName('transfer-panel__body')[0]
+        var moveList = []
+        for (var i=0; i<nodes.length; i++) {
+            if (nodes[i].getElementsByTagName('input')[0].checked) {
+                moveList.push(nodes[i])
+            }
+        }
+        moveList.map(item => {
+            item.getElementsByTagName('input')[0].checked = false
+            item.getElementsByTagName('input')[0].removeEventListener('change', changeRightStoreStatus)
+            item.getElementsByTagName('input')[0].addEventListener('change', changeLeftStoreStatus)
+            parentNode.prepend(item)
+        })
+        resetVal(true)
+    }
+
+    function handleTransferDataToRight () {
+        var nodes = d.getElementsByClassName('left-panel')[0].getElementsByClassName('transfer-panel__item')
+        var parentNode = d.getElementsByClassName('right-panel')[0].getElementsByClassName('transfer-panel__body')[0]
+        var leftParentNode = d.getElementsByClassName('left-panel')[0].getElementsByClassName('transfer-panel__body')[0]
+        var moveList = []
+        for (var i=0; i<nodes.length; i++) {
+            if (nodes[i].getElementsByTagName('input')[0].checked) {
+                moveList.push(nodes[i])
+            }
+        }
+        moveList.map(item => {
+            item.getElementsByTagName('input')[0].checked = false
+            item.getElementsByTagName('input')[0].removeEventListener('change', changeLeftStoreStatus)
+            item.getElementsByTagName('input')[0].addEventListener('change', changeRightStoreStatus)
+            parentNode.appendChild(item)
+        })
+        resetVal(true)
+    }
+
+    function changeLeftAll (e) {
+        if (e.checked) {
+            d.getElementsByClassName('transfer-buttons')[0].children[1].classList.add('active');
+        } else {
+            d.getElementsByClassName('transfer-buttons')[0].children[1].classList.remove('active');
+        }
+        var nodes = d.getElementsByClassName('left-panel')[0].getElementsByClassName('transfer-panel__item')
+        for (var i=0; i<nodes.length; i++) {
+            nodes[i].getElementsByTagName('input')[0].checked = e.checked
+        }
+    }
+
+    function changeRightAll (e) {
+        if (e.checked) {
+            d.getElementsByClassName('transfer-buttons')[0].children[0].classList.add('active');
+        } else {
+            d.getElementsByClassName('transfer-buttons')[0].children[0].classList.remove('active');
+        }
+        var nodes = d.getElementsByClassName('right-panel')[0].getElementsByClassName('transfer-panel__item')
+        for (var i=0; i<nodes.length; i++) {
+            nodes[i].getElementsByTagName('input')[0].checked = e.checked
+        }
+    }
+
+    function resetVal (status) {
+      if (status) {
+        d.getElementsByClassName('transfer-buttons')[0].children[0].classList.remove('active');
+        d.getElementsByClassName('transfer-buttons')[0].children[1].classList.remove('active');
+        d.getElementById('left-all2').checked = false
+        d.getElementById('right-all2').checked = false
+      }
+
+      var rightNodes = d.getElementsByClassName('right-panel')[0].getElementsByClassName('transfer-panel__item')
+      var list = []
+      for (var i=0; i<rightNodes.length; i++) {
+        list.push(rightNodes[i].getElementsByTagName('input')[0].value)
+      }
+      d.getElementById('betc_id').value = list
+    }
+
+  })();
+
+// $('.transfer-panel__item').hover(function() {
+//     var fullText = $(this).find('.colum4').text(); // 获取完整文本
+//     $(this).attr('title', fullText); // 设置鼠标悬停时的提示文本为完整文本
+// }, function() {
+//     $(this).removeAttr('title'); // 移除鼠标离开时的提示文本属性
+// });
+</script>
+
+<style>
+  .shop-code-fuzzy{
+      z-index: 9999999;
+  }
+  .gridlist thead th{
+      font-size: 14px;
+  }
+  .gridlist tbody td{
+      font-size: 14px;
+  }
+  .allocation-info {
+      padding-left: 15px;
+      box-sizing: border-box;
+  }
+  .allocation-info .allocation-info__row .allocation-search__col {
+      display: inline-block;
+      width: 260px;
+      font-size: 0;
+      vertical-align: top;
+      margin-right: 20px;
+      height: 34px;
+      line-height: 34px;
+  }
+  .allocation-info .allocation-info__row .allocation-search__col:last-child {
+      width: 330px;
+  }
+  .allocation-info .allocation-info__row .allocation-search__col >div {
+      display: inline-block;
+      vertical-align: middle;
+      font-size: 14px;
+  }
+  .allocation-info .allocation-info__row .allocation-search__col .search-label {
+      width: 90px;
+      text-align: right;
+  }
+  .allocation-info .allocation-info__row .allocation-search__col .search-value {
+      width: calc(100% - 90px);
+  }
+  .allocation-info .allocation-info__row .allocation-search__col .search-value .cal {
+      margin-top: -3px;
+  }
+  .filter-list {
+      border-top: 1px solid #ddd;
+      padding-top: 20px;
+      margin: 5px 15px 0;
+      box-sizing: border-box;
+  }
+  .filter-list .filter-col {
+      display: inline-block;
+      vertical-align: top;
+      margin-right: 20px;
+      margin-bottom: 20px;
+      height: 34px;
+  }
+  .filter-list .filter-col:last-child {
+      margin-right: 0;
+  }
+  .filter-list .filter-col >div {
+      display: inline-block;
+      vertical-align: middle;
+      font-size: 14px;
+  }
+  .filter-list .filter-col input {
+      height: 34px;
+  }
+  .allocation-table {
+      width: 1100px;
+      margin-left: 15px;
+  }
+  .allocation-table tr th, .allocation-table tr td {
+      padding: 7px 10px;
+      box-sizing: border-box;
+      font-size: 12px;
+  }
+  .allocation-table tr th {
+      font-weight: bold;
+  }
+  .w-90 {
+      width: 80px !important;
+  }
+  .w-140 {
+      width: 140px !important;
+  }
+  .select-common {
+    width: 100px;
+    margin: 0 10px 10px 0;
+    vertical-align: top;
+  }
+  .transfer-wrap {
+      height: 300px;
+      font-size: 0;
+      margin-top: 5px;
+  }
+  .transfer-wrap >div {
+      height: 100%;
+      display: inline-block;
+      vertical-align: top;
+  }
+  .transfer-wrap .transfer-panel {
+      font-size: 14px;
+      width: calc((100% - 130px)/2);
+      border: 1px solid #ebeef5;
+      border-radius: 4px;
+      box-sizing: border-box;
+  }
+  .transfer-wrap .transfer-panel .transfer-panel__header {
+      height: 40px;
+      line-height: 40px;
+      background: #f5f7fa;
+      margin: 0;
+      /* padding-left: 15px; */
+      border-bottom: 1px solid #ebeef5;
+      box-sizing: border-box;
+      color: #000;
+      font-size: 0;
+  }
+  .transfer-wrap .transfer-panel .transfer-panel__header >div {
+    /* line-height: 40px !important; */
+    border-bottom-width: 0 !important;
+  }
+  .transfer-wrap .transfer-panel .colum1, .transfer-wrap .transfer-panel .colum2,.transfer-wrap .transfer-panel .colum4, .transfer-wrap .transfer-panel .colum3 {
+    display: inline-block;
+    padding-left: 10px;
+    box-sizing: border-box;
+    vertical-align: top;
+    height: 100%;
+    line-height: 39px;
+    border-bottom: 1px solid #ebeef5;
+    font-size: 12px;
+  }
+  .transfer-wrap .transfer-panel .colum1 {
+    width: 35px;
+    border-right: 1px solid #ebeef5;
+  }
+  .transfer-wrap .transfer-panel .colum2 {
+    width: 130px;
+    border-right: 1px solid #ebeef5;
+  }
+  .transfer-wrap .transfer-panel .colum4 {
+    width: 180px;
+    border-right: 1px solid #ebeef5;
+  }
+  .transfer-wrap .transfer-panel .colum3 {
+    width: calc(100% - 155px);
+  }
+  .transfer-panel__item .colum4 {
+    width: 180px; /* 假设这是你想要限制的宽度 */
+    white-space: nowrap; /* 防止文本换行 */
+    overflow: hidden; /* 隐藏超出的内容 */
+    text-overflow: ellipsis; /* 显示省略号 */
+  }
+  /* 
+  .transfer-panel__item:hover .colum4 {
+    width: 180px;  或者设定一个足够宽的宽度来显示全部内容 
+    white-space: normal; 允许文本换行 
+    overflow: visible;  显示超出的内容 
+  }*/
+  .transfer-wrap .transfer-panel .transfer-panel__body {
+      height: 260px; 
+      /* padding: 0 15px; */
+      overflow-y: scroll;
+      font-size: 0;
+  }
+  .transfer-wrap .transfer-panel .transfer-panel__body .transfer-panel__item {
+      height: 40px;
+  }
+  .transfer-wrap .transfer-buttons {
+      line-height: 300px;
+      padding: 0 10px;
+  }
+  .transfer-wrap .transfer-buttons .btn-item {
+      width: 35px;
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+      display: inline-block;
+      font-size: 14px;
+      cursor: not-allowed;
+      color: #fff;
+      border-radius: 4px;
+      background-color: #a0cfff;
+      margin: 0 5px;
+  }
+  .transfer-wrap .transfer-buttons .btn-item.active {
+      cursor: pointer;
+      background-color: #409eff;
+  }
+  .import_file {
+      position: relative;
+      display: inline-block;
+      /*background: #D0EEFF;*/
+      /*border: 1px solid #99D3F5;*/
+      /*border-radius: 4px;*/
+      /*padding: 4px 12px;*/
+      overflow: hidden;
+      /*color: #1E88C7;*/
+      text-decoration: none;
+      text-indent: 0;
+      line-height: 20px;
+  }
+  .import_file input {
+      position: absolute;
+      font-size: 100px;
+      right: 0;
+      top: 0;
+      opacity: 0;
+  }
+</style>

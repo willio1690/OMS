@@ -1,0 +1,15 @@
+<desktop>
+
+    <permissions>
+        <permission id="order_view_presale">预售订单</permission>
+
+    </permissions>
+	<workground name="订单管理" id="order_center" order="100" icon="icon-dingdanguanli-01">
+        <menugroup name="订单查看" en="order-view">
+            <menu controller='admin_order' action='index'  permission='order_view_presale' display='true' order='1000303'>预售订单</menu>
+
+        </menugroup>
+    </workground>
+
+
+</desktop>

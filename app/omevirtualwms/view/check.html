@@ -1,0 +1,20 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+	<{if $t eq ''}><h3><{$show.title}></h3><{/if}>
+    <div class="division">
+  <form action="index.php?app=omevirtualwms&ctl=admin_wms&act=getinfo" method="post" id="from-stockout" >
+  <input type="hidden" name='flag' value='<{$show.k}>' /><!--标识-->
+	 <table>
+		<tr>
+			<td>请输入<{$show.input}>： &nbsp;&nbsp;&nbsp;
+			<input type="text" id="num" name="num" vtype="required" value="<{$keywords}>" />
+			<{button  type="submit" label="查询"}></td>
+		</tr>
+	</table>
+	</form>
+  </div>
+</div>

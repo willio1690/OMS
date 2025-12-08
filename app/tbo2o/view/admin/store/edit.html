@@ -1,0 +1,139 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{/capture}>
+<style>
+
+</style>
+
+<form method="post" action="index.php?app=tbo2o&ctl=admin_store&act=toEdit" id="store">
+    <input type="hidden" name="store_id" value="<{$storeInfo.store_id}>" />
+    <div class="tableform">
+        <h5>基本信息</h5>
+        <div class="division" id="store_page">
+            <table border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th><em class="c-red">*</em> 名称：</th>
+                    <td>
+                        <{$storeInfo.store_name}><{help}><{t}>门店在此系统需要显示的中文名称<{/t}><{/help}>
+                    </td>
+                    <th><em class="c-red">*</em> 门店编码：</th>
+                    <td>
+                        <{$storeInfo.store_bn}><{help}><{t}>门店在系统中的唯一标识<{/t}><{/help}>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th><em class="c-red">*</em> 所属类目：</th>
+                    <td>
+                        <{input type='storecat' app='tbo2o' name="storecatSelected" value=$storeInfo.cat_id required="true"}>
+                    </td>
+                    <th><em class="c-red">*</em> 淘宝门店ID：</th>
+                    <td>
+                        <{$storeInfo.outer_store_id}>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th><em class="c-red">*</em> 门店类型：</th>
+                    <td>
+                        <select name="store_type">
+                            <option value="0">--请选择--</option>
+                            <option value="normal" <{if $storeInfo.store_type == 'normal'}>selected<{/if}>>普通门店</option>
+                            <option value="mall" <{if $storeInfo.store_type == 'mall'}>selected<{/if}>>商城</option>
+                            <option value="mall_shop" <{if $storeInfo.store_type == 'mall_shop'}>selected<{/if}>>店中店</option>
+                            <option value="light_shop" <{if $storeInfo.store_type == 'light_shop'}>selected<{/if}>>淘小铺</option>
+                            <option value="hospital" <{if $storeInfo.store_type == 'hospital'}>selected<{/if}>>阿里健康(医院)</option>
+                            <option value="department" <{if $storeInfo.store_type == 'department'}>selected<{/if}>>阿里健康(医院科室)</option>
+                            <option value="warehous" <{if $storeInfo.store_type == 'warehous'}>selected<{/if}>>仓库</option>
+                        </select>
+                    </td>
+                    <th><em class="c-red">*</em> 营业时间：</th>
+                    <td>
+                        <{$storeInfo.open_hours}>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th><em class="c-red">*</em> 地区：</th>
+                    <td>
+                        <{$storeInfo.area|region}>
+                    </td>
+                    <th><em class="c-red">*</em> 详细地址：</th>
+                    <td>
+                        <{$storeInfo.address}>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th><em class="c-red">*</em> 门店状态：</th>
+                    <td>
+                        <input type="radio" name="status" value="normal" <{if $storeInfo.status == 'normal'}>checked="checked"<{/if}> /> 正常 <input type="radio" name="status" value="close" <{if $storeInfo.status == 'close'}>checked="checked"<{/if}> /> 关店 <input type="radio" name="status" value="hold" <{if $storeInfo.status == 'hold'}>checked="checked"<{/if}> /> 暂停营业
+                    </td>
+                    <th><em class="c-red">*</em> 联系人：</th>
+                    <td>
+                        <{$storeInfo.contacter}>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th><em class="c-red">*</em> 固定电话：</th>
+                    <td>
+                        <{$storeInfo.tel}>
+                    </td>
+                    <th><em class="c-red">*</em> 电话：</th>
+                    <td>
+                        <{$storeInfo.moblie}>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th><em class="c-red">*</em> 传真：</th>
+                    <td>
+                        <{$storeInfo.fax}>
+                    </td>
+                    <th><em class="c-red">*</em> 邮编：</th>
+                    <td>
+                        <{$storeInfo.zip}>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="table-action">
+              <{button class="btn-primary" type="button" id="savestore" name="submit" label="提交"}>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+
+$('savestore').addEvent('click',function(e){
+    var _this=this;
+    var form=this.getParent('form');
+
+    form.store('target',{
+        onRequest:function(){
+            _this.disabled=true;
+        },
+        onComplete:function(jsontext){
+            try{
+                var json = JSON.decode(jsontext);
+                if (typeof(json.error)!='undefined'){
+                    _this.disabled=false;
+                }else{
+                    _this.disabled=true;
+                    if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                    setTimeout('window.close()',200);
+                }
+            }catch(e){}
+        }
+    });
+    form.fireEvent('submit',e);
+});
+
+</script>

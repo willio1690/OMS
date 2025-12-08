@@ -1,0 +1,141 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<link href="../../../../app/desktop/statics/perfect/main.css" rel="stylesheet" type="text/css">
+<div class="form-layout">
+    <form method="post" id="series_form" action="index.php?app=dealer&ctl=admin_series&act=toEditShop">
+        <input type="hidden" id="series_id" name="series_id" value="<{$series_info.series_id}>">
+        <div class="form-layout-block">
+            <h3>授权店铺</h3>
+            <div class="form-layout-fields form-layout-fields-column">
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>产品线编码：</span>
+                    <{$series_info.series_code}>
+                    <input type="hidden" id="series_code" name="series_code" value="<{$series_info.series_code}>" />
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>产品线名称：</span>
+                    <{$series_info.series_name}>
+                    <input type="hidden" id="series_name" name="series_name" value="<{$series_info.series_name}>">
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>产品线描述：</span>
+                    <{$series_info.description}>
+                    <input type="hidden" id="description" name="description" value="<{$series_info.description}>">
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"><span style="color:red;">*</span>产品线分类：</span>
+                    <{$series_info.cat_name}>
+                    <input type="hidden" id="cat_name" name="cat_name" value="<{$series_info.cat_name}>">
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">产品线备注：</span>
+                    <{$series_info.remark}>
+                    <input type="hidden" id="remark" name="remark" value="<{$series_info.remark}>">
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">所属贸易公司：</span>
+                    <{foreach from=$betcs item=betc}>
+                        <{if $series_info.betc_id == $betc.betc_id}>
+                            <{$betc.betc_name}>
+                            <input type="hidden" id="betc_id" name="betc_id" value="<{$betc.betc_id}>">
+                        <{/if}>
+                    <{/foreach}>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">经销店铺：</span>
+                    <div id="ajax_get_div_contents_shop"></div>
+                </div>
+            </div>
+            <div id="cc" class="noprint table-action">
+                <{button type="button" id="series_btn" label="保 存"}> &nbsp;
+                <{button type="button" class="btn-secondary" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+
+// 根据贸易公司ID更新经销店铺选项
+function updateShopOptions(betcId) {
+    new Request.HTML({
+        url: 'index.php?app=dealer&ctl=admin_series&act=ajax_shopyjdf_html&p[0]='+$('series_id').value,
+        method: 'post',
+        update: $('ajax_get_div_contents_shop'),
+        data: {'betc_id': betcId}, // 动态传入betc_id
+        onSuccess: function () {
+            // 请求成功后的处理（如果需要）
+        }
+    }).send();
+}
+
+//基础物料和经销店铺选择按钮展示
+function ajax_onload_html(){
+    // 经销店铺请求逻辑，这里不再直接发送请求，而是通过updateShopOptions函数根据betc_id动态发送
+    updateShopOptions($('betc_id').value); // 初始化时可以考虑是否需要立即根据默认选择的贸易公司加载
+}
+
+//经销店铺选择后展示模块
+function shop_object_callback(rs,handle){
+    var length = handle.getElements('.row').length;
+    var html = '已选择了'+length+'个经销店铺,'+"<a href='javascript:void(0);' onclick='shop_selected_show()'>查看选中的经销店铺.</a>";
+    if ($defined($('hand-selected-shop'))){
+        $('hand-selected-shop').setHTML(html);
+    }else{
+        var div = new Element('div',{'html':html,'id':'hand-selected-shop'});
+        div.injectBefore(handle);
+        $('hand-selected-shop').style.cssText = 'float:left;margin:10px 10px 10px 5px';
+    }
+}
+
+//经销店明细展示
+function shop_selected_show(){
+    new Dialog('index.php?app=dealer&ctl=admin_series&act=showShops',{
+        ajaxoptions:{data:$('hand-selected-shop').getNext('div'),method:'post'}
+    });
+}
+
+(function() {
+    window.addEvent('domready', function() {
+        ajax_onload_html();
+        // // 监听所属贸易公司下拉框的变化
+        // $('betc_id').addEvent('change', function (e) {
+        //     var selectedBetcId = this.value; // 获取选中的贸易公司ID
+        //     updateShopOptions(selectedBetcId); // 更新经销店铺选项
+        // });
+
+        //点击提交表单
+        $('series_btn').addEvent('click',function(e){
+            var _this = this;
+            var form = this.getParent('form');
+            form.store('target',{
+                onRequest:function(){
+                    _this.disabled=true;
+                },
+                onComplete:function(jsontext){
+                    try{
+                        var json = JSON.decode(jsontext);
+                        if (typeof(json.error)!='undefined'){
+                            _this.disabled=false;
+                        }else{
+                            _this.disabled=true;
+                            if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                            setTimeout('window.close()',200);
+                        }
+                    }catch(e){}
+                }
+            });
+            form.fireEvent('submit',e);
+        });
+    });
+})();
+</script>

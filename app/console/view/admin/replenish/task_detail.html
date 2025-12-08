@@ -1,0 +1,47 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+<form name="form1" id="memo_form" action="index.php?<{$env.server.QUERY_STRING}>" method="post">
+<div class="tableform">
+    <h4>补货任务详情</h4>
+    <div class="division">
+    <table border="0" cellspacing="0" cellpadding="0" class="gridlist" >
+        <tbody>
+            <tr>
+                <th style='text-align:right;'>补货任务号:</th>
+                <td style='text-align:left;padding-left:5px;'><{$reTaskInfo.task_bn}></td>
+                <th style='text-align:right;'>补货任务名称:</th>
+                <td style='text-align:left;padding-left:5px;'><{$reTaskInfo.task_name}></td>
+                <th style='text-align:right;'>单据状态:</th>
+                <td style='text-align:left;padding-left:5px;'><{$reTaskInfo.task_status}></td>
+            </tr>
+        </tbody>
+        <tbody>
+            <tr>
+                <th style='text-align:right;'>门店类型:</th>
+                <td style='text-align:left;padding-left:5px;'><{$reTaskInfo.store_type_name}></td>
+                <th style='text-align:right;'>销售开始日期:</th>
+                <td style='text-align:left;padding-left:5px;'><{$reTaskInfo.start_time|date:"Y-m-d H:i:s"}></td>
+                <th style='text-align:right;'>销售结束日期:</th>
+                <td style='text-align:left;padding-left:5px;'><{$reTaskInfo.end_time|date:"Y-m-d H:i:s"}></td>
+            </tr>
+        </tbody>
+        <tbody>
+            <tr>
+                <th style='text-align:right;'>销售补货系数:</th>
+                <td style='text-align:left;padding-left:5px;'><{$reTaskInfo.multipl_num}></td>
+                <th style='text-align:right;'>调出仓库:</th>
+                <td style='text-align:left;padding-left:5px;'><{$reTaskInfo.branch_name}></td>
+                <th style='text-align:right;'>创建时间:</th>
+                <td style='text-align:left;padding-left:5px;'><{$reTaskInfo.create_time|date:"Y-m-d H:i:s"}></td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+</div>
+</form>

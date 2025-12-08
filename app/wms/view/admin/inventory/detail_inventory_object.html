@@ -1,0 +1,36 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div> 
+  <div class="division" >
+	<h3>盘点表明细清单</h3>
+	<table width='100%' cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+            <tr>
+                <th>基础物料编码</th>
+                <th>货位</th>
+                <th>条码</th>
+                <th>实际数量</th>
+                <th>盘点人</th>
+                <th>操作时间&nbsp;</th>
+            </tr>
+            </thead>
+            
+            <tbody>
+            <{foreach from=$items item=items key=keys}>
+            <tr class="toggler atStart" >
+                <td><{$items.bn}></td>
+                <td><{$items.pos_name|default:'-'}></td>
+                <td><{$items.barcode}></td>
+                <td><{$items.actual_num}></td>
+                <td><{$items.oper_name}></td>
+                <td><{$items.oper_time|date_format:"%y-%m-%d %H:%I:%S"}></td>
+            </tr>
+            <{/foreach}>
+            </tbody>
+            
+    </table> 
+  </div>
+</div>

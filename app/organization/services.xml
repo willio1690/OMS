@@ -1,0 +1,15 @@
+<services>
+	
+	<service id="desktop_finder.organization_mdl_organization">
+		<class>organization_finder_organization</class>
+	</service>
+	<service id="extend_filter_organization_mdl_organization">
+		<class>organization_finder_extend_filter_organization</class>
+	</service>
+    
+    <service id="html_input">
+        <class>organization_view_input</class>
+    </service>
+    
+
+</services>

@@ -1,0 +1,130 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form class="tableform" id="form_refund" method='post' action='index.php?app=ome&ctl=admin_refund_apply&act=doBatchAgreeRefund&finder_id=<{$env.get.finder_id}>'>
+    <input type='hidden' name='order_id' id='order_id' value='<{$order_id}>'>
+    <input type='hidden' name='shop_id' id='shop_id' value='<{$shop_id}>'>
+    <input type='hidden' name='apply_ids' id='apply_ids' value='<{$apply_ids}>'>
+    <input type='hidden' name='api_refund_request' id='api_refund_request' value='false' />
+
+    <table width="100%" >
+        <tbody>
+        <tr>
+            <th><{t}>退款申请单总数：共 <{$applys_nums}> 笔<{/t}></th>
+            <td></td>
+            <th><{t}>退款申请单总金额：<{/t}></th>
+            <td><b><{$total_money|cur}></b></td>
+        </tr>
+        </tbody>
+    </table>
+    <table width="100%" >
+        <tbody>
+        <tr>
+            <th><{t}>退款银行：<{/t}></th>
+            <td colspan="3">
+                <{input type='text' id='refund_bank' name='bank' value='' width="100"}>
+                <{input id="selectAccount" type="select" name='select_account' options=$pay_account value=''}>
+            </td>
+        </tr>
+        <tr>
+            <th><{t}>退款帐号：<{/t}></th>
+            <td colspan="3"><{input type='text' id='refund_account' name='account' value='' width="200"}></td>
+        </tr>
+        <tr>
+            <th><{t}>第三方交易号：<{/t}></th>
+            <td colspan="3"><{input type='text' id='trade_no' name='trade_no' value='' width="200" }></td>
+        </tr>
+        
+        <tr>
+            <th><{t}>支付帐号：<{/t}></th>
+            <td colspan="3">
+                <{input type='text' name='pay_account' width="100" value='' }>
+            </td>
+        </tr>
+        <tr>
+            <th><em style='color:red;'>*</em><{t}>付款类型：<{/t}></th>
+            <td colspan="3">
+                <{foreach from=$typeList key=key item=item}>
+                <input type="radio" name="pay_type"  value=<{$key}> vtype='requiredradio'><lable><{$item}></lable>&nbsp;
+                <{/foreach}>
+            </td>
+        </tr>
+        <tr>
+            <th><{t}>支付方式：<{/t}></th>
+            <td colspan="3">
+                <select id='payment' name='payment'>
+                </select>
+                <em class="red">请先添加或同步前端店铺支付方式</em>
+            </td>
+        </tr>
+        <tr>
+            <th><{t}>退款单备注：<{/t}></th>
+            <td colspan="3"><textarea name="memo"  cols="80" rows="3" value=''></textarea></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <{area inject=".mainFoot"}>
+    <div class="table-action">
+        <table width="100%" cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr>
+                <td><button class="btn btn-primary" id="btn-submit" onclick='dosubmit()'><span><span><{t}>提交<{/t}></span></span></button></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <{/area}>
+</form>
+
+<script>
+    function dosubmit(){
+        $("form_refund").fireEvent('submit',{stop:function(){}});
+    }
+    (function(){
+
+        $$('input[name^=pay_type]').addEvent('click', function(){
+            var order_id = $('order_id').value, shop_id = $('shop_id').value, pay_type = this.value;
+            W.page('index.php?app=ome&ctl=admin_finance&act=payment_by_pay_type&p[0]='+order_id+'&p[1]='+shop_id+'&p[2]='+pay_type,
+                    {
+                        update:$('payment'),
+                        onComplete:function(){
+                            if($('payment').length <= 1){
+                                $('payment').disabled = 'disabled';
+                            }else{
+                                $('payment').disabled = '';
+                            }
+                        }
+                    });
+        });
+
+        $('form_refund').store('target',{
+            onRequest:function(){
+                $('api_refund_request').set('value', 'true');
+                $('btn-submit').set('disabled', 'true');
+            },
+            onComplete:function(jsontext){
+                var json = Json.evaluate(jsontext);
+                if (typeof(json.error) != 'undefined'){
+                    $('btn-submit').set('disabled', '');
+                }else{
+                    $('btn-submit').set('disabled', 'true');
+                    finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+                    $('btn-submit').getParent('.dialog').retrieve('instance').close();
+                }
+            }
+        });
+
+        $('selectAccount').addEvent('change', function(e){
+            e=new Event(e);
+            var ipt=e.target;
+            var str = ipt.value;
+            var aItems = str.split('-');
+            $('refund_bank').value = aItems[0];
+            $('refund_account').value = aItems[1];
+        });
+
+    })();
+</script>

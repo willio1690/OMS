@@ -1,0 +1,16 @@
+DELIMITER $$
+CREATE PROCEDURE ome_log_remove_partition()
+BEGIN
+    SET @old_date = DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY);
+    SET @old_date_ts = UNIX_TIMESTAMP(@old_date);
+    SET @partition_name = (SELECT PARTITION_NAME FROM INFORMATION_SCHEMA.PARTITIONS WHERE TABLE_NAME = '{table}ome_api_log' AND TABLE_SCHEMA = '{db}' AND PARTITION_DESCRIPTION < @old_date_ts AND PARTITION_NAME != 'p_future' LIMIT 1);
+
+    IF @partition_name IS NOT NULL THEN
+        SET @sql = CONCAT('ALTER TABLE {table}ome_api_log DROP PARTITION `', @partition_name, '`;');
+        PREPARE stmt FROM @sql;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END IF;
+END$$
+
+DELIMITER ;

@@ -1,0 +1,100 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<h3>当前在途库存差异列表</h3>
+<{button label="修复全部" class="btn-primary" id="repare_all"}>
+<div  id="showall">
+ <form id='reparefrom' method="post" action="index.php?app=ome&ctl=admin_stock&act=repare_arrive_stock">   
+        <div class="gray_form" style="margin-top:24px;">
+          <table class="gridlist" style="*width:97%;">
+            <thead>
+              <tr>
+              <th style="padding-left:10px;"><input type="checkbox" id="selectAll" checked></th>
+                <th>货号</th>
+                <th>当前在途库存</th>
+                <th>正确在途库存</th>
+                <th>在途库存流水之和</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+                <{foreach from=$arrive_list item=items key=key}>
+                    <tr>
+                    <td style="padding-left:10px;"><input type="checkbox" class="product_ids" name="product_ids[]" value="<{$items.product_id}>" checked></td>
+                        <td><{$items.bn}></td>
+                        <td><{$items.now_arrive_store}></td>
+                        <td><{$items.local_arrive_store}>&nbsp;</td>
+                        <td><{$items.stream_arrive_store}>&nbsp;</td>
+                        <td><a href="javascript:void(0)" onclick="repare_stock('<{$items.product_id}>')">修正</a></td>
+                    </tr>
+                <{/foreach}>
+            </tbody>
+           
+          </table>
+        </div>
+
+</form>   
+</div>
+<script>
+function repare_stock(product_id){
+    new Request({
+                         url:'index.php?app=ome&ctl=admin_stock&act=repare_arrive_stock',data:'product_ids='+product_id,
+                         method:'post',
+                         onRequest:function(){
+                            return MessageBox.show('正在修改，请稍等...');
+                         },
+                         onComplete:function(re){
+                         var re = JSON.decode(re);
+                         if (re == 'success')
+                          {
+                               alert('操作成功');
+                              window.location.reload(true) 
+                             
+                          }else{
+                              alert('操作失败');
+                          } 
+                         }
+           }).send();
+
+}
+
+$('selectAll').addEvent('click',function(e){
+    var _this = this.checked;
+    var checkvalue = _this;
+    $$('.product_ids').each(function(e){
+        e.set('checked',checkvalue);
+    
+    });
+});
+
+if ($('repare_all'))
+{  
+    var _form = $('reparefrom');
+    
+    $('repare_all').addEvent('click',function(e){
+        var params = _form.toQueryString()
+        //提交
+        new Request({
+                         url:'index.php?app=ome&ctl=admin_stock&act=repare_arrive_stock',data:params,
+                         method:'post',
+                         onRequest:function(){
+                            return MessageBox.show('正在修改，请稍等...');
+                         },
+                         onComplete:function(re){
+                         var re = JSON.decode(re);
+                         if (re == 'success')
+                          {
+                               alert('操作成功');
+                              window.location.reload(true) 
+                             
+                          }else{
+                              alert('操作失败');
+                          } 
+                         }
+           }).send();   
+    
+    });
+}
+</script>

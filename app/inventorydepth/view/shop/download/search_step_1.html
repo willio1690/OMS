@@ -1,0 +1,57 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform" id="goods-search">
+    <div class="error" style="display: none;"></div>
+    <form id="goods-search-form" action="">
+        <input type="hidden" name="baseApiUrl" value="index.php?app=inventorydepth&ctl=shop&act=downloadAjaxV2&p[]=<{$shop_id}>">
+        <table>
+            <tr>
+                <th><em class="c-red">*</em> 开始修改时间：</th>
+                <td><{input type="date" vtype="date&&required" name="start_modified"}></td>
+            </tr>
+            <tr>
+                <th>结束修改时间：</th>
+                <td><{input type="date" vtype="date" name="end_modified"}></td>
+            </tr>
+        </table>
+    </form>
+
+    <div class="table-action">
+        <{button label="下一步" class="btn btn-primary" id="goods-search-btn"}>
+        <{button label="关闭" class="btn btn-secondary" isCloseDialogBtn='true'}>
+    </div>
+</div>
+
+
+<script>
+(function(){
+    $('goods-search-btn').addEvent('click', function(){
+        if(! validate($('goods-search-form'))) return;
+
+        W.page('index.php?app=inventorydepth&ctl=shop&act=downloadPagePromise&p[]=<{$shop_id}>', {
+            data:$('goods-search-form').toQueryString(),
+            method:'post',
+            update:$('goods-search'),
+            onComplete:function(resp){
+                try {
+                    resp = JSON.decode(resp);
+                    if (resp.error){
+                        $E('#goods-search .error').show().setText(resp.error);
+                    }
+                } catch(e) {}
+
+                // $('goods-search-btn').set('disabled', false);
+            },
+            onRequest:function(){
+                $E('#goods-search .error').hide().empty();
+
+                $('goods-search-btn').set('disabled', true);
+            }
+        });
+    });
+})();
+</script>
+

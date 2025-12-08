@@ -1,0 +1,38 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{include file="admin/analysis/graphic_time_header.html" app="o2o"}>
+
+<{if $detail_hidden < 1}>
+<!-- detail start -->
+<div class="large">
+    <{include file="analysis/detail.html" app="eccommon"}>
+</div>
+<!-- detail end -->
+<{/if}>
+
+<{if $graph_hidden < 1}>
+<!-- graph start -->
+<table class="chart-view">
+     <tr><td valign="top">
+        <{include file="analysis/graph.html" app="eccommon"}>
+    </td></tr>
+</table>
+<!-- graph end -->
+<{/if}>
+
+<{if $rank_html}>
+<!-- rank start -->
+<table class="chart-view">
+     <tr>
+        <td valign="top">
+            <{$rank_html}>
+        </td>
+     </tr>
+</table>
+<!-- rank end -->
+<{/if}>
+
+

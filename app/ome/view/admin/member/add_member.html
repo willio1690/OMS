@@ -1,0 +1,153 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+  <form action="index.php?app=ome&ctl=admin_member&act=doAddMember" method="post" id="newMemForm">
+    <table border="0">
+      <tbody>
+        <tr>
+          <th>用户名：</th>
+          <td>
+            <{if $member}>
+              <input type="hidden" name="member_id" value="<{$member['member_id']}>" />
+              <input type="hidden" name="flag" value="<{$flag}>" />
+            <{/if}>
+          	<input id="_uname" name="account[uname]" type="text" vtype="required" size="12" value='<{$member["account"]["uname"]}>' /> <em class="red">*</em>
+          </td>
+          <th>姓名：</th>
+          <td>
+            <input id="_name" name="contact[name]" type="text" vtype="required" size="15" value='<{$member["contact"]["name"]}>' /> <em class="red">*</em>
+          </td>
+        </tr>
+        <tr>
+          <th>性别：</th>
+          <td><input type="radio" value="male" <{if $member['profile']['gender'] == 'male'}> checked <{/if}> name="profile[gender]" vtype="requiredradio">男
+          <input type="radio" name="profile[gender]" value="female" <{if $member['profile']['gender'] == 'female'}> checked <{/if}> vtype="requiredradio">女
+           <em class="red">*</em>
+          </td>
+          <th>固定电话：</th>
+          <td><input id="_telephone" name="contact[phone][telephone]" type="text" value="<{$member['contact']['phone']['telephone']}>" /></td>
+        </tr>
+        <tr>
+          <th>邮编：</th>
+          <td>
+            <input id="_zip" name="contact[zipcode]" type="text" size="6" value="<{$member['contact']['zipcode']}>" />
+          </td>
+          <th>手机：</th>
+          <td><input id="_mobile" name="contact[phone][mobile]" type="text" value="<{$member['contact']['phone']['mobile']}>" /></td>
+        </tr>
+        <tr>
+          <th>Email：</th>
+          <td colspan="3"><input id="_email" name="contact[email]" type="text" vtype="email" size="40" value="<{$member['contact']['email']}>" /></td>
+        </tr>
+        <tr>
+          <th>地区：</th>
+          <td colspan="3"><{input type='region' app='eccommon' name="contact[area]" vtype="area" value=$member['contact']['area'] id="_region" }></td>
+        </tr>
+        <tr>
+        <tr>
+          <th>发票title：</th>
+          <td>
+            <input name="title" type="text" value="<{$member['title']}>" />
+          </td>
+          <th>开票税号：</th>
+          <td><input name="ship_tax" type="text" value="<{$member['ship_tax']}>" /></td>
+        </tr>
+          <th>备注：</th>
+          <td colspan="3">
+            <textarea id="memo" name="remark" rows="5" cols="70"><{$member['remark']}></textarea></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="table-action">
+      <{button label="确定" class="btn-primary" type="button" id="btnMemSubmit"}> &nbsp; &nbsp;
+      <{button label="取消" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+    <input type='hidden' name='shop_id' value=<{$shop_id}>>
+  </form>
+</div>
+<script>
+  (function(){
+
+   function is_phone(str){
+
+	    var partten = /^[\d-]+$/;
+	    if(partten.test(str)){
+	        return true;
+	    }else{
+	        return false;
+	    }
+	}
+
+	function is_mobile(str){
+
+	    var partten = /^\d{8,15}$/;
+	    if(partten.test(str)){
+	        return true;
+	    }else{
+	        return false;
+	    }
+	}
+	  
+    $('btnMemSubmit').addEvent('click',function(){
+      var form = this.getParent('form');
+      if(! validate(form)) return;
+
+	   //固定电话与手机必填一项
+	   var gd_tel,mobile;
+	   gd_tel = $('_telephone').value.replace(" ","");
+	   mobile = $('_mobile').value.replace(' ','');
+	   if (!gd_tel && !mobile){
+          alert('固定电话与手机号码必需填写一项');
+          $('_telephone').focus();
+          return false;
+	   }
+	   if (gd_tel){
+           if (is_phone(gd_tel) === false){
+               alert('请填写正确的固定电话');
+               $('_telephone').focus();
+               return false;
+           }
+	   }
+	   if (mobile){
+          if ( is_mobile(mobile) === false){
+               alert('请输入正确的手机号码');
+               $('_mobile').focus();
+               return false;
+          }
+          if (mobile[0] == '0'){
+               alert('手机号码前请不要加0');
+               $('_mobile').focus();
+               return false;
+          }
+       }
+      
+      //this.getParent('form').fireEvent('sumit',{stop:$empty});
+      new Request({url:form.action,method:'post',data:form.toQueryString(),
+        onRequest:function(){
+          MessageBox.show('正在提交表单');
+        },
+        onComplete:function(json){
+          json = JSON.decode(json);
+          if(json.succ == 'false') {
+            var msg = json.msg ? json.msg : '操作失败';
+            MessageBox.error(json.msg);
+            return;
+          }
+          json = json[0];
+          var getMemTemp = '<tr><td><input type="radio" name="id" value="'+json.member_id+'" vtype="requiredradio" /></td><td><a href="javascript:;" onclick="new Dialog(\'index.php?app=ome&ctl=admin_member&act=editMember&p[0]='+ json.member_id+'\',{width:700,title:\'编辑用户\',height:400})"><span>编辑</span></a></td><td>'+json.uname+'</td><td>'+json.sex+'</td><td>'+json.mobile+'</td><td>'+json.area.split(":")[1]+'</td><td>'+json.email+'</td></tr>';
+          $('memNode').setHTML(getMemTemp);
+          $('memNode').getElement('input[name=id]').addEvent('click',function(){
+            $$('*[disabled]').addClass('nodisabled').set('disabled',false);
+          });
+          $$('.nodisabled').removeClass('nodisabled').set('disabled',true);
+          MessageBox.success('保存成功');
+
+          $('newMemForm').getParent('.dialog').retrieve('instance').close();
+        }
+      }).send();
+    });
+  })()
+</script>

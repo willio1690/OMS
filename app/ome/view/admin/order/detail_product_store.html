@@ -1,0 +1,38 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">       
+<{/capture}>
+
+
+<div class="division">
+<h4>库存明细列表</h4>
+<table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+
+  <thead>
+  <tr>
+      <th>商品编码</th>
+      <th>商品名称</th>
+      <th>待审数量</th>
+      <th>库存</th>
+      <th>冻结库存</th>
+      <th>仓库</th>
+    </tr>
+    </thead>
+      <tbody>
+  <{foreach from=$store_list item=item}>
+    <tr>
+      <td><{if $item.is_less}>【<span style="color: brown;">缺货</span>】<{/if}><{$item.bn}></td>
+      <td><{$item.name}></td>
+      <td><{$item.undly_num}></td>
+      <td><{$item.store}></td>
+      <td><{$item.store_freeze}></td>
+      <td><{$item.branch_name}></td>
+    </tr>
+  <{/foreach}>
+  </tbody>
+</table>
+</div>

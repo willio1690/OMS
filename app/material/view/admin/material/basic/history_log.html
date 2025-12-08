@@ -1,0 +1,157 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<style>
+    .notice-inline.error  {background-image:none;margin-left:25px}
+    #fm1 .division td label ,#fm1 .division div label {vertical-align:top;}
+</style>
+
+    <input type="hidden" name="bm_id" value="<{$material_info.bm_id}>">
+    <div class="tableform">
+        <h3>查看快照</h3>
+        <div class="division">
+            <h5>基本信息</h5>
+            <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+                <thead>
+                <tr>
+                    <td width="10%" align="right" nowrap="nowrap">物料名称：</td>
+                    <td><{$data.material_name}></td>
+                    <td width="10%" align="right" nowrap="nowrap">物料类型：</td>
+                    <td><{$data.type_name}></td>
+                </tr>
+                <tr>
+                    <td width="10%" align="right" nowrap="nowrap">物料款号：</td>
+                    <td><{$data.material_spu}></td>
+                    <td width="10%" align="right" nowrap="nowrap">物料规格：</td>
+                    <td><{$data.specifications}></td>
+                </tr>
+                <tr>
+                    <td width="10%" align="right" nowrap="nowrap">物料编号：</td>
+                    <td><{$data.material_bn}></td>
+                    <td  width="10%" align="right" nowrap="nowrap">物料品牌：</td>
+                    <td><{$data.brand_name}></td>
+                </tr>
+                <tr>
+                    <td width="10%" align="right" nowrap="nowrap">物料条码：</td>
+                    <td><{$data.barcode}></td>
+                    <td width="10%" align="right" nowrap="nowrap">特殊扫码配置：</td>
+                    <td><{if $data.openscan}><{$data.openscan}><{/if}></td>
+                </tr>
+                <tr>
+                    <td width="10%" align="right" nowrap="nowrap">是否启用唯一码：</td>
+                    <td><{$data.serial_number}></td>
+                </tr>
+                <tr>
+                    <td width="10%" align="right">是否在售：</td>
+                    <td><{$data.is_sales}></td>
+                    <td colspan="2" rowspan="2" style="width: 550px;">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td width="10%" align="right">物料属性：</td>
+                    <td><{$data.is_type}></td>
+                </tr>
+                <tr>
+                    <td width="10%" align="right">是否全渠道：</td>
+                    <td><{$data.is_channel}></td>
+                </tr>
+                </thead>
+            </table>
+
+            
+
+            
+            <div id="warn_div">
+            <{if $data.show_storage_life}>
+                <div id="warn_div">
+                    <h5 style="margin-top:10px;">保质期管理</h5>
+                    <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+                        <thead>
+                        <tr>
+                            <td width="10%" align="right" nowrap="nowrap">
+                                是否启用保质期监控：
+                            </td>
+                            <td>是</td>
+                        </tr>
+                        <tr class="use_expire_conf" >
+                        <td width="10%" align="right" nowrap="nowrap">
+                            预警天数配置：
+                        </td>
+                        <td><{$data.warn_day}> </td>
+                        </tr>
+                        <tr class="use_expire_conf">
+                        <td width="10%" align="right" nowrap="nowrap">
+                            自动退出库存天数配置：
+                        </td>
+                        <td><{$data.quit_day}></td>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+         <{/if}>
+                <h5 style="margin-top:10px;">发票信息</h5>
+                <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+                    <thead>
+                    <tr>
+                        <td width="10%" align="right" nowrap="nowrap">
+                            开票税率：
+                        </td>
+                        <td><{$data.tax_rate}></td>
+                    </tr>
+                    <tr>
+                        <td width="10%" align="right" nowrap="nowrap">
+                            开票名称：
+                        </td>
+                        <td><{$data.tax_name}></td>
+                    </tr>
+                    <tr>
+                        <td width="10%" align="right" nowrap="nowrap">
+                            发票分类编码：
+                        </td>
+                        <td><{$data.tax_code}></td>
+                    </tr>
+                    </thead>
+                </table>
+                <h5 style="margin-top:10px;">扩展信息</h5>
+                <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+                    <thead>
+                    <tr>
+                        <td width="10%" align="right" nowrap="nowrap">
+                            成本价：
+                        </td>
+                        <td><{$data.cost}></td>
+                    </tr>
+                    <tr>
+                        <td width="10%" align="right" nowrap="nowrap">
+                            零售价：
+                        </td>
+                        <td><{$data.retail_price}></td>
+                    </tr>
+                    <tr>
+                        <td width="10%" align="right" nowrap="nowrap">
+                            重量：
+                        </td>
+                        <td><{$data.weight}></td>
+                    </tr>
+                    <tr>
+                        <td width="10%" align="right" nowrap="nowrap">
+                            包装单位：
+                        </td>
+                        <td><{$data.unit}></td>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div id="cc" class="noprint table-action">
+                <{button type="button" class="btn-secondary" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}>
+            </div>
+        </div>
+

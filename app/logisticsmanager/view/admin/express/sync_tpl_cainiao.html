@@ -1,0 +1,39 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform" id='sync_form'>
+    <h3>同步<{$template_cfg.template_name}>模板</h3>
+    <div style="margin: 15px 0px 15px;color:red">
+        只同步开启的电子面来源关联的<{$template_cfg.shop_name}>店铺， 如店铺未使用，请关闭对应的电子面单来源，避免同步失败
+    </div>
+    <div style="margin: 15px 0px 15px;">
+        <a href="<{$template_cfg.print_url}>" target="_blank">下载<{$template_cfg.template_name}>组件</a> &nbsp;&nbsp;
+        <{if $template_cfg.print_url_2}><a href="<{$template_cfg.print_url_2}>" target="_blank">下载<{$template_cfg.template_name_2}>组件</a> &nbsp;&nbsp;<{/if}>
+        <{if $template_cfg.template_url}><a href="<{$template_cfg.template_url}>" target="_blank">设置<{$template_cfg.template_name}>模板</a><{/if}>
+    </div>
+    <div id="progress">同步中...</div>
+</div>
+<script type="text/javascript">
+    (function(){
+        var finder_id = '<{$finder_id}>';
+        new Request({
+            url: 'index.php?app=logisticsmanager&ctl=admin_express_cainiao&act=doSyncTpl',
+            data: {channel_type:'<{$channel_type}>'},
+            method: 'post',
+            onSuccess: function (response) {
+                var rs = JSON.decode(response);
+                if (rs['rsp'] == 'succ') {
+                    var pHtml = rs['msg'] ? rs['msg'] : '<br/>同步完成';
+                    $('progress').set('html', pHtml);
+                    finderGroup[finder_id].refresh.delay(100, finderGroup[finder_id]);
+                    //$('sync_form').getParent('.dialog').retrieve('instance').close();
+                } else {
+                    var pHtml = '<br/><span style="color:red">失败：' + rs['msg'] + '</span>';
+                    $('progress').set('html', pHtml);
+                }
+            }
+        }).send();
+    })();
+</script>

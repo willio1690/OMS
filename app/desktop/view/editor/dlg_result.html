@@ -1,0 +1,10 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<select name="<{$type}>" style="width:200px;margin-top:5px">
+  <{foreach from=$list item=item}>
+  <option value="<{$item.url}>"><{$item.label}></option>
+  <{/foreach}>
+</select>

@@ -1,0 +1,419 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<link rel="stylesheet" type="text/css" href="<{$env.app.res_url}>/style.css" media="screen" />
+<style type="text/css">
+.exec_hour { width:auto; height:30px; line-height:30px; }
+</style>
+<div class="tableform">
+  <div id="x-g-basic" class="goods-detail">
+  <form action="index.php?app=console&ctl=admin_vopsetting&act=save&finder_id=<{$env.get.finder_id}>" method="post" id="setting_frm" name="setting_frm">
+    <table cellspacing="0" cellpadding="0" border="0">
+        <tbody>
+          <tr>
+                <th><span class="red">*</span>应用店铺:</th>
+                <td>
+                    <input type='checkbox' name='shopids[]' value='_ALL_' id='all_shop'>所有店铺
+                    <ul id='shops' >
+                        <{foreach from=$shopList item=value key=key}>
+                            <li class='span-auto' style='min-width: 118px;margin-bottom:5px;'>
+                                <{if in_array($value.shop_id, $used_shop_ids)}>
+                                    <input disabled="disabled" type='checkbox' name='shopids[]' value="<{$value.shop_id}>" /> <span style='font-size:14px;font-weight:bold;'><{$value.name}></span>
+                                <{else}>
+                                    <input type='checkbox' name='shopids[]' value="<{$value.shop_id}>" <{if in_array($value.shop_id, $sel_shop_ids)}>checked<{/if}> onchange="select_shop(this)" /> 
+                                    <span <{if in_array($value.shop_id, $sel_shop_ids)}>style='font-size:14px;font-weight:bold;color:red;'<{else}>style='font-size:14px;font-weight:bold;'<{/if}> ><{$value.name}></span>
+                                <{/if}>
+                            </li>
+                        <{/foreach}>
+                    </ul>
+                </td>
+            </tr>
+
+            <tr>
+                <th height="30">每日拣货时间点：</th>
+                <td><span style="color:#999;">请设置具体每天拣货的时间点！</span></td>
+            </tr>
+            <tr>
+              <th height="30">&nbsp;</th>
+              <td id="hourNode">
+                <{if $sel_exec_hour}>
+                    <{foreach from=$sel_exec_hour key=key item=hour}>
+                        <div class="exec_hour">
+                            <span><input name="exec_hour[]" type="checkbox" value="<{$key}>" checked="checked" /> 时间段<{$key}>：</span>
+                            <span>
+                                <select name="exec_hour_<{$key}>" id="exec_hour_<{$key}>">
+                                <{foreach from=$hour_list key=key_i item=hourVal}>
+                                    <option value="<{$key_i}>" <{if $key_i == $hour}>selected<{/if}> ><{$hourVal}></option>
+                                <{/foreach}>
+                                </select>
+                            </span>
+                            <{if $key == 1}>
+                            <span>&nbsp;&nbsp;<{button type="button" label="添加更多" class="btn-secondery" name="btn_add_hour" id="btn_add_hour"}></span>
+                            <{/if}>
+                        </div>
+                    <{/foreach}>
+                <{else}>
+                    <div class="exec_hour">
+                        <span><input name="exec_hour[]" type="checkbox" value="1" /> 时间段1：</span>
+                        <span>
+                            <select name="exec_hour_1" id="exec_hour_1">
+                            <{foreach from=$hour_list key=key item=val}>
+                                <option value="<{$key}>"><{$val}></option>
+                            <{/foreach}>
+                            </select>
+                        </span>
+                        <span>&nbsp;&nbsp;<{button type="button" label="添加更多" class="btn-secondery" name="btn_add_hour" id="btn_add_hour"}></span>
+                    </div>
+                <{/if}>
+              </td>
+            </tr>
+
+            <tr>
+                <th height="30">指定出库仓：</th>
+                <td>
+                <{if $branch_list}>
+                <select name="branch_id" id="branch_id">
+                <{foreach from=$branch_list item=val}>
+                    <option value="<{$val.branch_id}>" <{if $val.branch_id == $vop_config.branch_id}>selected<{/if}> ><{$val.name}></option>
+                <{/foreach}>
+                </select>
+                <{else}>
+                <select name="branch_id" id="branch_id">
+                     <option value="">=请先获取仓库数据=</option>
+                </select>
+                <{/if}>&nbsp;&nbsp;<span style="margin-left:5px;color:red">&nbsp;*目前只支持自有仓储和伊藤忠仓储</span>
+                </td>
+            </tr>
+
+            <tr>
+                <th height="30">承运商：</th>
+                <td>
+                <div id="load_carrier_code">
+                    <select name="carrier_code" id="carrier_code">
+                        <option value="">请选择</option>
+                        <{foreach from=$carrier_code key=key item=val}>
+                        <option value="<{$key}>" <{if $vop_config.carrier_code == $key}>selected<{/if}> ><{$val}></option>
+                        <{/foreach}>
+                    </select>
+                </div>
+                </td>
+            </tr>
+            
+            <tr>
+                <th height="30">配送方式：</th>
+                <td>
+                    <select name="dly_mode" id="dly_mode">
+                        <option value="">请选择</option>
+                        <{foreach from=$dly_mode key=key item=val}>
+                        <option value="<{$key}>" <{if $vop_config.dly_mode == $key}>selected<{/if}> ><{$val}></option>
+                        <{/foreach}>
+                    </select>
+                </td>
+            </tr>
+            
+            <tr>
+                <th height="30">是否合并出库：</th>
+                <td><input type="radio" name="is_merge" value="1" <{if $vop_config.is_merge=='1'}>checked<{/if}> >是 <input type="radio" name="is_merge" value="0" <{if $vop_config.is_merge != '1'}>checked<{/if}> >否<span style="margin-left:5px;color:red">&nbsp;多个拣货单要求入相同的唯品会仓库时，是否允许合并生成一张出库单出库</span></td>
+            </tr>
+            
+            <tr>
+                <th height="30">启用状态：</th>
+                <td>
+                <input type="radio" name="is_auto_combine" value="1" <{if $vop_config.is_auto_combine=='1'}>checked<{/if}> >是 
+                <input type="radio" name="is_auto_combine" value="0" <{if $vop_config.is_auto_combine !='1'}>checked<{/if}> >否
+                </td>
+            </tr>
+
+            <tr>
+                <td style="border-top:1px solid #e8e8e8;"><input type="hidden" name="sid" value="<{$vop_config.sid}>" /></td>
+                <td style="border-top:1px solid #e8e8e8; text-align:left;">
+                    <div class="table-action text_left" style="border:0px; text-align:left;">
+                        <{if $vop_config.sid}>
+                            <{button id="btn_setting" label="保存" type="submit" name="submit" }>
+                        <{else}>
+                            <{button id="btn_setting" label="提交" type="submit" name="submit" }>
+                        <{/if}>
+                        
+                        <{button label="关闭" type="button" id="btn-close"}>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </form>
+  </div>
+</div>
+<script>
+(function(){
+    //所有店铺
+    $('all_shop').addEvent('change',function(){
+        var a =  $$('form input[type=checkbox][name=shopids[]]');
+        if(a[0].checked){
+            for(var i = 0;i<a.length;i++){
+                if(a[i].disabled){
+                    continue;
+                }
+                if(a[i].type == "checkbox") a[i].checked = true;
+            }
+        }else{
+            for(var i = 0;i<a.length;i++){
+                if(a[i].disabled){
+                    continue;
+                }
+                if(a[i].type == "checkbox") a[i].checked = false;
+            }
+        }
+        
+        ajax_carrier_code();
+    });
+})();
+
+(function(){
+    var _form = $('setting_frm');
+    var btn = $('btn_setting');//提交按钮
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    _form.store('target',{
+        onComplete:function(){
+        },
+        onSuccess:function(response){
+            
+            var hash_res_obj = JSON.decode(response);
+            
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+                if(_dialogIns){
+                    finder.refresh();
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+    
+    btn.addEvent("click",function(e)
+    {
+        var shop_ids    = $$('form input[type=checkbox][name=shopids[]]');
+        var shop_empty    = true;
+        for(var i=0; i<shop_ids.length; i++)
+        {
+            if(shop_ids[i].checked)
+            {
+                shop_empty    = false;
+            }
+        }
+        if(shop_empty)
+        {
+            alert("请选择店铺");
+            return false;
+        }
+        
+        var is_auto_combine = $$('form input[type=radio][name=is_auto_combine]:checked').get('value');
+        if(is_auto_combine != "1")
+        {
+            return true;
+        }
+        
+        var branch_id    = $("branch_id").value;
+        var key_i, hour;
+        var hour_list    = new Array();
+        var conditions = document.getElementsByName("exec_hour[]");
+        var carrier_code = $("carrier_code").value;
+        var dly_mode = $("dly_mode").value;
+		
+        if(branch_id == "")
+        {
+            alert("请选择出库仓");
+            return false;
+        }
+        
+        if(carrier_code == "")
+        {
+            alert("请选择承运商");
+            return false;
+        }
+        
+        if(dly_mode == "")
+        {
+            alert("请选择配送方式");
+            return false;
+        }
+        
+        var flag = false;
+        for(var i=0; i<conditions.length; i++)
+        {
+            if(conditions[i].checked == true)
+            {
+                key_i    = i + 1;
+                hour = $("exec_hour_"+ key_i).value;
+                
+                if(hour_list.indexOf(hour) != -1)
+                {
+                    alert("不能选择相同的时间段 "+ hour + ":00");
+                    return false;    
+                }
+                
+                hour_list[i]    = hour;
+                flag = true;
+            }
+        }
+        
+        if(!flag)
+        {
+            alert('请选择每日审核时间点');
+            return false;
+        }
+        
+        _form.fireEvent('submit',{stop:$empty});
+    });
+
+    $('btn-close').addEvent('click', function(){
+        $('btn-close').getParent('.dialog').retrieve('instance').close();
+    });
+})();
+
+function get_arrival_time(e)
+{
+    var dly_mode = e.value;
+    
+    if(dly_mode == "")
+    {
+        return false;    
+    }
+    
+    var arrivalTime = new Array();
+    var json = "";//<{$json_arrival_time}>
+    
+    if(json)
+    {
+        for (var i in json)
+        {
+            arrivalTime[i] = new Array();
+            
+            for(var k in json[i])
+            {
+                arrivalTime[i][k]    = json[i][k];
+            }
+        }
+        
+        var html = '<select name="arrival_hour" id="arrival_hour"><option value="">请选择时间段</option>';
+        
+        var sel_arrivalTime = new Array();
+        sel_arrivalTime = arrivalTime[dly_mode];
+        
+        for(i=1; i<sel_arrivalTime.length; i++)
+        {
+            html += '<option value="'+ sel_arrivalTime[i] +'">'+ sel_arrivalTime[i] +'</option>';    
+        }
+        
+        html += '</select>';
+        
+        $("set_arrival_time").set('html', html);
+    }
+}
+
+var json_hour_list = <{$json_hour_list}>;
+var hour_data = eval(json_hour_list);
+$("btn_add_hour").addEvent('click', function(e){
+    
+    var execHourObj   = document.getElementsByName("exec_hour[]");
+    var hourLength    = execHourObj.length;
+    
+    if(hourLength > 11)
+    {
+        alert("最多可添加12个时间段");
+        return false;
+    }
+    
+    var nowLength     = hourLength + 1;
+    var html = '<span><input name="exec_hour[]" type="checkbox" value="'+ nowLength +'" /> 时间段'+ nowLength +'：</span>';
+    html += '<span><select name="exec_hour_'+ nowLength +'" id="exec_hour_'+ nowLength +'">';
+    
+    for(var i in hour_data){
+        html += '<option value="'+ i +'">'+ hour_data[i] +'</option>';
+    }
+    
+    html += '</select></span>';
+    var newRow = new Element('div.exec_hour',{html:html}).inject($('hourNode'));
+});
+
+function select_shop(obj)
+{
+    if(obj.checked)
+    {
+        obj.getNext('span').setStyle('color','red');
+    }
+    else
+    {
+        obj.getNext('span').setStyle('color','');
+    }
+    
+    ajax_carrier_code();
+}
+
+function ajax_carrier_code()
+{
+    var a =  $$('form input[type=checkbox][name=shopids[]]');
+    var sel_carrier_code = "<{$vop_config.carrier_code}>";
+    var shop_ids = '';
+    var html = '<select name="carrier_code" id="carrier_code"><option value="">请选择</option></select>';
+    
+    for(var i = 0;i<a.length;i++){
+        
+        if(a[i].checked)
+        {
+            if(a[i].value != '_ALL_')
+            {
+                shop_ids += (',' + a[i].value);
+            }
+        }
+    }
+    
+    if(shop_ids == '')
+    {
+        $("load_carrier_code").set('html', html);
+        
+        return false;    
+    }
+    
+    new Request(
+    {
+        url: "index.php?app=console&ctl=admin_vopsetting&act=ajax_carrier_code",
+        async:false,
+        method:'post',
+        data:{shop_ids:shop_ids},
+        onComplete: function(json)
+        {
+            json = JSON.decode(json);
+            
+            if(json.res == 'succ')
+            {
+                carrier_data = json.carrier_list;
+                html = '<select name="carrier_code" id="carrier_code"><option value="">请选择</option>';
+                
+                carrier_data.each(function(rs, i)
+                {
+                    if(rs.carrier_code == sel_carrier_code)
+                    {
+                        html            += '<option value="'+ rs.carrier_code +'" selected="selected">'+ rs.carrier_name +'</option>';
+                    }
+                    else
+                    {
+                        html    += '<option value="'+ rs.carrier_code +'">'+ rs.carrier_name +'</option>';
+                    }
+                });
+                html    += '</select>';
+                
+                $("load_carrier_code").set('html', html);
+            }
+            else
+            {
+                $("load_carrier_code").set('html', html);
+                alert("获取承运商失败");
+            }
+        }
+    }).send();
+}
+</script>

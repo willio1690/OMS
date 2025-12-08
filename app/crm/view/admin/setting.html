@@ -1,0 +1,125 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div style="margin-left:20px;margin-bottom:10px;padding:5px; border:0;font-size:15px;">
+	<table width="100%" cellpadding="0" cellspacing="0" border="0">
+		<tr>
+			<td>
+			
+			<{if !$crmInfo}>
+				<span style="color:red;font-weight:bold;">您还未绑定CRM,请先进行绑定</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<{button type="button" id="ap" label="申请绑定关系" onclick="apply_bindrelation()" app="channel"}></p>
+			
+			<{else}>
+				<span style="font-weight:bold;">系统状态：<span style="color:green;">已绑定CRM系统</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<{button type="button" id='view_bindrelation' label="查看绑定关系" onclick="view_bindrelation()" app="channel"}>
+			<{/if}>
+			</td>
+		</tr>
+	</table>
+</div>
+<{if !$crmInfo}>
+	<div style="margin-left:10px;border:1px #666666 solid;width:581px;">
+	
+		<a href="http://www.shopex.cn/products/crm" target="_blank"><img width="581px" height="383px"  src='<{$env.app.res_url}>/crm.gif'></a>
+	</div>
+<{/if}>
+
+<{if $crmInfo}>
+	<form action='index.php?app=crm&ctl=admin_setting&act=add' method='post'>
+		<div class='tableform'>
+	         <table width="100%" cellspacing="0" cellpadding="0" border="0">
+	             <tbody>
+					<tr>
+						<th>添加赠品应用：</th>
+						<td>
+							<input   type="radio"  name="crm[gift]"  value="on" <{if $data.gift eq 'on'}>checked<{/if}> onclick="basicOn();">开启&nbsp;&nbsp;&nbsp;
+							<input  type="radio"  name="crm[gift]" value="off" <{if !$basic }>checked<{/if}><{if $data.gift eq 'off'}>checked<{/if}> onclick="basicOff();">关闭
+							<{if $gift_count eq 0}>
+								<span style="color:red;font-weight:bold;">（先在赠品管理内添加赠品，再到CRM应用端添加赠品规则）</span>
+							<{/if}>
+							
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<{if !$basic}>
+				<script>
+					document.getElementById('crm_basic').style.display = "none";
+				</script>
+			<{/if}>
+			<div id='crm_basic' >
+					<{include file='admin/basic.html'}>;
+		   </div> 
+		   	   <table width="100%" cellspacing="0" cellpadding="0" border="0">
+	             <tbody>
+					<tr>
+						<th>操作日志：</th>
+						<td>
+						<{if $operation_data}>
+						<{foreach from=$operation_data item=value}>
+						<span style="font-weight:bold;"><{$value.memo}></span>&nbsp;&nbsp;<{$value.operate_time|cdate:'FDATE_FTIME'}>&nbsp;&nbsp;&nbsp;by &nbsp;<{$value.op_name}>
+							<br/>
+						<{/foreach}>
+						<{/if}>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</form>
+<{/if}>
+<script>
+	//var server_name = "<{$server_name}>";
+	function basicOn(){
+		 document.getElementById('crm_basic').style.display = "";
+	}
+	//编辑商品时，验证是否能开启规格
+	function basicOff() {
+		if(confirm('确认关闭？')){
+			new Request({
+			    url:'index.php?app=crm&ctl=admin_setting&act=removeSetting',
+			    onComplete: function(json) {
+			    	document.getElementById('crm_basic').style.display = "none";
+			    }
+			 }).send(); 
+			return true;
+		}else{
+	        return false;
+	    }
+		//document.getElementById('crm_basic').style.display = "none";
+		 //进入后台删除相关配置信息
+		/*new Request({
+		    url:'index.php?app=crm&ctl=admin_setting&act=removeSetting',
+		    onComplete: function(json) {
+		    	//history.go(0);
+		    }
+		 }).send(); */
+	}
+	//申请CRM绑定
+	function apply_bindrelation(server_name){
+		var server_name1 = "<{$server_name}>";
+	   	 new Request({
+             url:'index.php?app=crm&ctl=admin_setting&act=apply_bindrelation',
+             onComplete: function(text) {
+             	mesg = window.open('http://'+server_name1+'/index.php','','width=800,height=400');
+             	mesg.document.write(text);
+             }
+      	}).send();
+		
+	}
+	//查看绑定关系
+	function view_bindrelation(){
+		var server_name2 = "<{$server_name}>";
+ 	   	 new Request({
+             url:'index.php?app=channel&ctl=admin_channel&act=view_bindrelation',
+             onComplete: function(text) {
+             	mesg2 = window.open('http://'+server_name2+'/index.php','','width=800,height=400');
+             	mesg2.document.write(text);
+             }
+      	}).send();
+	}
+
+</script>

@@ -1,0 +1,17 @@
+<services>
+    <service id="desktop_finder.taoguaniostockorder_mdl_iso">
+        <class>taoguaniostockorder_finder_iso</class>
+    </service>
+    <service id="extend_filter_taoguaniostockorder_mdl_iso">
+        <class>taoguaniostockorder_finder_extend_filter_iso</class>
+    </service>
+    <service id="taoguaniostockorder.iostockorder">
+        <class>taoguaniostockorder_iostockorder</class>
+    </service>
+     <service id="data_clear">
+        <class>taoguaniostockorder_service_data_clear</class>
+    </service>
+    <service id="operation_log">
+        <class>taoguaniostockorder_operation_log</class>
+    </service>
+</services>

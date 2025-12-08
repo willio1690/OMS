@@ -1,0 +1,14 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<span>
+<select type="select" name="class_id" id="class_id" required="true" class=" x-input-select inputstyle">
+<{if $class_list}>
+<{foreach from=$class_list key=keyVal item=itemVal}>
+<option value="<{$itemVal.class_id}>" <{if $itemVal.class_id == $init.content.class_id}>selected<{/if}>><{$itemVal.class_name}></option>
+<{/foreach}>
+<{/if}>
+</select>
+</span>

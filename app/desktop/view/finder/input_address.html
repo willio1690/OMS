@@ -1,0 +1,48 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<link rel="stylesheet" type="text/css" href="<{$base_url}>/app/desktop/statics/css/layui.css"/>
+<link rel="stylesheet" href="<{$base_url}>/app/desktop/statics/css/address.css">
+<input id="cascader" >
+<input type="hidden" name="<{$params.name}>" id="<{$params.id}>" value="<{$params.data}>">
+
+<script>
+    var casader;
+    var value = "<{$params.data}>";
+    var options = <{$treeList}>;
+    if (value =='') {
+        value = null;
+        var disabled = false;
+    }else{
+        value = JSON.parse(value);
+        var disabled = true;
+    }
+    Ex_Loader('layui',function(){
+        Ex_Loader('address',function(){
+            layui.use(['layCascader'], function () {
+                var layCascader = layui.layCascader;
+                var cascader = layCascader({
+                    elem: '#cascader',
+                    options: options,
+                    value: value,
+                    disabled: disabled,
+                    clearable: !disabled,
+                    placeholder: '请选择',
+                    props: {
+                        multiple: true,
+                        value: 'id',
+                        label: 'label',
+                        checkStrictly: true
+                    }
+                });
+                cascader.change(function (values, nodes) {
+                    var arr = nodes
+                        .map(n => n.path.map(p => p.data.id).join(','))
+                    document.getElementById("<{$params.id}>").value = JSON.stringify(arr)
+                })
+            });
+        });
+    });
+</script>

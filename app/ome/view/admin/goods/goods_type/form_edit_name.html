@@ -1,0 +1,80 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division" style=" padding:3px; margin:0;">
+<table>
+<tr>
+  <th align="right"><{t}>类型名称:<{/t}></th>
+  <td><input type="text" class="_x_ipt" vtype="required" name="gtype[name]" value="<{$gtype.name|escape:'html'}>">*</td>
+</tr>
+<tr>
+  <th align="right"><{t}>类型别名:<{/t}></th>
+  <td><input type="gtype[text]" value="<{$gtype.alias|escape:'html'}>" name="gtype[alias]" size="40"/><br /><{t}>（以"|"分隔，以"|"开头与结尾，如：“|T恤|T恤衫|”）<{/t}></td>
+</tr>
+<tr>
+          <th><{t}>京东分类:<{/t}></th>
+          <td>
+          <input type="hidden" value="<{$gtype.addon.jd_code}>" name="gtype[addon][jd_code]" class='x-input'/>
+          <select id="firstCategoryNo" level=1></select> -
+          <select id="secondCategoryNo" level=2></select> -
+          <select id="thirdCategoryNo" level=3></select>
+          </td>
+        </tr>
+
+
+<{if $brands}>
+<tr>
+  <th align="right"><{t}>关联品牌:<{/t}></th>
+
+  <td class="select-brand">
+    <div class="content-head"><input type="checkbox" id="checkAll" <{if $select_all}>checked='checked'<{/if}> name="checkAll" class="x-input " autocomplete="off">全选</label></div><br/>
+    <{foreach from=$brands item=item key=key}>
+        <input type="checkbox" name="gtype[brand][<{$key}>][brand_id]" value="<{$item.brand_id}>" <{if $gtype.brand[$item.brand_id]}>checked='checked'<{/if}> /><{$item.brand_name}>
+    <{/foreach}>
+  </td>
+</tr>
+<{/if}>
+</table>
+</div>
+<script>
+if($('checkAll')){
+  $('checkAll').addEvent('click',function(){
+    $ES('input[type=checkbox]').set('checked',this.checked==true?true:false);
+  });
+  }
+
+$$('#firstCategoryNo','#secondCategoryNo','#thirdCategoryNo').addEvent('change',function(){
+    var curVal = this.value;
+    var nextObj = curVal ? this.getNext('select') : this;
+
+    if ($defined(nextObj)) {
+        nextObj.empty();$('thirdCategoryNo').empty();
+
+        var nextLevel = curVal ? nextObj.get('level') : this.get('level');
+        var jd_code = $E('input[name="gtype[addon][jd_code]"]').value.split('/');
+        new Request.JSON({
+          url:"index.php?app=ome&ctl=admin_goods_cat&act=getJdCate&p[0]="+curVal+"&p[1]="+nextLevel,
+          onComplete:function(resp){
+            if (resp.success && resp.msg.length>0) {
+              nextObj.adopt(new Element('option',{'value':'', 'text':'请选择'}));
+              resp.msg.each(function(item){
+                  nextObj.adopt(new Element('option',{'value':item.categoryNo,'text':item.categoryName,'selected':item.categoryNo==jd_code[nextObj.get('level')-1]?true:false}));
+              });
+
+              if ($defined(nextObj.getElement('option:selected')) && nextObj.getElement('option:selected').value){
+                  nextObj.fireEvent('change');
+              }
+            }
+          }
+        }).send();
+    } else {
+        var jd_code = $('firstCategoryNo').value + '/' + $('secondCategoryNo').value + '/' + $('thirdCategoryNo').value;
+
+        $E('input[name="gtype[addon][jd_code]"]').value = jd_code;
+    }
+});
+
+$('firstCategoryNo').fireEvent('change');
+</script>

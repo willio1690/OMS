@@ -1,0 +1,104 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <form method="post" action="index.php?app=o2o&ctl=admin_store&act=saveBatchCtrlStore" id="batch-store-form">
+        <{foreach from=$storeIds item=storeId}>
+        <input type="hidden" name="store_ids[]" value="<{$storeId}>">
+        <{/foreach}>
+        
+        <div class="division">
+            <div style="padding: 10px; background-color: #f0f8ff; border: 1px solid #b0d4f1; border-radius: 4px; margin-bottom: 15px;">
+                <strong>已选择 <{$selected_count}> 个门店进行批量设置</strong>
+            </div>
+        </div>
+        
+        <div class="division">
+            <table>
+                <tbody>
+                <tr>
+                    <th>
+                        管控库存：
+                    </th>
+                    <td>
+                        <input type="radio" name="is_ctrl_store" value="1" checked>是
+                        <input type="radio" name="is_ctrl_store" value="2">否
+                    </td>
+                </tr>
+                <tr id="negative-store-row">
+                    <th>
+                        允许负库存：
+                    </th>
+                    <td>
+                        <input type="radio" name="is_negative_store" value="1">是
+                        <input type="radio" name="is_negative_store" value="2" checked>否
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        是否参加O2O：
+                    </th>
+                    <td>
+                        <input type="radio" name="is_o2o" value="1" checked>是
+                        <input type="radio" name="is_o2o" value="2">否
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-action">
+            <{button class="btn-primary" type="button" id="savebatchstore" name="submit" label="保存"}>
+            <{button class="btn-secondary" type="button" isCloseDialogBtn="true" label="取消"}>
+        </div>
+    </form>
+</div>
+
+<script>
+    // 页面加载完成后设置初始显示状态
+    window.addEvent('domready', function() {
+        var selectedCtrlStore = $$('input[name="is_ctrl_store"]:checked')[0];
+        var negativeStoreRow = $('negative-store-row');
+        
+        if (selectedCtrlStore && selectedCtrlStore.value == "1") {
+            negativeStoreRow.style.display = 'table-row';
+        } else {
+            negativeStoreRow.style.display = 'none';
+        }
+    });
+
+    // 监听管控库存单选框变化
+    $$('input[name="is_ctrl_store"]').addEvent('change', function() {
+        var negativeStoreRow = $('negative-store-row');
+        if (this.value == "1") {
+            negativeStoreRow.style.display = 'table-row';
+            // 当选择管控库存为"是"时，自动设置允许负库存为"否"
+            $$('input[name="is_negative_store"][value="2"]').set('checked', true);
+        } else {
+            negativeStoreRow.style.display = 'none';
+        }
+    });
+
+    $('savebatchstore').addEvent('click',function(event){
+        // 提交表单
+        $('batch-store-form').fireEvent('submit', {stop:$empty});
+    });
+
+    $('batch-store-form').store('target',{
+        onRequest:function(){
+            $('savebatchstore').set('disabled', 'true');
+        },
+        onComplete:function(resp){
+            resp = JSON.decode(resp)
+
+            $('savebatchstore').set('disabled', '');
+            if (resp.error) return ;
+
+            $('batch-store-form').getParent('.dialog').retrieve('instance').close();
+
+            finderGroup['<{$env.get.finder_id}>'].refresh();
+        }
+    });
+</script>

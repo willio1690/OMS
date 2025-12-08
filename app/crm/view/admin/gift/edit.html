@@ -1,0 +1,157 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="POST" action="index.php?<{$env.server.QUERY_STRING}>" class="tableform" id="gift_form">
+    <{input type="hidden" name="id" value=$rs.gift_id }>
+    <div class="division1">
+
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" >
+            <tr>
+                <th><{t}>赠品名称：<{/t}></th>
+                <td>
+                    <{$rs.gift_name}>
+                </td>
+            </tr>
+            <tr>
+                <th><{t}>商家编码：<{/t}></th>
+                <td>
+                    <{$rs.gift_bn}>
+                </td>
+            </tr>
+            <tr>
+                <th><{t}> 数量设置：<{/t}></th>
+                <td>
+                   <input type="radio" name="giftset" class='giftset' value='0' <{if $rs.giftset=='0'  || $rs.giftset==''}>checked<{/if}>> 指定数量
+                    <input type="radio" name="giftset" class='giftset' value='2' <{if $rs.giftset=='2'}>checked<{/if}>> 实际库存数量
+                    <input type="radio" name="giftset" class='giftset' value='1' <{if $rs.giftset=='1'}>checked<{/if}>> 不限数量
+
+                </td>
+            </tr>
+            <tr class='gifthtml'>
+                <th><{t}>赠送数量：<{/t}></th>
+                <td>
+                    <{input type="text" id="gift_num" name="gift_num" value=$rs.gift_num size="4" }>
+                </td>
+            </tr>
+            <tr class='giftyj'>
+                <th><{t}>预警设置：<{/t}></th>
+                <td>
+                    <{input type="bool" id="gift_yj" name="is_yujing" value=$rs.is_yujing}>
+                </td>
+            </tr>
+            <tr class='giftyjhtml'>
+                <th><{t}>预警数量：<{/t}></th>
+                <td>
+                    <{input type="number" id="gift_yj_num" name="yj_num" value=$rs.yj_num}>
+                </td>
+            </tr>
+            <tr class='giftyjhtml'>
+                <th><{t}>预警手机号：<{/t}></th>
+                <td>
+                    <div>多个手机号使用#分割</div>
+                    <textarea name="yj_mobile"><{$rs.yj_mobile}></textarea>
+                </td>
+            </tr>
+            <tr>
+                <th><{t}>已赠数量：<{/t}></th>
+                <td>
+                    <{$rs.send_num}>
+                </td>
+            </tr>
+            <tr>
+                <th><em class="c-red">*</em><{t}>赠品状态：<{/t}></th>
+                <td>
+                    <div>
+                        <input type="radio" value="0" name="is_del" /> 启用
+                        <input type="radio" value="1" name="is_del" /> 禁用
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+    <input type="hidden" name="product_id" value="<{$rs.product_id}>">
+</form>
+
+<{area inject='.mainFoot'}>
+<div class="table-action">
+    <{button type="button" label="保存" id="save_btn"}>
+</div>
+<{/area}>
+
+<script>
+    var is_del = <{$rs.is_del}>;
+
+    (function(){
+
+        $$('input[name="is_del"][value='+is_del+']').set('checked','checked');
+
+        $('save_btn').addEvent('click', function(){
+
+            if(!$('gift_num').value){
+                alert("请输入数字");
+                $('gift_num').focus();
+                return false;
+            }
+
+            $('gift_form').fireEvent('submit',{stop:$empty});
+        });
+
+        var _form = $('gift_form');
+        var btn =$('save_btn');
+
+        _form.store('target',{
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+
+                if (hash_res_obj.success != undefined && hash_res_obj.success != "")
+                {
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+
+                    if(_dialogIns)
+                    {
+                        _dialogIns.close();
+                    }
+                }
+            }
+        });
+        $$('.giftset').addEvent('click',function(e){
+            showgift(this.value)
+        });
+        $$('input[name=is_yujing]').addEvent('click',function(e){
+            showgiftyj(this.value)
+        });
+
+        function showgift(value){
+            if (value == '0' || value== '')
+            {
+                $$('.gifthtml').setStyle('display','');
+            }else{
+               
+                $$('.gifthtml').setStyle('display','none');
+            }
+            if (value == '1')
+            {
+                $$('.giftyj').setStyle('display','none');
+                $$('.giftyjhtml').setStyle('display','none');
+            }else{
+                $$('.giftyj').setStyle('display','');
+                showgiftyj($$('input[name=is_yujing]:checked').get('value'));
+            }
+        }
+        function showgiftyj(value) {
+            if(value == 'true') {
+                $$('.giftyjhtml').setStyle('display','');
+            } else {
+                $$('.giftyjhtml').setStyle('display','none');
+            }
+        }
+        var giftsetvalue = $$('input[name=giftset]:checked').get('value');
+        showgift(giftsetvalue);
+
+    })();
+</script>

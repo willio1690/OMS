@@ -1,0 +1,267 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<link href="../../../../app/desktop/statics/perfect/main.css" rel="stylesheet" type="text/css">
+
+<{/capture}>
+<style>
+    .notice-inline.error  {background-image:none;margin-left:25px}
+    #fm1 .division td label ,#fm1 .division div label {vertical-align:top;}
+    #body .workground {
+        width: 100%!important;
+    }
+    .content-main {
+        width: 100%!important;
+    }
+</style>
+ <h3>基础信息</h3>
+<div class="form-layout content-container">
+    
+        <div class="form-layout-block">
+          
+  
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">物料名称：
+                    <{$material_info.material_name}></span>
+                </div>
+
+                <div class="form-field">
+                    <span class="form-field-label">物料类型：<{$goods_types.name}></span>
+                    
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">物料分类：<{$cats.cat_name}></span>
+                    
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">物料品牌：<{$brandList.brand_name}></span>
+                    
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">物料编号：
+                   <{$material_info.material_bn}></span>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">物料条码：
+                    <{$material_info.material_cdoe}></span>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">物料规格：
+                   <{$material_info.specifications}></span>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">物料款号：
+                    <{$material_info.material_spu}></span>
+                </div>
+                
+                <div class="form-field">
+                    <span class="form-field-label">是否启用唯一码：
+                  
+                        <{if $material_info.serial_number == 'true' }>
+                        <label for="serial_number1">是</label>
+                        <{else}>
+                     
+                        <label for="serial_number2" >否</label>
+                        <{/if}>
+                    </span>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">是否在售：
+                  
+                        <{if $material_info.visibled == 1}>
+                            <label for="visibled1">在售</label>
+                        <{else}>
+                             <label for="visibled2" >停售</label>
+                        <{/if}>    
+                      
+                       </span>
+                  
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">是否全渠道：
+                 
+                        <{if $material_info.omnichannel == 1}>
+                            <label for="omnichannel1">开启</label>
+                        <{else}>
+                            <label for="omnichannel2" >关闭</label>
+                        <{/if}>
+                        
+                        </span>
+                 
+                </div>
+            </div>
+           
+           
+            <div class="form-layout-block">
+                <h3>扩展信息</h3>
+                <div class="form-layout-fields">
+                    <div class="form-field">
+                        <span class="form-field-label">成本价：
+                        <{$material_info.cost}></span>
+                    </div>
+                    <div class="form-field">
+                        <span class="form-field-label">长度：厘米(cm)
+                        <{$material_info.length}></span>
+                    </div>
+                    <div class="form-field">
+                        <span class="form-field-label">包装单位：
+                        <{$material_info.unit}></span>
+                    </div>
+                </div>
+                <div class="form-layout-fields">
+                    <div class="form-field">
+                        <span class="form-field-label">零售价：
+                        <{$material_info.retail_price}></span>
+                    </div>
+                    <div class="form-field">
+                        <span class="form-field-label">宽度：厘米(cm)
+                        <{$material_info.width}></span>
+                    </div>
+                    <div class="form-field">
+                        <span class="form-field-label">毛重:克(g)：
+                        <{$material_info.weight}></span>
+                    </div>
+                </div>
+                <div class="form-layout-fields">
+                    <div class="form-field">
+                        <span class="form-field-label">采购进价：
+                        <{$material_info.purchasing_price}></span>
+                    </div>
+                    <div class="form-field">
+                        <span class="form-field-label">高度：厘米(cm)
+                        <{$material_info.high}></span>
+                    </div>
+                    <div class="form-field">
+                        <span class="form-field-label">体积:立方米（cm³）：
+                        <{$material_info.volume}></span>
+                    </div>
+                </div>
+                 <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">箱规：</span>
+                    <{$material_info.box_spec}>
+                </div>
+                 <div class="form-field">
+                    <span class="form-field-label">净重:克(g)：</span>
+                    <{$material_info.net_weight}>
+                </div>
+            </div>
+            </div>
+          <div class="form-layout-block">
+             <h3>属性信息</h3>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">颜色：
+                    <{$material_info.color}></span>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">尺码：
+                    <{$material_info.size}></span>
+                </div>
+                 <div class="form-field">
+                    <span class="form-field-label">季节：
+                    <{$arr_props.season}></span>
+                </div>
+            </div>
+
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">材质：
+                    <{$arr_props.uppermatnm}></span>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">适用对象：
+                    <{$arr_props.gendernm}></span>
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label">鞋型：
+                    <{$arr_props.widthnm}></span>
+                </div>
+            </div>
+            <div class="form-layout-fields">
+                <div class="form-field">
+                    <span class="form-field-label">风格款式：
+                    <{$arr_props.modelnm}></span>
+                </div>
+                <div class="form-field">
+                    
+                </div>
+                <div class="form-field">
+                    <span class="form-field-label"></span>
+                    
+                </div>
+            </div>
+        </div>   
+        <div class="form-layout-block">
+            <h3>自定义列</h3>
+            <div class="form-layout-fields">
+
+                <{foreach from=$customcols  item=customcol}>
+                <div class="form-field">
+                    <span class="form-field-label"><{$customcol.col_name}>：<{$customcol.col_value}></span>
+                    
+                </div>
+                <{/foreach}>
+                
+            </div>
+           
+           
+        </div>
+   
+<div class="form-layout-block">
+    <h3>发票信息</h3>
+    <div class="form-layout-fields">
+        <div class="form-field">
+            <span class="form-field-label">开票税率：
+            <{$material_info.tax_rate}></span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">开票名称：
+            <{$material_info.tax_name}></span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">发票分类编码：
+           <{$material_info.tax_code}></span>
+        </div>
+    </div>
+</div>
+
+
+</div>
+<h3>关联半成品/普通物料信息</h3>
+ <div class="form-layout-block" id="combination_items">
+                
+                <div class="gridlist" style="padding:10px;">
+
+                    <table class="gridlist" id="material_table"  style="margin:4px 0;">
+                        <thead>
+                        <tr>
+                            <th>编码</th>
+                            <th style="width:240px;">名称</th>
+                            <th>数量</th>
+                            
+                        </tr>
+                        </thead>
+                        <{foreach from=$items item=items}>
+                        <tr>
+                            <td><{$items.material_bn}></td>
+                            <td><{$items.material_name}></td>
+                            <td><{$items.material_num}></td> 
+                            
+                        </tr>
+                        <{/foreach}>
+                    </table>
+                   
+                </div>
+            </div>
+
+
+

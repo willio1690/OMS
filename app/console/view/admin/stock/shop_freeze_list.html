@@ -1,0 +1,84 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<h3>店铺:<span style="color:red;"><{$shop_info.name}></span> 货号:<span style="color:red;"><{$shop_info.product_bn}></span><span class="num">（店铺冻结数量：<strong><{$shop_freeze_num}></strong>）</span></h3>
+  <table cellpadding="0" cellspacing="0" border="0" class="gridlist">
+    <thead>
+      <tr>
+     
+      <th>订单号</th>
+      <th>来源店铺</th>
+      <th>创建时间</th>
+      
+      <th>确认状态</th>
+      <th>发货状态</th>
+      <th>购买数量</th>
+      <th>已拆分数量</th>
+      <th>已发货数量</th>
+      </tr>
+    </thead>
+    <{if $rows}>
+        <tbody>
+        <{foreach item=item from=$rows}>
+          <tr <{if $item.process_status eq 'confirmed'}>style="background-color:#FFC"<{elseif $item.process_status neq 'unconfirmed'}>style="background-color:#FFCBCA"<{/if}> >
+        
+            <td><{$item.order_bn}></td>
+            <td><{$shop_info.name}></td>
+            <td><{$item.createtime}></td>
+            
+            <td><{$item.process_title}></td>
+            <td><{$item.status}></td>
+            <td><{$item.nums}></td>
+            <td><{$item.dly_num}></td>
+            <td><{$item.sendnum}></td>
+      
+          </tr>
+        <{/foreach}>
+        </tbody>
+    <{else}>
+        <tbody>
+          <tr>
+            <td colspan="8" style="text-align:center; color:#666;">没有相关记录...</td>
+            </tr>
+        </tbody>
+    <{/if}>
+  </table>
+
+<{if $o2o_rows}>
+<br />
+<br />
+<h3>O2O门店店铺冻结<span class="num">（O2O门店订单确认发货后才释放店铺冻结）</span></h3>
+  <table cellpadding="0" cellspacing="0" border="0" class="gridlist">
+    <thead>
+      <tr>
+      <th>订单号</th>
+      <th>来源店铺</th>
+      <th>创建时间</th>
+      
+      <th>确认状态</th>
+      <th>发货状态</th>
+      <th>购买数量</th>
+      <th>已拆分数量</th>
+      <th>已发货数量</th>
+      </tr>
+    </thead>
+    <tbody>
+    <{foreach item=item from=$o2o_rows}>
+      <tr>
+
+        <td><{$item.order_bn}></td>
+        <td><{$shop_info.name}></td>
+        <td><{$item.createtime}></td>
+        
+        <td><{$item.process_title}></td>
+        <td><{$item.status}></td>
+        <td><{$item.nums}></td>
+        <td><{$item.nums}></td>
+        <td><{$item.sendnum}></td>
+      </tr>
+    <{/foreach}>
+    </tbody>
+  </table>
+<{/if}>

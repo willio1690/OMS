@@ -1,0 +1,35 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!--发票展示界面-->
+<div class="division">
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0">
+        <thead>
+            <tr>
+                <th>日期</th>
+                <th>费用项</th>
+                <th>费用对象</th>
+                <th>收入金额</th>
+                <th>支出金额</th>
+                <th>凭据号</th>
+            </tr>
+        </thead>
+        <tbody>
+            <{foreach from=$data item=item}>
+            <tr>
+                <td><{$item.trade_time|date_format:"%Y-%m-%d %H:%M:%S"}></td>
+                <td><{$item.fee_item}></td>
+                <td><{$item.fee_obj}></td>
+                <td><{$item.plus|cur}></td>
+                <td><{$item.minus|cur}></td>
+                <td><{$item.credential_number}></td>
+            </tr>
+            <{/foreach}>
+            <tr style="background-color:#74c0f9">
+                <td colspan="7"><span>合计金额：<{$money}></span></td>
+            </tr>
+        </tbody>            
+    </table>
+</div>

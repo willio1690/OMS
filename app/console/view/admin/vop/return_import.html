@@ -1,0 +1,116 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .msgbox {
+        top: -400px !important;
+        transition: top 0.5s ease-in-out; /* 添加过渡效果，使变化更平滑（可选）*/
+    }
+</style>
+<div id="allocation-error"  class="error" style="display:none;"></div>
+<form action='index.php?app=omecsv&ctl=admin_to_import&act=treat&ctler=console_mdl_vopreturn&add=console&finder_id=<{$env.get.finder_id}>' method='post' target="uploadframe" enctype="multipart/form-data" class="tableform" id="import-form">
+    <{toinput from=$env.post}>
+    <div class="tableform" id="upload">
+        <div class="division">
+            <table border="0" cellpadding="0" cellspacing="0" class="">
+                <tr>
+                    <th>
+                        下载模板：
+                    </th>
+                    <td style="text-align:left;">
+                        <a target="_blank" href="index.php?app=console&ctl=admin_vopreturn&act=exportTemplate&p[0]=<{$shop_type}>&finder_id=<{$env.get.finder_id}>">点击下载</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+         <div class="division">
+            <table border="0" cellpadding="0" cellspacing="0" class="">
+                <tr>
+                    <th>
+                        选择店铺：
+                    </th>
+                    <td style="text-align:left;" colspan="2">
+                      <select name="shop_id">
+                          <option value="">请选择</option> 
+                          <{foreach from=$shoplist item=shops}>
+                          <option value="<{$shops.shop_id}>"><{$shops.name}></option>
+                          <{/foreach}>
+                      </select>
+                    </td>
+                   
+                </tr>
+               
+            </table>
+        </div>
+        <div class="division">
+            <table border="0" cellpadding="0" cellspacing="0" class="">
+               
+                <tr>
+                    <th>
+                        导入文件：
+                    </th>
+                    <td style="text-align:left;">
+                        <input type='file' name='import_file' accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id='ImportCSV'/>
+                    </td>
+                    <td width="">
+                        <h4><{t}>上传文件,支持(
+                            <span style ='color:red;font-size:16px;'>.csv</span>、
+                            <span style='color:red;font-size:16px;'>.xls</span>、
+                            <span style='color:red;font-size:16px;'>.xlsx</span>
+                            )格式！<{/t}>
+                        </h4>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-action">
+        
+       
+        <input type='hidden' name='shop_type' value="<{$shop_type}>"/>
+        <{button label='导入' id="ImportBtn" class="btn-primary"  type="submit"}>
+        <{button label='关闭' id="stopBtn"   class="btn-secondary" type="button" }>
+    </div>
+    <div class="notice-inline"><span id="iMsg" style="color:red;"></span></div>
+    <div class="error" style="display: none;"></div>
+</form>
+<script>
+    (function(){
+        var state;
+        $('ImportBtn').addEvent('click',function(e){
+            if(state||!$('ImportCSV').value.length)return false;
+            state=true;
+            this.style.cursor='not-allowed';
+        });
+        $('ImportCSV').addEvent('change',function(e){
+            state=false;
+            $('ImportBtn').style.cursor='pointer';
+        });
+        var allocationError = document.getElementById('allocation-error');
+        $('import-form').store('target', {
+            onComplete:function(resp){
+                state=false;
+                $('ImportBtn').style.cursor='pointer';
+                var res = JSON.parse(resp);
+                if(res){
+                    $('allocation-error').setHTML(res.error);
+                    allocationError.style.display = 'block'; // 显示错误信息框
+                }
+            },
+        });
+
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+        $('stopBtn').addEvent('click', function(){
+            try{
+                var _dialogIns = this.getParent('.dialog').retrieve('instance');
+            }catch(e){}
+            if(_dialogIns){
+                setTimeout(finder.refresh(),30000);
+                _dialogIns.close();
+            }
+        });
+    })();
+</script>

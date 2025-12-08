@@ -1,0 +1,18 @@
+<services>
+    <service id="desktop_finder.dchain_mdl_branch">
+        <class>dchain_finder_branch</class>
+    </service>
+    
+    <service id="desktop_finder.dchain_mdl_aoxiang_branch">
+        <class>dchain_finder_aoxiang_branch</class>
+    </service>
+        <service id="desktop_finder.dchain_mdl_aoxiang_logistics">
+        <class>dchain_finder_aoxiang_logistics</class>
+    </service>
+    <service id="desktop_finder.dchain_mdl_aoxiang_product">
+        <class>dchain_finder_aoxiang_product</class>
+    </service>
+    <service id="desktop_finder.dchain_mdl_aoxiang_delivery">
+        <class>dchain_finder_aoxiang_delivery</class>
+    </service>
+</services>

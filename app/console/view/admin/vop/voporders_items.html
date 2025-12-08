@@ -1,0 +1,57 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">
+  <{script src="coms/autocompleter.js" app="desktop"}>
+  <{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+
+<style type="text/css">
+.item_del { background-color: rgb(216, 216, 216); }
+.item_quality_check { background-color: rgb(226, 208, 243); }
+</style>
+
+<div class="tableform">
+    <h4>销售明细</h4>
+    <div class="division">
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+                <tr>
+                    <th style='text-align:left;padding-left:5px;'>货号</th>
+                    <th style='text-align:left;padding-left:5px;'>条形码</th>
+                    <th style='text-align:left;padding-left:5px;'>数量</th>
+                    <th style='text-align:left;padding-left:5px;'>处理状态</th>
+                    <th style='text-align:left;padding-left:5px;'>拣货单</th>
+                    <th style='text-align:left;padding-left:5px;'>仓库编码</th>
+                    <th style='text-align:left;padding-left:5px;'>销售来源</th>
+                    <th style='text-align:left;padding-left:5px;'>合作模式</th>
+                    <th style='text-align:left;padding-left:5px;'>订单时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                <{if $itemList}>
+                <{foreach from=$itemList item=item}>
+                <tr>
+                    <td style="text-align:left;padding-left:5px;"><{$item.product_bn}></td>
+                    <td style="text-align:left;padding-left:5px;"><{$item.barcode}></td>
+                    <td style="text-align:left;padding-left:5px;"><{$item.amount}></td>
+                    <td style="text-align:left;padding-left:5px;"><{$item.status}></td>
+                    <td style="text-align:left;padding-left:5px;"><{$item.pick_no}></td>
+                    <td style="text-align:left;padding-left:5px;"><{$item.warehouse}></td>
+                    <td style="text-align:left;padding-left:5px;"><{$item.sales_source_indicator}></td>
+                    <td style="text-align:left;padding-left:5px;"><{$item.cooperation_mode}></td>
+                    <td style="text-align:left;padding-left:5px;"><{$item.create_time|date:"Y-m-d H:i:s"}></td>
+                </tr>
+                <{/foreach}>
+                <{else}>
+                <tr>
+                  <td colspan="8" style="text-align:center;"><div class="note" style="margin:0;"> 暂无销售明细 </div></td>
+                </tr>
+                <{/if}>
+            </tbody>
+        </table>
+    </div>
+</div>

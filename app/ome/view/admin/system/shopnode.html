@@ -1,0 +1,27 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="notice"><{t}>系统对应的节点信息。<{/t}></div>
+
+<div class="tableform">
+<{tabber}>
+    <{tab name="网店节点"}>
+        <{if $node_id}>
+        <div class="division">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <th><{t}>当前节点:<{/t}></th>
+                <td><{$node_id}></td>
+              </tr>
+            </table>
+        </div>
+        <{else}>
+            <div class="notice">
+            <{t}>无网店节点对应的文字....<{/t}>
+            </div>
+        <{/if}>
+    <{/tab}>
+<{/tabber}>
+</div>

@@ -1,0 +1,142 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" type="text/css" href="./common.css" />
+  <link rel="stylesheet" type="text/css" href="./stop.css" />
+  <script src="./axios.min.js"></script>
+  <script src="./flexible.js"></script>
+</head>
+
+<body>
+  <div class="page flex-col">
+    <!-- heder -->
+    <div class="section_1">
+      <div class="text-wrapper_1 flex-row align-center justify-between">
+        <img src="./icon-back.png" class="icon-back">
+        <span class="text_1">验货退款</span>
+        <img src="./icon-refresh.png" class="icon-refresh">
+      </div>
+    </div>
+    <div class="main flex-col">
+      <div class="section_2">
+        <div class="group_1 flex-col">
+          <div class="text-wrapper_2 flex-row justify-between">
+            <span class="text_2 active pr">拦截成功</span>
+            <span class="text_2 pr">拦截失败</span>
+          </div>
+        </div>
+        <div class="group_3 flex-col">
+          <div class="text-wrapper_3 flex-row justify-between">
+            <span class="text_4">订单状态</span>
+            <span class="text_5">已揽收</span>
+          </div>
+          <div class="text-wrapper_3 flex-col">
+            <div class="flex-row justify-between">
+              <span class="text_4">快递单号</span>
+              <span class="text_5 flex-row">
+                <span id="expressNumber">343253463464576</span>
+                <!-- 拦截失败 smarty判断是否显示 -->
+                <img class="label_1" src="./icon-pencil.png" onclick="editExpressNumber()" /> 
+              </span>
+            </div>
+            <!-- 拦截失败 smarty判断是否显示 -->
+            <span class="text_7">请按实际物流公司退货单号为准，以便后续退货质检</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer justify-between">
+      <button class="footer-btn modal-confirm" onclick="submitDelivery()">确认</button>
+    </div>
+  </div>
+  <div class="mask" id="mask"></div>
+  <div class="toast" id="toast"></div>
+  <!-- 弹窗组件 -->
+  <!-- 弹窗组件模板 -->
+  <div class="modal" id="commonModal" style="display: none;">
+    <div class="modal-mask"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"></h3>
+        <span class="modal-close">×</span>
+      </div>
+      <div class="modal-content">
+        <!-- 动态内容区域 -->
+      </div>
+      <div class="modal-footer justify-between">
+        <button class="modal-btn modal-cancle">取消</button>
+        <button class="modal-btn modal-confirm">确定</button>
+      </div>
+    </div>
+  </div>
+  <!-- 引入共用的js -->
+  <script src="./common.js"></script>
+  <script>
+    // 初始化弹窗实例
+    const modal = new Modal();
+    // API 方法封装
+    const api = {
+      // 发货
+      delivery(params) {
+        return request.post('/delivery', params);
+      },
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const toggleBtn = document.querySelector('.label_1');
+      // 添加触摸反馈
+      toggleBtn.addEventListener('touchstart', function () {
+        this.style.opacity = '0.7';
+      });
+
+      toggleBtn.addEventListener('touchend', function () {
+        this.style.opacity = '1';
+      });
+    });
+    // 编辑快递单号
+    function editExpressNumber() {
+      modal.show({
+        title: '修改快递单号',
+        fields: [{
+          type: 'input',
+          name: 'expressNumber',
+          label: '快递单号',
+          required: true,
+          placeholder: '请输入快递单号'
+        },],
+        onConfirm: (formData) => {
+          // 更新显示的快递单号
+          document.getElementById('expressNumber').textContent = formData.expressNumber;
+          modal.hide();
+        }
+      });
+    }
+
+    // 提交快递单号
+    function submitDelivery() {
+      api.delivery({
+        expressNumber: document.getElementById('expressNumber').textContent.trim()
+      }).then(res => {
+        if (res.code === 0) {
+          showToast('提交成功');
+          // 可以根据需要添加其他操作，比如跳转页面
+        } else {
+          showToast(res.msg || '提交失败');
+        }
+      }).catch(err => {
+        showToast('提交失败');
+      });
+    }
+  </script>
+</body>
+
+</html>

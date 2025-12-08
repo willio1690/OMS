@@ -1,0 +1,17 @@
+<services>
+    <service id="tgkpi.pick">
+        <class>tgkpi_analysis_pick</class>
+    </service>
+
+    <service id="desktop_finder.tgkpi_mdl_pick">
+        <class>tgkpi_finder_pick</class>
+    </service>
+    
+    <service id="desktop_finder.tgkpi_mdl_reason">
+        <class>tgkpi_finder_reason</class>
+    </service>
+
+    <service id="data_clear">
+        <class>tgkpi_service_data_clear</class>
+    </service>
+</services>

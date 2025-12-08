@@ -1,0 +1,41 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<{if $shopData.shop_type == 'mia'}>
+<form action="index.php?<{$env.server.QUERY_STRING}>" id="shop_dly_crop" method="post">
+<input type="hidden" name="shop_id" value="<{$shopData.shop_id}>"/>
+<div id="shop_crop" class="division">
+ <table width="40%" cellspacing="0" cellpadding="0" border="0" >
+ <tbody>
+     <tr>
+         <td width="100">物流公司</td>
+         <td width="100">物流编号</td>
+         <td>是否国外物流</td>
+     </tr>
+     <{foreach from=$dlyCrops item=dlyCrop}>
+     <tr>
+         <td><{$dlyCrop.name}></td>
+         <td><{$dlyCrop.type}></td>
+         <td>
+         	<input  type="radio"  name="overseas[<{$dlyCrop.corp_id}>]"  value="1" <{if $dlyCrop.oversea eq '1'}>checked<{/if}>>是
+         	&nbsp;
+			<input  type="radio"  name="overseas[<{$dlyCrop.corp_id}>]"  value="0" <{if $dlyCrop.oversea eq '0'}>checked<{/if}>>否
+         </td>
+     </tr>
+     <{/foreach}>
+ </tbody>
+ </table>
+<br />
+</div>
+<{button type='submit' label='确认'}>
+</form>
+<{else}>
+<{/if}>
+</div>
+<script>
+
+
+</script>

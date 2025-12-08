@@ -1,0 +1,88 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=ome&ctl=admin_return_rchange&act=dealRejectFreight" id="frm" enctype="multipart/form-data">
+            <{input type=hidden name=return_id value=$data.return_id}>
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th>退货寄回运费：</th>
+                        <td>
+                            <{$data.amount}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>申请描述：</th>
+                        <td>
+                            <{$data.apply_desc}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><em class="c-red"> * </em>拒绝凭证：</th>
+                        <td>
+                            <{input type="sfile" name="reject_images" f_type="public" }>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><em class="c-red"> * </em>拒绝原因：</th>
+                        <td>
+                            <textarea name='reject_desc' style="margin: 0px; width: 258px; height: 77px;"  vtype="required" cols="40" rows="5"></textarea>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' class="btn-primary" label='拒绝' }>
+                    <{button type="button" id='close_btn' class="btn-secondary" label='关闭' isCloseDialogBtn="true"}>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<{/area}>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+
+                    if(_dialogIns){
+                        setTimeout(finder.refresh(),30000);
+                        _dialogIns.close();
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+    })();
+</script>

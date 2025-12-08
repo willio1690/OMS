@@ -1,0 +1,152 @@
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+body {
+  margin: 0;
+  background-color: rgba(243, 243, 243, 1);
+}
+
+.page {
+  background-color: rgba(243, 243, 243, 1);
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0;
+}
+
+.main {
+  margin-top: 2.5625rem;
+  padding-bottom: 4.375rem
+}
+
+/* goodsinfo */
+.goods-item {
+  background: #ffffff;
+  border-radius: 0.5rem;
+  margin: 0.75rem auto 0.438rem;
+  width: 21.94rem;
+}
+.section_6 {
+  /* margin: 0.75rem 0.563rem 0 0.438rem; */
+}
+
+.image_2 {
+  width: 5rem;
+  height: 5rem;
+  /* margin: 0.094rem 0 0.25rem 0; */
+}
+
+.text-group_1 {
+  margin: 0.78rem 0.56rem 0.75rem 0.56rem;
+  flex-shrink: 1;
+}
+
+.text_28 {
+  height: 2.5rem;
+  word-break: break-all;
+  color: rgba(24, 24, 24, 1);
+  font-size: 0.875rem;
+  letter-spacing: 0.31111112236976624px;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  line-height: 1.25rem;
+}
+
+.text_29 {
+  font-family: PingFangSC, PingFang SC;
+  word-break: break-all;
+  color: #121212;
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-align: left;
+  line-height: 1.032rem;
+  /* 清除默认样式 */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0; 
+  vertical-align: middle;
+}
+
+.input_1 {
+  border-radius: 0;
+  width: 5.25rem;
+  height: 2rem;
+  padding-left: 0.69rem;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: #000000;
+  line-height: 1.03rem;
+  text-align: left;
+  font-style: normal;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+  vertical-align: middle;
+  position: relative;
+  box-sizing: border-box;
+  border: 1px solid #dfdfdf !important;
+  padding: 2px 4px !important;
+}
+
+input::placeholder {
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: #cbcbcb;
+  line-height: 1.03rem;
+  text-align: left;
+  font-style: normal;
+}
+
+.text_30 {
+  word-break: break-all;
+  color: rgba(151, 151, 153, 1);
+  font-size: 0.75rem;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 1.032rem;
+  margin: 0.313rem 4.875rem 0 0;
+}
+
+.text_31 {
+  word-break: break-all;
+  color: rgba(29, 29, 29, 1);
+  font-size: 0.75rem;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  line-height: 1.032rem;
+  margin: 0 0 0 10.6875rem;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  padding: 0.625rem 0.438rem;
+  z-index: 100;
+}
+
+.footer-btn {
+  border-radius: 0.25rem;
+  border: none;
+  background: #000;
+  cursor: pointer;
+  width: 8.34rem;
+  padding: 0.44rem;
+  color: #d4ca99;
+  font-size: 0.88rem;
+}

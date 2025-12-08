@@ -1,0 +1,38 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $branchopts}>
+<form id='goods-sync-form' method='post' action=''>
+<div class="tableform">
+    <{input type='radio' name='branch_bn' options=$branchopts vtype="requiredradio"}>
+    <input type="hidden" name="filter" value="<{$filter}>">
+</div>
+<div class="table-action">
+<{button label="同步" type="button" id="goods-sync-btn"}>
+<{button label="关闭" type="button" isCloseDialogBtn="true" }>
+</div>
+</form>
+<script type="text/javascript">
+(function(){
+    var url = "index.php?app=pos&ctl=productsync&act=sync&org_id=<{$org_id}>";
+    $('goods-sync-btn').addEvent('click',function(e){
+        var form = $('goods-sync-form'); var _this = this;
+        if(! validate(form)) return;
+
+        new Request({url:url,method:'post',data:form,
+            onComplete:function(result){
+                _this.getParent('.dialog').retrieve('instance').close();
+                finderGroup['<{$env.get.finder_id}>'].refresh();
+            },
+            onRequest:function(){
+                _this.disabled=true;
+                _this.set('html', '<span><span>正在同步</span></span>');
+            }
+        }).send();
+    });
+})();
+</script>
+
+<{/if}>

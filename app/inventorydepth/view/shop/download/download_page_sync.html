@@ -1,0 +1,54 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform" id="download-body">
+    <div class="error" style="display: none;"></div>
+    <form action="" method="post" id="download-form">
+        <input type="hidden" name="baseApiUrl" value="index.php?app=inventorydepth&ctl=shop&act=doSync&p[]=<{$shop_id}>">
+        <table cellspacing="0" cellpadding="0" border="0">
+            <tr>
+                <th>开始时间：</th>
+                <td><{input type="date" vtype="date" name="start_modified" value=$time_from style="width:96px; font-family:arial;"}></td>
+            </tr>
+            <tr>
+                <th>结束时间：</th>
+                <td><{input type="date" vtype="date" name="end_modified" value=$time_to style="width:96px; font-family:arial;"}></td>
+            </tr>
+        </table>
+    </form>
+    <div class="table-action">
+        <{button label="下一步" class="btn btn-primary" id="download-search-btn"}>
+        <{button label="关闭" class="btn btn-secondary" isCloseDialogBtn='true'}>
+    </div>
+</div>
+<script>
+    (function () {
+        $('download-search-btn').addEvent('click', function () {
+            if (!validate($('download-form'))) return;
+
+            W.page('index.php?app=inventorydepth&ctl=shop&act=downloadPageSyncPromise&p[]=<{$shop_id}>', {
+                data: $('download-form').toQueryString(),
+                method: 'post',
+                update: $('download-body'),
+                onComplete: function (resp) {
+                    try {
+                        resp = JSON.decode(resp);
+                        if (resp.error) {
+                            $E('#download-body .error').show().setText(resp.error);
+                        }
+
+                        $('download-search-btn').set('disabled', false);
+                    } catch (e) {
+                    }
+                },
+                onRequest: function () {
+                    $E('#download-body .error').hide().empty();
+
+                    $('download-search-btn').set('disabled', true);
+                }
+            });
+        });
+    })();
+</script>

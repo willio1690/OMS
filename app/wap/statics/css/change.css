@@ -1,0 +1,135 @@
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+.flex-shrink-1 {
+  flex-shrink: 1;
+}
+
+.text-group_1 {
+  margin: 0 0 0.313rem 0.844rem;
+  flex-shrink: 1;
+}
+
+.text_28 {
+  /*height: 2.5rem;*/
+  overflow-wrap: break-word;
+  color: rgba(24, 24, 24, 1);
+  font-size: 0.875rem;
+  letter-spacing: 0.31111112236976624px;
+  font-family: PingFangSC-Medium;
+  font-weight: 500;
+  text-align: left;
+  line-height: 1.25rem;
+}
+
+.status-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.status-returned {
+  font-size: 0.75rem;
+  color: #161515;
+  line-height: 1.03rem;
+  text-align: right;
+  font-style: normal;
+  background: #f5edc9;
+  border-radius: 0.13rem;
+  padding: 0.28rem 0.5rem;
+}
+
+.modal-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: 8px;
+  width: 20.44rem;
+}
+
+.intercept-goods-item .text-group_1 {
+  margin-left: 0.75rem;
+  width: 14.13rem;
+  flex-shrink: 1;
+}
+
+.status-returned,.status-order {
+    font-size: 0.75rem;
+    color: #161515;
+    line-height: 1.03rem;
+    text-align: right;
+    font-style: normal;
+    background: #F5EDC9;
+    border-radius: 0.13rem;
+    padding: 0.28rem 0.5rem;
+  }
+  .status-order {
+    color: #C69A1B;
+  }
+  .status-order-box {
+    flex: 1;
+    text-align: right;
+  }
+  .return_goods {
+    background: #FBF8E8;
+    border-radius: 0.5rem;
+    padding: 1.09rem 0;
+  }
+  .return_goods .text_29,.return_goods .text_30 {
+    color: #181818;
+  }
+  .text_32 {
+    overflow-wrap: break-word;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #121212;
+    /* line-height: 1.25rem; */
+    line-height: 1.032rem;
+    text-align: left;
+    font-style: normal;
+    text-align: left;
+    white-space: nowrap;
+    margin-top: 0.188rem;
+    width: 4.3125rem;
+  }
+  
+  .text_33 {
+    overflow-wrap: break-word;
+    font-weight: 400;
+    font-size: 0.75rem;
+    color: #121212;
+    font-family: PingFangSC, PingFang SC;
+    text-align: left;
+    white-space: nowrap;
+    /* line-height: 1.032rem; */
+    line-height: 1.032rem;
+    margin: 0.125rem 0 0 0;
+    flex: 1;
+  }
+  .status-returned,.status-order {
+    font-size: 0.75rem;
+    color: #161515;
+    line-height: 1.03rem;
+    text-align: right;
+    font-style: normal;
+    background: #F5EDC9;
+    border-radius: 0.13rem;
+    padding: 0.28rem 0.5rem;
+    white-space: nowrap;
+  }
+
+  .text_26 {
+    overflow-wrap: break-word;
+    color: rgba(18, 18, 18, 1);
+    font-size: 0.75rem;
+    letter-spacing: 0.2666666805744171px;
+    font-family: PingFangSC-Medium;
+    font-weight: 500;
+    text-align: left;
+    line-height: 1.032rem;
+    margin: 0.188rem 0 0 0;
+  }

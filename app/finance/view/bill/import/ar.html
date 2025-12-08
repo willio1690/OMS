@@ -1,0 +1,65 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style type="text/css">
+    .gridlist tr th{width: 100px;height: 30px;text-align: right;}
+</style>
+
+<h3>导入销售应收账单</h3>
+
+<form action='<{if $thisUrl}><{$thisUrl}><{else}>index.php?app=omecsv&ctl=admin_to_export&act=treat<{/if}>' method='post' id='export_form' enctype="multipart/form-data">
+    <div class="division" >
+        <h5>第一步，下载销售应收账单模板文件</h5>
+        <table border="0" cellspacing="0" class="gridlist" cellpadding="0" style="width:83%">
+            <tr>
+                <th  width="15%">导出文件格式：</th>
+                <td width="30%">
+                    <{input type='select' name='_io_type' options=$ioType required=true}>
+                </td>
+                <td class="table-action"  width="50%">
+                    <{button id='export-btn' type="submit" label=$___desktop="导出"|t:'desktop' app="desktop" icon="btn_get_world.gif"}>
+                </td>
+            </tr>
+            <input type='hidden' name='filter[salesExportType]' value="ar"/>
+            <input type='hidden' name='add' value="finance"/>
+            <input type='hidden' name='ctler' value="finance_mdl_bill"/>
+
+        </table>
+
+        <{toinput from=$data}>
+
+    </div>
+</form>
+
+<form action='<{if $thisUrl}><{$thisUrl}><{else}>index.php?app=omecsv&ctl=admin_to_import&act=treat<{/if}>&ctler=finance_mdl_ar&add=<{$add}>' method='post' target="uploadframe" enctype="multipart/form-data" id="import_form" class="tableform">
+    <div class="division" >
+        <h5>第二步，填写模板文件</h5>
+        <div class="tableform">打开模板文件,在里面对应写入上传数据的内容。</div>
+        <h5>第三步，上传填写好的文件</h5>
+        <table border="0" cellspacing="0" class="gridlist" cellpadding="0" style="width:83%">
+            <input type='hidden' name='filter[importFiletype]' value="ar"/>
+            <input type='hidden' name='filter[checkTime]' value="after"/>
+            <tr>
+                <th width="10%">导入文件：</th>
+                <td width="20%">
+                    <input type='file' name='import_file' id='ImportCSV'/>
+                </td>
+                <td width="30%">
+                    <h4><{t}>上传文件,支持(
+                        <span style ='color:red;font-size:16px;'>.csv</span>、
+                        <span style='color:red;font-size:16px;'>.xls</span>、
+                        <span style='color:red;font-size:16px;'>.xlsx</span>)格式！<{/t}>
+                    </h4>
+                </td>
+                <td class="table-action" width="35%">
+               
+                    <{button label=$___desktop="导入"|t:'desktop' id="ImportBtn"  type="submit"}>
+                    
+                </td>
+            </tr>
+        </table>
+        <{toinput from=$data}>
+    </div>
+</form>

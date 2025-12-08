@@ -1,0 +1,60 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../app/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<div class="tableform" id="saleinfo">
+    <h4>基本信息</h4>
+    <div class="division">
+    <table border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <th>福袋组合编码：</th>
+            <td><{$data.combine_bn}></td>
+            <th>福袋组合名称：</th>
+            <td><{$data.combine_name}></td>
+            <th>创建日期：</th>
+            <td><{$data.create_time|cdate}></td>
+        </tr>
+        <tr>
+            <th>选中物料个数：</th>
+            <td><{$data.selected_number|default:'0'}></td>
+            <th>包含件数：</th>
+            <td><{$data.include_number|default:'0'}></td>
+            <th>最后更新时间：</th>
+            <td><{$data.last_modified|cdate}></td>
+        </tr>
+    </table>
+    </div>
+    
+    <h4>关联基础物料：</h4>
+    <div class="goods-spec-cell" id='goods-spec-product'>
+    <table cellspacing="0" cellpadding="0" border="0" class="gridlist">
+        <thead>
+            <tr>
+                <th><{t}>基础物料编码<{/t}></th>
+                <th><{t}>基础物料名称<{/t}></th>
+                <th><{t}>基础物料规格<{/t}></th>
+                <th><{t}>零售价<{/t}></th>
+                <th><{t}>成本价<{/t}></th>
+                <th><{t}>选中比例(%)<{/t}></th>
+            </tr>
+        </thead>
+        <tbody>
+            <{foreach from=$items item=item}>
+            <tr>
+                <td><{$item.material_bn}></td>
+                <td><{$item.material_name}></td>
+                <td><{$item.specifications}></td>
+                <td><{$item.retail_price}></td>
+                <td><{$item.cost}></td>
+                <td><{$item.ratio_str}></td>
+            </tr>
+            <{/foreach}>
+        </tbody>
+    </table>
+    </div>
+</div>

@@ -1,0 +1,47 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+	<tbody>
+		<tr>
+			<th><{t}>选择应用店铺：<{/t}></th>
+			<td>
+				<{foreach from=$shop_info item=value key=key}>
+					<{if $shopex_shop_type[$value['shop_type']]}>
+						<input type="checkbox" name="crm[name][<{$key}>]" value="<{$value.node_type}>===<{$value.shop_id}>"  disabled><font style="color:#999999;"><{$value['name']}></font>
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					  		
+						<!--  
+							<{if $order_type[$value['node_type']]}>选择店铺订单类型：<{/if}>
+							<{foreach from=$order_type[$value['node_type']] item=val key=k}>
+									<input type="checkbox" name="crm[order_type][<{$key}>][<{$k}>]" value="<{$val}>" <{if $checked_order.$key.$k}>checked<{/if}>><{$val}>&nbsp;&nbsp;
+							<{/foreach}>
+						-->
+						</p>  
+					
+			  <{else}>
+			  		<input type="checkbox" name="crm[name][<{$key}>]" value="<{$value.node_type}>===<{$value.shop_id}>" <{if $checked_shop[$value['shop_id']]}> checked=true<{/if}>><font style="font-size: 12px;font-weight: 700;"><{$value['name']}></font>
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					</p>  
+			  <{/if}>	
+			  <{/foreach}>
+			</td>
+		</tr>
+	<th>备注：</th>
+	<td><span style="color:red;font-weight:bold;">易开店、分销王、ECstore等shopex体系店铺，不支持CRM赠品处理</span>
+	</td>
+		<tr>
+			<th><{t}>出错处理：<{/t}></th>
+			<td>
+				<input  type="radio"  name="crm[error]"  value="off" <{if $data.error eq 'off'}>checked<{/if}>>不添加赠品，继续审单发货&nbsp;&nbsp;&nbsp;
+				<input  type="radio"  name="crm[error]"  value="on" <{if $data.error eq 'on'}>checked<{/if}>>打标提醒，并人工处理
+			<span style="color:red;font-weight:bold;">（当添加赠品发生错误，导致添加失败，可选择不添加赠品继续发货；或者，在订单上打标提醒，进行人工处理）</span>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<div class="table-action">
+	<{button label="提交" type="submit" name="submit" }>
+</div>

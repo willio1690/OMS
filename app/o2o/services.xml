@@ -1,0 +1,51 @@
+<services>
+    <service id="desktop_finder.o2o_mdl_store">
+        <class>o2o_finder_store</class> 
+    </service>
+    <service id="desktop_finder.o2o_mdl_server">
+        <class>o2o_finder_server</class> 
+    </service>
+    <service id="desktop_finder.o2o_mdl_autostore_rule">
+        <class>o2o_finder_autostore_rule</class> 
+    </service>
+    <service id="system_setting">
+        <class>o2o_system_setting</class>
+    </service>
+    <service id="desktop_finder.o2o_mdl_branch_product">
+        <class>o2o_finder_branch_product</class>
+    </service>
+    <service id="desktop_finder.o2o_mdl_branch_products">
+        <class>o2o_finder_branch_products</class>
+    </service>
+    <service id="extend_filter_o2o_mdl_branch_product">
+        <class>o2o_finder_extend_filter_branch_product</class>
+    </service>
+    <service id="extend_filter_o2o_mdl_branch_products">
+        <class>o2o_finder_extend_filter_branch_products</class>
+    </service>
+    <service id="desktop_finder.o2o_mdl_product_store">
+        <class>o2o_finder_product_store</class>
+    </service>
+    <service id="desktop_finder.o2o_mdl_inventory">
+        <class>o2o_finder_inventory</class>
+    </service>
+    <service id="operation_log">
+        <class>o2o_operation_log</class>
+    </service>
+    <service id="desktop_finder.o2o_mdl_refuse_reason">
+        <class>o2o_finder_refuse_reason</class>
+    </service>
+
+    <service id="desktop_finder.o2o_mdl_performance_orders">
+        <class>o2o_finder_performance_orders</class>
+    </service>
+    <service id="desktop_finder.o2o_mdl_delivery">
+        <class>o2o_finder_delivery</class>
+    </service>
+     <service id="extend_filter_o2o_mdl_inventory">
+        <class>o2o_finder_extend_filter_inventory</class>
+    </service>
+    <service id="extend_filter_o2o_mdl_store">
+        <class>o2o_finder_extend_filter_store</class>
+    </service>
+</services>

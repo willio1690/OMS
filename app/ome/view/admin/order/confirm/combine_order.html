@@ -1,0 +1,228 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+/* 订单标签基础样式 */
+.order-tag {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: center;
+    min-width: 20px;
+    line-height: 1.2;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.order-tag:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* 标签颜色变体 - 每个标签完全独特颜色 */
+.order-tag-user { background: linear-gradient(135deg, #8e44ad, #9b59b6); border: 1px solid #7d3c98; }
+.order-tag-address { background: linear-gradient(135deg, #e74c3c, #c0392b); border: 1px solid #a93226; }
+.order-tag-fail { background: linear-gradient(135deg, #2c3e50, #34495e); border: 1px solid #1a252f; }
+.order-tag-abnormal { background: linear-gradient(135deg, #f39c12, #e67e22); border: 1px solid #d68910; }
+.order-tag-gift { background: linear-gradient(135deg, #27ae60, #2ecc71); border: 1px solid #229954; }
+.order-tag-pending { background: linear-gradient(135deg, #3498db, #2980b9); border: 1px solid #21618c; }
+.order-tag-presale { background: linear-gradient(135deg, #e91e63, #c2185b); border: 1px solid #ad1457; }
+
+/* 布局容器 */
+.order-row-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 32px;
+    width: 100%;
+}
+
+.order-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    max-width: calc(100% - 120px);
+}
+
+.order-actions-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+</style>
+
+<tr data-order-id="<{$order.order_id}>" <{if $orderId == $order_id}> class='masterorder' <{ elseif $order.process_status=="cancel" || $order.pause=="true" || $order.status<>"active" || $order.abnormal=='true' || $order.is_fail=='true' }>class="disabled"<{else}><{if $order.pay_status<>1 && $order.pay_status<>4 && $order.pay_status<>5}>class="waring"<{else}>class="combineorder"<{/if}><{/if}>>
+    <td rowspan="2">
+        
+        <div class="order-row-container">
+            <!-- 订单状态标签区域 -->
+            <div class="order-tags-container">
+                <{if $sameMemOrder }>
+                <span class="order-tag order-tag-user" rel="与主订单收货地址不相同" title="与主订单收货地址不相同">同用户</span>
+                <{elseif $sameAddrOrder}>
+                <span class="order-tag order-tag-address" rel="与主订单收货地址相同" title="与主订单收货地址相同">同址</span>
+                <{/if}>
+
+                <{if $order.is_fail == 'true'}>
+                    <span class="order-tag order-tag-fail" rel="此订单在失败订单中，请修复" onmouseover="Ex_Loader('finder',function(){bindFinderColTip(event);});" title="此订单在失败订单中，请修复">败</span>
+                <{elseif $order.abnormal == 'true'}>
+                    <span class="order-tag order-tag-abnormal" rel="此订单属异常订单，请解决" onmouseover="Ex_Loader('finder',function(){bindFinderColTip(event);});" title="此订单属异常订单，请解决">异</span>
+                 <{elseif $order.has_tbgifts == 1}>
+                    <span class="order-tag order-tag-gift" rel="此订单有优惠赠品，请添加" onmouseover="Ex_Loader('finder',function(){bindFinderColTip(event);});" title="此订单有优惠赠品，请添加">赠</span>
+                <{elseif ($order.group_id == null && $order.group_id==null)}>
+                    <span class="order-tag order-tag-pending" rel="此订单还未获取" onmouseover="Ex_Loader('finder',function(){bindFinderColTip(event);});" title="此订单还未获取">缓</span>
+                <{/if}>
+
+                <{if $order.order_type == 'presale'}><span class="order-tag order-tag-presale" rel="预售订单" title="预售订单">预</span><{/if}>
+            </div>
+
+            <!-- 操作按钮区域 -->
+            <div class="order-actions-container">
+                <input style="margin:0px 5px 0px 10px;<{if $orderId == $order_id || $order.derviveryId >0 }>cursor:not-allowed;<{/if}>" type="checkbox"  name="orderIds[]" data-cupu="<{$order.cpup_service|implode:','}>" id="orderIds" value="<{$order.order_id}>" <{if $order.has_tbgifts == 1}>has_gift="1"<{/if}> <{if $orderId != $order_id }><{if $order.has_tbgifts == 1}>onclick='displayGiftNote();reWriteProductNode();'<{else}>onclick='reWriteProductNode();'<{/if}><{/if}> <{if $order.derviveryId >0  || ($order.process_status=="cancel" || $order.pause=="true" || $order.status<>"active" || $order.abnormal=='true' || $order.is_fail=='true') || ( (($order.pay_status<>1 && $order.pay_status<>4 && $order.pay_status<>5) && ($order.pay_status<>3 && $order.confirm_flag<>1) ) && $order.is_cod=='false')}>disabled<{elseif $orderId == $order_id}> checked<{/if}> <{if $orderId == $order_id || $order.derviveryId >0 }> onchange="this.checked = ! this.checked;" <{/if}>/>
+                
+                <span id='extendBtn<{$order.order_id}>' style="font-size:16px;font-weight: 700;padding-right: 15px;cursor: pointer;color: blue;" onclick="displayDetail(this);">+</span>
+            </div>
+
+        </div>
+
+    </td>
+
+    <td class="orderbn"><{$order.order_bn}></td>
+    
+    <td class="paystatus"><{if $order.pay_status ==1 || $order.pay_status==5 || $order.pay_status==4}>已支付<{elseif $order.pay_status==6 || $order.pay_status==7}>退款中<{else}><{if $order.is_cod=='false'}><span style="font-weight: 700;color: red;">未支付</span><{else}><span style="font-weight: 700;font-size: 14px; color: red;">货到付款</span><{/if}><{/if}></td>
+    
+    <td class="difftime"><{$order.difftime}></td>
+    <td class="memo">
+        <div id="mark_<{$orderId}>" title="<{$order.mark_text}>" style="text-align:left;height:22px;overflow:hidden;width:100%;color: #0000ff;font-size: 14px;" <{if $order.mark_text}>onclick="copy_txt('mark_<{$orderId}>');"<{/if}>><{$order.mark_text}></div>
+        <div id="mark_<{$orderId}>_input" style="display:none"><textarea name="market_copy" id="mark_<{$orderId}>_ci" cols="30" rows="4" readonly><{$order.mark_text}></textarea><br/><span style="font-weight: 700;color:red;">使用CTRL+C和CTRL+V复制</span><{button type="button" label="完成" onClick="copy_finsh('mark_{$orderId}');" }></div>
+    </td>
+    <td class="mark">
+        <div id="memo_<{$orderId}>" title="<{$order.custom_mark}>" style="text-align:left;height:22px;overflow:hidden;width:100%;color: #0000ff;font-size: 14px;" <{if $order.custom_mark}>onclick="copy_txt('memo_<{$orderId}>')"<{/if}>><{$order.custom_mark}></div>
+        <div id="memo_<{$orderId}>_input" style="display:none"><textarea name="memo_copy" id="memo_<{$orderId}>_ci" cols="30" rows="4" readonly><{$order.custom_mark}></textarea><br/><span style="font-weight: 700;color:red;">使用CTRL+C和CTRL+V复制</span><{button type="button" label="完成" onClick="copy_finsh('memo_{$orderId}');" }></div>
+    </td>
+    <td class="shipping">
+        <{$order.shipping}>
+        <div class="cpup-service">
+            <{if $order.promise_service}>
+            <span style="color: #ff6600; font-weight: bold;"><{$order.promise_service}></span>
+            <{else}>
+            <{if is_array($order.cpup_service) && in_array('201',$order.cpup_service)}>
+            <span style="color: #6666ff;">按需配送</span>
+            <{/if}>
+            <{if is_array($order.cpup_service) && in_array('202',$order.cpup_service)}>
+            <span style="color: #c64ae2;">顺丰配送</span>
+            <{/if}>
+            <{if is_array($order.cpup_service) && in_array('203',$order.cpup_service)}>
+            <span style="color: #4ae25e;">承诺发货</span>
+            <{/if}>
+            <{if is_array($order.cpup_service) && in_array('204',$order.cpup_service)}>
+            <span style="color: #e2bc4a;">承诺送达</span>
+            <{/if}>
+            <{if is_array($order.cpup_service) && in_array('210',$order.cpup_service)}>
+            <span style="color: #e2bc4a;">极速上门</span>
+            <{/if}>
+            <{/if}>    
+        </div>
+    </td>
+    <td class="marktype">
+    <{if $order.mark_type}>
+    <img height="20" width="20" src="<{$base_dir}>/app/ome/statics/remark_icons/<{$order.mark_type}>.gif">
+    <{/if}>
+    </td>
+    <td class="tamount"><{if $order.total_amount == 0}>-<{else}><{$order.total_amount}><{/if}></td>
+    <td class="amount"><{if $order.payed == 0}>-<{else}><{$order.payed}><{/if}></td>
+    <td class="cost_freight"><{$order.cost_freight}></td>
+    <td><{$order.identifier}></td>
+    <td class='operation' rowspan="2">
+        <{if $order.derviveryId >0 }>
+            <span style="color:red;font-weight:700;">已生成发货单</span>
+        <{else}>
+            <{if $order.process_status != "cancel" }>
+                <{if $order.abnormal !='true' }>        
+                    <{if $order.ship_status == 0 || $order.ship_status == 2}> 
+                        <{ if $order.pause == 'true' }> 
+                            <a href='javascript:void(0);' onclick="doDetailAction(5, <{$order.order_id}>);">恢复</a>
+                        <{else}>
+                            <a href='javascript:void(0);' onclick="doDetailAction(4, <{$order.order_id}>);">暂停</a>
+                        <{/if}>   
+                        <{if $order.flag_edit eq 'true' || $order.order_source eq 'taofenxiao'}>
+                        <a href="javascript:void(0);" onclick="<{ if $order.pause == 'true' }>update('<{$order.order_id}>');<{else}>alert('请暂停后再进行编辑操作')<{/if}>" >编辑</a>
+                        <{/if}>
+                        <a href="javascript:void(0);" onclick="new Dialog('index.php?ctl=admin_order&act=do_abnormal&app=ome&p[0]=<{$order.order_id}>&finder_id=<{$finder_id}>',{width:700,height:300,title:'订单异常',onClose:function(){window.location.reload();}}); ">异常</a>
+                        <a href="javascript:void(0);" onclick="new Dialog('index.php?ctl=admin_order&act=do_cancel&app=ome&p[0]=<{$order.order_id}>&finder_id=<{$finder_id}>',{width:700,height:300,title:'订单取消',onClose:function(){window.location.reload();}}); ">取消</a>
+                    <{/if}>
+                <{ else }>
+                    <a href="javascript:void(0);" onclick="new Dialog('index.php?ctl=admin_order&act=do_abnormal&app=ome&p[0]=<{$order.order_id}>&finder_id=<{$finder_id}>',{width:700,height:300,title:'订单异常',onClose:function(){window.location.reload();}}); ">异常</a>
+                <{ /if }>
+            <{/if}>
+        <{/if}>
+    </td>
+</tr>
+<tr>
+    <{if $sameMemOrder || $sameAddrOrder}>
+    <td colspan="11" style="text-align: left; padding-left: 10px; line-height: 1.6; background-color: #f0f2f5; border-top: 1px solid #d9d9d9;">
+        <!-- 用户名，收货人姓名、手机、地区、详细地址 -->
+        <span style="color: #666; font-weight: bold;">用户：</span><{$order.member_name}>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span style="color: #666; font-weight: bold;">收货人：</span><span sensitive-field="ship_name"><{$order.consignee.name|ciphertext:'order','ship_name',$order.shop_type}></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span style="color: #666; font-weight: bold;">手机：</span><span sensitive-field="ship_mobile"><{$order.consignee.mobile|ciphertext:'order','ship_mobile',$order.shop_type}></span>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span style="color: #666; font-weight: bold;">地区：</span><{$order.consignee.area|region}>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span style="color: #666; font-weight: bold;">地址：</span><span sensitive-field="ship_addr"><{$order.consignee.addr|ciphertext:'order','ship_addr',$order.shop_type}></span>
+    </td>
+    <{/if}>
+</tr>
+<tr id="detail<{$order.order_id}>" style='display:none'>
+    <td style="background:#bbb;" colspan="11">
+        <div style="padding:3px;">
+        <table  class="nosplit gridlist clear" width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <thead>
+            <tr>
+                <th nowrap="nowrap">物料编码</th>
+                <th>物料名称</th>
+                <th nowrap="nowrap">销售物料编码</th>
+                <th>销售物料名称</th>
+                <th style="width:15%;">规格</th>
+                <th style="width:8%;">价格</th>
+                <th style="width:8%;">小计</th>
+                <th style="width:6%;">购买数量</th>
+                <th style="width:6%;">发货数量</th>
+                <th style="width:6%;">已退货量</th>
+            </tr>
+            </thead>
+            <tbody id="detail<{$order.order_id}>_Node">
+                <{assign var="index" value=0}>
+                <{foreach from=$combineOrders[$order.order_id]['items'] item=objs key=obj_type}>
+                <{include file="admin/order/confirm/{$obj_type}_confirm.html"}>
+                <{/foreach}>
+            </tbody>
+        </table>
+        <{ if is_array($order.tbgifts) && count($order.tbgifts) >0}>
+        <br/>
+        <table class="nosplit gridlist clear" width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <thead>
+            <tr>
+                <th>赠品名称</th>
+                <th style="width:6%;">需送数量</th>
+            </tr>
+            </thead>
+            <tbody>
+                <{foreach from=$order.tbgifts item=tbgift}>
+                <th><{$tbgift.name}></th>
+                <th><{$tbgift.nums}></th>
+                <{/foreach}>
+            </tbody>
+        </table>
+        <{/if}>
+        </div>   
+    </td>
+</tr>

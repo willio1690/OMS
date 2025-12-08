@@ -1,0 +1,1442 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> <{$title}> </title>
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/common.css">
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/delivery.css">
+  <script src="<{$env.app.res_url}>/js/axios.min.js"></script>
+  <script src="<{$env.app.res_url}>/js/libs.min.js"></script>
+  <script src="<{$env.app.res_url}>/js/mobile.min.js"></script>
+  <script src="<{$env.app.res_url}>/js/main.min.js"></script>
+</head>
+
+<body>
+  <div class="page flex-col">
+    <!-- heder -->
+    <div class="section_1 flex-col">
+      <div class="text-wrapper_1 flex-row align-center justify-between">
+        <img src="<{$env.app.res_url}>/img/icon-back.png" class="icon-back">
+        <span class="text_1">批量呼叫快递</span>
+        <img src="<{$env.app.res_url}>/img/icon-refresh.png" class="icon-refresh">
+      </div>
+    </div>
+    <div class="main">
+      <!-- 说明文字 -->
+      <div class="batch-info-section">
+        <div class="batch-info-text">
+          共选中<{$total_count}>订单，操作后将为这些订单呼叫快递
+        </div>
+      </div>
+
+      <!-- 配置选项 -->
+      <div class="group_2 flex-col">
+        <div class="group_4 flex-row justify-between">
+          <span class="text_3">物流公司</span>
+          <div class="custom-select" data-name="logi_company" id="logi_company">
+            <div class="custom-select-trigger">
+              <span class="custom-select-value">请选择</span>
+              <img class="custom-select-arrow" referrerpolicy="no-referrer" src="<{$env.app.res_url}>/img/icon-arrow-down.png" />
+            </div>
+            <div class="custom-select-options">
+              <!-- 选项将通过JavaScript动态生成 -->
+            </div>
+          </div>
+        </div>
+        <div class="group_4 flex-row justify-between">
+          <span class="text_3">服务类型</span>
+          <div class="custom-select" data-name="product_type" id="product_type">
+            <div class="custom-select-trigger">
+              <span class="custom-select-value">请选择</span>
+              <img class="custom-select-arrow" referrerpolicy="no-referrer" src="<{$env.app.res_url}>/img/icon-arrow-down.png" />
+            </div>
+            <div class="custom-select-options">
+              <div class="custom-select-option" data-value="">请选择</div>
+            </div>
+          </div>
+        </div>
+        <div class="group_4 flex-row justify-between">
+          <span class="text_3">月结账号</span>
+          <div class="custom-select" data-name="monthly_account" id="monthly_account">
+            <div class="custom-select-trigger">
+              <span class="custom-select-value">小镇</span>
+              <img class="custom-select-arrow" referrerpolicy="no-referrer" src="<{$env.app.res_url}>/img/icon-arrow-down.png" />
+            </div>
+            <div class="custom-select-options">
+              <div class="custom-select-option selected" data-value="default">小镇</div>
+            </div>
+          </div>
+        </div>
+        <div class="group_4 flex-row justify-between">
+          <span class="text_3">取件时间</span>
+          <div class="custom-select" data-name="pickup_time" id="pickup_time">
+            <div class="custom-select-trigger">
+              <span class="custom-select-value">立即取件</span>
+              <img class="custom-select-arrow" referrerpolicy="no-referrer" src="<{$env.app.res_url}>/img/icon-arrow-down.png" />
+            </div>
+            <div class="custom-select-options">
+              <div class="custom-select-option selected" data-value="now">立即取件</div>
+            </div>
+          </div>
+        </div>
+        <div class="group_4 flex-row justify-between">
+          <span class="text_3">是否打印</span>
+          <div class="custom-select" data-name="need_print" id="need_print">
+            <div class="custom-select-trigger">
+              <span class="custom-select-value">否</span>
+              <img class="custom-select-arrow" referrerpolicy="no-referrer" src="<{$env.app.res_url}>/img/icon-arrow-down.png" />
+            </div>
+            <div class="custom-select-options">
+              <div class="custom-select-option selected" data-value="0">否</div>
+              <div class="custom-select-option" data-value="1">是</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="delivery-footer justify-between">
+      <{if $total_count > 0}>
+      <button class="delivery-footer-btn modal-confirm" onclick="startBatchDelivery()">打印配货单</button>
+      <{else}>
+      <button class="delivery-footer-btn delivery-btn-disabled" disabled>暂无待发货订单</button>
+      <{/if}>
+    </div>
+  </div>
+
+  <div class="mask" id="mask"></div>
+  <div class="toast" id="toast"></div>
+
+  <!-- 自定义确认弹窗 - 解决Mac版微信小程序兼容性问题 -->
+  <div class="custom-confirm-modal" id="customConfirmModal" style="display: none;">
+    <div class="custom-confirm-mask"></div>
+    <div class="custom-confirm-container">
+      <div class="custom-confirm-content">
+        <div class="custom-confirm-message" id="customConfirmMessage">确认操作吗？</div>
+      </div>
+      <div class="custom-confirm-buttons">
+        <button class="custom-confirm-btn custom-confirm-cancel" id="customConfirmCancel">取消</button>
+        <button class="custom-confirm-btn custom-confirm-ok" id="customConfirmOk">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 进度弹窗 -->
+  <div class="modal" id="progressModal" style="display: none;">
+    <div class="modal-mask"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">批量呼叫快递进行中</h3>
+      </div>
+      <div class="modal-content">
+        <div class="progress-info">
+          <div class="progress-text">
+            <span>正在处理：</span>
+            <span id="currentStore">-</span>
+          </div>
+          <div class="progress-text">
+            <span>总进度：</span>
+            <span id="progressText">0/0</span>
+          </div>
+          <div class="progress-text" style="display: none;">
+            <span>处理状态：</span>
+            <span id="progressStatus">准备中...</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+          </div>
+          <div class="progress-percentage" id="progressPercentage">0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 结果弹窗 -->
+  <div class="modal" id="resultModal" style="display: none;">
+    <div class="modal-mask"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">批量呼叫快递完成</h3>
+        <span class="modal-close" onclick="closeResultModal()">×</span>
+      </div>
+      <div class="modal-content">
+        <div class="result-summary">
+          <div class="result-stats">
+            <div class="result-stat-item success">
+              <div class="stat-number" id="successCount">0</div>
+              <div class="stat-label">呼叫成功</div>
+            </div>
+            <div class="result-stat-item fail">
+              <div class="stat-number" id="failCount">0</div>
+              <div class="stat-label">呼叫失败</div>
+            </div>
+            <div class="result-stat-item success" id="printSuccessItem" style="display: none;">
+              <div class="stat-number" id="printSuccessCount">0</div>
+              <div class="stat-label">打印成功</div>
+            </div>
+            <div class="result-stat-item fail" id="printFailItem" style="display: none;">
+              <div class="stat-number" id="printFailCount">0</div>
+              <div class="stat-label">打印失败</div>
+            </div>
+          </div>
+        </div>
+        <div class="result-details" id="resultDetails">
+          <!-- 详细结果将在这里显示 -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn modal-confirm" onclick="closeResultModal()">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="<{$env.app.res_url}>/js/common.js"></script>
+  <script>
+    let isProcessing = false;
+    let corpList = [];
+    let defaultCorp = [];
+    let storeOrdersData = [];
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function () {
+      // 生成取件时间选项
+      generatePickupTimeOptions();
+
+      // 初始化自定义下拉组件
+      initCustomSelects();
+
+      // 获取门店订单数据和物流公司配置
+      loadStoreOrdersData();
+    });
+
+    // 生成取件时间选项
+    function generatePickupTimeOptions() {
+      const selectBox = document.getElementById('pickup_time');
+      const optionsContainer = selectBox.querySelector('.custom-select-options');
+      const startHours = 9;
+      const endHours = 21;
+
+      for (let h = 0; h <= endHours; h++) {
+        const h_str = h.toString().padStart(2, '0');
+        const disabled_0 = h < startHours;
+        const disabled_30 = (h < startHours || h === endHours);
+
+        if (!disabled_0) {
+          const option = document.createElement('div');
+          option.className = 'custom-select-option';
+          option.setAttribute('data-value', `${h_str}:00`);
+          option.textContent = `${h_str}:00`;
+          optionsContainer.appendChild(option);
+        }
+        if (!disabled_30) {
+          const option = document.createElement('div');
+          option.className = 'custom-select-option';
+          option.setAttribute('data-value', `${h_str}:30`);
+          option.textContent = `${h_str}:30`;
+          optionsContainer.appendChild(option);
+        }
+      }
+    }
+
+    // 加载门店订单数据
+    function loadStoreOrdersData() {
+      var store_id = "<{$store_id}>";
+      loadCorpConfig(store_id);
+    }
+
+    // 加载物流公司配置
+    function loadCorpConfig(store_id, corp_code = '') {
+      $.post('getCorpList', {'store_id': store_id}, function(rs) {
+        const json = JSON.parse(rs);
+        const is_default_month_account = json.storeInfo.is_default_month_accoun;
+        
+        corpList = json.corpList;
+        let default_corp_code = corp_code || json.default_corp_code;
+        defaultCorp = json.default_corp;
+
+        // 填充物流公司下拉框
+        fillLogisticCompany(default_corp_code);
+        
+        // 填充月结账号
+        fillMonthlyAccount(is_default_month_account, default_corp_code);
+      });
+    }
+
+    // 填充物流公司下拉框
+    function fillLogisticCompany(default_corp_code) {
+      const logiSelect = document.getElementById('logi_company');
+      const optionsContainer = logiSelect.querySelector('.custom-select-options');
+      const valueSpan = logiSelect.querySelector('.custom-select-value');
+
+      // 清空选项
+      optionsContainer.innerHTML = '';
+
+      if (corpList && corpList.length > 0) {
+        // 添加"请选择"选项
+        const defaultOption = document.createElement('div');
+        defaultOption.className = 'custom-select-option';
+        defaultOption.setAttribute('data-value', '');
+        defaultOption.textContent = '请选择';
+        optionsContainer.appendChild(defaultOption);
+
+        let selectedText = '请选择';
+
+        for (let i in corpList) {
+          const option = document.createElement('div');
+          option.className = 'custom-select-option';
+          option.setAttribute('data-value', corpList[i].type);
+          option.textContent = corpList[i].name;
+
+          if (corpList[i].type == default_corp_code) {
+            option.classList.add('selected');
+            selectedText = corpList[i].name;
+            fillProductType(corpList[i], default_corp_code);
+          }
+
+          optionsContainer.appendChild(option);
+        }
+
+        valueSpan.textContent = selectedText;
+      } else {
+        // 当没有物流公司时，默认选中"未绑定物流公司"
+        const option = document.createElement('div');
+        option.className = 'custom-select-option selected';
+        option.setAttribute('data-value', '');
+        option.textContent = '未绑定物流公司';
+        optionsContainer.appendChild(option);
+        valueSpan.textContent = '未绑定物流公司';
+      }
+
+      // 重新绑定事件监听器
+      bindCustomSelectEvents(logiSelect);
+    }
+
+    // 填充服务类型
+    function fillProductType(corpInfo, corp_code) {
+      const productSelect = document.getElementById('product_type');
+      const optionsContainer = productSelect.querySelector('.custom-select-options');
+      const valueSpan = productSelect.querySelector('.custom-select-value');
+
+      // 清空选项
+      optionsContainer.innerHTML = '';
+
+      if (corpInfo.product_type && corpInfo.product_type.length > 0) {
+        // 添加"请选择"选项
+        const defaultOption = document.createElement('div');
+        defaultOption.className = 'custom-select-option';
+        defaultOption.setAttribute('data-value', '');
+        defaultOption.textContent = '请选择';
+        optionsContainer.appendChild(defaultOption);
+
+        let selectedText = '请选择';
+
+        for (let j in corpInfo.product_type) {
+          const option = document.createElement('div');
+          option.className = 'custom-select-option';
+          option.setAttribute('data-value', corpInfo.product_type[j].value);
+          option.textContent = corpInfo.product_type[j].label;
+
+          const isDefault = defaultCorp && defaultCorp[corp_code] &&
+                           defaultCorp[corp_code].product_type &&
+                           corpInfo.product_type[j].value == defaultCorp[corp_code].product_type;
+
+          if (isDefault) {
+            option.classList.add('selected');
+            selectedText = corpInfo.product_type[j].label;
+          }
+
+          optionsContainer.appendChild(option);
+        }
+
+        valueSpan.textContent = selectedText;
+      } else {
+        const option = document.createElement('div');
+        option.className = 'custom-select-option selected';
+        option.setAttribute('data-value', '');
+        option.textContent = '默认';
+        optionsContainer.appendChild(option);
+        valueSpan.textContent = '默认';
+      }
+
+      // 重新绑定事件监听器
+      bindCustomSelectEvents(productSelect);
+    }
+
+    // 填充月结账号
+    function fillMonthlyAccount(is_default_month_account, corp_code) {
+      const monthlySelect = document.getElementById('monthly_account');
+      const optionsContainer = monthlySelect.querySelector('.custom-select-options');
+      const valueSpan = monthlySelect.querySelector('.custom-select-value');
+
+      // 清空选项
+      optionsContainer.innerHTML = '';
+
+      let selectedText = '';
+
+      if (is_default_month_account == 'true') {
+        const option = document.createElement('div');
+        option.className = 'custom-select-option selected';
+        option.setAttribute('data-value', 'default');
+        option.textContent = '小镇';
+        optionsContainer.appendChild(option);
+        selectedText = '小镇';
+      } else {
+        const option = document.createElement('div');
+        option.className = 'custom-select-option selected';
+        option.setAttribute('data-value', '');
+        option.textContent = '请选择';
+        optionsContainer.appendChild(option);
+        selectedText = '请选择';
+      }
+
+      if (defaultCorp && corp_code && defaultCorp[corp_code] && defaultCorp[corp_code].corp_month_account) {
+        const isDefaultAccount = defaultCorp[corp_code].default_corp_month_account == defaultCorp[corp_code].corp_month_account;
+
+        const option = document.createElement('div');
+        option.className = 'custom-select-option';
+        option.setAttribute('data-value', defaultCorp[corp_code].corp_month_account);
+        option.textContent = `${defaultCorp[corp_code].corp_month_account}(门店)`;
+
+        if (isDefaultAccount) {
+          // 移除之前的选中状态
+          optionsContainer.querySelector('.selected').classList.remove('selected');
+          option.classList.add('selected');
+          selectedText = `${defaultCorp[corp_code].corp_month_account}(门店)`;
+        }
+
+        optionsContainer.appendChild(option);
+      }
+
+      valueSpan.textContent = selectedText;
+
+      // 重新绑定事件监听器
+      bindCustomSelectEvents(monthlySelect);
+    }
+
+    // 初始化自定义下拉组件功能
+    function initCustomSelects() {
+      const customSelects = document.querySelectorAll('.custom-select');
+
+      customSelects.forEach(select => {
+        // 只为还没有绑定事件的组件绑定事件
+        if (!select.hasAttribute('data-events-bound')) {
+          bindCustomSelectEvents(select);
+          select.setAttribute('data-events-bound', 'true');
+        }
+      });
+
+      // 点击页面其他地方关闭所有下拉菜单（只绑定一次）
+      if (!document.body.hasAttribute('data-global-click-bound')) {
+        document.addEventListener('click', function() {
+          document.querySelectorAll('.custom-select').forEach(select => {
+            select.classList.remove('active');
+          });
+        });
+        document.body.setAttribute('data-global-click-bound', 'true');
+      }
+    }
+
+    // 为单个自定义下拉组件绑定事件
+    function bindCustomSelectEvents(select) {
+      const trigger = select.querySelector('.custom-select-trigger');
+      const options = select.querySelector('.custom-select-options');
+
+      // 移除旧的事件监听器（如果存在）
+      const newTrigger = trigger.cloneNode(true);
+      trigger.parentNode.replaceChild(newTrigger, trigger);
+
+      // 重新获取valueSpan，因为trigger被替换了
+      const valueSpan = select.querySelector('.custom-select-value');
+
+      // 标记为已绑定事件
+      select.setAttribute('data-events-bound', 'true');
+
+      // 点击触发器切换下拉菜单
+      newTrigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+
+        // 关闭其他已打开的下拉菜单
+        document.querySelectorAll('.custom-select').forEach(otherSelect => {
+          if (otherSelect !== select) {
+            otherSelect.classList.remove('active');
+          }
+        });
+
+        // 切换当前下拉菜单
+        select.classList.toggle('active');
+      });
+
+      // 点击选项
+      const optionElements = select.querySelectorAll('.custom-select-option');
+      optionElements.forEach(option => {
+        option.addEventListener('click', function(e) {
+          e.stopPropagation();
+
+          // 移除其他选项的选中状态
+          optionElements.forEach(opt => opt.classList.remove('selected'));
+
+          // 设置当前选项为选中状态
+          option.classList.add('selected');
+
+          // 重新获取valueSpan确保是最新的元素
+          const currentValueSpan = select.querySelector('.custom-select-value');
+
+          // 更新显示值
+          currentValueSpan.textContent = option.textContent;
+
+          // 关闭下拉菜单
+          select.classList.remove('active');
+
+          // 处理物流公司选择变化事件
+          if (select.getAttribute('data-name') === 'logi_company') {
+            const corp_code = option.getAttribute('data-value');
+            var store_id = "<{$store_id}>";
+            if (corp_code && store_id) {
+              loadCorpConfig(store_id, corp_code);
+            }
+          }
+        });
+      });
+    }
+
+    // 获取自定义下拉组件的值
+    function getCustomSelectValue(selectId) {
+      const select = document.getElementById(selectId);
+      if (!select) return '';
+
+      const selectedOption = select.querySelector('.custom-select-option.selected');
+      return selectedOption ? selectedOption.getAttribute('data-value') : '';
+    }
+
+    // 设置自定义下拉组件的值
+    function setCustomSelectValue(selectId, value, text) {
+      const select = document.getElementById(selectId);
+      if (!select) return;
+
+      const valueSpan = select.querySelector('.custom-select-value');
+      const options = select.querySelectorAll('.custom-select-option');
+
+      // 移除所有选中状态
+      options.forEach(opt => opt.classList.remove('selected'));
+
+      // 查找并选中对应的选项
+      const targetOption = Array.from(options).find(opt => opt.getAttribute('data-value') === value);
+      if (targetOption) {
+        targetOption.classList.add('selected');
+        valueSpan.textContent = targetOption.textContent;
+      } else if (text) {
+        // 如果没有找到选项但提供了文本，直接设置显示文本
+        valueSpan.textContent = text;
+      }
+    }
+
+    function startBatchDelivery() {
+      if (isProcessing) {
+        showToast('正在处理中，请稍候...');
+        return;
+      }
+
+      // 验证配置参数
+      const logi_company = getCustomSelectValue('logi_company');
+      const product_type = getCustomSelectValue('product_type');
+      const monthly_account = getCustomSelectValue('monthly_account');
+      const pickup_time = getCustomSelectValue('pickup_time');
+      const need_print = getCustomSelectValue('need_print');
+
+      if (!logi_company) {
+        showToast('请选择物流公司');
+        return;
+      }
+
+      if (!monthly_account) {
+        showToast('请选择月结账号');
+        return;
+      }
+
+      // 使用自定义confirm替代原生confirm，解决Mac版微信小程序兼容性问题
+      showCustomConfirm('确认要批量呼叫快递吗？', function() {
+        // 确认后继续执行
+        continueStartBatchDelivery();
+      });
+      return;
+    }
+
+    // 继续执行批量发货的函数
+    function continueStartBatchDelivery() {
+      isProcessing = true;
+      showProgressModalWithTitle('批量呼叫快递');
+
+      // 获取配置参数
+      const logi_company = getCustomSelectValue('logi_company');
+      const product_type = getCustomSelectValue('product_type');
+      const monthly_account = getCustomSelectValue('monthly_account');
+      const pickup_time = getCustomSelectValue('pickup_time');
+      const need_print = getCustomSelectValue('need_print');
+
+      // 开始批量处理
+      processBatchDelivery({
+        logi_code: logi_company,
+        product_type: product_type,
+        monthly_account: monthly_account,
+        pickup_time: pickup_time,
+        need_print: need_print
+      });
+
+    }
+
+    // 批量处理快递呼叫
+    async function processBatchDelivery(config) {
+      const results = {
+        total_count: 0,
+        call_success: 0,
+        call_fail: 0,
+        print_success: 0,
+        print_fail: 0,
+        need_print: config.need_print === '1',
+        error_messages: [],
+        store_results: []
+      };
+
+      try {
+        // 获取批量订单数据
+        const storeStats = JSON.parse('<{$store_stats_json}>') || {};
+        const deliveryIds = storeStats.delivery_ids || [];
+        const orderBns = storeStats.order_bns || {};
+        const totalCount = deliveryIds.length;
+        results.total_count = totalCount;
+
+        updateProgress('批量处理中', 0, totalCount, '准备处理订单...');
+
+        let processedCount = 0;
+
+        // 处理所有订单
+        for (let i = 0; i < deliveryIds.length; i++) {
+          const delivery_id = deliveryIds[i];
+          const order_bn = orderBns[delivery_id] || delivery_id; // 如果没有订单号则使用发货单ID
+          try {
+            updateProgress('批量处理中', processedCount, totalCount, `正在处理${order_bn}...`);
+
+            const deliveryParams = {
+              delivery_id: delivery_id,
+              logi_code: config.logi_code,
+              monthly_account: config.monthly_account,
+              product_type: config.product_type,
+              pickup_time: config.pickup_time,
+              need_print: config.need_print
+            };
+
+            const deliveryResponse = await $.post('<{$delivery_link.doPrint}>', deliveryParams);
+            const deliveryJson = JSON.parse(deliveryResponse);
+
+            const message = deliveryJson.msg || '';
+
+            if (deliveryJson.rsp === 'succ') {
+              // rsp返回succ，表示呼叫快递成功
+              results.call_success++;
+              if (config.need_print === '1') {
+                // 如果需要打印，表示打印也成功
+                results.print_success++;
+                updateProgress('批量处理中', processedCount + 1, totalCount, `${order_bn} 呼叫并打印成功`);
+              } else {
+                updateProgress('批量处理中', processedCount + 1, totalCount, `${order_bn} 呼叫成功`);
+              }
+            } else if (deliveryJson.rsp === 'fail') {
+              // rsp返回fail，需要根据msg内容判断具体情况
+              if (message.includes('打印失败')) {
+                // msg包含"打印失败"，表示呼叫快递成功，打印失败
+                results.call_success++;
+                if (config.need_print === '1') {
+                  results.print_fail++;
+                  results.error_messages.push(`${order_bn}: ${message}`);
+                }
+                updateProgress('批量处理中', processedCount + 1, totalCount, `${order_bn} 呼叫成功，打印失败`);
+              } else if (message.includes('呼叫快递失败')) {
+                // msg包含"呼叫快递失败"，表示呼叫快递失败，打印失败
+                results.call_fail++;
+                if (config.need_print === '1') {
+                  results.print_fail++;
+                }
+                results.error_messages.push(`${order_bn}: ${message}`);
+                updateProgress('批量处理中', processedCount + 1, totalCount, `${order_bn} 呼叫失败`);
+              } else {
+                // 其他fail情况，默认为呼叫快递失败
+                results.call_fail++;
+                if (config.need_print === '1') {
+                  results.print_fail++;
+                }
+                results.error_messages.push(`${order_bn}: ${message || '呼叫快递失败'}`);
+                updateProgress('批量处理中', processedCount + 1, totalCount, `${order_bn} 呼叫失败`);
+              }
+            } else {
+              // 其他未知状态，默认为呼叫快递失败
+              results.call_fail++;
+              if (config.need_print === '1') {
+                results.print_fail++;
+              }
+              results.error_messages.push(`${order_bn}: 未知状态 - ${message || '呼叫快递失败'}`);
+              updateProgress('批量处理中', processedCount + 1, totalCount, `${order_bn} 呼叫失败`);
+            }
+
+            processedCount++;
+
+            // 添加延迟避免请求过快
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+          } catch (error) {
+            results.call_fail++;
+            results.error_messages.push(`${order_bn}: 网络错误或系统异常`);
+            processedCount++;
+            updateProgress('批量处理中', processedCount, totalCount, `${order_bn} 处理异常`);
+          }
+        }
+
+        isProcessing = false;
+        hideProgressModal();
+        showResultModal(results, config);
+
+      } catch (error) {
+        isProcessing = false;
+        hideProgressModal();
+        showToast(error.message || '批量处理失败');
+      }
+    }
+
+    function showProgressModal() {
+      document.getElementById('progressModal').style.display = 'block';
+      updateProgress('准备中...', 0, parseInt('<{$total_count}>') || 0);
+    }
+
+    function showProgressModalWithTitle(title) {
+      const modal = document.getElementById('progressModal');
+      const titleElement = modal.querySelector('.modal-title');
+      titleElement.textContent = title;
+      modal.style.display = 'block';
+      updateProgress('准备中...', 0, parseInt('<{$total_count}>') || 0);
+    }
+
+    function hideProgressModal() {
+      document.getElementById('progressModal').style.display = 'none';
+    }
+
+    function updateProgress(currentStore, processed, total, status = '') {
+      document.getElementById('currentStore').textContent = currentStore;
+      document.getElementById('progressText').textContent = processed + '/' + total;
+
+      const percentage = total > 0 ? Math.round(processed / total * 100) : 0;
+      document.getElementById('progressFill').style.width = percentage + '%';
+      document.getElementById('progressPercentage').textContent = percentage + '%';
+
+      if (status) {
+        document.getElementById('progressStatus').textContent = status;
+      }
+    }
+
+    function showResultModal(data, config) {
+      // 根据需求生成不同场景的提示信息
+      let resultMessage = '';
+      const totalCount = data.total_count;
+      const callSuccess = data.call_success;
+      const callFail = data.call_fail;
+      const printSuccess = data.print_success;
+      const printFail = data.print_fail;
+      const needPrint = data.need_print;
+
+      if (!needPrint) {
+        // 只呼叫快递的场景
+        if (callFail === 0) {
+          // 全部成功：共n单，全部呼叫快递成功
+          resultMessage = `共${totalCount}单，全部呼叫快递成功`;
+        } else {
+          // 有部分失败：共n单，呼叫快递成功x单，失败y单；可稍后重试呼叫快递+返回的错误码
+          resultMessage = `共${totalCount}单，呼叫快递成功${callSuccess}单，失败${callFail}单；可稍后重试呼叫快递`;
+          if (data.error_messages.length > 0) {
+            resultMessage += '\n\n错误详情：\n' + data.error_messages.slice(0, 5).join('\n');
+            if (data.error_messages.length > 5) {
+              resultMessage += `\n...还有${data.error_messages.length - 5}个错误`;
+            }
+          }
+        }
+      } else {
+        // 呼叫并打印的场景
+        if (callFail === 0 && printFail === 0) {
+          // 呼叫并打印，全部呼叫成功、全部打印成功：共n单，全部呼叫快递并打单成功
+          resultMessage = `共${totalCount}单，全部呼叫快递并打单成功`;
+        } else if (callFail > 0 && printFail > 0) {
+          // 呼叫并打印，部分呼叫成功、部分打印成功：共n单，呼叫快递成功x单，失败y单；打印成功x单，失败y单；可稍后重试呼叫快递或补打快递面单+返回的错误码
+          resultMessage = `共${totalCount}单，呼叫快递成功${callSuccess}单，失败${callFail}单；打印成功${printSuccess}单，失败${printFail}单；可稍后重试呼叫快递或补打快递面单`;
+          if (data.error_messages.length > 0) {
+            resultMessage += '\n\n错误详情：\n' + data.error_messages.slice(0, 5).join('\n');
+            if (data.error_messages.length > 5) {
+              resultMessage += `\n...还有${data.error_messages.length - 5}个错误`;
+            }
+          }
+        } else if (callFail === 0 && printFail > 0) {
+          // 呼叫并打印，全部呼叫成功，部分打印成功：共n单，全部呼叫快递成功；打印成功x单，失败y单；可稍后重新补打快递面单+返回的错误码
+          resultMessage = `共${totalCount}单，全部呼叫快递成功；打印成功${printSuccess}单，失败${printFail}单；可稍后重新补打快递面单`;
+          if (data.error_messages.length > 0) {
+            resultMessage += '\n\n错误详情：\n' + data.error_messages.slice(0, 5).join('\n');
+            if (data.error_messages.length > 5) {
+              resultMessage += `\n...还有${data.error_messages.length - 5}个错误`;
+            }
+          }
+        } else if (callFail > 0 && printFail === 0) {
+          // 部分呼叫失败，但成功的都打印成功了
+          resultMessage = `共${totalCount}单，呼叫快递成功${callSuccess}单，失败${callFail}单；打印成功${printSuccess}单；可稍后重试呼叫快递`;
+          if (data.error_messages.length > 0) {
+            resultMessage += '\n\n错误详情：\n' + data.error_messages.slice(0, 5).join('\n');
+            if (data.error_messages.length > 5) {
+              resultMessage += `\n...还有${data.error_messages.length - 5}个错误`;
+            }
+          }
+        }
+      }
+
+      // 更新结果显示
+      document.getElementById('successCount').textContent = callSuccess;
+      document.getElementById('failCount').textContent = callFail;
+
+      // 如果需要打印，显示打印统计
+      if (needPrint) {
+        document.getElementById('printSuccessItem').style.display = 'block';
+        document.getElementById('printFailItem').style.display = 'block';
+        document.getElementById('printSuccessCount').textContent = printSuccess;
+        document.getElementById('printFailCount').textContent = printFail;
+      } else {
+        document.getElementById('printSuccessItem').style.display = 'none';
+        document.getElementById('printFailItem').style.display = 'none';
+      }
+
+      // 高亮显示统计数字的函数
+      function highlightNumbers(text) {
+        return text
+          .replace(/(呼叫快递成功)(\d+)(单)/g, '$1<span class="highlight-number">$2</span>$3')
+          .replace(/(失败)(\d+)(单)/g, '$1<span class="highlight-number">$2</span>$3')
+          .replace(/(打印成功)(\d+)(单)/g, '$1<span class="highlight-number">$2</span>$3')
+          .replace(/(打印失败)(\d+)(单)/g, '$1<span class="highlight-number">$2</span>$3')
+          .replace(/(共)(\d+)(单)/g, '$1<span class="highlight-number">$2</span>$3');
+      }
+
+      // 显示详细结果消息，并高亮数字
+      const detailsContainer = document.getElementById('resultDetails');
+      detailsContainer.innerHTML = `
+        <div class="result-message">
+          <pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">${highlightNumbers(resultMessage)}</pre>
+        </div>
+      `;
+
+      document.getElementById('resultModal').style.display = 'block';
+    }
+
+    function closeResultModal() {
+      document.getElementById('resultModal').style.display = 'none';
+      // 返回上一页
+      history.back();
+    }
+
+    // 返回按钮
+    document.querySelector('.icon-back').addEventListener('click', function() {
+      if (isProcessing) {
+        // 使用自定义confirm替代原生confirm，解决Mac版微信小程序兼容性问题
+        showCustomConfirm('正在处理中，确认要离开吗？', function() {
+          history.back();
+        });
+      } else {
+        history.back();
+      }
+    });
+
+    // 刷新按钮
+    document.querySelector('.icon-refresh').addEventListener('click', function() {
+      if (isProcessing) {
+        showToast('正在处理中，请稍候...');
+      } else {
+        window.location.reload();
+      }
+    });
+
+    // 自定义确认弹窗函数 - 解决Mac版微信小程序兼容性问题
+    function showCustomConfirm(message, onConfirm, onCancel) {
+      const modal = document.getElementById('customConfirmModal');
+      const messageEl = document.getElementById('customConfirmMessage');
+      const okBtn = document.getElementById('customConfirmOk');
+      const cancelBtn = document.getElementById('customConfirmCancel');
+      const mask = modal.querySelector('.custom-confirm-mask');
+
+      // 检测环境并添加相应的类名
+      const isWechat = /micromessenger/i.test(navigator.userAgent);
+      if (isWechat) {
+        modal.classList.add('wechat-env');
+      }
+
+      // 设置消息
+      messageEl.textContent = message;
+
+      // 显示弹窗
+      modal.style.display = 'flex';
+
+      // 备用居中方案 - 如果flex不工作，使用绝对定位
+      setTimeout(function() {
+        const container = modal.querySelector('.custom-confirm-container');
+        const rect = container.getBoundingClientRect();
+
+        // 检查是否正确居中，如果没有则使用备用方案
+        const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const centerX = viewportWidth / 2;
+        const centerY = viewportHeight / 2;
+        const containerCenterX = rect.left + rect.width / 2;
+        const containerCenterY = rect.top + rect.height / 2;
+
+        // 如果偏差超过50px，使用绝对定位居中
+        if (Math.abs(containerCenterX - centerX) > 50 || Math.abs(containerCenterY - centerY) > 50) {
+          modal.style.display = 'block';
+          container.style.position = 'fixed';
+          container.style.top = '50%';
+          container.style.left = '50%';
+          container.style.transform = 'translate(-50%, -50%)';
+          container.style.webkitTransform = 'translate(-50%, -50%)';
+          container.style.margin = '0';
+        }
+      }, 10);
+
+      // 清除之前的事件监听器
+      const newOkBtn = okBtn.cloneNode(true);
+      const newCancelBtn = cancelBtn.cloneNode(true);
+      const newMask = mask.cloneNode(true);
+
+      okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+      cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+      mask.parentNode.replaceChild(newMask, mask);
+
+      // 确定按钮事件
+      newOkBtn.addEventListener('click', function() {
+        hideCustomConfirm();
+        if (onConfirm && typeof onConfirm === 'function') {
+          onConfirm();
+        }
+      });
+
+      // 取消按钮事件
+      newCancelBtn.addEventListener('click', function() {
+        hideCustomConfirm();
+        if (onCancel && typeof onCancel === 'function') {
+          onCancel();
+        }
+      });
+
+      // 点击遮罩关闭
+      newMask.addEventListener('click', function() {
+        hideCustomConfirm();
+        if (onCancel && typeof onCancel === 'function') {
+          onCancel();
+        }
+      });
+
+      // 添加触摸事件支持，解决移动端兼容性
+      newOkBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        this.style.opacity = '0.7';
+      });
+
+      newOkBtn.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        this.style.opacity = '1';
+        hideCustomConfirm();
+        if (onConfirm && typeof onConfirm === 'function') {
+          onConfirm();
+        }
+      });
+
+      newCancelBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        this.style.opacity = '0.7';
+      });
+
+      newCancelBtn.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        this.style.opacity = '1';
+        hideCustomConfirm();
+        if (onCancel && typeof onCancel === 'function') {
+          onCancel();
+        }
+      });
+    }
+
+    // 隐藏自定义确认弹窗
+    function hideCustomConfirm() {
+      const modal = document.getElementById('customConfirmModal');
+      const container = modal.querySelector('.custom-confirm-container');
+
+      // 清理样式
+      modal.style.display = 'none';
+      modal.classList.remove('wechat-env');
+
+      // 重置容器样式
+      container.style.position = '';
+      container.style.top = '';
+      container.style.left = '';
+      container.style.transform = '';
+      container.style.webkitTransform = '';
+      container.style.margin = '';
+    }
+  </script>
+
+  <style>
+    /* 批量说明信息样式 */
+    .batch-info-section {
+      background: rgba(255, 255, 255, 1);
+      border-radius: 1rem;
+      padding: 0.813rem 0.907rem;
+      margin: 0.782rem auto 0.75rem;
+      width: 21.938rem;
+      align-self: center;
+    }
+
+    .batch-info-text {
+      word-break: break-all;
+      color: rgba(151, 151, 153, 1);
+      font-size: 0.875rem;
+      font-family: PingFangSC-Regular;
+      font-weight: normal;
+      text-align: center;
+      line-height: 1.25rem;
+    }
+
+    /* 进度弹窗样式 */
+    .progress-info {
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .progress-text {
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #333;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 1.5rem;
+      background-color: #f0f0f0;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      margin: 0.75rem 0 0.5rem 0;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #d4ca99 0%, #b8a87a 100%);
+      transition: width 0.3s ease;
+      border-radius: 0.75rem;
+    }
+
+    .progress-percentage {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #333;
+      margin-top: 0.25rem;
+    }
+
+    /* 弹窗组件样式 - 与系统统一 */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+    }
+
+    .modal-mask {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border-radius: 0.5rem;
+      width: 20.44rem;
+      max-width: 90%;
+    }
+
+    .modal-header {
+      padding: 0.9375rem;
+      position: relative;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 1rem;
+      text-align: center;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .modal-close {
+      position: absolute;
+      right: 0.9375rem;
+      top: 0.9375rem;
+      cursor: pointer;
+      font-size: 1.25rem;
+      color: #999;
+      line-height: 1;
+    }
+
+    .modal-content {
+      padding: 0 0.9375rem 0.9375rem;
+    }
+
+    .modal-footer {
+      padding: 0.9375rem;
+      text-align: center;
+    }
+
+    .modal-btn {
+      width: 100%;
+      height: 2.47rem;
+      border-radius: 0.25rem;
+      border: 0.03rem solid #000000;
+      font-weight: 500;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+
+    .modal-confirm {
+      background: #000;
+      color: #d4ca99;
+    }
+
+    /* 结果弹窗特有样式 */
+    .result-summary {
+      margin-bottom: 1rem;
+    }
+
+    .result-stats {
+      display: flex;
+      justify-content: space-around;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 0.5rem;
+      border: 1px solid #e9ecef;
+    }
+
+    .result-stat-item {
+      text-align: center;
+      flex: 1;
+    }
+
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: #666;
+    }
+
+    .result-stat-item.success .stat-number {
+      color: #28a745;
+    }
+
+    .result-stat-item.fail .stat-number {
+      color: #dc3545;
+    }
+
+    .highlight-number {
+      color: #050505;
+      font-weight: 600;
+      background-color: rgba(212, 202, 153, 0.1);
+      padding: 0.1rem 0.2rem;
+      border-radius: 0.2rem;
+      font-size:18px;
+    }
+
+    .result-message {
+      background: #f8f9fa;
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .result-message pre {
+      font-size: 0.75rem;
+      line-height: 1.4;
+      color: #333;
+      white-space: pre-wrap;
+      font-family: inherit;
+      margin: 0;
+    }
+
+    /* 禁用按钮样式 */
+    .delivery-btn-disabled {
+      background: #f5f5f5 !important;
+      color: #999 !important;
+      cursor: not-allowed !important;
+    }
+
+    /* 自定义下拉组件样式 */
+    .custom-select {
+      position: relative;
+      width: auto;
+      min-width: 6rem;
+      max-width: 50%;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .custom-select-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      cursor: pointer;
+      position: relative;
+      padding: 0 1.25rem 0 1rem;
+      width: 100%;
+      min-height: 1.25rem;
+    }
+
+    .custom-select-value {
+      word-break: break-all;
+      color: rgba(18, 18, 18, 1);
+      font-size: 0.875rem;
+      letter-spacing: 0.31111112236976624px;
+      font-family: PingFangSC-Regular;
+      font-weight: normal;
+      text-align: right;
+      white-space: nowrap;
+      line-height: 1.25rem;
+    }
+
+    .custom-select-arrow {
+      position: absolute;
+      top: .125rem;
+      right: .125rem;
+      z-index: 0;
+      width: 0.5rem;
+      height: 0.313rem;
+      margin: 0.407rem 0 0.532rem 0.47rem;
+      transition: transform 0.3s ease;
+    }
+
+    .custom-select.active .custom-select-arrow {
+      transform: rotate(180deg);
+    }
+
+    .custom-select-options {
+      position: absolute;
+      top: 100%;
+      right: 1.25rem;
+      min-width: 8rem;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      max-height: 12rem;
+      overflow-y: auto;
+      display: none;
+      margin-top: 0.25rem;
+    }
+
+    .custom-select.active .custom-select-options {
+      display: block;
+    }
+
+    .custom-select-option {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      color: rgba(18, 18, 18, 1);
+      font-size: 0.875rem;
+      font-family: PingFangSC-Regular;
+      font-weight: normal;
+      text-align: left;
+      line-height: 1.25rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .custom-select-option:hover {
+      background-color: #f5f5f5;
+    }
+
+    .custom-select-option.selected {
+      background-color: #F5EDC9;
+      color: #C69A1B;
+    }
+
+    .custom-select-option:first-child {
+      border-top-left-radius: 0.5rem;
+      border-top-right-radius: 0.5rem;
+    }
+
+    .custom-select-option:last-child {
+      border-bottom-left-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
+    }
+
+    /* 自定义确认弹窗样式 - 解决Mac版微信小程序兼容性问题 */
+    .custom-confirm-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* 确保在所有浏览器中都能正确居中 */
+      -webkit-box-align: center;
+      -webkit-box-pack: center;
+      -ms-flex-align: center;
+      -ms-flex-pack: center;
+    }
+
+    .custom-confirm-mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .custom-confirm-container {
+      position: relative;
+      background: #fff;
+      border-radius: 0.5rem;
+      width: 18rem;
+      max-width: 90%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      /* 确保弹窗在视口中居中 */
+      margin: auto;
+      /* 防止弹窗被遮挡 */
+      max-height: 90vh;
+      /* 兼容性处理 */
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+    }
+
+    .custom-confirm-content {
+      padding: 1.5rem 1rem 1rem;
+      text-align: center;
+    }
+
+    .custom-confirm-message {
+      font-size: 1rem;
+      color: #333;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .custom-confirm-buttons {
+      display: flex;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .custom-confirm-btn {
+      flex: 1;
+      height: 2.75rem;
+      border: none;
+      background: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .custom-confirm-cancel {
+      color: #666;
+      border-right: 1px solid #e0e0e0;
+    }
+
+    .custom-confirm-cancel:hover,
+    .custom-confirm-cancel:active {
+      background-color: #f5f5f5;
+    }
+
+    .custom-confirm-ok {
+      color: #d4ca99;
+      font-weight: 500;
+    }
+
+    .custom-confirm-ok:hover,
+    .custom-confirm-ok:active {
+      background-color: #f8f6f0;
+    }
+
+    /* 移动端触摸优化 */
+    @media (max-width: 768px) {
+      .custom-confirm-container {
+        width: 16rem;
+      }
+
+      .custom-confirm-btn {
+        height: 3rem;
+        font-size: 1.1rem;
+      }
+
+      .custom-confirm-message {
+        font-size: 1.1rem;
+      }
+    }
+
+    /* 兼容性备用居中方案 - 当flex不支持时使用 */
+    @supports not (display: flex) {
+      .custom-confirm-modal {
+        display: table;
+        table-layout: fixed;
+      }
+
+      .custom-confirm-modal::before {
+        content: '';
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+      }
+
+      .custom-confirm-container {
+        display: inline-block;
+        vertical-align: middle;
+        text-align: left;
+      }
+    }
+
+    /* 微信小程序特殊处理 */
+    .custom-confirm-modal.wechat-env {
+      /* 强制使用绝对定位居中 */
+      display: block;
+    }
+
+    .custom-confirm-modal.wechat-env .custom-confirm-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      -webkit-transform: translate(-50%, -50%);
+      margin: 0;
+    }
+  </style>
+</body>
+</html> 

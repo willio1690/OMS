@@ -1,0 +1,44 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table cellspacing="0" cellpadding="0" style="width:100%">
+  <col class="Colauto"></col>
+  <col class="Coloption_1b"></col>
+  <col class="Coloption_1b"></col>
+  <col></col>
+  <tbody>
+      <{foreach from=$organization item=item key=iLoop name="item"}>
+      <tr parentid="<{$item.org_id}>" class="provice-bg">
+        <td style="text-align:left; width:320px;">
+          <div style="padding-left:<{$item.step*25}>px">
+            <{if $item.child_count>0}>
+            <span class="imgTree" onclick="clickTree(this);" id="org_<{$item.org_id}>" data-orgid="<{$item.org_id}>"> &nbsp;&nbsp; </span>
+            <{else}>
+            <span class="imgTree tree_open"> &nbsp;&nbsp; </span>
+            <{/if}>
+            <span style="font-weight:700; color:#000; text-decoration:none;padding-right:15px;" ><{$item.org_name}></span>
+          </div>
+        </th>
+        <{if $item.status == 2}>
+         <td style="width:60px;"><span>停用</span></Td>
+        <{/if}>
+        <{if $item.status == 1}>
+        <td style="width:60px;"><span>启用</span></Td>
+        <{/if}>
+        <td style="width:350px">
+            <{if $item.status == 2}>
+                <a href="javascript:W.page('index.php?app=organization&ctl=admin_management&act=doActiveGropItem&org_id=<{$item.org_id}>', $extend({method: 'get'}, JSON.decode({})), this);setTimeout('location.reload()',500);void(0);" target="">启用</a>
+            <{/if}>
+            <{if $item.status == 1}>
+                <a href="javascript:if(confirm('确认停用该组织？')){W.page('index.php?app=organization&ctl=admin_management&act=doUnactiveGropItem&org_id=<{$item.org_id}>', $extend({method: 'get'}, JSON.decode({})), this);setTimeout('location.reload()',500);}void(0);" target="">停用</a>
+                <{if $item.org_level_num < 5}>&nbsp;|&nbsp;<a class="i" href='index.php?app=organization&ctl=admin_management&act=addChildGropItem&org_id=<{$item.org_id}>' target="dialog::{title:'<{t}>添加下级组织架构 <{/t}>',width:800,height:300}">添加下级</a><{/if}>
+            <{/if}>
+            &nbsp;|&nbsp;<a class="i" href='index.php?app=organization&ctl=admin_management&act=editGropItem&org_id=<{$item.org_id}>&from_page_act=org_show' target="dialog::{title:'<{t}>组织架构 <{/t}>',width:800,height:300}">编辑</a>
+            &nbsp;|&nbsp;<a href="javascript:if(confirm('确认删除该组织？')){W.page('index.php?app=organization&ctl=admin_management&act=doDelGropItem&org_id=<{$item.org_id}>', $extend({method: 'get'}, JSON.decode({})), this);setTimeout('location.reload()',500);}void(0);" target="">删除</a>
+        </td>
+        <td></td>
+      </tr>
+      <{/foreach}>
+</table>

@@ -1,0 +1,231 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style type="text/css">
+#system-setting .subtitle{
+    color: #7493D4;
+    font-size:25px;
+    text-align: left;
+}
+#system-setting .ssubtitle{
+    color: #7493D4;
+    font-size:40px;
+}
+</style>
+
+<div style="margin-left:10px;border:0px #666666 solid;width:1134px;" id='examin_check'>
+	<a href="#" id='hh' onclick="start();"><img width="1133px" height="634px"  src='<{$env.app.res_url}>/examin.png'></a>
+</div>
+
+
+<div id='system-setting' style='display:none'>
+	<div class="tableform">
+	  <div class="subtitle">数据检测  &nbsp; &nbsp; &nbsp;<span id='buy_notice' style='display:none;'><a target="_blank"  style="font-size:15px;" href="http://fuwu.shopex.cn/detail/1158"><font style="color:red;">未购买体检服务或可用次数不足</font> 点击购买</a></span>
+	  </div>
+	  <table cellspacing="0" cellpadding="0" border="0">
+		<tbody >	        
+			 <tr>
+			    <td text-align='center'>第 1 步</td>
+			    <td>检测仓库信息完整度</td>
+			    <td id='branch_info_fullfill'><{if $info_fullfill}><font color='green'>完成</font><{else}><font color='red'>未完成&nbsp;&nbsp;</font><a  href="index.php?app=ome&ctl=admin_branch&act=index" target="_blank">(请先完善仓库必填项&nbsp;&nbsp;点击设置)</a><{/if}></td>
+			  </tr>
+			  <tr>
+                <td text-align='center'>第 2 步</td>
+                <td>检测历史订单</td>
+                <td id='branch_info_fullfill'><{if $history_order_count >=500}><font color='green'>完成</font><{else}><font color='red'>历史订单量小于500，无法体检</font><{/if}></td>
+              </tr>
+			      <td>第 3 步</td>
+			    <td>上传运费模板</td>
+			    <td id='template_import_status'>
+			    
+			  <div style="border:1px solid #CCC;width:350px;overflow:hidden;float:left;background:#FFF;padding:1px;">
+               <div id="processBar_examin" style="background:#7493D1;width:0%;height:15px;">&nbsp;</div>
+              </div>&nbsp;
+              
+                 <font color='red' id ='template_import_result'></font>
+			    </td>
+			  </tr>                  
+		</tbody>
+		</table>
+	  <div id="cc" class="noprint table-action">
+	      <{button  type="button" class="btn-secondary" id="examin" label="开始体检" onclick="start_examin();"}> &nbsp;
+	   </div>		
+	</div>
+</div>
+    <div id='message' style="font-size:15px;"></div>    
+    <div id='task' style='dispaly:none'></div>
+
+<script>
+var need_upload_temple = "<{$need_upload_temple}>";
+setProcessBar("processBar_examin",'1%');
+
+function setProcessBar(id,w){
+	document.getElementById(id).style.width = w;
+}
+
+
+
+var list_warehouse_id = JSON.decode('<{$all_warehouse_id}>');//所有发货网点
+var total_warehouse_amount = '<{$total_warehouse_amount}>';//仓库发货网点数量
+
+
+var used_times = 0;
+var available_times = 0;
+
+function get_used_times(){
+     new Request({
+        url:'index.php?app=channel&ctl=admin_logistics_examin&act=ajax_get_used_times',
+        method:'post',
+        data:'',
+        async:false,
+        onComplete:function(rs){
+        	var times_info = JSON.decode(rs);
+            used_times = parseInt(times_info.used_times);
+            available_times = parseInt(times_info.available_times);
+        	if((used_times >= available_times)){
+        		$('buy_notice').setStyle('display','');
+        	}
+ 
+            var html = "已用次数:"+times_info.used_times+"&nbsp;&nbsp;&nbsp;可使用次数："+times_info.available_times+"&nbsp;&nbsp;&nbsp;";
+            $('message').set('html',html); 
+        }
+    }).send(); 
+}
+
+function start(){
+	//获取使用次数
+    get_used_times();
+    $('examin').set('readOnly',true);
+    //隐藏宣传图片
+    $('examin_check').setStyle('display','none');
+    //显示检测配置功能
+    $('system-setting').setStyle('display','');
+    if(used_times >= available_times){
+        return true;
+    }
+    
+    
+    var info_fullfill = "<{$info_fullfill}>";
+    var history_order_count = '<{$history_order_count}>';
+    //历史单量大于500，且,仓库体检完整上传模板
+    if(history_order_count > 500 && info_fullfill ){
+        if(need_upload_temple){
+            //需要上传模板
+            start_template_upload();
+        }else{
+            //已上传过，且模板没变动，不需要再传了
+            template_uploaded();
+        }
+    }
+}
+
+function start_template_upload(){
+	setProcessBar("processBar_examin",'1%');
+	page_no = 1;
+	var rs = true;
+	for(var o in list_warehouse_id){
+		page_no ++;
+        var rs = ajax_template_upload(page_no,list_warehouse_id[o]);
+        if(!rs){
+        	$('template_import_result').html = ''
+           	 var submit_html = '上传模板出错';
+         	 $('template_import_result').setHTML(submit_html);
+         	 rs = false;
+         	 break;
+        }
+	} 
+	if(rs){
+		submit_html = '完成';
+	    $('template_import_result').set('html','完成').setStyle('color','green');
+        $('examin').removeClass('btn-secondary');
+        $('examin').addClass('btn');
+        $('examin').set('readOnly',false);
+        
+        //模板上传完毕，记录日志
+        ajax_upload_log();
+	}
+    //所有物流上传完毕再检查下是否订单足够
+   return true;
+}
+function template_uploaded(){
+    setProcessBar("processBar_examin",'100%'); 
+    submit_html = '完成';
+    $('template_import_result').set('html','完成').setStyle('color','green');
+    $('examin').removeClass('btn-secondary');
+    $('examin').addClass('btn');
+    $('examin').set('readOnly',false);
+    
+    return true;
+}
+function ajax_template_upload(page_no,warehouse_id){
+	var status = true;
+    new Request({
+    	url:'index.php?app=channel&ctl=admin_logistics_examin&act=ajax_warehouse_template_upload',
+   		method:'post',
+   		data:'warehouse_id='+warehouse_id,
+   		async:false,
+        onComplete:function(oresponseText){
+        	var responseText = JSON.decode(oresponseText);
+        	if(responseText.status == 'succ'){
+        		percent = 100*(page_no-1)/total_warehouse_amount;
+        		percent = Math.round(percent);
+        	    setProcessBar("processBar_examin",percent+'%');
+        	    status = true;
+        	}else{
+        		status = false;
+        	}
+        }
+    }).send();	
+    return status;
+}
+
+//体检任务
+function start_examin(task){
+	if(used_times >= available_times){
+		alert('未购买体检服务或可用次数不足，请先购买');return false;
+	}
+
+	var info_fullfill = "<{$info_fullfill}>";
+	if(!info_fullfill){
+		alert('仓库信息不完整，请先完善仓库比填项');return false;
+	}
+	var history_order_count = '<{$history_order_count}>';
+	if( history_order_count <500){
+		alert('历史单量小于500，无法体检');return false;
+	}
+    new Request({
+    	url:'index.php?app=channel&ctl=admin_logistics_examin&act=ajax_start_examin',
+   		method:'post',
+   		data:'',
+   		async:false,
+        onComplete:function(txt){
+        	 //提交体检
+        	 if(txt == 'succ'){
+        	      if(window.confirm('请稍后转到 物流体检报告查看')){
+        	    	   window.location.href="index.php?app=channel&ctl=admin_logistics_report&act=index"; 
+        	      }else{
+        	             var html = "<font color='green' size='10px'>体检任务已提交，需要一点时间，请转到 物流体检报告 查看</font>"; 
+        	             $('task').setStyle('display','');
+        	             $('task').setHTML(html);
+        	             var submit_html = '<span><span>体检中 . . . </span></span>';
+        	             $('examin').setHTML(submit_html);
+        	      }
+        	 }
+        }
+    }).send();
+}
+function ajax_upload_log(){
+    var status = true;
+    new Request({
+        url:'index.php?app=channel&ctl=admin_logistics_examin&act=ajax_upload_log',
+        method:'post',
+        data:'',
+        async:false,
+        onComplete:function(oresponseText){
+        }
+    }).send();  
+    return status;
+}
+</script>

@@ -1,0 +1,784 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout">
+  <form action="index.php?app=dealer&ctl=admin_platform_orders&act=doAddOrder&finder_vid=<{$finder_vid}>" method="post" id="newOrderForm">
+    <div class="form-layout-block order-num-input" style="margin-bottom:0px;">
+      <h3>来源店铺：</h3>
+      <div class="form-layout-fields" style="padding: 0">
+        <select name="shop_id">
+          <option value="">-选择店铺-</option>
+          <{foreach from=$shopData item=shop}>
+          <option value="<{$shop.shop_id}>"><{$shop.name}>（<{$shop.shop_type}>）</option>
+          <{/foreach}>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-layout-block" style="margin-top:20px;">
+      <h3>会员信息</h3>
+      <div class="form-layout-fields">
+        <p>
+          <select id="add_mem_sel">
+            <option value="uname_right">按用户名(精确)</option>>
+            <option value="uname">按用户名(模糊)</option>
+            <option value="mobile">按手机号</option>
+          </select>
+          <span style="position:relative;">
+              <input type="text" name="uname_right" style="width: 300px" id="ipt_data" />
+          </span>
+          <button class="btn-primary" type="button"  label="搜索" id="btn_search_member" style="cursor: pointer;">搜索</button>
+          <button class="btn-primary" type="button"  label="新建用户" id="btn_new_member" onclick="new Dialog('index.php?app=ome&ctl=admin_member&act=addMember',{width:700,title:'新建用户',height:400})">新建用户</button>
+        </p>
+        <table class="gridlist" style="*width:97%;">
+          <thead>
+          <tr>
+            <th style="width:20px;"></th>
+            <th>用户名</th>
+            <th>性别</th>
+            <th>手机号</th>
+            <th>地区</th>
+            <th>Email</th>
+          </tr>
+          </thead>
+          <tbody id="memNode">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="form-layout-block">
+      <h3>收货地址</h3>
+      <div class="form-layout-fields">
+        <table class="consignee-info-table" border="0" style="width: 100%;">
+          <tbody>
+          <tr>
+            <th style="width: 90px;">收货人姓名：</th>
+            <td name="consignee_name"><input id="consignee_name" name="consignee_name" type="text" vtype="required" size="15" value=""></td>
+            <th style="width: 90px;">收货人手机号：</th>
+            <td name="consignee_mobile"><input id="consignee_mobile" name="consignee_mobile" type="text" size="15" value=""></td>
+            <th style="width: 80px;">收货地址：</th>
+            <td name="consignee_address">
+              <{input type='region' app='eccommon' name="consignee_area" vtype="area" value=$region }>&nbsp;&nbsp;
+              <input id="consignee_addr" name="consignee_addr" type="text" vtype="required" size="32" value="">
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="form-layout-block">
+      <h3>销售物料信息</h3>
+      <div class="form-layout-fields">
+        <p class="clearfix">
+          <strong class="fl"><{button label="添加销售物料" id="add-material-btn" disabled="disabled"}></strong>
+          <span class="fr">
+            按物料编码添加:<input type="text" name="product_bn" disabled="disabled" />
+            按物料名添加:<input type="text" name="product_name" disabled="disabled" />
+            按条形码添加:<input type="text" name="product_barcode" disabled="disabled" />
+          </span>
+        </p>
+
+        <table class="gridlist" style="*width:97%;">
+          <thead>
+          <tr>
+            <th>销售物料编码</th>
+            <th>销售物料名称</th>
+            <th style="text-align:center;width:30px;">库存数量</th>
+            <th style="text-align:center;width:30px;">购买数量</th>
+            <th style="text-align:center;width:80px;">物料价格</th>
+            <th style="width:30px;">删除</th>
+          </tr>
+          </thead>
+          <tbody id="proNode">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="form-layout-block">
+      <h3>订单信息确认</h3>
+      <div class="form-layout-fields">
+      <table class="order-info-table" border="0" style="width: 100%;">
+        <tbody>
+        <tr>
+          <th>商品总金额：</th>
+          <td name="goods_amount">0</td>
+          <th>&nbsp;</th>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <th>订单总金额：</th>
+          <td name="order_amount">0</td>
+          <th>&nbsp;</th>
+          <td >&nbsp;</td>
+        </tr>
+        <tr>
+          <th>商家备注：</th>
+          <td><textarea rows="6" cols="50" name="order_memo"></textarea></td>
+        </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-primary" id="btn_submit">保 存</button>&nbsp;&nbsp;<{button class="btn" label="返 回" id="cancel-btn"}>
+    </div>
+  </form>
+</div>
+<script>
+  var visiTips = new Tips({
+    onShow:function(tip,el){
+      el.addClass('active');
+      tip.setStyle('display','block');
+    },
+    text: function(element){
+      if(element.get('visibility')=='false'){
+        return '隐藏商品';
+      }else{
+        return '';
+      }
+    }
+  });
+
+  // 订单类
+  var Order = {
+    addrlist:[],
+    addrTpl:'<li id="{addrid}" number="{number}" is_encrypt="{is_encrypt}" order_id="{order_id}"><input type="radio" name="address_id" value="{area}" /><span>{simple_name}&nbsp;&nbsp;&nbsp;{simple_mobile}&nbsp;&nbsp;{simple_telephone}&nbsp;&nbsp;{simple_region}&nbsp;&nbsp;{simple_address}</span><q style="display: none">{addr}</q><b style="display: none">{name}</b><i style="display: none">{zip}</i><em style="display: none">{mobile}</em>&nbsp; &nbsp; &nbsp; <h2 style="display: none">{telephone}</h2> &nbsp; &nbsp; &nbsp;  <strong>{email}</strong>&nbsp; &nbsp; &nbsp;  <cid>{certId}</cid> <a class="edit-addr">编辑</a></li>',
+    memberlist:[],
+    memberTpl:'<tr id="{memberid}"><td><input type="radio" name="member_id" value="{member_id}" /></td><td>{simple_uname}</td><td>{sex}</td><td>{simple_mobile}</td><td>{area}</td><td>{email}</td></tr>',
+
+    setAddr:function(data,cur){
+      // var html = '';
+      // if (typeOf(data) == 'array') {
+      //   this.addrlist = data;
+      //
+      //   for(var i=0;i<data.length;i++){
+      //     data[i]['number']=i;
+      //     data[i]['addrid']= 'addr'+i;
+      //
+      //     html+=this.addrTpl.substitute(data[i]);
+      //   }
+      // }
+      //
+      // $('addrlist').set('html',html);
+      //
+      // if (!html) return ;
+
+      // $$('input[name=address_id]').removeEvent('click').addEvent('click',function(){
+      //   var _this = this;
+      //
+      //   $('consignee_area').value      =this.getParent('li').getElement('input[name=address_id]').value;
+      //   $('consignee_addr').value      =this.getParent('li').getElement('q').get('text').trim();
+      //   $('consignee_name').value      =this.getParent('li').getElement('b').get('text').trim();
+      //   $('consignee_zip').value       =this.getParent('li').getElement('i').get('text').trim();
+      //   $('consignee_mobile').value    =this.getParent('li').getElement('em').get('text').trim();
+      //   $('consignee_telephone').value =this.getParent('li').getElement('h2').get('text').trim();
+      //   $('consignee_email').value     =this.getParent('li').getElement('strong').get('text').trim();
+      //   $('certId').value              =this.getParent('li').getElement('cid').get('text').trim();
+      //
+      //   var order_id = this.getParent('li').get('order_id');
+      //   if ('true' == this.getParent('li').get('is_encrypt') && order_id) {
+      //     Ex_Loader('security',function(){
+      //       var security = new Security({
+      //         url:'index.php?app=ome&ctl=admin_order&act=showSensitiveData&p[0]='+order_id,
+      //         showData:true
+      //       });
+      //
+      //       _this.getParent('li').getElement('em').set('text',security.decrypt('ship_mobile'));
+      //       _this.getParent('li').getElement('q').set('text',security.decrypt('ship_addr'));
+      //       _this.getParent('li').getElement('span').set('text',security.decrypt('ship_tel'));
+      //       _this.getParent('li').getElement('b').set('text',security.decrypt('ship_name'));
+      //
+      //       $('consignee_mobile').value    = security.decrypt('ship_mobile');
+      //       $('consignee_addr').value      = security.decrypt('ship_addr');
+      //       $('consignee_telephone').value = security.decrypt('ship_tel');
+      //       $('consignee_name').value      = security.decrypt('ship_name');
+      //     });
+      //   }
+      // });
+
+      // $ES('#addrlist .edit-addr').removeEvent('click').addEvent('click',function(){
+      //   var area      =this.getParent('li').getElement('input[name=address_id]').value;
+      //   var addr      =this.getParent('li').getElement('q').get('text').trim();
+      //   var name      =this.getParent('li').getElement('b').get('text').trim();
+      //   var zip       =this.getParent('li').getElement('i').get('text').trim();
+      //   var mobile    =this.getParent('li').getElement('em').get('text').trim();
+      //   var telephone =this.getParent('li').getElement('span').get('text').trim();
+      //   var email     =this.getParent('li').getElement('strong').get('text').trim();
+      //   var cid       =this.getParent('li').getElement('cid').get('text').trim();
+      //   var number    =this.getParent('li').get('number');
+      //   new Dialog('index.php?app=ome&ctl=admin_order&act=addNewAddress&area='+area,{width:700,title:'编辑收货地址',height:400,ajaxoptions:{
+      //       data:{addr:addr,name:name,zip:zip,mobile:mobile,telephone:telephone,email:email,cid:cid,number:number},method:'post'
+      //     }});
+      // });
+      //
+      // cur = cur ? cur : 0;
+      //
+      // if ($defined($('addr'+cur))) {
+      //   $ES('#addrlist input[name=address_id]').set('checked',false);
+      //   var addr = $('addr'+cur).getElement('input[name=address_id]');
+      //
+      //   addr.set('checked',true);
+      //   addr.fireEvent('click');
+      // };
+    },
+    setMember:function(data,mid){
+      var html='';
+      var _this = this;
+
+      // 先禁用
+      //$('addrlist').set('html','');
+
+      $('memNode').set('html','');
+      this.memberlist={};
+      this.addrlist=[];
+
+      $$('.nodisabled').removeClass('nodisabled').set('disabled',true);
+      if (typeOf(data) == 'array') {
+        for(var i=0;i<data.length;i++){
+          this.memberlist[data[i]['member_id']] = data[i];
+
+          data[i]['area'] = (data[i]['area'] ? data[i]['area'].split(':')[1] : '');
+          data[i]['memberid'] = 'mid'+data[i]['member_id'];
+
+          html += this.memberTpl.substitute(data[i]);
+        }
+      }
+
+      $('memNode').set('html',html);
+
+      if (!html) return ;
+
+      $ES('input[name=member_id]').addEvent('click',function(e){
+        // 后启用
+        $$('*[disabled]').addClass('nodisabled').set('disabled',false);
+
+        // new Request({url:'index.php?app=ome&ctl=admin_order&act=getMemberAddress',async:false,method:'post',data:'member_id='+this.value,
+        //   onSuccess:function(json){
+        //     if (json) json = JSON.decode(json);
+        //     _this.setAddr(json);
+        //   }
+        // }).send();
+      });
+
+      // $ES('#memNode .edit-member').addEvent('click',function(){
+      //   var member_id = this.getParent('tr').getElement('input[name=id]').get('value');
+      //   new Dialog('index.php?app=ome&ctl=admin_member&act=editMember&p[0]='+ member_id,{width:700,title:'编辑用户',height:400});
+      // });
+
+      var cur = mid ? mid : 0;
+      $ES('input[name=member_id]').set('checked',false);
+
+      if ($defined($('mid'+cur))) {
+        var curmember = $('mid'+cur).getElement('input[name=member_id]');
+
+        curmember.set('checked',true);
+        curmember.fireEvent('click');
+      } else {
+        $ES('input[name=member_id]')[0].set('checked',true);
+        $ES('input[name=member_id]')[0].fireEvent('click');
+      }
+    }
+  };
+
+  (function(){
+    function setOrderInfo(ret){
+
+      //$E('input[name=taxtitle]').set('value', ret.tax_title);
+      $('tax_title').store('tax_title',ret.tax_title);
+      if(ret.is_tax==='true'){
+        $('tax_title').style.display ='';
+        $('tax_title').set('value',ret.tax_title);
+        $('is_tax_yes').setProperty('checked', 'checked');
+        $('is_tax_no').setProperty('checked', false);
+      }else{
+        $('tax_title').style.display ='none';
+        $('tax_title').set('value','');
+        $('is_tax_yes').setProperty('checked', false);
+        $('is_tax_no').setProperty('checked', 'checked');
+      }
+
+      var option_val = ret.shop_id + '*' + ret.shop_type;
+      var shop_options = $$('select[name=shop_id] option');
+      for(var i=0; i<shop_options.length; i++){
+        if(shop_options[i].value === option_val){
+          shop_options[i].setProperty('selected', 'selected');
+          break;
+        }
+      }
+      $E('#proNode input').fireEvent('blur');
+    }
+
+    //搜索订单
+    // $('similar_order_search_button').addEvent('click', function(){
+    //   var url='?app=desktop&act=alertpages&goto='+encodeURIComponent("index.php?app=ome&ctl=admin_order&act=finderOrders&singleselect=1");
+    //   Ex_Loader('modedialog',function() {
+    //     new finderDialog(url,{params:{url:'index.php?app=ome&ctl=admin_order&act=getOrder',name:'order_id'},width:1000,height:500,onCallback:function(ret){
+    //         if(ret && ret!='null'){
+    //           var ret = JSON.decode(ret);
+    //           $('similar_order_bn').set('value', ret.order_info.order_bn);
+    //           $('similar_order_confirm_button').fireEvent('click');
+    //         }
+    //       }});
+    //   });
+    // });
+
+    function handleProductData(order_objects){
+      var list = [];
+      if(order_objects){
+        for(k in order_objects){
+          var obj = {};
+          var type = order_objects[k].obj_type;
+          if(type=='pkg'){
+            obj.sales_material_name = order_objects[k].name;
+            obj.sales_material_bn = order_objects[k].bn;
+            obj.num = order_objects[k].quantity;
+            obj.price = order_objects[k].sale_price/obj.num;
+            obj.type = type;
+            obj.spec_info = '捆绑';
+            obj.product_id = order_objects[k].goods_id;
+            obj.sm_id = order_objects[k].goods_id;
+            list.push(obj);
+          }else{
+            for(i in order_objects[k].order_items){
+              var item = {};
+              var itemObj = order_objects[k].order_items[i];
+
+              item.sales_material_name = order_objects[k].name;
+              item.sales_material_bn = order_objects[k].bn;
+              item.num = itemObj.quantity;
+              item.price = itemObj.sale_price/item.num;
+              item.type = 'goods';
+
+              item.product_id = order_objects[k].goods_id;
+              item.sm_id = order_objects[k].goods_id;
+              item.store = itemObj.store_minus_freeze;
+              list.push(item);
+            }
+          }
+        }
+      }
+      return list;
+    }
+
+    $('add_mem_sel').addEvent('change',function(){
+      $('ipt_data').name = this.get('value');
+    });
+
+    $('ipt_data').addEvent('enter',function(e){
+      e.stop();
+      new Request({url:'index.php?app=ome&ctl=admin_order&act=getMembers',method:'post',data:this.name+'='+this.value.trim(),
+        onSuccess:function(json){
+          if (json) json = JSON.decode(json);
+          Order.setMember(json);
+        }
+      }).send();
+    });
+
+    //搜索会员
+    $('btn_search_member').addEvent('click',function(e){
+      var _btn = this;
+      if($('ipt_data').value.trim() !== ''){
+        _this = $('ipt_data');
+        new Request({url:'index.php?app=ome&ctl=admin_order&act=getMembers&finder_id=1',
+          method:'post',
+          data:_this.name+'='+_this.value.trim(),
+          onRequest:function(){
+            _btn.disabled = true;
+            _this.disabled = true;
+          },
+          onSuccess:function(json){
+            if (json) json = JSON.decode(json);
+
+            Order.setMember(json);
+          },
+          onComplete:function(){
+            _btn.disabled = false;
+            _this.disabled = false;
+          }
+        }).send();
+      }
+    });
+
+    function sumOrderAmount()
+    {
+      var goods = parseFloat($E('td[name=goods_amount]').get('text'))||0;
+      var cost = 0;
+      var pmt = 0;
+
+      var reg = result = null;
+      if(pmt){
+        reg = /^[1-9][0-9]?\%$/;         //匹配百分数
+        result = pmt.match(reg);
+        if(result){
+          var _pmt = pmt.replace('%','');
+          var _amount = (goods+cost) - (goods+cost) * _pmt/100;
+          $E('td[name=order_amount]').set('text',(_amount).toFixed(3));
+        }else{
+          reg =  /^[-+\d]\d*\.?\d*$/;　 //匹配浮点数
+          result = pmt.match(reg);
+          if(result){
+            pmt = 0;
+
+            $E('td[name=order_amount]').set('text',( goods + cost + pmt).toFixed(3));
+          }else{
+            alert('折扣数据有误！');
+            $E('td[name=order_amount]').set('text',( goods + cost).toFixed(3));
+          }
+        }
+      }else{
+        $E('td[name=order_amount]').set('text',( goods + cost).toFixed(3));
+      }
+    }
+
+    var callurl='index.php?app=ome&ctl=admin_order&act=getSalesMaterialByAddNormalOrder', store=[];
+
+    // var options={
+    //   'getVar':'bn',
+    //   'delay':800,
+    //   'fxOptions':false,
+    //   callJSON:function(){return window.autocompleter_json;},
+    //   injectChoice:function(json){
+    //     var choice = new Element('li', {'html': this.markQueryValue(json[this.options.getVar])});
+    //     choice.store('_data',json);
+    //     choice.inputValue = json[this.options.getVar];
+    //     this.addChoiceEvents(choice).inject(this.choices);
+    //   },
+    //   onHide:function(){
+    //     if(!this.selected)return;
+    //     this.element.value = '';
+    //     var _json=this.selected.retrieve('_data');
+    //     _json=$splat(_json);
+    //     init(_json);
+    //   },
+    //   onFocus:function(ipt){
+    //   }
+    // };
+    //
+    // new Autocompleter.script($E('[name=product_bn]'),callurl, options);
+    // new Autocompleter.script($E('[name=product_name]'),callurl,$merge(options,{'getVar':'name'}));
+    // new Autocompleter.script($E('[name=product_barcode]'),callurl,$merge(options,{'getVar':'barcode'}));
+
+    var fdoc = document.createDocumentFragment();
+
+    function cost_item(data){
+      var sum=0;
+      data.each(function(el){
+        var num=price=0;
+        if ($defined(el['num']))
+        {
+          num = el['num'];
+        }
+        if ($defined(el['price']))
+        {
+          price = el['price'];
+        }
+        sum+=num*price;
+      });
+      $E('td[name=goods_amount]').set('text',sum.toFixed(3));
+
+      sumOrderAmount();
+    }
+
+    var pag;
+    var tpl='<tr key="{product_id}" id="goods_{product_id}">\
+            <td>{sales_material_bn}</td>\
+            <td class="material-name">{sales_material_name}</td>\
+            <td style="text-align:center;">{store}</td>\
+            <td style="text-align:center;"><input type="text" value="{num}"  key="num" vtype="unsignedint" tname="num[_PRIMARY_]" size="6"></td>\
+            <td style="text-align:center;"><input type="text" {tpl_price_readonly} value="{price}" key="price"  vtype="unsigned"  tname="price[_PRIMARY_]" size="6">元</td>\
+            <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>\
+          </tr>';
+
+    function createProduct(data)
+    {
+      pag = new PageData(tpl,data,{'updateMain':$('proNode'),'pageNum':10,PRIMARY_ID:'product_id',
+        'onShow':function(){
+          var _this=this;
+          $$('#proNode input[type]').addEvent('change',function(e){
+            if(!validatorMap[this.get('vtype')][1](this, this.getValue())){return ;}
+            var pid=this.getParent('tr').get('key'),value=this.value;
+            _this.editData(pid,[this.get('key'),value]);
+          });
+
+          rows=$$('#proNode tr');
+          rows.each(function(item,i){
+            // item.getElement('.btn_delete').addEvent('click',function(e){
+            item.getElement('.btn-delete-item').addEvent('click',function(e){
+              // if(_this.selectData(item.get('key')) && confirm('确定要删除 '+ _this.selectData(item.get('key'))['name'] +' 吗？')){
+              if(_this.selectData(item.get('key')) && confirm('确定要删除 '+ _this.selectData(item.get('key'))['sales_material_name'] +' 吗？')){
+                _this.delData(item.get('key'));
+                cost_item(_this.data);
+              }
+            });
+            item.getElement('input[key=price]').addEvents({
+              'blur':function(){
+                var notice;
+                if ($defined(this.getNext('span.error')))
+                {
+                  this.getNext('span.error').destroy();
+                }
+                if(!validatorMap['unsigned'][1](this, this.getValue())){
+                  notice=new Element('span.error',{html:'请输入数值！'}).injectAfter(this);
+                  notice.destroy.delay(4000,notice);
+                }else {
+                  cost_item(_this.data);
+                }
+              },
+              'focus':function(){
+                if(this.getNext('span.error')) this.getNext('span.error').destroy();
+              }
+            });
+
+            item.getElement('input[key=num]').addEvents({
+              'keypress':function(e){
+                if(e.code==13) item.getElement('input[key=price]').focus();
+              },
+              'blur':function(){
+                var notice;
+
+                if(!validatorMap['unsignedint'][1](this, this.getValue())) {
+                  notice=new Element('span.error',{html:'请输入数值！'}).injectAfter(this);
+                  notice.destroy.delay(4000,notice);
+                  return;
+                }
+
+                if(this.value.toInt() > this.getParent('td').getPrevious().get('text').trim().toInt()){
+                  notice=new Element('span.notice',{html:'购买数量超出库存数量！'}).injectAfter(this);
+                  notice.destroy.delay(4000,notice);
+                }
+
+                cost_item(_this.data);
+              },
+              'focus':function(){
+                if(this.getNext('span.notice')) this.getNext('.notice').destroy();
+                if(this.getNext('span.error')) this.getNext('span.error').destroy();
+              }
+
+            });
+
+          });
+          //var len = this.data.length ? (this.data.length > this.options.pageNum ? (this.options.current == this.getTotal() ? this.data.length-this.options.pageNum*(this.options.current-1) : this.options.pageNum) : this.data.length) : 0;
+          if(this.data.length) rows[0].getElement('input[key^=num]').focus();
+          $ES('.product-name').each(function(item){
+            if (item.get('visibility')=='false')
+            {
+              item.setStyle('color','#808080');
+            }
+          });
+          $ES('.product-name').removeEvent('mouseover').addEvent('mouseover',function(e){
+            if (this.get('visibility')=='false'){
+              var e  = new Event(e), el = e.target;
+
+              visiTips.attach(el);
+
+              el.addEvent('mouseleave',function(){
+                this.removeClass('active');
+              });
+
+              el.fireEvent('mouseenter',e);
+            }
+          });
+        }
+      });
+    }
+
+    //添加销售物料
+    $('add-material-btn').addEvent('click', function(e)
+    {
+      var shop_id = $E('select[name=shop_id]').getValue();
+      if(!shop_id){alert('请先选择店铺！');return;}
+
+      var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=dealer&ctl=admin_platform_orders&act=findSalesMaterial&shop_id='+shop_id);
+      new finderDialog(url, {params:{url:callurl, name:'sm_id[]'},width:1000,height:660,
+        onCallback:function(rs){
+          if(!rs)return;
+          rs = JSON.decode(rs);
+
+          init(rs);
+        }
+      });
+    });
+
+    //提交
+    $('btn_submit').addEvent('click',function(e)
+    {
+      //检查店铺
+      var shop_id = $E('select[name=shop_id]').getValue();
+      if(!shop_id){
+        alert('请先选择店铺！');
+        return;
+      }
+
+      //检查会员
+      if( $('memNode').getHTML().trim() == '') {
+        alert('请先选择会员信息！');
+        return;
+      }else if(!validradio('input[name=id]','请先选择会员')){
+        alert('请先选择会员！');
+        return;
+      }
+
+      //检查收货地址
+      //var consignee_name = $E('input[name=consignee_name]').getValue();
+      var consignee_name = $ES('input[name=consignee_name]').get('value');
+      var consignee_mobile = $ES('input[name=consignee_mobile]').get('value');
+      var consignee_area = $ES('input[name=consignee_area]').get('value');
+      var consignee_addr = $ES('input[name=consignee_addr]').get('value');
+
+      if(consignee_name == '' || consignee_mobile == ''){
+        alert('收货人姓名、 收货人手机号不能为空！');
+        return;
+      }
+
+      if(consignee_area == '' || consignee_addr == ''){
+        alert('收货人地区、 收货人详细地址不能为空！');
+        return;
+      }
+
+      //检查销售物料
+      if( $('proNode').getHTML().trim() == '') {
+        var tip=$('add-material-btn').getParent().getElement('.error') || new Element('span.error').inject($('add-material-btn').getParent());
+
+        tip.setHTML('请先添加商品');
+        tip.destroy.delay(4000,tip);
+        MessageBox.error('表单验证失败:请先添加商品');
+        e.stop();
+
+        return;
+      }
+
+      //商品金额不允许为0
+      var goods = parseFloat($E('td[name=goods_amount]').get('text'))||0;
+      if(goods == '0' && confirm('商品金额为0，确定要新建订单吗？') == false) {
+        return false;
+      }
+
+      var _this=this;
+      var form = $('newOrderForm');
+      if(pag){
+        var data=pag.toHideInput($('proNode').getElement('tr'));
+        form.store('target',{extraData:data,
+          onRequest:function(){
+            $('btn_submit').set('disabled', 'true');
+            $('btn_submit').set('text','处理中');
+          },
+          onComplete:function(jsontext){
+            var json = Json.evaluate(jsontext);
+            if (typeof(json.error) != 'undefined'){
+              $('btn_submit').set('disabled', '');
+              $('btn_submit').set('text','提交');
+            }else{
+              $('btn_submit').set('disabled', 'true');
+              $('btn_submit').set('text','处理中');
+            }
+          }
+        });
+      }
+      form.fireEvent('submit',e);
+    });
+
+    function init(rs){
+      var tmparr=findProduct(rs,'product_id');
+      store.unshift.apply(store,tmparr.reverse());
+      createProduct(store,tpl);
+    }
+    function findProduct(arr,PRIMARY){
+      if(!store.length)return arr;
+      store.each(function(a){
+        arr.each(function(b){
+          if(a[PRIMARY]==b[PRIMARY])arr.erase(b);
+        });
+      });
+      return arr;
+    }
+
+    function validProduct(element,msg){
+      element=$(element);
+      new Element('span.error',{html:msg}).injectAfter(element);
+      element.removeEvents('blur').addEvent('blur',function(){
+        if(validate(element)) element.removeEvent('blur',arguments.callee);
+      });
+    }
+
+    function validradio(el,msg){
+      el=$E(el);
+      var els=el && $ES('input[type=radio][name='+ el.get('name') +']');
+
+      if($defined(els) && !els.some(function(radio){return (radio.checked == true);})) {
+        var tip=$('addrlist').getParent('.gray_form').getElement('p .error') || new Element('span.error').inject($('addrlist').getParent('.gray_form').getElement('p'));
+        tip.setHTML(msg);
+        tip.destroy.delay(4000,tip);
+        el.focus();
+        MessageBox.error("表单验证失败:"+msg);
+        return false;
+      }
+      return true;
+    }
+  })();
+
+$('cancel-btn').addEvent('click',function(){
+  window.history.back();
+});
+</script>
+
+<style>
+  .content-container {
+    background: #EEF5F9;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
+    overflow: auto;
+    padding: 0;
+    box-shadow: none;
+  }
+  .form-layout .form-layout-fields-column {
+    flex-direction: column;
+  }
+  .form-layout  .form-layout-fields-column .form-field  {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .form-layout  .form-layout-fields-column .form-remark {
+    font-size: 12px;
+    color: #999999;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 206px;
+    margin-top: 8px;
+  }
+  .form-layout  .form-layout-fields-column .form-field .form-field-label{
+    width: 200px;
+    text-align: right;
+    margin-bottom: 0;
+    margin-right: 10px;
+  }
+  .form-layout .form-layout-fields-column .form-field .form-input  {
+    width: 35%;
+  }
+</style>
+
+<style>
+  .order-num-input {
+    position: relative;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+  .order-num-input h3 {
+    width: fit-content!important;
+    border-bottom: none!important;
+  }
+  .order-info-table th {
+    padding: 15px 0;
+  }
+</style>

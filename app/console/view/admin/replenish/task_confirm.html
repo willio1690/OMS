@@ -1,0 +1,89 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <form id="frm_submit" name="frm_submit" method="post" action="index.php?app=console&ctl=admin_replenish_task&act=doConfirm">
+    <div class="division">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" >
+          <tbody>
+          <tr>
+            <td >补货任务名称：<span style="font-weight:bold;"><{$data.task_name}></span></td>
+          </tr>
+          <tr>
+            <td >&nbsp;</td>
+          </tr>
+          <tr>
+            <td align="center">
+                <input type="hidden" name="task_id" value="<{$data.task_id}>" />
+                <input type="hidden" name="task_bn" value="<{$data.task_bn}>" />
+                <{button label="确定补货任务" type="button" id="btn-submit" class="btn-primary"}>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+    </div>
+    </form>
+</div>
+
+<script>
+var task_id = "<{$data.task_id}>";
+
+var finder = finderGroup['<{$env.get.finder_id}>'];    
+$('frm_submit').store('target',{
+    onComplete:function(json){
+        try{
+            var json = Json.evaluate(json);
+			
+            if (typeof(json.error) != 'undefined'){
+                _this.disabled=false;
+                var msg = '取消失败';
+                if(json.msg) {
+                    msg += ':'+json.msg;
+                }
+                alert(msg);
+            }else{
+                var _dialogIns = $('btn-submit').getParent('.dialog').retrieve('instance');
+                _dialogIns.close();
+                alert('确认成功');
+                finder.refresh.delay(400,finder);
+            }
+        }catch(e){}
+    }
+});
+
+$('btn-submit').addEvent('click',function(e){
+	var operator_name = '<{$title}>';
+	var _this=this;
+	new Request({url:'index.php?app=console&ctl=admin_replenish_task&act=doConfirm&p[0]='+ task_id,method:'POST',
+		onRequest:function(){
+			$('btn-submit').set('disabled', 'true');
+			$('btn-submit').getElements('span')[1].set('text','正在执行...'); 
+		},
+		onComplete:function(json){
+			if (json != ''){
+				json = JSON.decode(json);
+				
+				if(json.rsp == 'fail'){
+					
+					if(json.msg == ''){
+						json.msg = 	'确认补货任务失败';
+					}
+					
+					alert(json.msg);
+					
+					$('btn-submit').set('disabled', '');
+					$('btn-submit').getElements('span')[1].set('text','确定补货任务'); 
+					
+					_this.getParent('.dialog').retrieve('instance').close();
+					window.finderGroup['<{$env.get.finder_id}>'].refresh(true);
+					return;
+				}else{
+					$('frm_submit').fireEvent('submit',{stop:function(){}});
+				}
+			}
+		},
+	}).send();
+});
+</script>

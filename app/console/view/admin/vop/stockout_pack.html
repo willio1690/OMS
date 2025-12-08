@@ -1,0 +1,57 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">       
+  <{script src="coms/autocompleter.js" app="desktop"}>
+  <{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+
+<div class="tableform">
+    <h4>装箱信息</h4>
+    <div class="division">
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+                <tr>
+                    <th style='text-align:left;padding-left:5px;'>采购单号</th>
+                    <th style='text-align:left;padding-left:5px;'>拣货单号</th>
+                    <th style='text-align:left;padding-left:5px;'>箱号</th>
+                    <th style='text-align:left;padding-left:5px;'>货号</th>
+                    <th style='text-align:left;padding-left:5px;'>条形码</th>
+                    <th style='text-align:left;padding-left:5px;'>货品名称</th>
+                    <th style='text-align:left;padding-left:5px;'>装箱数量</th>
+                </tr>
+            </thead>
+            <tbody id="dataNode">
+                <tr>
+                  <td colspan="7" style="text-align:center;"><div class="note" style="margin:0;"> 暂无装箱信息 </div></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+var tpl = '<tr>'+
+        '<td style="text-align:left;padding-left:5px;">{po_bn}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{pick_no}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{box_no}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{bn}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{barcode}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{product_name}</td>'+
+        '<td style="text-align:left;padding-left:5px;">{num}</td>'+
+       '</tr>';
+
+var store=[],pag;
+new Request({url:'index.php?app=console&ctl=admin_vopstockout&act=getBillItemBoxs&p[0]=<{$stockout_id}>',
+onComplete:function(rs){
+    rs=JSON.decode(rs);
+    store.combine(rs);
+    createProduct(store);
+}}).send();
+
+function createProduct(data){
+    pag=new PageData(tpl,data,{'updateMain':$('dataNode'),'pageNum':20});
+}
+</script>

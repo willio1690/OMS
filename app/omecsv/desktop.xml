@@ -1,0 +1,10 @@
+<desktop>
+    <permissions>
+        <permission id="omecsv_split_queue">切片任务列表</permission>
+    </permissions>
+    <workground name="控制面板" id="adminpanel" order="1800" icon="icon-kongzhimianban-01">
+        <menugroup name="其他"  en="other">
+            <menu controller='admin_split_queue' action='index' params='' permission="omecsv_split_queue" order="10000" display='true'>切片任务列表</menu>
+        </menugroup>
+    </workground>
+</desktop>

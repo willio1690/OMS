@@ -1,0 +1,51 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">       
+<{/capture}>
+
+<div class="tableform">
+           <div class="division">
+           
+<input type="hidden" name="shop_id" value="<{$shop_id}>" />
+<table>
+<tr><th>是否开启家装订单发货</th><td>
+            <input type="radio" name="jzorderconf" value='1'  <{if $jzorderconf=='1'}>checked<{/if}>> 是
+            <input type="radio" name="jzorderconf" value='0' <{if $jzorderconf=='0' || $jzorderconf==''}>checked<{/if}>> 否
+              (开启后订单会向淘宝获取家装服务商信息发货)  </td></tr>
+</table>
+  <div class="division">
+     
+    <{button type="submit" label="保存" class="btn-secondery" id="btn_manual"}>
+  </div>
+</div>
+</div>
+
+<script>
+
+  if($("btn_manual")){
+
+     
+   $("btn_manual").addEvent("click",function(e){
+       var jzorderconf= $E('input[type=radio]:checked').get('value');
+
+        new Request({
+        url:'index.php?app=ome&ctl=admin_shop&act=jzorder',
+        data:"&shop_id="+"<{$shop_id}>&jzorderconf="+jzorderconf,
+        method:'post',
+        onSuccess:function(response){
+        	var resp =  JSON.decode(response);
+        	if(resp.rsp=="fail"){
+    				var msg = resp.msg ? resp.msg : resp.res;
+    				MessageBox.error(msg);
+        	}else{ MessageBox.success("保存成功");}
+		    }
+      }).send();
+   });
+  }
+
+</script>
+

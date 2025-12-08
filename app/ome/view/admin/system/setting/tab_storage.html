@@ -1,0 +1,183 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="form-layout-block">
+    <h3>仓库设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">仓库设置：</span>
+            <select class="form-input"  name="set[ome.branch.mode]">
+                <{if $branchCount <= 1}>
+                <option value="single" <{if $setData.ome_branch_mode=='single'}>selected="selected"<{/if}>>单仓库</option>
+                <{/if}>
+                <option value="multi" <{if $setData.ome_branch_mode=='multi'}>selected="selected"<{/if}>>多仓库</option>
+            </select>
+            <{if $branchCount > 1}> <span class="nt form-remark" style="color:red">注:当前仓库数量大于一个,不可切换为单一仓库</span><{/if}>
+        </div>
+    </div>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">第三方仓盘点设置：</span>
+            <select class="form-input"  name="set[taoguaninventory.quantity.mode]">
+                <option value="1" <{if $setData.taoguaninventory_quantity_mode == '1'}>selected="selected"<{/if}>>全量</option>
+                <option value="2" <{if $setData.taoguaninventory_quantity_mode != '1'}>selected="selected"<{/if}>>增量</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>仓库调拨方式</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">调拨方式：</span>
+            <select class="form-input"  name="set[taoguanallocate.appropriation_type]">
+                <option value="directly" <{if $setData.taoguanallocate_appropriation_type=='directly'}>selected="selected"<{/if}>>直接调拨</option>
+                <option value="io" <{if $setData.taoguanallocate_appropriation_type=='io'}>selected="selected"<{/if}>>出入库调拨</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>库内转储设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">是否开启自动完成：</span>
+            <div class="form-radios">
+                <input id="stockdump_auto_finish_on" name="set[stockdump.auto.finish]" <{if $setData['stockdump_auto_finish'] != 'false'}>checked<{else}><{/if}> type="radio" value="true">
+                <label for="stockdump_auto_finish_on">开启</label>
+                <input id="stockdump_auto_finish_off" name="set[stockdump.auto.finish]" <{if $setData['stockdump_auto_finish'] != 'false'}><{else}>checked<{/if}> type="radio" value="false">
+                <label for="stockdump_auto_finish_off" >关闭</label>
+            </div>
+            <span class="nt form-remark" style="color:red">选择“开启”，WMS同物理仓之间的转储，OMS会自动完成，选择“关闭”，WMS同物理仓之间的转储，OMS不会自动完成，需手动模拟完成</span>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>采购方式</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">采购方式：</span>
+            <select class="form-input"  name="set[purchase.po_type]">
+                <option value="cash" <{if $setData.purchase_po_type=='cash'}>selected="selected"<{/if}>>现购</option>
+                <option value="credit" <{if $setData.purchase_po_type=='credit'}>selected="selected"<{/if}>>赊购</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>条码控制设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">是否条码入库控制：</span>
+            <div class="form-radios">
+                <input id="purchase_stock_stockset_on" name="set[purchase.stock.stockset]" <{if $setData['purchase_stock_stockset'] == 'true'}>checked<{else}><{/if}> type="radio" value="true">
+                <label for="purchase_stock_stockset_on">开启</label>
+                <input id="purchase_stock_stockset_off" name="set[purchase.stock.stockset]" <{if $setData['purchase_stock_stockset'] == 'true'}><{else}>checked<{/if}> type="radio" value="false">
+                <label for="purchase_stock_stockset_off" >关闭</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">"确认"之条码设置：</span>
+            <input class="form-input" placeholder="请输入'确认'之条码设置" type="text" name="set[purchase.stock_confirm]" value="<{$setData.purchase_stock_confirm}>" vtype="required" />
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">"取消"之条码设置：</span>
+            <input class="form-input" placeholder="请输入'取消'之条码设置" type="text" name="set[purchase.stock_cancel]" value="<{$setData.purchase_stock_cancel}>" vtype="required" />
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>退货入库设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">退货入库仓库反馈自动完成设置：</span>
+            <div class="form-radios">
+                <input id="ome_reship_auto_finish_on" name="set[ome.reship.auto_finish]" <{if $setData['ome_reship_auto_finish'] == 'true'}>checked<{else}><{/if}> type="radio" value="true">
+                <label for="ome_reship_auto_finish_on">开启</label>
+                <input id="ome_reship_auto_finish_off" name="set[ome.reship.auto_finish]" <{if $setData['ome_reship_auto_finish'] == 'true'}><{else}>checked<{/if}> type="radio" value="false">
+                <label for="ome_reship_auto_finish_off" >关闭</label>
+            </div>
+            <span class="nt form-remark" style="color:red">选择“是”使用第三方仓储如(伊藤忠,科捷)反馈数量良品与不良品之和与申请数量无差异,自动完成退货处理无需再”最终确认“</span>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">退货入库有差异不接收：</span>
+            <div class="form-radios">
+                <input id="ome_reship_diff_refuse_on" name="set[ome.reship.diff_refuse]" <{if $setData['ome_reship_diff_refuse'] == 'true'}>checked<{else}><{/if}> type="radio" value="true">
+                <label for="ome_reship_diff_refuse_on">是</label>
+                <input id="ome_reship_diff_refuse_off" name="set[ome.reship.diff_refuse]" <{if $setData['ome_reship_diff_refuse'] == 'true'}><{else}>checked<{/if}> type="radio" value="false">
+                <label for="ome_reship_diff_refuse_off" >否</label>
+            </div>
+        </div>
+        <div class="form-field">
+            <span class="form-field-label">售后单生成节点设置：</span>
+            <select class="form-input"  name="set[ome.aftersales.auto_finish]">
+                <option value="false" <{if $setData['ome_aftersales_auto_finish'] == 'false' || empty($setData['ome_aftersales_auto_finish'])}>selected="selected"<{/if}> >OMS退款</option>
+                <option value="true" <{if $setData['ome_aftersales_auto_finish'] == 'true'}>selected="selected"<{/if}> >OMS收货</option>
+                <option value="refunded" <{if $setData['ome_aftersales_auto_finish'] == 'refunded'}>selected="selected"<{/if}> >平台退款（含OMS收货）</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>售后仅退款设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">未签收时售后仅退款：</span>
+            <select class="form-input"  name="set[ome.reship.refund.only.reship]">
+                <option value="false" <{if $setData['ome_reship_refund_only_reship'] == 'false' || empty($setData['ome_reship_refund_only_reship'])}>selected="selected"<{/if}> >不转换</option>
+                <option value="true" <{if $setData['ome_reship_refund_only_reship'] == 'true'}>selected="selected"<{/if}> >转售后退货</option>
+                <option value="refund" <{if $setData['ome_reship_refund_only_reship'] == 'refund'}>selected="selected"<{/if}> >转售前退款</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="form-layout-block">
+    <h3>WMS设置</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">WMS设置</span>
+            <div class="form-radios">
+                <input id="ome_iostock_auto_finish_on" name="set[ome.iostock.auto_finish]" <{if $setData.ome_iostock_auto_finish=='true'}>checked<{/if}> type="radio" value="true">
+                <label for="ome_iostock_auto_finish_on">开启</label>
+                <input id="ome_iostock_auto_finish_off" name="set[ome.iostock.auto_finish]" <{if $setData.ome_iostock_auto_finish=='true'}><{else}>checked<{/if}> type="radio" value="false">
+                <label for="ome_iostock_auto_finish_off" >关闭</label>
+            </div>
+            <span class="nt form-remark" style="color:red">开：可小不可大 关：可大可小 选择"可小不可大"使用第三方仓储如(伊藤忠,科捷)反馈出入库数量 大于申请数量时不自动完成</span>
+        </div>
+    </div>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">盘点自动完成：</span>
+            <div class="form-radios">
+                <input id="wms_stock_inventory_finish_auto_on" name="set[wms.stock.inventory.finish.auto]" <{if $setData.wms_stock_inventory_finish_auto=='true'}>checked<{/if}> type="radio" value="true">
+                <label for="wms_stock_inventory_finish_auto_on">开启</label>
+                <input id="wms_stock_inventory_finish_auto_off" name="set[wms.stock.inventory.finish.auto]" <{if $setData.wms_stock_inventory_finish_auto=='false'|| !$setData.wms_stock_inventory_finish_auto}>checked<{/if}> type="radio" value="false">
+                <label for="wms_stock_inventory_finish_auto_off" >关闭</label>
+            </div>
+        </div>
+    </div>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">库存异动开关：</span>
+            <div class="form-radios">
+                <input id="wms_stock_quantity_open_on" name="set[wms.stock.quantity.open]" <{if $setData.wms_stock_quantity_open=='true' || !$setData.wms_stock_quantity_open}>checked<{/if}> type="radio" value="true">
+                <label for="wms_stock_quantity_open_on">开启</label>
+                <input id="wms_stock_quantity_open_off" name="set[wms.stock.quantity.open]" <{if $setData.wms_stock_quantity_open=='false'}>checked<{/if}> type="radio" value="false">
+                <label for="wms_stock_quantity_open_off" >关闭</label>
+            </div>
+        </div>
+    </div>
+    <div class="form-layout-fields form-layout-fields-column">
+        <div class="form-field">
+            <span class="form-field-label">奇门WMS库存快照日盘表：</span>
+            <div class="form-radios">
+                <input id="wms_snapshot_dailystock_open_on" name="set[wms.snapshot.dailystock]" <{if $setData.wms_snapshot_dailystock=='on' || !$setData.wms_snapshot_dailystock}>checked<{/if}> type="radio" value="on">
+                <label for="wms_snapshot_dailystock_open_on">开启</label>
+                <input id="wms_snapshot_dailystock_open_off" name="set[wms.snapshot.dailystock]" <{if $setData.wms_snapshot_dailystock=='off'}>checked<{/if}> type="radio" value="off">
+                <label for="wms_snapshot_dailystock_open_off" >关闭</label>
+            </div>
+        </div>
+    </div>
+</div>

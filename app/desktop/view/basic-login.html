@@ -1,0 +1,497 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $error_info}>
+<div class="error-info">
+	<{$error_info}>
+</div>
+<{/if}>
+<style>
+    /* 新登录表单样式 */
+    .passport-form {
+        margin: 0;
+        text-align: left;
+        width: 100%;
+    }
+    .passport-form ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+    }
+    .passport-form li {
+        margin-bottom: 28px !important;
+        width: 100% !important;
+        text-align: left !important;
+        display: block !important;
+        clear: both !important;
+    }
+    .passport-form li:last-child {
+        margin-bottom: 0 !important;
+    }
+    .passport-form li.colspan {
+        margin-top: 36px !important;
+        margin-bottom: 0 !important;
+        text-align: left !important;
+        clear: both !important;
+    }
+    .passport-form li.colspan::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+    .passport-form label {
+        display: block !important;
+        margin-bottom: 10px !important;
+        color: #333 !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        text-align: left !important;
+        width: 100% !important;
+        line-height: 1.5 !important;
+    }
+    .passport-form input[type="text"],
+    .passport-form input[type="password"],
+    .passport-form select,
+    .passport-form .inputstyle-out,
+    .passport-form .inputstyle-out-name,
+    .passport-form .inputstyle-out-pw {
+        width: 100% !important;
+        padding: 14px 16px !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 6px !important;
+        font-size: 14px !important;
+        transition: all 0.2s ease !important;
+        background: #fff !important;
+        color: #333 !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        display: block !important;
+        text-align: left !important;
+        line-height: 1.5 !important;
+        font-family: inherit !important;
+    }
+    .passport-form input[type="text"]:focus,
+    .passport-form input[type="password"]:focus,
+    .passport-form select:focus {
+        outline: none !important;
+        border-color: #666 !important;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05) !important;
+    }
+    .passport-form input::placeholder {
+        color: #999;
+    }
+    .passport-form select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23333' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        padding-right: 40px;
+        cursor: pointer;
+    }
+    /* 错误信息 */
+    .error-info {
+        background: #fee;
+        color: #c33;
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+    /* Caps Lock 提示 */
+    .info-tip {
+        position: absolute;
+        background: #333;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        margin-top: 8px;
+        visibility: hidden;
+        z-index: 10;
+    }
+    .info-tip-arrow {
+        position: absolute;
+        top: -6px;
+        left: 20px;
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: 6px solid #333;
+    }
+    /* 验证码 */
+    .passport-form .inputstyle-short-out {
+        width: calc(100% - 120px);
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .refresh-code {
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 12px;
+    }
+    .verifycodeimg {
+        height: 40px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    /* 隐私协议 */
+    .passport-form li.colspan {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+    .passport-form li.colspan label {
+        display: inline !important;
+        margin: 0 !important;
+        font-weight: normal !important;
+        font-size: 13px !important;
+        color: #666 !important;
+        line-height: 1.5 !important;
+        flex: 1 !important;
+    }
+    .passport-form li.colspan input[type="checkbox"] {
+        width: auto !important;
+        margin: 0 !important;
+        margin-top: 2px !important;
+        flex-shrink: 0 !important;
+        vertical-align: top !important;
+    }
+    .passport-form li.colspan a {
+        color: #0066cc;
+        text-decoration: none;
+    }
+    .passport-form li.colspan a:hover {
+        text-decoration: underline;
+    }
+    /* 登录按钮 */
+    .passport-form .btn-login {
+        width: auto !important;
+        min-width: 140px !important;
+        background: #000 !important;
+        color: #fff !important;
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 14px 40px !important;
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        cursor: pointer;
+        transition: all 0.2s ease !important;
+        text-align: center !important;
+        margin: 0 0 0 auto !important;
+        display: block !important;
+        float: none !important;
+        line-height: 1.5 !important;
+        position: relative !important;
+    }
+    .passport-form .btn-login:hover {
+        background: #333 !important;
+    }
+    .passport-form .btn-login:active {
+        background: #000 !important;
+        transform: translateY(1px);
+    }
+    .passport-form .btn-login span {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .passport-form .btn-login span span {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .passport-form .btn-login #btn-login-inner {
+        display: inline-block !important;
+        text-align: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: 1.5 !important;
+    }
+    /* SSO 登录 */
+    .sso-login {
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid #e0e0e0;
+    }
+    .sso-item {
+        display: inline-block;
+        margin-right: 12px;
+    }
+</style>
+<form class="passport-form" action="<{$callback}>" method="post" name="basicloginform" onsubmit="return encrypt_login()">
+	<ul>
+		<li>
+			<label for="uname"><{t}>用户名<{/t}></label>
+			<input class="inputstyle-out inputstyle-out-name" autofocus type="text" required="true" id="uname" value="<{$uname|default:''}>" placeholder="<{t}>请输入用户名<{/t}>"/>
+		</li>
+		<li>
+			<label for="password"><{t}>密码<{/t}></label>
+			<input class="inputstyle-out inputstyle-out-pw" type="password" id="password" value="<{$password|default:''}>" placeholder="<{t}>请输入密码<{/t}>"/>
+			<{if $type=="member"}><a href="<{link app='b2c' ctl='site_passport' act='lost'}>" style="display:block;margin-top:8px;font-size:13px;color:#0066cc;text-decoration:none;"><{t}>忘记密码<{/t}></a><{/if}>
+			<div class="info-tip" id="caps-info">
+				<div class="info-tip-arrow">&nbsp;</div>
+				<{t}>Caps Lock键已开启,密码输入是大写状态!<{/t}>
+			</div>
+			<input type="hidden" id="login_iv" value="<{$login_iv}>">
+			<input type="hidden" id="login_cipher" name="login_cipher" value="">
+		</li>
+		<{if $show_varycode}>
+		<li>
+			<label for="verifycode"><{t}>验证码：<{/t}></label>
+			<input maxlength="4" autocomplete="off" class="inputstyle-short-out" name="verifycode" id="verifycode" value="" placeholder="<{t}>验证码<{/t}>" />
+			<a href="javascript:changeimg('shopadminvocode')" class="refresh-code"><img id="shopadminvocde" src="<{$desktop_url}>index.php?app=desktop&ctl=passport&act=gen_vcode&<{$smarty.now}>" class="verifycodeimg"></a>
+		</li>
+		<{/if}>
+		<{if $mobile_check}>
+		<li>
+			<label for="mobileverifycode"><{t}>手机验证码：<{/t}></label>
+			<input maxlength="6" autocomplete="off" class="inputstyle-short-out" name="mobileverifycode" id="mobileverifycode" value="" placeholder="<{t}>手机验证码<{/t}>" />
+			<input type="hidden" id="needmobileverifycode" name="needmobileverifycode" value="1">
+			<{button id="getmobileverifycode" type="button" label="获取手机验证码"}>
+		</li>
+		<{/if}>
+		<li class="colspan">
+			<input id="pipl-agree" type="checkbox" required="true" />
+			<label for="pipl-agree"><{t}>登录即表示同意<a href="https://www.shopex.cn/agreement/99" target="_blank" style="color:#0066cc;text-decoration:none;">《隐私制度》</a><{/t}></label>
+		</li>
+		<li class="colspan">
+			<button id="btn-login" type="submit" class="btn-login btn common-btn">
+				<span>
+					<span id="btn-login-inner"><{t}>登 录<{/t}></span>
+				</span>
+			</button>
+		</li>
+	</ul>
+</form>
+
+<script>
+	/**
+	 * 接口数据加密函数
+	 * @param str string 需加密的json字符串
+	 * @param key string 加密key(16位)
+	 * @param iv string 加密向量(16位)
+	 * @return string 加密密文字符串
+	 */
+	function encrypt(str, key, iv) {
+		//密钥16位
+		var key = CryptoJS.enc.Latin1.parse(key);
+		//加密向量16位
+		var iv = CryptoJS.enc.Latin1.parse(iv);
+		var encrypted = CryptoJS.AES.encrypt(str, key, {
+			iv: iv,
+			mode: CryptoJS.mode.CBC,
+			padding: CryptoJS.pad.ZeroPadding
+		});
+		return encrypted;
+	}
+
+	/**
+	 * 接口数据解密函数
+	 * @param str string 已加密密文
+	 * @param key string 加密key(16位)
+	 * @param iv string 加密向量(16位)
+	 * @returns {*|string} 解密之后的json字符串
+	 */
+	function decrypt(str, key, iv) {
+		//密钥16位
+		var key = CryptoJS.enc.Latin1.parse(key);
+		//加密向量16位
+		var iv = CryptoJS.enc.Latin1.parse(iv);
+		var decrypted = CryptoJS.AES.decrypt(str, key, {
+			iv: iv,
+			mode: CryptoJS.mode.CBC,
+			padding: CryptoJS.pad.ZeroPadding
+		});
+		return decrypted.toString(CryptoJS.enc.Utf8);
+	}
+
+	/**
+	 * 登录信息加密 使用aes192进行加密
+	 */
+	function encrypt_login() {
+		var nowDate = new Date();
+		var year = nowDate.getFullYear();
+		var month = nowDate.getMonth() + 1 < 10 ? "0" + (nowDate.getMonth() + 1)
+				: nowDate.getMonth() + 1;
+		var day = nowDate.getDate() < 10 ? "0" + nowDate.getDate() : nowDate.getDate();
+		var dateStr = year + "-" + month + "-" + day;
+
+		var encrypt_key = dateStr+"eDu189";
+		//加密向量16位
+		var cipher_info = new Object();
+		cipher_info['uname'] = document.getElementById("uname").value;
+		cipher_info['password'] = document.getElementById("password").value;
+		cipher_info['terminal'] = 'PC';
+
+		var encrypt_string = JSON.stringify(cipher_info);
+
+
+		var iv  = document.getElementById("login_iv").value;
+		var encrypted_string = encrypt(encrypt_string, encrypt_key, iv);
+
+		//var decrypted_string = decrypt(encrypted_string.toString(), encrypt_key, iv);
+
+		document.getElementById("login_cipher").value = encrypted_string.toString();
+
+	}
+var ck = function(key){
+	this.key = key;
+	this.options = {
+		path: '/',
+		domain: false,
+		duration: 30,
+		secure: false,
+		document: document,
+		encode: true
+	};
+};
+ck.prototype = {
+	w:function(value){
+			if (this.options.encode) value = encodeURIComponent(value);
+			if (this.options.domain) value += '; domain=' + this.options.domain;
+			if (this.options.path) value += '; path=' + this.options.path;
+			if (this.options.duration){
+				var date = new Date();
+				date.setTime(date.getTime() + this.options.duration * 24 * 60 * 60 * 1000);
+				value += '; expires=' + date.toGMTString();
+			}
+			if (this.options.secure) value += '; secure';
+			this.options.document.cookie = this.key + '=' + value;
+	},
+	r:function(){
+			var value = this.options.document.cookie.match('(?:^|;)\\s*' + this.key + '=([^;]*)');
+			return (value) ? decodeURIComponent(value[1]) : null;
+	}
+};
+var cukie = {
+	w:function(k,v){
+		var ins = new ck(k);
+		ins.w(v);
+	},
+	r:function(k){
+		var ins = new ck(k);
+		return ins.r();
+	},
+	d:function(k){
+		var ins = new ck(k);
+		ins.options.duration = -1;
+		ins.w('');
+	}
+};
+
+
+(function(){
+var uname=document.getElementById("uname");
+var password=document.getElementById("password");
+var verifycode=document.getElementById("verifycode");
+var capsTip = document.getElementById('caps-info');
+var getmobileverifycode = document.getElementById('getmobileverifycode');
+var blf = document.basicloginform;
+var errorMsg = '<{$error_info}>';
+if(getmobileverifycode) {
+	var getmobileverifycodeclick = function (e) {
+		document.getElementById('needmobileverifycode').value='2';
+		blf.submit();
+	};
+	if(errorMsg.indexOf('手机验证码已发送') != -1) {
+		var oSpan = getmobileverifycode.getElementsByTagName('span')[1];
+		var spanStr = '获取手机验证码';
+		var spanTime = 60;
+		var si = setInterval(function(){
+			spanTime --;
+			if(spanTime < 1) {
+				clearInterval(si);
+				if(getmobileverifycode.addEventListener){
+					getmobileverifycode.addEventListener('click',getmobileverifycodeclick,false);
+				}else{
+					getmobileverifycode.attachEvent('onclick',getmobileverifycodeclick);
+				}
+				oSpan[[oSpan.innerText?'innerText':'textContent']] = spanStr;
+			} else {
+				var tmpSpanStr = spanStr + '(' + spanTime + ')';
+				oSpan[[oSpan.innerText?'innerText':'textContent']] = tmpSpanStr;
+			}
+		}, 1000);
+	} else {
+		if(getmobileverifycode.addEventListener){
+			getmobileverifycode.addEventListener('click',getmobileverifycodeclick,false);
+		}else{
+			getmobileverifycode.attachEvent('onclick',getmobileverifycodeclick);
+		}
+	}
+}
+
+uname.onmouseover=function(){
+	this.className='inputstyle-move inputstyle-move-name';
+}
+uname.onmouseout=function(){
+	this.className='inputstyle-out inputstyle-out-name';
+}
+
+password.onmouseover=function(){
+		this.className='inputstyle-move inputstyle-move-pw';
+}
+password.onmouseout=function(){
+	this.className='inputstyle-out inputstyle-out-pw';
+}
+password.onblur=function(){
+	capsTip.style.visibility  =  'hidden';
+}
+password.onkeypress=function(event){
+	detectCapsLock(event);
+}
+
+function detectCapsLock(e){
+	e=e||window.event;
+   valueCapsLock  =  e.keyCode ? e.keyCode:e.which;
+   valueShift  =  e.shiftKey ? e.shiftKey:((valueCapsLock  ==   16 ) ? true : false );
+
+    if (((valueCapsLock >=   65   &&  valueCapsLock  <=   90 )  &&   ! valueShift)
+    || ((valueCapsLock >=   97   &&  valueCapsLock  <=   122 )  &&  valueShift))
+       capsTip.style.visibility  =  'visible';
+    else
+       capsTip.style.visibility  =  'hidden';
+}
+var submitHandle = function(e){
+	var str ="<{t}>登录中..<{/t}>";
+	var bl =document.getElementById('btn-login');
+	bl.setAttribute('type','button');
+	var bli = document.getElementById('btn-login-inner');
+	bli[bli.innerText?'innerText':'textContent']=str;
+};
+
+if(blf.addEventListener){
+	blf.addEventListener('submit',submitHandle,false);
+}else{
+	blf.attachEvent('onsubmit',submitHandle);
+}
+
+if(!verifycode)return;
+verifycode.onmouseover=function(){
+	this.className='inputstyle-short-move';
+}
+verifycode.onmouseout=function(){
+	this.className='inputstyle-short-out';
+}
+
+<{if $show_varycode}>
+changeimg = function(id){
+	var timestamp = Date.parse(new Date());
+	document.getElementById('shopadminvocde').src='<{$desktop_url}>index.php?app=desktop&ctl=passport&act=gen_vcode#'+timestamp;
+
+}
+<{/if}>
+})();
+</script>

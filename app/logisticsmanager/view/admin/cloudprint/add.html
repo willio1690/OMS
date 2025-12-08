@@ -1,0 +1,87 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=logisticsmanager&ctl=admin_cloudprint&act=doSave&finder_id=<{$finder_id}>" method="post" id="cloudprint_add_form" class="tableform">
+<div class="division">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" >
+        <tbody>
+             <tr>
+                <th>云打印机编码:</th> 
+                <td>
+                   <input type="text" name="code" value="<{$cloudprint.code}>" vtype="required" maxlength="100">
+                </td>
+            </tr>
+            <tr>
+                <th>终端号:</th> 
+                <td>
+                   <input type="text" name="machine_code" value="<{$cloudprint.machine_code}>" vtype="required" maxlength="100">
+                </td>
+            </tr>
+           
+            <tr>
+                <th>云打印:</th> 
+                <td>
+                   <select name="channel_id" >
+                       <option value="">请选择</option>
+                       <{foreach from=$channel item=channel}>
+                       <option value="<{$channel.channel_id}>" <{if $channel.channel_id==$cloudprint.channel_id}>selected<{/if}>><{$channel.channel_name}></option>
+                       <{/foreach}>
+                   </select>
+                </td>
+            </tr>
+            <tr>
+                <th>门店:</th> 
+                <td>
+                   <select name="store_id" vtype="required">
+                       <option value="">请选择</option>
+                       <{foreach from=$storeList item=store}>
+                       <option value="<{$store.store_id}>" <{if $store.store_id==$cloudprint.store_id}>selected<{/if}>><{$store.name}></option>
+                       <{/foreach}>
+                   </select>
+                </td>
+            </tr>
+            
+           <tr>
+                <th>禁用状态:</th> 
+                <td>
+                   <select name="disabled" vtype="required">
+                       
+                       <option value="true" <{if $cloudprint.disabled=='true'}>selected<{/if}>>是</option>
+                       <option value="false" <{if $cloudprint.disabled=='false' || $cloudprint.disabled==''}>selected<{/if}>>否</option>
+                   </select>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
+
+<div class="table-action">
+      <{button label="确定" class="btn-primary" type='submit' id='save_cloudprint'}> &nbsp; &nbsp;
+      <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+<input type='hidden' id='finder_id' name='finder_id' value='<{$finder_id}>'>
+<input type='hidden' name='id' value='<{$cloudprint.id}>'>
+</form>
+
+<script>
+$('save_cloudprint').addEvent('click',function(e){
+var form=this.getParent('form');
+var _this=this;
+
+form.store('target',{
+    onComplete:function(jsontext){
+        var json = Json.evaluate(jsontext);
+        if (typeof(json.error) != 'undefined'){
+            this.disabled=false;
+        }else{
+            finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+            $('cloudprint_add_form').getParent('.dialog').retrieve('instance').close();
+        }
+    }
+});
+
+form.fireEvent('submit',e);
+});
+</script>

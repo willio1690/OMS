@@ -1,0 +1,66 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if !$_is_singlepage}>
+<style>
+    .delivery-tab{margin:0;padding:0;overflow:hidden;}
+    .delivery-tab li{float:left; width:200px;height:24px;line-height:24px;margin-right:5px;font-size: 12px;overflow:hidden;}
+    .delivery-tab .hover{background-position:0 0;font-weight:bold;}
+</style>
+<form method="POST" action="index.php?app=brush&ctl=admin_logistics&act=changeLogistics" class="tableform" id="form_change_dly">
+<div class="tableform">
+    <div class="note">
+        本次操作您共选择了 <span id='orderCount' class="color:red"><{$orderCnt}></span> 个发货单。
+        <input type="hidden" name="ids" value="<{$ids}>" />
+    </div>
+    <div><b>选择你要更换的新物流：</b></div>
+    <ul class="delivery-tab">
+        <{foreach from=$dlyCorp item=corp}>
+        <li>
+            <label><input type="radio" name="logi_id" value="<{$corp.corp_id}>"/>&nbsp;&nbsp;<{$corp.name}><{if $corp.tmpl_type=='electron'}> <span style="color:red;">电子面单</span><{elseif $corp.tmpl_type=='cainiao' }><span style="color:red;">菜鸟面单</span><{/if}></label>
+        </li>
+        <{/foreach}>
+    </ul><br /><br />
+</div>
+</form>
+<{area inject='.mainFoot'}>
+<div class="table-action">
+	<{button type="button" label="更换物流" id="btn-run"}>
+</div>
+<{/area}>
+
+<script>
+(function(){
+	var _form = $('form_change_dly');
+	var btn =$('btn-run');
+	var finder_id = finderGroup['<{$env.get.finder_id}>'];
+	
+	_form.store('target',{
+		onSuccess:function(response){
+			var hash_res_obj = JSON.decode(response);
+		
+			if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+				try{
+					var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+				}catch(e){}
+				
+				if(_dialogIns){	
+					_dialogIns.close();
+					window.finderGroup[finder_id].refresh();
+				}
+			}
+			
+		}
+	});
+
+    btn.addEvent('click',function(){
+        _form.fireEvent('submit',{stop:$empty});
+    });
+	
+})();
+</script>
+
+<{/if}>
+ 

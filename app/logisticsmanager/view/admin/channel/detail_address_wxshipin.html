@@ -1,0 +1,56 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<form id="form1" name="form1" method="post">
+    <p><{button label="查询网点签约" class="btn-primary" type="button" id="shop_address"}></p>
+    <div class="division">
+        <table  class="gridlist" width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tr><th>网点编码</th><td><input type="text" id='site_code' name="site_code" value="<{$extend_detail.addon.site_code}>" size="80" ></td></tr>
+            <tr><th>电子面单账号ID</th><td><input type="text" id='acct_id' name="acct_id" value="<{$extend_detail.addon.acct_id}>" size="80" ></td></tr>
+            <tr><th>店铺ID</th><td><input type="text" id='shop_id' name="shop_id" value="<{$extend_detail.addon.shop_id}>" size="80" ></td></tr>
+            <tr><th>名称</th><td><input type="text" id='shop_name' name="shop_name" value="<{$extend_detail.shop_name}>" size="80" ></td></tr>
+            <tr><th>省</th><td><input type="text" id='province' name="province" value="<{$extend_detail.province}>" size="80" ></td></tr>
+            <tr><th>市</th><td><input type="text" id='city' name="city" value="<{$extend_detail.city}>" size="80" ></td></tr>
+            <tr><th>地区</th><td><input type="text" id='area' name="area" value="<{$extend_detail.area}>" size="80" ></td></tr>
+            <tr><th>街道</th><td><input type="text" id='street' name="street" value="<{$extend_detail.street}>" size="80" ></td></tr>
+            <tr><th>地址</th><td><input type="text" id='address_detail' name="address_detail" value="<{$extend_detail.address_detail}>" size="80" ></td></tr>
+            <tr><th>发件人</th><td><input type="text" id='default_sender' name="default_sender" value="<{$extend_detail.default_sender}>" size="80" ></td></tr>
+            <tr><th>电话</th><td><input type="text" id='tel' name="tel" value="<{$extend_detail.tel}>" size="80" ></td></tr>
+            <tr><th>手机</th><td><input type="text" id='mobile' name="mobile" value="<{$extend_detail.mobile}>" size="80" ></td></tr>
+            <tr><th>邮编</th><td><input type="text" id='zip' name="zip" value="<{$extend_detail.zip}>" size="80" ></td></tr>
+        </table>
+        <input type="hidden" name="id" value="<{$extend_detail.id}>">
+        <input type="hidden" name="channel_id" value="<{$channel_id}>">
+    </div> 
+    <div class="table-action">
+        <input id="savebtn" type="button" name="submit" value="保存地址">
+    </div>
+</form>
+</div>
+
+<script>
+    if ($('shop_address')){
+        $('shop_address').addEvent('click',function(e){
+            var url = 'index.php?app=logisticsmanager&ctl=admin_channel&act=get_shop_address&p[0]=<{$channel_id}>&finder_id=<{$env.get.finder_id}>';
+            new Dialog(url,{title:'网点签约',width:900,height:400});
+        });
+    }
+    if ($('savebtn')){
+        $('savebtn').addEvent('click',function(e){
+            var _data =$('form1').toQueryString()+'&finder_id=<{$env.get.finder_id}>';
+            var finder_id= '<{$env.get.finder_id}>';
+            new Request({
+                url:'index.php?app=logisticsmanager&ctl=admin_channel&act=save_address',
+                data:_data,
+                method:'post',
+                onSuccess:function(rs){
+                    alert('保存成功!');
+                finderGroup[finder_id].refresh.delay(400,finderGroup[finder_id]);
+                }
+            }).send();
+        });
+    }
+</script>

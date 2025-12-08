@@ -1,0 +1,312 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5, viewport-fit=cover" />
+  <title> <{$title}> </title>
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/common.css">
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/delivery.css">
+  <script src="<{$env.app.res_url}>/js/axios.min.js"></script>
+  <script src="<{$env.app.res_url}>/js/libs.min.js"></script>
+  <script src="<{$env.app.res_url}>/js/mobile.min.js"></script>
+  <script src="<{$env.app.res_url}>/js/main.min.js"></script>
+  <style>
+    /* 让图片在移动端可完整预览、可滚动、可缩放 */
+    .print-preview-wrapper {
+      position: relative;
+      width: 100vw;
+      height: calc(100vh - 120px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #fff;
+      box-sizing: border-box;
+      padding: 8px;
+    }
+    .print-preview-inner {
+      display: inline-block;
+      transform-origin: 0 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .print-preview-img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+    /* 头部和底部固定后，中间可滚动 */
+    .page .section_1 { position: sticky; top: 0; z-index: 10; }
+    .delivery-footer { position: sticky; bottom: 0; z-index: 10; }
+    /* 去掉外层布局可能的padding/margin影响高度计算 */
+    .main { padding: 0; margin: 0; }
+    .group_2, .group_4 { padding: 0; margin: 0; }
+    .group_4 { width: 100%; }
+  
+  </style>
+</head>
+
+<body>
+  <div class="page flex-col">
+    <!-- heder -->
+    <div class="section_1 flex-col">
+      <div class="text-wrapper_1 flex-row align-center justify-between">
+        <img src="<{$env.app.res_url}>/img/icon-back.png" class="icon-back">
+        <span class="text_1">打印配货单</span>
+        <img src="<{$env.app.res_url}>/img/icon-refresh.png" class="icon-refresh">
+      </div>
+    </div>
+    <div class="main">
+
+      <{if $base64_image}>
+      <div class="group_2 flex-col">
+        <div class="group_4 flex-row justify-between">
+          <div class="print-preview-wrapper">
+            <div class="print-preview-inner" id="printPreviewInner">
+              <img class="print-preview-img" id="printPreviewImg" src="<{$base64_image}>" alt="配货单预览">
+            </div>
+          </div>
+        </div>
+       
+      </div>
+      <{else}>
+        <div class="group_2 flex-col">
+        请检查打印模板设置
+        </div>
+      <{/if}>
+      <!-- goodsInfo -->
+      
+    </div>
+    <div class="delivery-footer justify-between">
+      <{if $base64_image}>
+      <button class="delivery-footer-btn modal-confirm" onclick="submitDelivery()">打印配货单</button>
+      <{/if}>
+    </div>
+  </div>
+  <div class="mask" id="mask"></div>
+  <div class="toast" id="toast"></div>
+  <!-- 弹窗组件 -->
+  <!-- 弹窗组件模板 -->
+  <div class="modal" id="commonModal" style="display: none;">
+    
+  <script>
+    // 简单双指缩放支持（可选：也可使用手势库）
+    (function() {
+      var wrapper = document.querySelector('.print-preview-wrapper');
+      var inner = document.getElementById('printPreviewInner');
+      var img = document.getElementById('printPreviewImg');
+      if (!wrapper || !inner || !img) return;
+
+      // 默认自适应整屏显示
+      function fitToWrapper() {
+        inner.style.transform = 'scale(1)';
+      }
+      fitToWrapper();
+
+      var scale = 1;
+      var startDistance = 0;
+
+      function getDistance(touches) {
+        var dx = touches[0].clientX - touches[1].clientX;
+        var dy = touches[0].clientY - touches[1].clientY;
+        return Math.sqrt(dx*dx + dy*dy);
+      }
+
+      wrapper.addEventListener('wheel', function(e) {
+        if (!e.ctrlKey && !e.metaKey) return; // 桌面浏览器按住Ctrl/⌘滚轮可缩放
+        e.preventDefault();
+        var delta = e.deltaY > 0 ? -0.05 : 0.05;
+        scale = Math.max(0.3, Math.min(5, scale + delta));
+        inner.style.transform = 'scale(' + scale + ')';
+      }, { passive: false });
+
+      wrapper.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 2) {
+          startDistance = getDistance(e.touches);
+        }
+      }, { passive: true });
+
+      wrapper.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          var newDistance = getDistance(e.touches);
+          var delta = (newDistance - startDistance) / 300; // 调整灵敏度
+          scale = Math.max(0.3, Math.min(5, scale + delta));
+          inner.style.transform = 'scale(' + scale + ')';
+          startDistance = newDistance;
+        }
+      }, { passive: false });
+    })();
+  </script>
+    <div class="modal-mask"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"></h3>
+        <span class="modal-close">×</span>
+      </div>
+      <div class="modal-content">
+        <!-- 动态内容区域 -->
+      </div>
+      <div class="modal-footer justify-between">
+        <button class="modal-btn modal-cancle">取消</button>
+        <button class="modal-btn modal-confirm">确定</button>
+      </div>
+    </div>
+  </div>
+  <script src="<{$env.app.res_url}>/js/common.js"></script>
+  <script>
+   
+
+  
+    // 物流公司选择变化事件 - 将在自定义下拉组件初始化时绑定
+
+  function submitDelivery(){
+    var ajax_url = "<{$delivery_link.doPrint}>";
+    var delivery_id = '<{$delivery_id}>';
+    var action = '<{$action}>';
+    if(delivery_id == ""){
+        showToast('无效的参数');
+        return false;
+    }
+
+    var formdata = {
+        "delivery_id": delivery_id,
+
+        "action":action,
+        "need_print": 1 
+    }; 
+
+    showLoading('正在打印中');
+
+    $.post(ajax_url, formdata, function(rs) {
+        hideLoading();
+        if (rs) {
+            json = JSON.parse(rs);
+            if(json.rsp == 'succ'){
+              showToast(json.msg);
+              // 返回上一页
+              setTimeout(() => {
+                history.back()
+              }, 1500);
+            }else{
+              showToast(json.msg);
+            }
+        }else {
+          showToast('请求失败，请检查网络是否正常');
+        }
+    });
+  }
+  </script>
+
+  <style>
+    /* 自定义下拉组件样式 */
+    .custom-select {
+      position: relative;
+      width: auto;
+      min-width: 6rem;
+      max-width: 50%;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .custom-select-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      cursor: pointer;
+      position: relative;
+      padding: 0 1.25rem 0 1rem;
+      width: 100%;
+      min-height: 1.25rem;
+    }
+
+    .custom-select-value {
+      word-break: break-all;
+      color: rgba(18, 18, 18, 1);
+      font-size: 0.875rem;
+      letter-spacing: 0.31111112236976624px;
+      font-family: PingFangSC-Regular;
+      font-weight: normal;
+      text-align: right;
+      white-space: nowrap;
+      line-height: 1.25rem;
+    }
+
+    .custom-select-arrow {
+      position: absolute;
+      top: .125rem;
+      right: .125rem;
+      z-index: 0;
+      width: 0.5rem;
+      height: 0.313rem;
+      margin: 0.407rem 0 0.532rem 0.47rem;
+      transition: transform 0.3s ease;
+    }
+
+    .custom-select.active .custom-select-arrow {
+      transform: rotate(180deg);
+    }
+
+    .custom-select-options {
+      position: absolute;
+      top: 100%;
+      right: 1.25rem;
+      min-width: 8rem;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      max-height: 12rem;
+      overflow-y: auto;
+      display: none;
+      margin-top: 0.25rem;
+    }
+
+    .custom-select.active .custom-select-options {
+      display: block;
+    }
+
+    .custom-select-option {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      color: rgba(18, 18, 18, 1);
+      font-size: 0.875rem;
+      font-family: PingFangSC-Regular;
+      font-weight: normal;
+      text-align: left;
+      line-height: 1.25rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .custom-select-option:hover {
+      background-color: #f5f5f5;
+    }
+
+    .custom-select-option.selected {
+      background-color: #F5EDC9;
+      color: #C69A1B;
+    }
+
+    .custom-select-option:first-child {
+      border-top-left-radius: 0.5rem;
+      border-top-right-radius: 0.5rem;
+    }
+
+    .custom-select-option:last-child {
+      border-bottom-left-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
+    }
+  </style>
+</body>
+</html>

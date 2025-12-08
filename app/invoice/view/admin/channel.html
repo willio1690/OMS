@@ -1,0 +1,158 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="post" action="index.php?app=invoice&ctl=admin_channel&act=do_save" id="form_channel">
+<div class="tableform" id='invoice-auth'>
+    <div class="division">
+        <input type="hidden" name="channel_id" value="<{$channel.channel_id}>">
+
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+            <tr>
+                <th>开票渠道名称：</th>
+                <td><{input type="text" name="name" id="name" value=$channel.name size="50" vtype="required"}> <font color="red"> * 必填 </font></td>
+            </tr>
+            <tr>
+                <th>开票渠道类型：</th>
+                <td>
+                    <{input vtype="required" type="select" id='channel_type' name='channel_type' rows=$channels value=$channel.channel_type valueColumn="code" labelColumn="name"}>
+<!--                     <{if $channel.channel_type}>
+                        <{input type="select" id='channel_type' name='channel_type' rows=$channels value=$channel.channel_type valueColumn="code" labelColumn="name" disabled="disabled"}>
+                       
+                    <{else}>
+                        <{input vtype="required" type="select" id='channel_type' name='channel_type' rows=$channels value=$channels.0.code valueColumn="code" labelColumn="name"}>
+                    <{/if}> -->
+                </td>
+            </tr>
+            <tr>
+                <th>金税版本：</th>
+                <td>
+                    <select name="golden_tax_version" id='golden_tax_version'  >
+                        <option value="0" <{if $channel.golden_tax_version == 0}>selected<{/if}> >三期</option>
+                        <option value="1" <{if $channel.golden_tax_version == 1}>selected<{/if}> >四期</option>
+                    </select>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+
+
+<!--         <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+           <tbody id='bw_channel_info' <{if $channel.channel_type!='bw'}>style='display:none'<{/if}>>
+	           <tr>
+	               <th>登录税号：</th>
+	               <td><{input  vtype="required" type="text" name="bw_user"  value=$channel.bw_user size="30"}>&nbsp;&nbsp;<em class="c-red">*</em></td>
+	           </tr>
+	          <tr>
+	               <th>税号对应的接入码：</th>
+	               <td><{input  vtype="required" type="text" name="bw_key"  value=$channel.bw_key size="30"}>&nbsp;&nbsp;<em class="c-red">*</em></td>
+	           </tr>
+        </tbody>
+        </table> -->
+<!--         <table width="100%" cellspacing="0" cellpadding="0" border="0"   >
+        <tbody >
+                <{if $channel.shop_id}>
+                    <tr>
+                        <th>关联店铺：</th>
+                        <td><{input type="select" name='shop_id' rows=$shopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" disabled="disabled"}></td>
+                    </tr>
+                <{else}>
+                   <tr style="display:none" id='relation_shop'></tr>
+                <{/if}>
+                
+        </tbody>
+        </table> -->
+
+        <div id='auto-config'></div>
+    </div>
+</div>
+<div class="table-action">
+    <{button label="提交" type="submit" name="submit" id="btn-submit"}>
+    <{button label="关闭" type="button" id="btn-close"}>
+</div>
+</form>
+
+<script type="text/javascript">
+(function(){
+    $('channel_type').addEvent('change',function(){
+        if (!this.value) {
+            $E('#invoice-auth #auto-config').empty();
+            return ;
+        } 
+
+        W.page('index.php?app=invoice&ctl=admin_channel&act=getAuthConfigs&p[0]='+this.value+'&p[1]=<{$channel.channel_id}>',{
+            update:$E('#invoice-auth #auto-config'),
+            clearUpdateMap:false
+        });
+    });
+
+    $('channel_type').fireEvent('change');
+
+    <{if $channel.channel_id}>
+        $('channel_type').set('disabled',true);
+        $('golden_tax_version').set('disabled',true);
+    <{/if}>
+})();
+</script>
+<!-- <script>
+(function()
+		{
+			var _form	= $('form_channel');
+		    var btn   = $('btn-submit');//按钮ID
+		    var finder = finderGroup['<{$env.get.finder_id}>'];
+		    _form.store('target',{
+		        onComplete:function(){
+		        },
+		        onSuccess:function(response){
+		            var hash_res_obj = JSON.decode(response);
+		            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+		                try{
+		                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+		                }catch(e){}
+		                if(_dialogIns){
+		                    finder.refresh();
+		                    _dialogIns.close();
+		                }
+		            }
+		        }
+		    });
+
+		    btn.addEvent('click',function(){
+		        _form.fireEvent('submit',{stop:$empty});
+		    });
+			$('btn-close').addEvent('click', function(){
+				$('btn-close').getParent('.dialog').retrieve('instance').close();
+			});
+			
+		})();
+    $('channel_type').addEvent('change', function () {
+         var channel_type= $("channel_type").value;
+         if(!channel_type) return ;
+         new Request({
+             url: 'index.php?app=invoice&ctl=admin_channel&act=ajax_get_shop',
+             data: 'channel_type=' + channel_type,
+             method: 'post',
+             onSuccess: function (response) {
+                  var result = JSON.decode(response);
+                 if (result) {
+                      var temp = '<th>关联店铺：</th><td><select name="shop_id" class="x-input-select inputstyle">';
+                     Object.each(result, function (i, index) {
+                         temp += '<option value=' + i.shop_id + '>' + i.name + '</option>';
+                     });
+                      temp += '</td></select>';
+                      $('relation_shop').show();
+                      $('bw_channel_info').hide();
+                      $('relation_shop').set('html', temp);
+                 }else{
+                      $('relation_shop').hide();
+                      $('relation_shop').set('html', '');
+                      if(channel_type == 'bw' ){
+                          $('bw_channel_info').show();
+                      }
+                 }
+             }
+         }).send();
+     });
+</script> -->

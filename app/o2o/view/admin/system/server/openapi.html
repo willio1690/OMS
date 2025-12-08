@@ -1,0 +1,40 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0" >
+  <tbody>
+    <tr>
+      <th ><em class="c-red">*</em>POS平台：</th>
+      <td>
+      
+           <{input type='select' name='server[node_type]' id="openapi_platform" vtype='required' value=$server.node_type options=array('pos'=>'标准','pekon'=>'秉坤','dms'=>'DMS','hudao'=>'互道') required=true}>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div id="openapi_platform_config">
+    <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+      <tbody>
+      <tr>
+        <th ><em class="c-red">*</em>节点：</th>
+        <td>
+          <{input name="server[node_id]" vtype="required" value=$server["node_id"] size="64"}>
+        </td>
+      </tr>
+        <tr>
+          <th ><em class="c-red">*</em>私钥：</th>
+          <td>
+            <{input name="config[private_key]" vtype="required" value=$server["config"]["private_key"] size="64"}>
+          </td>
+        </tr>
+        <tr>
+          <th ><em class="c-red">*</em>api地址：</th>
+          <td>
+            <{input name="config[api_url]" vtype="required" value=$server["config"]["api_url"] size="64"}>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+</div>

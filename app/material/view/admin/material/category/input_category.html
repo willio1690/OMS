@@ -1,0 +1,67 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="gEditor-GCat-category-material" class="object-select ">
+	<div class="label" id="<{$id}>">
+	<{if $category}>
+	<{$category.cat_name}>
+	<{else}>
+	<{t}>选择分类<{/t}>
+	<{/if}>
+	</div>
+	<div class="handle">&nbsp;</div>
+    <input type="hidden" name="cat_id" id="gEditor-GCat-input-material" name=<{$params.name}> value="<{$category.cat_id}>" />
+
+</div>
+<script>
+	$('gEditor-GCat-category-material').addEvent('click',function(){
+		var handle = $('gEditor-GCat-category-material'),cat_id= handle.getElement('input').value;
+		var originalValue = cat_id; // 记录原始值
+		
+		new Dialog('index.php?app=material&ctl=admin_material_cat&act=get_subcat&p[0]='+cat_id,{
+			title:'选择分类',
+			width:700,height:420,resizeable:false,
+			onShow:function(){
+				this.handle=handle;
+			},
+			onClose:function(){
+				// Dialog关闭时检查值是否发生变化
+				var newValue = handle.getElement('input').value;
+				if(newValue != originalValue){
+					// 值发生变化，触发change事件
+					handle.getElement('input').fireEvent('change');
+					
+					// 如果存在gEditor-GCat-input，也同步更新
+					if($('gEditor-GCat-input')){
+						$('gEditor-GCat-input').value = newValue;
+						$('gEditor-GCat-input').fireEvent('change');
+					}
+				}
+			}
+		});
+	});
+
+    if($('ext_prop')){
+        $('gEditor-GCat-input-material').addEvent('change',function(){
+            new Request.HTML({
+                url:'index.php?app=material&ctl=admin_material_cat&act=get_cat_prop',
+                method:'get',
+                update:'ext_prop',
+                data:'cat_id='+ this.value
+            }).send();
+        });
+    }
+
+    if($('ext_prop_topsales')){
+        $('gEditor-GCat-input-material').addEvent('change',function(){
+            new Request.HTML({
+                url:'index.php?app=material&ctl=admin_material_cat&act=get_cat_prop&type=topsales',
+                method:'get',
+                update:'ext_prop_topsales',
+                data:'cat_id='+ this.value
+            }).send();
+        });
+    }
+</script>

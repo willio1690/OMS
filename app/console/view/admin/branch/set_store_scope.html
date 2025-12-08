@@ -1,0 +1,18 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!-- POST需要提交的字段，需要加上class="dailog-batch-ipt" -->
+<table>
+    <tbody>
+        <tr>
+            <th>MIN最小库存：<input name="store_mode" type="hidden" value="<{$store_mode}>" class="dailog-batch-ipt" /></th>
+            <td><input name="min_store" type="text" id="min_store" value="0" size="8" maxlength="3" class="dailog-batch-ipt" onkeyup="value=value.replace(/[^0-9]/ig,'')" /></td>
+        </tr>
+        <tr>
+            <th>MAX最大库存：</th>
+            <td><input name="max_store" type="text" id="max_store" value="0" size="8" maxlength="5" class="dailog-batch-ipt" onkeyup="value=value.replace(/[^0-9]/ig,'')" /></td>
+        </tr>
+    </tbody>
+</table>

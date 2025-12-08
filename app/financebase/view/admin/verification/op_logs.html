@@ -1,0 +1,31 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+           <div class="division">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0">
+
+        <tbody>
+  
+      <tr>
+   
+         <td > 操作者 </td>
+         <td > 时间 </td>
+         <td > 金额 </td>
+       </tr>
+
+            <{foreach from=$list item=item}>
+       <tr>
+    
+         <td><{$item.op_name}></td>
+         <td><{$item.time|cdate}></td>
+         <td><{$item.money|cur}></td>
+       </tr>
+        <{/foreach}>
+        </tbody>
+      </table>
+    
+
+  </div>  </div>

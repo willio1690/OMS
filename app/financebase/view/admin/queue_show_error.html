@@ -1,0 +1,32 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+  <h3>查看原因</h3>
+  <div class="division">
+  
+
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+
+          <{foreach from=$error_msg item=item}>
+          <tr>
+            <th >原因</th>
+            <td >
+                <{$item}>
+            </td>
+          </tr>
+          <{/foreach}>
+          </table>
+         
+
+      <div class="table-action"><{button label="关闭" onclick="javascript:void(window.close());" class="btn-secondary" type="button"}></div>
+   
+    
+  </div>
+</div>
+<script>
+
+

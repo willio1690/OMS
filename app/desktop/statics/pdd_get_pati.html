@@ -1,0 +1,47 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!--#拼多多设备指纹-->
+<{if defined('DEBUG_JS') && DEBUG_JS}>
+<{script src="js/moo.js" }>
+<{else}>
+<script src="js_mini/moo_min.js" ></script>
+<{/if}>
+<script src="https://pfile.pddpic.com/galerie-go/open_sdk/pc.202102201613.js" type="text/javascript"></script>
+<script type="text/javascript">
+  var pageCode = '';
+
+  new Request({
+    url: '/index.php?app=ome&ctl=admin_shop&act=get_page_code',
+    method: 'post',
+    onComplete: function (res) {
+      resp = JSON.decode(res);
+      if (resp.pageCode) {
+        pageCode = resp.pageCode;
+        PDD_OPEN_init({
+          code: pageCode
+          // 对于获取 code 接口或未登录态，可不传：PDD_OPEN_init({}, function () { ... })
+        }).then(function () {
+          // 初始化已完成
+          window.PDD_OPEN_getPati().then(
+              function (pati) {
+                // 使用 pati
+                set_session_pinduoduo_pati(pageCode, pati);
+              }).catch(error => console.log(error))
+        })
+      }
+    }
+  }).send();
+//直接cookie存
+  set_session_pinduoduo_pati = function (pageCode, pati) {
+    new Request({
+      url: '/index.php?app=ome&ctl=admin_shop&act=set_code_pati',
+      method: 'post',
+      data: {page_code: pageCode, pati: pati},
+      onComplete: function (res) {
+      }
+    }).send();
+  };
+</script>

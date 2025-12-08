@@ -1,0 +1,135 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .express-biz-type {
+        filter: brightness(0.9) contrast(0.9);
+        border:1px solid blue; 
+        color:blue;
+        margin: 2px;
+        padding: 0px 2px;
+        border-radius: 5px;
+        white-space: nowrap;
+    }
+    .lattice-point-name {
+        filter: brightness(0.9) contrast(0.9);
+        border:1px solid green; 
+        color:green;
+        margin: 2px;
+        padding: 0px 2px;
+        border-radius: 5px;
+        white-space: nowrap;
+    }
+    .brand-name {
+        filter: brightness(0.9) contrast(0.9);
+        border:1px solid red; 
+        color:red;
+        margin: 2px;
+        padding: 0px 2px;
+        border-radius: 5px;
+        white-space: nowrap;
+    }
+</style>
+<h4>网点信息</h4>
+<ul>
+    <{foreach from=$result.data = item=item}>
+        <li>
+            <input type="radio" class="x-input inputstyle" name="netsite_address" value="<{$item|json_encode|base64_encode}>" <{if $item.is_default}>checked<{/if}>>
+            <{if $item.express_biz_type}>
+            <span  class="express-biz-type">
+                <{switch from=$item.express_biz_type}>
+                <{case value="1"}>
+                直营
+                <{case value="2"}>
+                加盟
+                <{case value="3"}>
+                落地配
+                <{case value="4"}>
+                直营⽹点
+                <{/switch}>
+            </span>
+            <{/if}>
+            <{if $item.lattice_point_name}>
+            <span class="lattice-point-name">
+                【<{$item.lattice_point_no}>】<{$item.lattice_point_name}>
+            </span>
+            <{/if}>
+            <{if $item.brand_name}>
+            <span class="brand-name">
+                【<{$item.brand_code}>】<{$item.brand_name}>
+            </span>
+            <{/if}>
+            <span><{$item.consignor_name}></span>
+            <span><{$item.consignor_phone}></span>
+            <span><{$item.province_name}></span>
+            <span><{$item.city_name}></span>
+            <span><{$item.county_name}></span>
+            <span><{$item.address}></span>
+            <span><{$item.county_name}></span>
+            <input type="hidden" name="brand_code" value="<{$item.brand_code}>">
+        </li>
+    <{/foreach}>
+</ul>
+<hr/>
+<table class="netsite-info">
+
+</table>
+<hr/>
+<div class="netsite-services">
+
+</div>
+<script>
+    if ($E('input[name=netsite_address]:checked')){
+        selectAddress($E('input[name=netsite_address]:checked'));
+        selectService($E('input[name=netsite_address]:checked'));
+    }
+
+    $ES('input[name=netsite_address]').addEvent('click', function(){
+        $E('.netsite-info').empty();
+        $E('.netsite-services').empty();
+        
+        selectAddress(this)
+        selectService(this)
+    });
+
+    function selectAddress(el) {
+
+        const parsedJson = JSON.parse(atob(el.value));
+
+        let netsiteInfo = $E('.netsite-info');
+
+        if (parsedJson.payment_type == '0'){
+            netsiteInfo.adopt(new Element('tr', {
+                'html': '<th>结算方式：</th><td>统一结算</td>'
+            }));
+        }
+
+        if (parsedJson.payment_type == '1'){
+            netsiteInfo.adopt(new Element('tr', {
+                'html': '<th>结算方式：</th><td>自结算</td>'
+            }));
+        }
+
+        if (parsedJson.customer_code){
+            netsiteInfo.adopt(new Element('tr', {
+                'html': '<th>月结卡号：</th><td>'+parsedJson.customer_code+'</td>'
+            }));
+        }
+    }
+
+    function selectService(el){
+        const parsedJson = JSON.parse(atob(el.value));
+
+        let payment_type = parsedJson.payment_type;
+        let brand_code = parsedJson.brand_code;
+        let lattice_point_no = parsedJson.lattice_point_no;
+        let cp_code = parsedJson.code;
+
+        W.page('index.php?app=logisticsmanager&ctl=admin_channel&act=queryNetsiteServices&p[]='+cp_code+'&p[]='+payment_type+'&p[]='+brand_code+'&p[]='+lattice_point_no+'&channel_type=<{$env.get.channel_type}>&shop_id=<{$env.get.shop_id}>',{
+                update:$E('.netsite-services'),
+                clearUpdateMap:false,
+            });
+    }
+</script>

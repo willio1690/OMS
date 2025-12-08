@@ -1,0 +1,84 @@
+<desktop>
+    <permissions>
+<!--        <permission id="dealer_business" show='ome_roles:show_dealer'>经销商</permission>-->
+<!--        <permission id="dealer_goods" show='ome_roles:show_dealer'>经销商货品</permission>-->
+        <permission id="dealer_shop" show='ome_roles:show_dealer'>代发店铺管理</permission>
+        <permission id="dealer_series" show='ome_roles:show_dealer'>产品线设置</permission>
+        <permission id="dealer_series_products" show='ome_roles:show_dealer'>产品线查询</permission>
+        <permission id="dealer_series_endorse_products" show='ome_roles:show_dealer'>商品代发设置</permission>
+        <permission id="dealer_sales_material_sku" show='ome_roles:show_dealer'>代发销售商品</permission>
+        <!-- <permission id="dealer_sales_material_pkg" show='ome_roles:show_dealer'>经销组合商品</permission> -->
+        <permission id="dealer_shop_stocksync" show='ome_roles:show_dealer'>代发库存同步管理</permission>
+        <permission id="dealer_shop_stocksku" show='ome_roles:show_dealer'>库存同步列表</permission>
+        <permission id="dealer_order_platform" show='ome_roles:show_dealer'>平台原始订单</permission>
+        <permission id="dealer_order_fenxiao" show='ome_roles:show_dealer'>代发订单</permission>
+        <permission id="dealer_order_sync" show='ome_roles:show_dealer'>平台状态跟踪</permission>
+        <permission id="dealer_order_add" show='ome_roles:show_dealer'>新建代发订单</permission>
+        <permission id="dealer_order_export" show='ome_roles:show_dealer'>导出代发订单</permission>
+        <permission id="dealer_platform_aftersale" show='ome_roles:show_dealer'>平台原始售后单</permission>
+        <permission id="dealer_bbu" show='ome_roles:show_dealer'>公司业务组织</permission>
+        <permission id="dealer_betc" show='ome_roles:show_dealer'>业务贸易公司</permission>
+        <permission id="dealer_bs" show='ome_roles:show_dealer'>经销商</permission>
+        <permission id="dealer_bs_jcda" show='ome_roles:show_dealer'>经销商</permission>
+        <permission id="dealer_goods_price" show='ome_roles:show_dealer'>经销商品价格</permission>
+        <permission id="dealer_goods_price_add" show='ome_roles:show_dealer'>经销商品价格新增</permission>
+        <permission id="dealer_goods_price_edit" show='ome_roles:show_dealer'>经销商品价格编辑</permission>
+        <permission id="dealer_goods_price_batchupdate" show='ome_roles:show_dealer'>经销商品价格批量更新</permission>
+        <permission id="dealer_goods_price_import" show='ome_roles:show_dealer'>经销商品价格导入</permission>
+        <permission id="dealer_goods_price_export" show='ome_roles:show_dealer'>经销商品价格导出</permission>
+        <permission id="dealer_platform_sales" show='ome_roles:show_dealer'>代发销售单</permission>
+        <permission id="dealer_platform_delivery" show='ome_roles:show_dealer'>代发发货单</permission>
+        <permission id="dealer_platform_reship" show='ome_roles:show_dealer'>代发退货单</permission>
+        <permission id="dealer_aftersale" show='ome_roles:show_dealer'>代发售后单</permission>
+    </permissions>
+
+    <workground name="代发管理" id="dealer_manager"  order="600" icon="icon-daifa">
+        <menugroup name="组织设置" en="dealer-organization">
+            <menu controller='admin_bbu' action='index' permission='dealer_bbu' display='true' order='6001010'>公司业务组织</menu>
+            <menu controller='admin_betc' action='index' permission='dealer_betc' display='true' order='6001020'>业务贸易公司</menu>
+            <menu controller='admin_bs' action='index' permission='dealer_bs' display='true' order='6001030'>经销商</menu>
+        </menugroup>
+        <menugroup name="代发产品线" en="dealer-goods">
+<!--            <menu controller='admin_business' action='index' permission='dealer_business' display='true' order='6000100'>经销商</menu>-->
+<!--            <menu controller='admin_goods' action='index' permission='dealer_goods' display='true' order='6000101'>经销商货品</menu>-->
+            <menu controller='admin_series' action='index' permission='dealer_series' display='true' order='6002010'>产品线设置</menu>
+            <menu controller='admin_series_products' action='index' permission='dealer_series_products' display='true' order='6002020'>产品线查询</menu>
+        </menugroup>
+        <menugroup name="代发业务设置" en="dealer-operation">
+            <menu controller='admin_shop' action='index' permission='dealer_shop' display='true' order='6003010'>代发店铺管理</menu>
+            <menu controller='admin_material_sales' action='index' permission='dealer_sales_material_sku' display='true' order='6003020'>代发销售商品</menu>
+            <menu controller='admin_series_endorse_products' action='index' permission='dealer_series_endorse_products' display='true' order='6003030'>商品代发设置</menu>
+            <menu controller='admin_shop_stocksync' action='index' permission='dealer_shop_stocksync' display='true' order='6003040'>代发库存同步管理</menu>
+            <menu controller='admin_shop_stocksku' action='index' permission='dealer_shop_stocksku' display='true' order='6003050'>库存同步列表</menu>
+            <!-- <menu controller='admin_sales_material' action='index_pkg' permission='dealer_sales_material_pkg' display='true' order='6000130'>经销组合商品</menu> -->
+        </menugroup>
+
+        <menugroup name="代发订单管理" en="dealer-order">
+            <menu controller='admin_platform_orders' action='index' permission='dealer_order_platform' display='true' order='6004010'>平台原始订单</menu>
+            <menu controller='admin_orders' action='index' permission='dealer_order_fenxiao' display='true' order='6004020'>代发订单</menu>
+            <menu controller='admin_delivery' action='index' permission='dealer_platform_delivery' display='true' order='6004030'>代发发货单</menu>
+            <menu controller='admin_platform_aftersale' action='index' permission='dealer_platform_aftersale' display='true' order='6004040'>平台原始售后单</menu>
+            <menu controller='admin_reship' action='index' permission='dealer_platform_reship' display='true' order='6004050'>代发退货单</menu>
+            <menu controller='admin_consign' action='index' permission='dealer_order_sync' display='true' order='6004060'>平台状态跟踪</menu>
+            <menu controller='admin_platform_orders' action='add' permission='dealer_order_add' display='false' order='6004070'>新建代发订单</menu>
+            <menu controller='admin_platform_orders' action='export' permission='dealer_order_export' display='false' order='6004080'>导出代发订单</menu>
+        </menugroup>
+        <menugroup name="代发单据" en="dealer-sale">
+            <menu controller='admin_sales' action='index' permission='dealer_platform_sales' display='true' order='6005010'>代发销售单</menu>
+            <menu controller='admin_aftersale' action='index' permission='dealer_aftersale' display='true' order='6005020'>代发售后单</menu>
+        </menugroup>
+    </workground>
+
+    <workground name="基础档案" id="goods_manager" order="600" icon="icon-jichudangan-01">
+        <menugroup name="经销商管理" en="dealer-management">
+            <menu controller='admin_bs' action='index' permission='dealer_bs_jcda' display='true' order='6001030'>经销商</menu>
+            <menu controller='admin_goods_price' action='index' permission='dealer_goods_price' display='true' order='6001040'>经销商品价格</menu>
+            <menu controller='admin_goods_price' action='add' permission='dealer_goods_price_add' display='false' order='6001041'>经销商品价格新增</menu>
+            <menu controller='admin_goods_price' action='edit' permission='dealer_goods_price_edit' display='false' order='6001042'>经销商品价格编辑</menu>
+            <menu controller='admin_goods_price' action='batchUpdateStartTime' permission='dealer_goods_price_batchupdate' display='false' order='6001043'>经销商品价格批量更新</menu>
+            <menu controller='admin_goods_price' action='displayImportV2' permission='dealer_goods_price_import' display='false' order='6001044'>经销商品价格导入</menu>
+            <menu controller='admin_goods_price' action='export' permission='dealer_goods_price_export' display='false' order='6001045'>经销商品价格导出</menu>
+        </menugroup>
+    </workground>
+
+</desktop>

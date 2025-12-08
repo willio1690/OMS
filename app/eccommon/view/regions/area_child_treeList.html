@@ -1,0 +1,150 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.x-tree-list .imgTree{padding-right:0;}
+</style>
+
+<div class="content-head">
+    <input type="checkbox" id="checkAll" name="checkAll" class="x-input " autocomplete="off">全选
+</div>
+
+<div id="child-nodes" class="x-tree-list">
+    <{foreach from=$area item=item key=iLoop name="item"}>
+    <span parentid="<{$item.p_region_id}>" class="node <{if $item.child_count>0}>hasc<{/if}>">
+        <{if $item.child_count>0}>
+            <span class="imgTree" onclick="clickTree(this);" id="<{$item.region_id}>"> &nbsp;&nbsp; </span>
+        <{else}>
+            <span class="imgTree tree_open" id="<{$item.region_id}>"> &nbsp;&nbsp; </span>
+        <{/if}>
+        <span class="node-line">&nbsp;</span>
+        <input type="checkbox" class="area_chkbox" name="region" value="<{$item.region_id}>" pid="<{$item.p_region_id}>">
+        <span class="">&nbsp;</span>
+        <span class="node-name"><{$item.local_name}></span>
+    </span>
+    <{/foreach}>
+</div>
+
+<{area inject=".mainFoot"}>
+<div class="table-action">
+  <{button label="确定" class="btn btn-primary" id="submit"}> &nbsp; <{button label="关闭" class="btn btn-secondary" isCloseDialogBtn='true'}>
+</div>
+<{/area}>
+
+<script>
+    var _inputHidden=$("child_area_<{$area_pid}>");
+    var _inputHiddenValue=_inputHidden.value.split(',');
+
+    function clickTree(el){
+        var el=$(el), obj = el.getParent('[parentid]'), curr_chk=obj.getChildren('input')[0];
+        if(!el.hasClass("tree_open")){
+            if(!obj.getNext() || !obj.getNext().get('readstatus')){
+                var div=new Element('div.node-child-box[readstatus=1]').injectAfter(obj).setHTML('<span></span>');
+                W.page('index.php?app=eccommon&ctl=regions&act=getChildSub',{
+                    update:div.firstChild,
+                    method:'post',
+                    data:'regionId='+el.id,
+                    onComplete:function(){
+                        obj.getNext().getElements('.area_chkbox').each(function(item){
+                            if(item.getProperty('pid').toInt() == el.id){
+                                if(curr_chk.checked){
+                                    item.set('checked',true);
+                                }else{
+                                    item.set('checked',false);
+                                }
+                            }
+
+                            chkAddClickEvent(item);
+                            formatData(item);
+                        });
+                    }
+                });
+            }
+            obj.getNext().show();
+            el.addClass("tree_open");
+
+        }else{
+            obj.getNext().hide();
+            el.removeClass("tree_open");
+        }
+    }
+
+    var chkAddClickEvent=function(item){
+        item.removeEvents('click').addEvent('click',function(){
+            var currNode = this.getParent('[parentid]');
+            var nextNode = currNode.getNext();
+            if(nextNode && nextNode.getTag()=='div'){
+                $ES('input[type=checkbox]',nextNode).set('checked',this.checked==true?true:false);
+            }
+
+            var prevNode = currNode.getParent().getParent();
+            if(prevNode.hasClass('node-child-box')&&prevNode.getFormElementsPlus().length>0){
+                checkPNode(currNode,true);
+            }else if(prevNode.hasClass('node-child-box')){
+                checkPNode(currNode,false);
+            }
+        });
+    }
+
+    var checkPNode=function(cnode,checked){
+        var pnode=cnode.getParent().getParent().getPrevious();
+        while(pnode.hasClass('hasc')){
+            if(checked){
+                pnode.getElement('input[type=checkbox]').set('checked',checked);
+            }else{
+                if(cnode && cnode.getFormElementsPlus().length <= 0){
+                    pnode.getElement('input[type=checkbox]').set('checked',checked);
+                }
+            }
+
+            cnode = pnode.getParent().getParent();
+            pnode = pnode.getParent().getParent().getPrevious();
+        }
+    };
+
+    var formatData=function(item){
+        if(_inputHiddenValue.length >=1 && _inputHiddenValue[0] != ''){
+            if(_inputHiddenValue.indexOf(item.value)>-1){
+                item.set('checked',true);
+                if(item.getParent().hasClass('hasc')){
+                    var currTreeElement = item.getPrevious().getPrevious();
+                    clickTree(currTreeElement);
+                }
+            }else if(_inputHiddenValue.indexOf(item.value) < 0){
+                item.set('checked',false);
+            }
+        }
+    };
+
+    var initTree=function(){
+        $ES('.area_chkbox').each(function(item){
+            chkAddClickEvent(item);
+            formatData(item);
+        });
+    };
+
+    initTree();
+
+    $('checkAll').addEvent('click',function(){
+        return $ES('.area_chkbox').set('checked',this.checked?true:false);
+    });
+
+    var child_area_dialog = $('child-nodes');
+    $('submit').addEvent('click',function(){
+        var nodes=child_area_dialog.getElements('.node').filter(function(n){
+            return n.getElement('input[type=checkbox]').checked;
+        });
+
+        var IDdatas=[];
+        var Namedatas=[];
+        nodes.each(function(node){
+            var v = node.getElement('input[type=checkbox]').getValue();
+            IDdatas.push(v);
+        });
+
+      _inputHidden.set('value',IDdatas.join(','));
+      $('submit').getParent('.dialog').retrieve('instance').close();
+    });
+</script>

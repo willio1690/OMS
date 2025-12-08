@@ -1,0 +1,25 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">       
+<{/capture}>
+
+<div class="tableform">
+           <div class="division">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0">
+
+        <tbody>
+            <{foreach from=$info item=item}>
+       <tr>
+         <th ><{$item.title}> </th>
+         <td><{$item.content}></td>
+       </tr>
+        <{/foreach}>
+        </tbody>
+      </table>
+    
+
+  </div>  </div>

@@ -1,0 +1,74 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<h4 class="head-title">服务端信息</h4>
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=o2o&ctl=admin_server&act=save" id="server">
+            <input type="hidden" name="server[server_id]" value="<{$server.server_id}>" />
+            <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tbody>
+            <tr>
+              <th><em class="c-red">*</em> 服务端编码：</th>
+              <td><{if $server.server_bn}><{$server.server_bn}><{else}><{input type='text&&required' size="32" name="server[server_bn]" value=$server.server_bn}><{/if}>
+              <input type='hidden' name="server[old_server_bn]" value="<{$server.server_bn}>">
+              <{help}><{t}>服务端在系统中的唯一标识<{/t}><{/help}>
+              </td>
+            </tr>
+            <tr>
+            <th ><em class="c-red">*</em> 名称：</th>
+              <td><{input type="text&&required" size="32" name="server[name]" value=$server.name}>
+              <{help}><{t}>服务端在此系统需要显示的中文名称<{/t}><{/help}>
+              </td>
+            </tr>
+            <tr>
+            <th ><em class="c-red">*</em> 服务端类型：</th>
+              <td><{input type='select' name='server[type]' id='server_type' vtype='required' rows=$type_list valueColumn='type' labelColumn='label' value=$server.type}>
+              <{help}><{t}>服务端对接联通的模式<{/t}><{/help}>
+              </td>
+            </tr>
+            </tbody>
+            </table>
+            <div id='server_config'></div>
+            <div class="table-action">
+            <{button class="btn-primary" type="button" id="saveserver" name="submit" label="提交"}>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+
+$('server_type').addEvents({
+    'change':function(e){
+        if (!this.value) return;
+        W.page('index.php?app=o2o&&ctl=admin_server&act=confightml&p[0]=<{$server.server_id}>&p[1]='+this.value,{update:$('server_config'),clearUpdateMap:false});
+    },
+    'domready':function(e){
+      this.fireEvent('change',e);
+    }
+});
+
+$('saveserver').addEvent('click',function(event){
+    $('server').fireEvent('submit',new Event(event));
+});
+
+$('server').store('target',{
+    onRequest:function(){
+       $('saveserver').set('disabled', 'true');
+    },
+    onComplete:function(jsontext){
+       var json = Json.evaluate(jsontext);
+       if (typeof(json.error) != 'undefined'){
+           $('saveserver').set('disabled', '');
+       }else{
+           $('saveserver').set('disabled', 'true');
+
+           $('server').getParent('.dialog').retrieve('instance').close();
+       }
+    }
+});
+
+</script>

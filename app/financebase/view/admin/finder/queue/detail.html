@@ -1,0 +1,44 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division">
+    <h4>任务详情</h4>
+    <div class="tableform">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+            <tr>
+                <th>任务ID：</th>
+                <td><{$queue.queue_id}></td>
+            </tr>
+            <tr>
+                <th>队列名：</th>
+                <td><{$queue.queue_name}></td>
+            </tr>
+            <tr>
+                <th>队列模式：</th>
+                <td><{$queue.queue_mode}></td>
+            </tr>
+            <tr>
+                <th>状态：</th>
+                <td><{$queue.status}></td>
+            </tr>
+            <tr>
+                <th>上传时间：</th>
+                <td><{$queue.create_time|cdate:'FDATE_STIME'}></td>
+            </tr>
+            <tr>
+                <th>完成时间：</th>
+                <td><{$queue.modify_time|cdate:'FDATE_STIME'}></td>
+            </tr>
+            <tr>
+                <th>队列数据：</th>
+                <td><pre><{$queue.queue_data|unserialize|var_export}></td>
+            </tr>
+            <tr>
+                <th>错误原因：</th>
+                <td><pre><{$queue.error_msg|unserialize|var_export}></td>
+            </tr>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+<?php
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+/**
+ * 京东钱包流水model类
+ *
+ * @author wangbiao<wangbiao@shopex.cn>
+ * @version $Id: Z
+ */
+class financebase_mdl_bill_import_jdbill extends dbeav_model
+{
+    public $filter_use_like = true;
+    
+    /**
+     * _filter
+     * @param mixed $filter filter
+     * @param mixed $tableAlias tableAlias
+     * @param mixed $baseWhere baseWhere
+     * @return mixed 返回值
+     */
+
+    public function _filter($filter, $tableAlias = NULL, $baseWhere = NULL)
+    {
+        return parent::_filter($filter, $tableAlias, $baseWhere).$where;
+    }
+    
+    /**
+     * 不建议使用这个方法
+     * 请直接使用$this->dump()方法
+     */
+    public function getRow($cols='*', $filter=array())
+    {
+        $sql = "SELECT $cols FROM ".$this->table_name(true)." WHERE ".$this->filter($filter);
+        
+        return $this->db->selectrow($sql);
+    }
+}

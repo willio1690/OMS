@@ -1,0 +1,97 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">       
+<{/capture}>
+
+<style>
+.division th, .division td { height: 32px; line-height: 32px;}
+</style>
+
+<div class="tableform">
+    <{if $isAoxiang}>
+    <div class="division">
+        <input type="hidden" name="shop_id" value="<{$shop_id}>" />
+        <table>
+            <tr>
+                <th>同步仓库</th>
+                <td>
+                    <input type="radio" name="sync_branch" value='true' <{if $aoxiangConfig['sync_branch'] != 'false'}>checked<{/if}>> 是
+                    <input type="radio" name="sync_branch" value='false' <{if $aoxiangConfig['sync_branch'] == 'false'}>checked<{/if}>> 否
+                    <span class="red">&nbsp;开启后(默认开启)，店铺签约翱象成功后，自动同步OMS系统中店铺关联的店铺给到翱象平台。</span>
+                </td>
+            </tr>
+            <tr>
+                <th>同步商品</th>
+                <td>
+                    <input type="radio" name="sync_product" value='true' <{if $aoxiangConfig['sync_product'] != 'false'}>checked<{/if}>> 是
+                    <input type="radio" name="sync_product" value='false' <{if $aoxiangConfig['sync_product'] == 'false'}>checked<{/if}>> 否
+                    <span class="red">&nbsp;开启后(默认开启)，店铺签约翱象成功后，自动同步OMS系统中商品给到翱象平台。</span>
+                </td>
+            </tr>
+            <tr>
+                <th>同步库存</th>
+                <td>
+                    <input type="radio" name="sync_stock" value='true' <{if $aoxiangConfig['sync_stock'] != 'false'}>checked<{/if}>> 是
+                    <input type="radio" name="sync_stock" value='false' <{if $aoxiangConfig['sync_stock'] == 'false'}>checked<{/if}>> 否
+                    <span class="red">&nbsp;开启后(默认开启)，店铺签约翱象成功后，自动同步商品对应的仓库级库存给到翱象平台。</span>
+                </td>
+            </tr>
+            <tr>
+                <th>同步发货单</th>
+                <td>
+                    <input type="radio" name="sync_delivery" value='true' <{if $aoxiangConfig['sync_delivery'] != 'false'}>checked<{/if}>> 是
+                    <input type="radio" name="sync_delivery" value='false' <{if $aoxiangConfig['sync_delivery'] == 'false'}>checked<{/if}>> 否
+                    <span class="red">&nbsp;开启后(默认开启)，店铺签约翱象成功后，自动同步订单生成的发货单给到翱象平台。</span>
+                </td>
+            </tr>
+            <tr>
+                <th>同步物流公司</th>
+                <td>
+                    <input type="radio" name="sync_logistics" value='true' <{if $aoxiangConfig['sync_logistics'] != 'false'}>checked<{/if}>> 是
+                    <input type="radio" name="sync_logistics" value='false' <{if $aoxiangConfig['sync_logistics'] == 'false'}>checked<{/if}>> 否
+                    <span class="red">&nbsp;开启后(默认开启)，店铺签约翱象成功后，自动同步OMS系统中物流公司给到翱象平台。</span>
+                </td>
+            </tr>
+        </table>
+        <div class="division">
+            <{button type="submit" label="保存" class="btn-secondery" id="btn_manual"}>
+        </div>
+    </div>
+    <{else}>
+        <span class="red">此店铺不支持翱象配置</span>
+    <{/if}>
+
+</div>
+
+<script>
+
+if($("btn_manual")){
+    $("btn_manual").addEvent("click",function(e){
+        var sync_branch= $E('input[name=sync_branch]:checked').get('value');
+        var sync_logistics= $E('input[name=sync_logistics]:checked').get('value');
+        var sync_product= $E('input[name=sync_product]:checked').get('value');
+        var sync_stock= $E('input[name=sync_stock]:checked').get('value');
+        var sync_delivery= $E('input[name=sync_delivery]:checked').get('value');
+
+        new Request({
+            url:'index.php?app=ome&ctl=admin_shop&act=setAxoaing',
+            data:"&shop_id="+"<{$shop_id}>&sync_branch="+sync_branch+"&sync_logistics="+sync_logistics+"&sync_product="+sync_product+"&sync_stock="+sync_stock+"&sync_delivery="+sync_delivery,
+            method:'post',
+                onSuccess:function(response){
+                    var resp = JSON.decode(response);
+                    if(resp.rsp=="fail"){
+                        var msg = resp.msg ? resp.msg : resp.res;
+                        MessageBox.error(msg);
+                    }else{
+                        MessageBox.success("保存成功");
+                    }
+                }
+      }).send();
+   });
+}
+</script>
+

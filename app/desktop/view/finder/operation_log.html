@@ -1,0 +1,30 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <h3>操作日志</h3>
+    <div class="division">
+        <table class="gridlist">
+            <thead>
+                <tr>
+                    <th>操作时间</th>
+                    <th>操作人</th>
+                    <th>行为</th>
+                    <th>操作内容</th>
+                </tr>
+            </thead>
+            <tbody>
+                <{foreach from=$rows item=row}>
+                <tr>
+                    <td><{$row.operate_time|cdate:'FDATE_FTIME'}></td>
+                    <td><{$row.op_name}></td>
+                    <td><{$row.operation}></td>
+                    <td><{$row.memo}></td>
+                </tr>
+                <{/foreach}>
+            </tbody>
+        </table>
+    </div>
+</div>

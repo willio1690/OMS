@@ -1,0 +1,8 @@
+# phpstan.neon
+includes:
+    - app/base/kernel.php
+
+parameters:
+    level: 2
+    autoload_files:
+        - vendor/autoload.php

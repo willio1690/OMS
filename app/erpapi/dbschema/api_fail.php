@@ -1,0 +1,151 @@
+<?php
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+$db['api_fail']=array(
+    'columns' => array(
+        'id' => array(
+            'type' => 'int unsigned',
+            'required' => true,
+            'pkey'     => true,
+            'extra'    => 'auto_increment',
+            'label'    => 'ID',
+            'width'    => 150,
+            'editable' => false,
+        ),
+        'obj_bn' => array(
+            'type'     => 'varchar(50)',
+            'label'    => '单据编号',
+            'in_list'  => true,
+            'default_in_list' => true,
+            'filterdefault' => true,
+            'required' => true,
+            'order' => 10,
+            'searchtype' => 'has',    
+        ),
+        'obj_type' => array(
+            'type' => 'varchar(50)',
+            'label' => '单据类型',
+            'in_list' => true,
+            'default_in_list' => true,
+            'required' => true,
+            'order' => 20,
+        ),
+        'sub_obj_bn' => array(
+            'type'              => 'varchar(255)',
+            'label'             => '子单号',
+            'default'           => '',
+            'in_list'           => true,
+            'default_in_list'   => true, 
+        ),
+        'retry_params' => array(
+            'type' => 'longtext',
+            'comment' => '重试参数',
+            'in_list'=> false,
+            'default_in_list'=> false,
+            // 'required' => true,
+            'order' => 30,
+        ),
+        'method' => array(
+            'type' => 'varchar(50)',
+            'label' => '操作',
+            'in_list'=>true,
+            'default_in_list'=>true,
+            // 'required' => true,
+            'order' => 30,
+        ),
+        'err_msg' => array(
+            'label' => '失败原因',
+            'type' => 'longtext',
+            'default' => '',
+            'order' => 40,
+            'in_list' => true,
+            'default_in_list' => true,
+            'width' => 300,
+        ),
+        'err_code' => array(
+            'type' => 'varchar(255)',
+            'default' => '',
+            'order' => 50,
+            'comment' => '错误代码',
+        ),
+        'fail_times' => array(
+            'type' => 'mediumint(8) unsigned',
+            'label' => '失败次数',
+            'in_list' => true,
+            'default_in_list' => true,
+            'default' => '0',
+            'order' => 60,
+        ),
+        'page_content' => array(
+            'type' => 'text',
+            'comment' => '请求页数',
+        ),
+        'status' => array(
+            'type' => array(
+                'running'=>'进行中',
+                'succ'=>'成功',
+                'fail'=>'失败',
+            ),
+            'label' => '状态',
+            'in_list' => true,
+            'default_in_list' => true,
+            'default' => 'fail',
+            'order' => 70,
+        ),
+        'create_time' => array(
+            'type' => 'time',
+            'label' => '创建时间',
+            'in_list' => true,
+            'default_in_list' => true,
+            'default' => '0',
+            'order' => 80,
+        ),
+        'last_modify' => array(
+            'type' => 'time',
+            'label' => '最后更新时间',
+            'in_list' => true,
+            'default_in_list' => true,
+            'default' => '0',
+            'order' => 80,
+        ),
+        'msg_id' => array(
+            'type' => 'varchar(60)',
+            'label' => 'msg_id',
+            'in_list' => true,
+            'default_in_list' => true,
+            'filtertype' => 'time',
+            'default' => '',
+            'order' => 90,
+        ),
+         'params' => array(
+            'label' => '请求参数',
+            'type' => 'longtext',
+            'default' => '',
+           
+        ),
+    ),
+    'index' => array(
+        'ind_obj_bn' => array(
+            'columns' => array('obj_bn','obj_type','sub_obj_bn'),
+        ),
+        'ind_status' => array(
+            'columns' => ['status'],
+        ),
+        'ind_create_time' => array(
+            'columns' => ['create_time'],
+        ),
+        'ind_last_modify' => array(
+            'columns' => ['last_modify'],
+        ),
+        'ind_obj_type' => array(
+            'columns' => ['obj_type','status','last_modify','fail_times'],
+        ),
+    ),
+    'comment' => '请求失败记录',
+    'engine' => 'innodb', 
+    'version' => '$Rev: 44513 $',
+    'charset' => 'utf8mb4',
+);

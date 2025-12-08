@@ -1,0 +1,24 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table cellspacing="0" cellpadding="0" style="width:100%">
+  <col class="Colauto"></col>
+  <tbody>
+  <{foreach from=$cat item=item key=iLoop name="item"}>
+  <tr parentid="<{$item.cat_id}>" class="provice-bg">
+    <td style="text-align:left; width:320px;" nowrap>
+      <div style="padding-left:<{$item.cat_grade*25}>px">
+        <{if $item.child_count>0}>
+        <span class="imgTree" onclick="clickTree(this);" id="<{$item.cat_id}>"> &nbsp;&nbsp; </span>
+        <{else}>
+        <span class="imgTree tree_open" id="<{$item.cat_id}>"> &nbsp;&nbsp; </span>
+        <{/if}>
+
+        <{$item.cat_name}>
+      </div>
+    </td>
+  </tr>
+  <{/foreach}>
+</table>

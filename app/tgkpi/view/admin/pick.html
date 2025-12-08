@@ -1,0 +1,255 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    #delivery_list {height:200px;overflow-y:scroll;width:500px;border:1px solid #CCC;border-top:none;}
+    #delivery_list table{font-size:14px;}
+    .x-input {height:40px;font-size:20px;font-weight:bold;font-family:Arial;color:#3F4D69}
+    .division {font-size:16px;border-top:1px dotted #CCC;}
+    .division th{font-weight:bold;line-height:40px;}
+    .division td{vertical-align: middle;}
+    #save_btn {font-size:18px;font-weight: 700; height: 50px; width:200px;cursor: pointer;display: -moz-inline-stack;line-height: 40px;overflow: visible;text-decoration: none;vertical-align: middle;}
+    .error {font-style:italic;}
+    #delivery_tbl td{border-top:1px solid #CCC;}
+    #status {font-size:20px;font-weight:bold;color:#F30}
+    .rnum {font-size:20px;font-weight:bold;color:#F30}
+</style>
+
+<div class="tableform">  
+    <h3><{t}>分配/领取方式<{/t}></h3>
+
+    <!--h4><{t}>工号<{/t}></h4-->
+    <form method="post" action="index.php?app=tgkpi&ctl=admin_pick&act=save" id="tgkpi_pick">
+    <div class="division">
+        <table cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <th><{t}>拣录方式：<{/t}></th>
+                <td style="line-height:40px">
+                    <input type="radio" name="in_type" value="single" id="single_in" /> <label for="single_in">单个</label>　　　　
+                    <input type="radio" name="in_type" value="batch" id="batch_in" checked /> <label for="batch_in">按批次</label>
+                </td>
+            </tr>
+
+            <tr>
+                <th><{t}>工号：<{/t}></th>
+                <td>
+                    <{input type="text" name="pick_owner" id="pick_owner" size="30" }>
+                    (<span id="op_info">请输入工号</span>)
+                </td>
+            </tr>
+
+            <tr>
+                <th><{t}>快递单号：<{/t}></th>
+                <td>
+                    <{input type="text" name="logi_no" id="logi_no" size="30" }>
+                    (输入999提交表单)
+                </td>
+            </tr>
+            
+            <tr>
+                <th><{t}>发 货 单：<{/t}></th>
+                <td>
+                    <div id="delivery_list">
+                        <table id="delivery_tbl" border="0" cellpadding="0" cellspacing="0" >
+                            <tr bgcolor="#F4F4F4">
+                                <td>物流公司</td>
+                                <td>快递单号</td>
+                                <td>批次号</td>
+                                <td>货品数/SKU数</td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            
+            <tr>
+                <th>&nbsp;</th>
+                <td>
+                    <button type="button" id="save_btn">确认录入</button> <span id="status"></span>
+                </td>
+            </tr>
+            
+        </table>
+    </div>
+    </form>
+</div>
+
+<script>
+setTimeout("$('pick_owner').focus();",1000);
+
+window.addEvent('domready', function() {
+    $('pick_owner').focus();
+}); 
+
+$('save_btn').addEvent('click',function(){
+    save_pick();	
+});
+
+var pickowner = '';
+$('pick_owner').addEvent('keyup',function(e){
+    if(e.code==13){ 
+        if (pickowner == this.value)
+        {
+            return ;
+        }
+        pickowner = this.value;
+        get_op_info();
+    }
+    return false;
+});
+
+
+$('pick_owner').addEvent('blur',function(e){
+    if (pickowner == this.value)
+    {
+        return ;
+    }
+    pickowner = this.value;
+    get_op_info();
+    return false;
+});
+
+var logino = '';
+$('logi_no').addEvent('keyup',function(e){
+    if(e.code==13){ 
+        if (logino == this.value)
+        {
+            return ;
+        }
+        logino = this.value;
+        get_delivery();
+    }
+    return false;
+});
+
+function get_radio_val(name){
+    var objs = document.getElementsByName(name);
+    var val = new Array();
+    for(var i=0;i<objs.length;i++) {
+        if(objs[i].checked) val.push(objs[i].value);
+    }
+    return val.join(',');
+}
+
+function chk_logi_no(logi_no){
+    var logi_nos = document.getElementsByName('logi_no[]');
+    for(var i=0;i<logi_nos.length;i++) {
+        if (logi_no == logi_nos[i].value){
+            $('logi_no').set('value','');
+            return false;
+        }
+    }
+    return true;
+}
+
+function save_pick(){
+    if($('pick_owner').get('value') == '') {
+        alert('请输入工号！');
+        $('pick_owner').focus();
+        return false;
+    }
+
+    $('tgkpi_pick').submit();
+    $('save_btn').set('disabled','disabled');
+}
+
+function add_node(str,logi_no){
+　　var tr=document.createElement("tr");
+    if(str == '404') {
+    　　tr.innerHTML = '<td colspan="4">无效的快递单号 <span class="error">'+logi_no+'</span></td>';
+        document.getElementById("delivery_tbl").appendChild (tr);
+    }else{
+        try{
+            var objs = eval('(' + str + ')');
+			if ($defined(objs.succ))
+            {	var obj = objs.succ;
+				for(var i=0;i<obj.length;i++) {
+					if(!obj[i].logi_no) continue;//过滤未录入快递号
+					tr.innerHTML = '<td><input type="hidden" name="logi_no[]" value="'+obj[i].logi_no+'" /><input type="hidden" name="delivery_id[]" value="'+obj[i].delivery_id+'" />'+obj[i].logi_name+'</td><td>'+obj[i].logi_no+'</td><td>'+obj[i].ident+'</td><td>'+obj[i].itemNum+' / '+obj[i].skuNum+'</td>';
+					document.getElementById("delivery_tbl").appendChild (tr);
+					var tr=document.createElement("tr");
+				}
+			}
+
+			if ($defined(objs.fail))
+			{
+				var obj = objs.fail;
+				for(var i=0;i<obj.length;i++) {
+					tr.innerHTML = '<td colspan="4">录入快递单<span class="error">'+obj[i].logi_no+'</span>失败：'+obj[i].msg+'</td>';
+					document.getElementById("delivery_tbl").appendChild (tr);
+					var tr=document.createElement("tr");
+				}
+			}
+        }catch(e){
+            tr.innerHTML = '<td colspan="4">错误的数据 <span class="error">'+logi_no+'</span></td>';
+            document.getElementById("delivery_tbl").appendChild (tr);
+        }
+    }
+    /*document.getElementById('delivery_end').scrollIntoView();*/
+    $('delivery_list').scrollTop=$('delivery_list').scrollHeight;
+
+    $('status').set('html','合计：'+(document.getElementById("delivery_tbl").getElementsByTagName("input").length/2) + '单');
+}
+
+// 获取工号对应的信息
+function get_op_info(){
+    var pick_owner = $('pick_owner').get('value');
+    if(!pick_owner) return false;
+    var error_info = '<span class="rnum">工号错误！</span>';
+    var succ_info = '<span class="rnum" style="color:blue">$name</span> 您好！今日需捡货单数：<span class="rnum" style="color:blue">$running</span> / 已完成：<span class="rnum">$finish</span>';
+    var pingRequest = new Request(
+    {
+        method : "post",
+        url : "index.php?app=tgkpi&ctl=admin_pick&act=get_op_info&111="+111,
+        data: 'pick_owner='+pick_owner,
+        onSuccess : function(responseText) {
+            //alert(responseText);
+            if(responseText == 'no user') {
+                $('op_info').set('html',error_info);
+                $('pick_owner').focus();
+            }else{
+                var obj = eval('(' + responseText + ')');
+                succ_info = succ_info.replace('$running',obj.running);
+                succ_info = succ_info.replace('$finish',obj.finish);
+				succ_info = succ_info.replace('$name',obj.name);
+                $('op_info').set('html',succ_info);
+                $('logi_no').focus();
+            }
+        },
+        onFailure : function() {
+            document.getElementById("status").innerHTML = "failed";
+        }
+    });
+    pingRequest.send();
+    return false;   
+}
+
+function get_delivery() {
+    var pick_owner = $('pick_owner').get('value');
+    var logi_no = $('logi_no').get('value');
+    var in_type = get_radio_val('in_type');
+    
+    if(logi_no == '999') {save_pick();return false;}
+    if(!logi_no) return false;
+    if(!chk_logi_no(logi_no)) return false;
+
+    var pingRequest = new Request(
+    {
+        method : "post",
+        url : "index.php?app=tgkpi&ctl=admin_pick&act=get_delivery&111="+111,
+        data: 'logi_no='+logi_no+'&in_type='+in_type,
+        onSuccess : function(responseText) {
+            //alert(responseText);
+            add_node(responseText,logi_no);
+            $('logi_no').set('value','');
+            $('logi_no').focus();
+        },
+        onFailure : function() {
+            document.getElementById("status").innerHTML = "failed";
+        }
+    });
+    pingRequest.send();
+} 
+</script>

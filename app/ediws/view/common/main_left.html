@@ -1,0 +1,15 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="main-left fl">
+    <div class="main-left-tit clearfix">
+        <span class="">商品报表</span>
+    </div>
+    <ul>
+        <{foreach from=$menus item=menu key=key}>
+        <li <{if $key == $main_left_key}>class="cur"<{/if}>><a href="<{$menu.link}>"><{$menu.name}></a></li>
+        <{/foreach}>
+    </ul>
+</div>

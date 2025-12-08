@@ -1,0 +1,5 @@
+<desktop>
+    <permissions>
+        <permission id="setting_qimen" display='false'>qimen</permission>
+    </permissions>
+</desktop>

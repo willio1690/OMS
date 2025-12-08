@@ -1,0 +1,136 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../app/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<form name="form1" method="POST" action="index.php?app=ome&ctl=admin_receipts_print&act=doItemDetail">
+<div class="tableform">
+    <h4>物料信息:</h4>
+    <div class="division">
+    <table border="0" cellspacing="0" class="gridlist" cellpadding="0">
+        <thead>
+            <tr>
+                <th>基础物料编码:</th>
+                <th>基础物料名称:</th>
+                <th>规格:</th>
+                <th>数量:</th>
+                <{if $show_unit == true}><th>计量单位:</th><{/if}>
+               <th>均单价</th>
+               <th>优惠金额:</th>
+               <th>实收</th>
+               <{if $wms_type == 'yjdf'}>
+               <th>WMS仓储采购价</th>
+               <th>是否WMS赠品</th>
+               <{/if}>
+            </tr>
+        </thead>
+        <tbody>
+            <{foreach from=$items item=item}>
+            <tr>
+                <td><{$item.bn}></td>
+                <td><{$item.product_name}></td>
+                <td><{$item.spec_info}></td>
+                <td><font color="red"><{$item.number}><input type="hidden" name="num[<{$item.item_id}>]" value="<{$item.number}>" /></font></td>
+                <{if $show_unit == true}><th><{$item.unit}></th><{/if}>
+                <td><{$item.price}></td>
+                <td><{$item.pmt_price}></td>
+                <td><{$item.sale_price}></td>
+                <{if $wms_type == 'yjdf'}>
+                <td><{$item.purchase_price}></td>
+                <td><{if $item.is_wms_gift == 'true'}><span style="color:red;">是</span><{else}>否<{/if}></td>
+                <{/if}>
+            </tr>
+            <{/foreach}>
+        </tbody>
+    </table>
+    </div>
+    
+    <{if $detailItems}>
+    <h4>发货单明细详情：</h4>
+    <div class="division">
+    <table border="0" cellspacing="0" class="gridlist" cellpadding="0">
+        <thead>
+            <tr>
+                <th>基础物料编码</th>
+                <th>数量</th>
+                <th>子订单号</th>
+                <th>销售类型</th>
+                <th>单价</th>
+                <th>金额</th>
+                <th>实付金额</th>
+                <th>用户实付</th>
+                <th>销售实付</th>
+                <th>SKU货品总优惠</th>
+                <th>SKU货品单价</th>
+                <th>SKU货品总价</th>
+            </tr>
+            </thead>
+            <tbody>
+            <{foreach from=$detailItems item=item}>
+            <tr>
+                <td><{$item.bn}></td>
+                <td><{$item.number}></td>
+                <td><{$item.oid}></td>
+                <td><{$item.s_type}></td>
+                <td><{$item.price}></td>
+                <td><{$item.amount}></td>
+                <td><{$item.divide_order_fee}></td>
+                <td><{$item.divide_user_fee}></td>
+                <td><{$item.retail_price}></td>
+                <td><{$item.total_promotion_amount}></td>
+                <td><{$item.origin_amount}></td>
+                <td><{$item.total_price}></td>
+            </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+    </div>
+    <{/if}>
+
+    <{if $checkItems}>
+    <h4>重点检查明细:</h4>
+    <div class="division">
+        <table border="0" cellspacing="0" class="gridlist" cellpadding="0">
+            <thead>
+            <tr>
+                <th>基础物料编码</th>
+                <th>订单号</th>
+                <th>发货仓</th>
+                <th>会员反馈途径</th>
+                <th>问题描述</th>
+                <th>订单标签</th>
+                <th>图片信息</th>
+                <th>视频信息</th>  
+                <th>一级分类</th>
+                <th>二级分类</th>
+                <th>三级分类</th>
+            </tr></thead>
+            <tbody class="item_quality_check"><{foreach from=$checkItems item=c_item}>
+            <tr>
+                <td><{$c_item.bn}></td>
+                <td><{$c_item.order_sn}></td>
+                <td><{$c_item.delivery_warehouse}></td>
+                <td><{$c_item.channel}></td>
+                <td><{$c_item.problem_desc}></td>
+                <td><{$c_item.order_label}></td>
+                <td><{$c_item.image_list}></td>
+                <td><{$c_item.video_list}></td>
+                <td><{$c_item.first_classification}></td>
+                <td><{$c_item.second_classification}></td>
+                <td><{$c_item.third_classification}></td>
+            </tr>
+            <{/foreach}>
+            </tbody>
+        </table>
+    </div>
+    <{/if}>
+</div>
+
+<{if $write != '1' && $dly.process == 'false'}><input type="hidden" name="delivery_id" value="<{$dly.delivery_id}>" />
+<div style="text-align:center;display:none;"><{button type="submit" label="提交" }></div><{/if}>
+
+</form>

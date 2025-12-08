@@ -1,0 +1,74 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="gridlist-action data-action" id="dataAction" style="margin-bottom:10px;padding:5px; border:0;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <td nowrap="nowrap" style="width:auto;">
+            <div class="tabs-wrap select-tabs delivery-cfg-tab">
+                <ul style="margin-top:2px;padding:0;">
+                    <li class="tab current" >
+                        <span><a href="javascript:void(0);"><{t}>退换货自动审核设置<{/t}></a></span>
+                    </li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+    </table>
+</div>
+<form method="post" action="index.php?app=ome&ctl=admin_return_setting&act=index" id="form-setting" >
+<div class="tableform tableform-tabs">
+    <div class="division">
+    <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+            <tr>
+                <th>售后申请单自动审批：</th>
+                <td>
+                    <input type="radio" name="set[aftersale.auto_approve]" value="off" <{if $setData.aftersale_auto_approve != 'on'}> checked<{/if}>>关闭
+                    <input type="radio" name="set[aftersale.auto_approve]" value="on"  <{if $setData.aftersale_auto_approve == 'on'}> checked<{/if}>>开启
+                    &nbsp;&nbsp;<span style="color:red;">* 开启后售后申请单新建时，系统会自动进行审批操作。</span>
+                 </td>
+            </tr>
+            <tr>
+                <th>售后申请单带赠品自动审批：</th>
+                <td>
+                    <input type="radio" name="set[aftersale.gift_auto_approve]" value="off" <{if $setData.aftersale_gift_auto_approve != 'on'}> checked<{/if}>>关闭
+                    <input type="radio" name="set[aftersale.gift_auto_approve]" value="on"  <{if $setData.aftersale_gift_auto_approve == 'on'}> checked<{/if}>>开启
+                    &nbsp;&nbsp;<span style="color:red;">* 开启后携带赠品的售后申请单，系统会自动进行审批操作。</span>
+                 </td>
+            </tr>
+            <tr>
+                <th>退换货单自动审批：</th>
+                <td>
+                    <input type="radio" name="set[return.auto_approve]" value="off" <{if $setData.return_auto_approve != 'on'}> checked<{/if}>>关闭
+                    <input type="radio" name="set[return.auto_approve]" value="on"  <{if $setData.return_auto_approve == 'on'}> checked<{/if}>>开启
+                    &nbsp;&nbsp;<span style="color:red;">* 开启后退换货单新建时，系统会自动进行审批操作。</span>
+                 </td>
+            </tr>
+            <tr>
+                <th>审核必须有退回物流单号：</th>
+                <td>
+                    <input type="radio" name="set[return.logi_auto_approve]" value="off" <{if $setData.return_logi_auto_approve != 'on'}> checked<{/if}>>关闭
+                    <input type="radio" name="set[return.logi_auto_approve]" value="on"  <{if $setData.return_logi_auto_approve == 'on'}> checked<{/if}>>开启
+                    &nbsp;&nbsp;<span style="color:red;">* 开启后退换货单自动审核时，必须已经有【退回物流单号】才会自动审核通过。</span>
+                </td>
+            </tr>
+            <tr>
+                <th>是否自动审核平台售后申请：</th>
+                <td>
+                    <input type="radio" name="set[return.auto_confirm]" value="off" <{if $setData.return_auto_confirm != 'on'}> checked<{/if}>>关闭
+                    <input type="radio" name="set[return.auto_confirm]" value="on"  <{if $setData.return_auto_confirm == 'on'}> checked<{/if}>>开启
+                    &nbsp;&nbsp;<span style="color:red;">* 开启后，当达到指定条件时OMS会自动同意/拒绝用户提交的售后申请单（*注：现只支持【抖音与京东云交易】平台对接业务）。</span>
+                 </td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+    
+    <div class="table-action">
+        <{button label="提交" type="submit" name="submit" id="btn-setting"}>
+    </div>
+</div>
+</form>

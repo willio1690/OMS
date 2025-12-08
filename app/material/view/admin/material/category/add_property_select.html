@@ -1,0 +1,129 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division selectBox">
+      <div class="gridlist-action">
+        <{button app="desktop" label=$___b2c="添加可选值"|t:'b2c' class="addselect" icon="btn_add.gif" }>
+      </div>
+     
+      <table border="0" cellspacing="0" cellpadding="0" class="gridlist sepc_value_table ">
+        <thead>
+         <tr>
+            <th><{t}>选择项可选值<{/t}>
+            <{help}><{t}>多个可选值请用逗号"<{/t}><font color='blue'>,</font><{t}>"分割<{/t}><{t}>，如果某个可选值包含别名，请用竖线"<{/t}><font color='blue'>|</font><{t}>"分隔<{/t}><br /><br /><{t}>例如：手机的制式有GSM、CDMA、双模（别名：G/C双模）。写成格式如：GSM,CDMA,双模|G/C双模<{/t}><{/help}></th>
+            
+            <th><{t}>操作<{/t}></th>
+          </tr>
+        </thead>
+        <tbody>
+        <{foreach from=$select_list item=itemVal key=itemKey}>
+            <tr>
+                <td style="vertical-align:middle; text-align:center" class="ipt_pro">
+                <input type="hidden" name="gtype[props][<{$props_key}>][options][id][]" class="" value ="<{$itemVal.value}>" />
+                <input type="text" maxlength='20'  name="gtype[props][<{$props_key}>][options][value][]" value="<{$itemVal.value}>" vtype="required" <{if !$itemVal.edit_del}>readonly="readonly"<{/if}> /></td>
+                <td style="vertical-align:middle;">
+                    <{img app=desktop src="bundle/icon_asc.gif" class="asc" title="向上移动" style="cursor:pointer;"}> &nbsp; &nbsp; 
+                    <{img app=desktop src="bundle/icon_desc.gif" class="desc" title="向下移动" style="cursor:pointer;"}> &nbsp; &nbsp; 
+                    <{if $itemVal.edit_del}><{img app=desktop src="bundle/delete.gif" class="delete" title="删除" style="cursor:pointer;"}><{else}>&nbsp; &nbsp;<{/if}>
+                </td>
+            </tr>
+        <{/foreach}>
+        </tbody>
+      </table>
+</div>
+ 
+<{area inject='.mainFoot'}>
+<div class="table-action">
+    <{button label=$___b2c="保存"|t:'b2c'  type="button" class="selectbtn"}>
+</div>
+<{/area}>
+
+<script>
+(function(){
+    var selectBox=$E('.selectBox'),dialog=selectBox.getParent('.dialog');
+    var n=0;
+    $E('.addselect',dialog).addEvent('click',function(e,v){
+        
+        if(n > 20){
+            alert("选择项最多只能添加20个值");
+            return false;    
+        }
+        
+         var newRow=new Element('tr');
+         newRow.inject($E('tbody',selectBox)).setHTML(getTemp(v||''));
+         bindEditEvent(newRow);
+    });
+    var getTemp =function(v){
+        n++;
+        return '<td style="vertical-align:middle; text-align:center;" class="ipt_pro"><input type="hidden" name="gtype[props][<{$props_key}>][options][id][]" class="" value =""/><input type="text" name="gtype[props][<{$props_key}>][options][value][]" maxlength="20" value="'+v+'" vtype="required" /></td><td style="vertical-align:middle;"><{img app=desktop src="bundle/icon_asc.gif" class="asc" title="向上移动" style="cursor:pointer;"}> &nbsp; &nbsp; <{img app=desktop src="bundle/icon_desc.gif" class="desc" title="向下移动" style="cursor:pointer;"}> &nbsp; &nbsp; <{img app=desktop src="bundle/delete.gif" class="delete" title="删除" style="cursor:pointer;"}></td>';
+    }
+
+   var bindEditEvent=function(row){
+            //sel_image=row.getElement('span.sel_image'),
+            var asc=row.getElement('img.asc'),
+                desc=row.getElement('img.desc'),
+                del=row.getElement('img.delete');
+
+            asc.addEvent('click',function(){
+               var pre=row.getPrevious('tr');
+               if(pre)row.injectBefore(pre);
+            });
+            desc.addEvent('click',function(){
+                var next=row.getNext('tr');
+                if(next)row.injectAfter(next);
+            });
+            
+            if(del){
+            del.addEvent('click',function(){
+               if($ES('tbody tr',dialog).length<2) {alert('可选值不能为空，请至少留一条可选值');return;}
+               if(confirm('<{t}>删除不可恢复，确认删除本行吗？<{/t}>'))row.remove();
+            });
+            }
+   };
+
+  $ES('tbody tr',dialog).each(bindEditEvent);
+
+  $E('.selectbtn',dialog).addEvent('click',function(e){
+        var obj=dialog.retrieve('instance'),
+           ipt=$ES('input[type=text]',selectBox);
+        
+        if(!ipt)return obj.close();
+        
+        var sel_values = ipt.get('value').join(',');
+        
+        if(sel_values == ''){
+            alert("请添加选项值!");
+            return false;
+        }
+        
+        var id_num = parseInt("<{$edit_id}>");
+        var property_select_id = 'property_select_' + id_num;
+        var property_select_values_id = 'property_select_values_' + id_num;
+        
+        var selectList = new Array();
+        var select_str = '<select name="property_select" id="property_select_'+ id_num +'">';
+        
+        selectList = sel_values.split(",");
+        for(var li=0; li<selectList.length; li++){
+            
+            if(selectList[li] == ""){
+                line_i = li + 1;
+                alert("第 "+ line_i +" 行，选项值不能为空，如不需要请删除!");
+                return false;
+            }
+            
+            select_str = select_str + '<option value="'+ li +'">'+ selectList[li] +'</option>';
+        }
+        select_str += '</select>';
+        
+        
+        $(property_select_id).set('html', select_str);
+        $(property_select_values_id).value = sel_values;
+        
+        obj.close();
+  });
+     
+})();
+</script>

@@ -1,0 +1,71 @@
+# Apache .htaccess 配置文件示例（Apache 2.4+）
+# 
+# 说明：
+# 1. 将此文件复制为 .htaccess 并放置在项目根目录
+# 2. 需要 Apache 2.4+ 版本（使用 mod_authz_core 模块）
+# 3. 确保 Apache 已启用 mod_rewrite、mod_headers 和 mod_authz_core 模块
+# 4. 根据实际部署路径调整配置
+
+# 启用 Rewrite 引擎
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # 拒绝访问敏感目录（优先处理，返回 403）
+    RewriteRule ^(\.git|script|data|config|vendor|cgi-bin|tools|docs|docker|tests|upgrade)(/.*)?$ - [F,L]
+    
+    # 如果文件或目录不存在，重定向到 index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # 特殊路由规则
+    RewriteRule ^m- /index.html [NC,L]
+    RewriteRule ^home$ /index.html [NC,L]
+    
+    # 其他请求重定向到 index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ /index.php?$1 [L,QSA]
+</IfModule>
+
+# 拒绝访问敏感文件（Apache 2.4+ 语法）
+<IfModule mod_authz_core.c>
+    # 拒绝访问 PHP 配置文件
+    <FilesMatch "^(config|secrets|defined_ext)\.php$">
+        Require all denied
+    </FilesMatch>
+    
+    # 拒绝访问隐藏文件（以 . 开头，除了 .htaccess）
+    <FilesMatch "^\.">
+        Require all denied
+    </FilesMatch>
+    
+    # 允许访问 .htaccess 文件本身（如果需要）
+    <Files ".htaccess">
+        Require all granted
+    </Files>
+</IfModule>
+
+# 安全头设置
+<IfModule mod_headers.c>
+    # 防止点击劫持
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # XSS 保护
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # 防止 MIME 类型嗅探
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # 推荐使用 HTTPS（如果已配置 SSL）
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# 禁止目录浏览
+Options -Indexes
+
+# 设置默认字符集
+AddDefaultCharset UTF-8
+
+# 禁用服务器签名
+ServerSignature Off
+

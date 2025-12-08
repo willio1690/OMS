@@ -1,0 +1,175 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.gridlist th{
+  width:100px;
+}
+.gridlist tbody td, .gridlist tbody th{
+    height: 26px;
+    line-height: 26px;
+}
+.gridlist tbody th{
+    text-align: right;
+}
+.delivery_info th, .delivery_info td{
+    height: 30px;
+    line-height: 30px;
+}
+.delivery_info th {
+	font-weight:bold;
+	font-size:14px;
+}
+</style>
+<form id="form-process" method="post" action="index.php?app=ome&ctl=admin_delivery_back&act=doprocess">
+<input type="hidden" name="order_id" value="<{$order.order_id}>" />
+<input type="hidden" name="order_bn" value="<{$order.order_bn}>" />
+<div>
+    <div style="width:100%; padding-top:15px;">
+        <div style="height:35px; line-height:35px; padding-left:15px; font-size:18px; color:red; font-weight:bold;">追回订单号：<{$order.order_bn}> </div>
+    </div>
+    <table cellspacing="0" cellpadding="0" border="0">
+        <tr class="finder-detail">
+        <td>
+            <div class="tableform">
+            <table width="100%" border="0" cellpadding="0" cellspacing="0" class='reship-detail'>
+                <tr>
+                    <td>
+                        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <th>订单号:</th>
+                                <td><{$order.order_bn}></td>
+                                <th>订单总额:</th>
+                                <td><{$order.total_amount|cur}></td>
+                                <th>已支付金额:</th>
+                                <td><{$order.payed|cur}></td>
+                                <th>支付方式:</th>
+                                <td><{$order.payinfo.pay_name}></td>
+                            </tr>
+                            <tr>
+                                <th>收货人姓名:</th>
+                                <td><{$order.consignee.name}></td>
+                                <th>收货人地区:</th>
+                                <td><{$order.consignee.area|region}></td>
+                                <th>收货人地址:</th>
+                                <td><{$order.consignee.addr|escape:'html'}></td>
+                                <th>收货人邮编:</th>
+                                <td><{$order.consignee.zip|escape:'html'}></td>
+                            </tr>
+                            <tr>
+                                <th>收货人手机:</th>
+                                <td><{$order.consignee.mobile}></td> 
+                                <th>收货人Email:</th>
+                                <td><{$order.consignee.email}></td>
+                                <th>收货人固定电话:</th>
+                                <td><{$order.consignee.telephone}></td>
+                                <th>配送方式:</th>
+                                <td><{$order.shipping.shipping_name}></td>                      
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            </div>
+          </td>
+          </tr>
+    </table>
+</div>
+
+<div class="tableform">
+    <div style="width:100%; padding-top:15px;">
+    	<div style="height:20px; line-height:20px; padding-left:10px; color:#222; font-weight:bold; font-size:16px;">发货单列表(共<span style="font-size:18px; color:red; font-weight:bold;"><{$dly_count}></span>个)</div>
+    </div>
+    
+    <{foreach from=$dlyList key=key item=dlyInfo}>
+    <table cellspacing="0" cellpadding="0" border="0">
+        <tr class="finder-detail">
+        <td>
+            <div class="tableform dlyList" style="margin-bottom:0px; padding-bottom:0px;">
+            <table width="100%" border="0" cellpadding="0" cellspacing="0" class='reship-detail'>
+                <tr>
+                    <td>
+                        <table width="100%" border="0" cellpadding="0" cellspacing="0" class="delivery_info">
+                            <tr>
+                                <th>发货单号:</th><td><{$dlyInfo.delivery_bn}></td>
+                                <th>物流公司:</th><td><{$dlyInfo.logi_name}></td>
+                                <th>发货仓库:</th><td><{$dlyInfo.branch_name}></td>
+                                <th style="color:red;">退货仓库:</th>
+                                <td>
+                                <select name="instock_branch[<{$dlyInfo.delivery_id}>]">
+                                <{foreach from=$branch_lists item=branch}>
+                                <option value="<{$branch.branch_id}>" <{if $dlyInfo.branch_id==$branch.branch_id}>selected<{/if}>><{$branch.name}></option>
+                                <{/foreach}>
+                                </select>&nbsp;<span style="color:red;">*</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-bottom:8px;">
+                        <div style="width:100%;">
+                            <table class="nosplit gridlist clear" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <thead>
+                                  <tr>
+                                      <th style="text-align:center;">基础物料编码</th>
+                                      <th style="text-align:center;">基础物料名称</th>
+                                      <th style="text-align:center;">退货数量</th>
+                                  </tr>
+                                </thead>
+                                
+                                <{foreach from=$dlyInfo.items key=key item=item}>
+                                <tr>
+                                    <td>&nbsp;&nbsp;<{$item.bn}></td>
+                                    <td>&nbsp;&nbsp;<{$item.product_name}></td>
+                                    <td>&nbsp;&nbsp;<{$item.number}></td>
+                                </tr>
+                                <{/foreach}>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            </div>
+          </td>
+		</tr>
+    </table>
+    <{/foreach}>
+    
+	<div class="table-action">  
+		<{button label="确认拒收" class="btn-primary" id='btn-primary' type="button" onclick="subCheckForm(event);"}>&nbsp;&nbsp;&nbsp;<{button label="取消" class="btn-secondary" isCloseDialogBtn="true" onclick="window.location='index.php?app=ome&ctl=admin_delivery_back&act=check';"}>
+	</div>
+</div>
+</form>
+<script>
+    window.addEvent('domready', function(){
+        if(!$('form-process'))return;
+        var _form=$('form-process'),_formActionURL=_form.get('action'); 
+        subCheckForm = function (event){
+			
+			if(!confirm('请您确认是否追回订单号：<{$order.order_bn}>?')){
+				return false;
+			}
+			
+			$('btn-primary').set('disabled', 'true');
+			var target={onComplete:function(){}};
+			
+			$extend(target,{
+			   onComplete:function(data){
+				   var rs =JSON.decode(data);
+				   if( rs && rs.success ){
+					   MessageBox.success(rs.success);
+					   window.location.href = 'index.php?app=ome&ctl=admin_delivery_back&act=check';
+				   }else{
+						MessageBox.error(rs.error);
+				   }
+				}
+			});
+			
+			_form.store('target',target);
+			_form.set('action',_formActionURL).fireEvent('submit',new Event(event));
+        };
+    });
+</script>

@@ -1,0 +1,49 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+    <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">       
+<{/capture}>
+<div class="division">
+    <h4>电子面单号导入记录</h4>
+    <{if $channel_type == 'customs'}>
+    <h5>第一步，下载CSV模板文件</h5>
+    <form method="post" action="index.php?app=logisticsmanager&ctl=admin_channel&act=exportTemplate" class="tableform" target='download' enctype="multipart/form-data">
+        <{button class="btn-primary" label="下载" type="submit"}>
+    </form>
+    <h5>第二步，上传填写好的CSV文件</h5>
+    <form action='index.php?app=omecsv&ctl=admin_to_import&act=treat&ctler=logisticsmanager_mdl_waybill&add=logisticsmanager&channel_id=<{$channel_id}>' method='post' target="uploadframe" enctype="multipart/form-data" id="import_form" class="tableform">
+        <th width="10%">导入文件：</th>
+        <td width="20%">
+            <input type='file' name='import_file' id='ImportCSV'/>
+        </td>
+        <{button label=$___desktop="导入"|t:'desktop' id="ImportBtn"  type="submit"}>
+    </form>
+    <{/if}>
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+        <thead>
+        <tr>
+            <th>操作时间</th>
+            <th>操作人</th>
+            <th>行为</th>
+            <th>操作内容</th>
+        </tr>
+        </thead>
+        <tbody>
+        <{foreach from=$log_list item=log}>
+        <tr>
+            <td><{$log.operate_time}></td>
+            <td><{$log.op_name}></td>
+            <td><{$log.operation}></td>
+           
+                <td><{$log.memo}></td>
+            
+        </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+</div>
+
+

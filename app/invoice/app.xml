@@ -1,0 +1,19 @@
+<app>
+    <name>INVOICE</name>
+    <description>订单发票管理</description>
+
+    <author>
+        <name>shopex开发团队</name>
+        <email>dev@shopex.cn</email>
+        <url>http://www.shopex.cn</url>
+    </author>
+
+    <version>1.0.0</version>   
+    <license>shopex license</license>
+    
+	<depends>
+		<app>base</app>
+        <app>desktop</app>
+	</depends>
+    <parent_model_class>dbeav_model</parent_model_class>
+</app>

@@ -1,0 +1,172 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=ome&ctl=admin_goods_cat&act=update" id="catEditor" method="post">
+    <{area inject=".mainHead"}>
+    <div class="finder-top clearfix">
+        <div class="finder-title"><h3 class="head-title"><{t}>费用项管理<{/t}></h3></div>
+    </div>
+    <div class="gridlist-action">
+        <{button label="展开" id="showCat-handle" }> <{button label="收起" id="hideCat-handle" }>
+    </div>
+    <div class="Node">
+        <div class='gridlist-head mainHead '>
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td><{t}>名称<{/t}></td>
+                    <td width="40%"><{t}>操作<{/t}></td>
+                </tr></table>
+            </div>
+        </div>
+        <{/area}>
+        <div class="Node-body">
+            <div id="cat_tree" class='gridlist catlist'> 
+                <{foreach from=$fee_item item=fee key=fee_id name="item"}>
+                <div style="padding:0" depath="<{$item.step}>" class="clear_cat row" cid="<{$fee_id}>" pid="">
+                    <div class='row-line' style="padding:0">
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="vertical-align:top">
+                                    <div style="padding-left:30px;text-align:left">
+
+                                        <span class="handle-icon" style='width:12px;line-height:12px; height:12px;overflow:hidden;display:inline-block;padding:0;cursor:pointer'>  <{img src="bundle/handle-hide.gif" alt=$___ome="收起"|t:'ome' title=$___ome="收起"|t:'ome' class="handle-hide" app='desktop'}>
+                                            <{img src="bundle/handle-show.gif" alt=$___ome="展开"|t:'ome' title=$___ome="展开"|t:'ome' class="handle-show" app='desktop'}> </span>
+
+                                            <{$fee.name}>
+                                        </div>
+                                    </td>
+                                    <td width="40%" style="vertical-align:top;valign:center;">
+                                        <div class="clearfix">
+                                            <div class="span-auto">&nbsp;</div>
+                                            <div class="span-auto">&nbsp;</div>
+                                            <div class="span-auto">
+                                                <span class="opt" onClick="new Dialog('index.php?app=finance&ctl=bill_setting&act=additem&p[0]=<{$fee_id}>', {title:'<{t}>增加费用项<{/t}>', width:550, height:300})">
+                                                    <{img src="bundle/addcate.gif" border="0" alt=$___ome="增加费用项"|t:'ome' app='desktop'}>
+                                                    <{t}>增加费用项<{/t}></span>
+                                                </div> 
+
+                                            </div>
+                                        </td>                
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <{foreach from=$fee.item item=item name="item"}>
+                        <div style="padding:0" depath="2" class="clear_cat row" cid="" pid="<{$fee_id}>">
+                            <div class='row-line' style="padding:0">
+                                <table cellpadding="0" cellspacing="0" border="0">
+                                    <tr>
+                                        <td style="vertical-align:top"><div style="padding-left:80px;text-align:left"><{$item.name}></div></td>
+                                        <td width="40%" style="vertical-align:top;valign:center;">
+                                            <div class="clearfix">
+                                                <div class="span-auto">&nbsp;</div>
+                                                <div class="span-auto">&nbsp;</div>
+                                                <div class="span-auto">
+                                                    <{if $item.inlay == 'false'}>
+                                                    <span class="opt" onclick="deleteRow('index.php?app=finance&ctl=bill_setting&act=do_delitem&p[0]=<{$item.fee_item_id}>',event)"><{img src="bundle/delecate.gif" border="0" alt=$___ome="删除"|t:'ome' app='desktop'}><{t}>删除<{/t}></span> 
+                                                    <{/if}>
+                                                </div> 
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <{/foreach}>
+
+                        <{/foreach}> 
+
+
+
+                    </div></div>
+
+                </form>
+                <script>
+                function deleteRow(act,event){
+                    e=$(new Event(event).stop().target);
+                    var row=e.getParent('.row');
+
+                    if(confirm('<{t}>您确定要删除该费用项？<{/t}>')){
+                        W.page(act,{
+                            method:'get',
+                            update:'messagebox',
+                            onComplete:function(re){
+                                row.remove();
+
+                            }
+                        });
+                    }
+                }
+
+                void function(){
+                    $E('#hideCat-handle').addEvent('click',function(){
+                        $ES('#cat_tree .clear_cat').each(function(e){
+                            if(e.get('depath')>1){
+                                e.setStyles({'display':'none'});
+                            }
+                        });
+                        $ES('#cat_tree .handle-hide').hide();
+                        $ES('#cat_tree .handle-show').show();
+                    });
+                    $E('#showCat-handle').addEvent('click',function(){
+
+                        $ES('#cat_tree .clear_cat').each(function(e){
+                            if(e.get('depath')>1){
+                                e.setStyles({'display':''});
+                            }
+                        });
+                        $ES('#cat_tree .handle-hide').show();
+                    });
+
+                    $('cat_tree').addEvent('click',function(e){
+
+                        if(!e.target.className.match(/handle-/i))return;
+
+
+                        var handle=$(e.stop().target);
+                        var eventRow=handle.getParent('.row');
+                        var visible=handle.hasClass('handle-show')?'':'none';
+                        if(visible=='none'){
+                            handle.hide().getNext().show();
+                        }else{
+                            handle.hide().getPrevious().show();
+
+                        }
+
+                        flode(eventRow,visible);
+
+                    }); 
+
+
+
+
+                    function flode(eventRow,visible){
+                        var cid=eventRow.get('cid');
+                        var pid=eventRow.get('pid');
+                        var depath=eventRow.get('depath');
+
+                        eventRow.getAllNext('div[pid='+cid+']').each(function(row){
+                            if(visible=='none'){
+                                row.hide();
+                                var obj=row.getElements('.handle-icon img');
+                                if(obj.length>1){
+                                    flode(row,visible);
+                                }
+                            }else{
+                                row.show();
+                                var obj=row.getElements('.handle-icon img');
+                                if(obj.length>1){
+                                    var vis=(obj[0].getStyle('display')=='none'?'none':'inline');
+                                    flode(row,vis);
+                                }
+                            }
+
+                        });
+                    }
+                }();
+
+
+                </script>

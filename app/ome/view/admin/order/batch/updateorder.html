@@ -1,0 +1,180 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="finder-detail">
+    <div class="notice" style="background-color:#FFE3E7; color:red; font-weight:bold;">注意：批量操作订单量较大时，请谨慎使用编辑替换商品功能，避免误操作。</div>
+    <div class="notice">温馨提示：删除的商品明细数量、价格将替换到新的商品上 <{help}>批量编辑多个订单时,以第一个订单明细为参考依据；当删除的销售物料在其它订单中不存在时，则自动跳过此订单不会进行编辑操作。<{/help}></div>
+    <div class="division">
+    <table class="gridlist" width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+            <tr>
+                <td><input type="checkbox" name="delAll" value="true" class="inputstyle"> 删除订单内所有明细，影响<b class="c-red"><{$GroupList|json_decode|count}></b>单。</td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+
+    <table  cellspacing="0" cellpadding="0" border="0">
+      <tbody>
+        <tr>
+        <td style="text-align: left;" ><h3>替换共有销售物料</h3></td>
+        <td style="text-align: right;" >
+            <{button label="添加销售物料" id="add-product-btn"}>
+           </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div id="goods-list">
+        <table class="gridlist" width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <thead><tr>
+                <th>销售物料编码</th>
+                <th>销售物料名称</th>
+                <th>规格</th>
+                <th>购买数量</th>
+                <th>商品单价</th>
+                <th>优惠小计</th>
+                <th>销售小计</th>
+                <th>操作</th>
+            </tr></thead>
+            <tbody id="old-item-list">
+                <{foreach from=$order.order_objects item=object}>
+                    <tr data-old="true" data-bn="<{$object.bn}>">
+                        <td class="bn"><{$object.bn}></td>
+                        <td class="name"><{$object.name}></td>
+                        <td class="addon">-</td>
+                        <td class="quantity"><{$object.quantity}></td>
+                        <td class="price"><{$object.price}></td>
+                        <td class="pmt_price"><{$object.pmt_price}></td>
+                        <td class="sale_price"><{$object.sale_price}></td>
+                        <td><{button label="删除" class="del-item-btn"}><input type="hidden" name="replace[]" value="<{$object.bn}>">
+                        </td>
+                    </tr>
+                <{/foreach}>
+                <tr><td colspan="9" style="background:#f0f0f0;height:28px; color:#999999;">以下为替换的销售物料：(当商品信息为新增商品，修改数量才有效)</td></tr>
+            </tbody>
+            <tbody id="new-item-list" >
+                
+            </tbody>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    function delItem(el){
+        var trEl = el.getParent('tr');
+        trEl.toggleClass('disabled');
+
+        if (trEl.dataset.old == 'true') {
+            trEl.getElement('input[name=replace[]]').toggleClass('dailog-batch-ipt');
+        }
+
+        if (trEl.hasClass('disabled') && trEl.dataset.old != 'true') {
+            trEl.remove();
+        }
+
+        if (!trEl.hasClass('disabled')) {
+            $E('input[name=delAll]').removeClass('dailog-batch-ipt');
+            $E('input[name=delAll]').checked = false;
+        }
+    }
+
+    $ES('.del-item-btn').addEvent('click',function(){
+        delItem(this);
+    });
+
+    $E('input[name=delAll]').addEvent('click',function(){
+        if (this.checked && !confirm('此操作将删除订单内的所有商品，确认勾选？')) {
+            return false;
+        }
+
+        this.toggleClass('dailog-batch-ipt');
+
+        if (this.checked) {
+            $ES('#goods-list #old-item-list tr').removeClass('disabled').addClass('disabled');
+            $ES('#goods-list #old-item-list tr input[name=replace[]]').removeClass('dailog-batch-ipt').addClass('dailog-batch-ipt');
+        } else {
+            $ES('#goods-list #old-item-list tr').removeClass('disabled');
+            $ES('#goods-list #old-item-list tr input[name=replace[]]').removeClass('dailog-batch-ipt');
+        }
+    });
+
+    $('add-product-btn').addEvent('click',function(e){
+        var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=ome&ctl=admin_order&act=findSalesMaterial');
+        Ex_Loader('modedialog',function(){
+            new finderDialog(url,{params:{url:'index.php?app=ome&ctl=admin_order&act=getSalesMaterial',name:'sm_id[]'},width:1000,height:660,
+              onCallback:function(rs){
+                if(!rs) return;
+                rs=JSON.decode(rs);
+
+                createProduct(rs);
+              }
+            });
+        });
+    });
+
+    var productTpl = '<td class="bn">{sales_material_bn}</td>\
+                        <td class="name">{sales_material_name}</td>\
+                        <td class="addon">-</td>\
+                        <td class="quantity"><input class="dailog-batch-ipt" type="number" size="3" name="change_number[{sales_material_bn}]" value="1"></td>\
+                        <td class="price">-</td>\
+                        <td class="pmt_price">-</td>\
+                        <td class="sale_price">-</td>\
+                        <td><{button label="删除" class="del-item-btn" onclick="delItem(this)"}><input class="dailog-batch-ipt" type="hidden" name="change[]" value="{sales_material_bn}"></td>';
+    function createProduct(rs){
+        var err_bn = [];
+        rs.each(function(item){
+            //console.log(item.sales_material_bn);
+            //console.log(item.items);
+            if ($defined($E('#goods-list tr[data-bn='+item.sales_material_bn+']'))) {
+                err_bn.push(item.sales_material_bn);
+                return false;
+            }
+
+            var trEl = new Element('tr', {
+                html:productTpl.substitute(item)
+            }).inject($E('#goods-list #new-item-list'));
+
+            trEl.dataset.bn = item.sales_material_bn;
+        });
+
+        if (err_bn.length > 0) {
+            MessageBox.error(err_bn.join('、')+'重复');
+        }
+    }
+
+    var pkgTpl = '<td class="bn">{pkg_bn}</td>\
+                    <td class="name">{name}</td>\
+                    <td class="addon">-</td>\
+                    <td class="quantity">-</td>\
+                    <td class="price">-</td>\
+                    <td class="pmt_price">-</td>\
+                    <td class="sale_price">-</td>\
+                    <td><{button label="删除" class="del-item-btn" onclick="delItem(this)"}><input class="dailog-batch-ipt" type="hidden" name="change[]" value="{pkg_bn}" /></td>';
+    function createPkg(rs){
+        var err_bn = [];
+        rs.each(function(item){
+            if ($defined($E('#goods-list tr[data-bn='+item.pkg_bn+']'))) {
+                err_bn.push(item.pkg_bn);
+                return false;
+            }
+
+            var trEl = new Element('tr', {
+                html:pkgTpl.substitute(item)
+            }).inject($E('#goods-list #new-item-list'));
+
+            trEl.dataset.bn = item.pkg_bn;
+        });
+
+
+
+        if (err_bn.length > 0) {
+            MessageBox.error(err_bn.join('、')+'重复');
+        }
+    }
+    function dosubmit(){
+        $("form-order").fireEvent('submit',{stop:function(){}});
+    }
+</script>

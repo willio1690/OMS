@@ -1,0 +1,140 @@
+<?php
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+$db['product_storagelife_history']=array (
+  'columns' => 
+  array (
+    'history_id' => 
+    array (
+      'type' => 'int unsigned',
+      'required' => true,
+      'pkey' => true,
+      'extra' => 'auto_increment',
+      'editable' => false,
+    ),
+    'branch_id' => 
+    array (
+      'type' => 'table:branch@ome',
+      'label' => '仓库名称',
+      'required' => true,
+      'editable' => false,
+      'in_list' => true,
+      'default_in_list' => true,
+    ),
+    'bn' =>
+    array (
+      'type' => 'varchar(30)',
+      'label' => '基础物料编码',
+      'editable' => false,
+      'in_list' => true,
+      'default_in_list' => true,
+      'filtertype' => 'normal',
+      'filterdefault' => true,
+      'searchtype' => 'nequal',
+    ),
+    'product_name' =>
+    array (
+      'type' => 'varchar(200)',
+      'label' => '基础物料名称',
+      'editable' => false,
+      'in_list' => true,
+      'default_in_list' => true,
+    ),
+    'act_type' => 
+    array (
+      'type' => 'tinyint',
+      'label' => '操作类型',
+      'required' => true,
+      'default' => 0,
+      'editable' => false,
+      'in_list' => true,
+      'default_in_list' => true,
+    ),
+    'act_time' => 
+    array (
+      'type' => 'time',
+      'label' => '操作时间',
+      'width' => 130,
+      'editable' => false,
+      'in_list' => true,
+      'default_in_list' => true,
+      'filtertype' => 'time',
+      'filterdefault' => true,
+    ),
+    'act_owner' => 
+    array (
+      'type' => 'table:account@pam',
+      'label' => '操作人',
+      'required' => true,
+      'editable' => false,
+      'in_list' => true,
+      'default_in_list' => true,
+    ),
+    'bill_type' => 
+    array (
+      'type' => 'tinyint',
+      'label' => '单据类型',
+      'required' => true,
+      'default' => 0,
+      'editable' => false,
+      'in_list' => true,
+      'default_in_list' => true,
+    ),
+    'bill_no' =>
+    array (
+      'type' => 'varchar(30)',
+      'label' => '单据编号',
+      'required' => true,
+      'default' => '',
+      'editable' => false,
+      'in_list' => true,
+      'default_in_list' => true,
+      'filtertype' => 'yes',
+      'filterdefault' => true,
+    ),
+    'expire_bn' => 
+    array (
+      'type' => 'varchar(200)',
+      'required' => true,
+      'editable' => false,
+      'label' => '保质期批次号',
+      'is_title' => true,
+      'in_list' => true,
+      'default_in_list' => true,
+      'filtertype' => 'normal',
+      'filterdefault' => true,
+      'searchtype' => 'nequal',
+    ),
+    'number' => 
+    array (
+      'type' => 'number',
+      'required' => true,
+      'default' => 0,
+      'editable' => false,
+      'label' => '数量',
+    ),
+  ),
+  'index' => 
+  array (
+    'ind_bill_no' => 
+    array (
+        'columns' =>
+        array (
+          0 => 'bill_no',
+        ),
+    ),
+    'idx_c_expire_bn' => 
+    array (
+        'columns' =>
+        array (
+          0 => 'expire_bn',
+        ),
+    ),
+  ),
+  'comment' => '保质期批次历史记录表',
+  'engine' => 'innodb',
+  'version' => '$Rev:  $',
+);

@@ -1,0 +1,98 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $error_msg}>
+    <div class="error-info">
+        <span class="alert-box error"><{$error_msg}></span>
+    </div>
+<{else}>
+    <ul class="no-bullet">
+        <li class="row">
+            <div class="grid-1" style="width:auto;">
+                <span class="text-reverse">发货单号：</span><em><{$dlyinfo.delivery_bn}></em><{if $dlyinfo.dly_overtime}><span style="background-color:#f00; color:#fff;text-align:center;padding:0px 3px;">超</span><{/if}>
+            </div>
+            <div class="grid-5 text-right">
+                <span style="color: red; font-weight: bold">
+                <{if $dlyinfo.status == '3' && $dlyinfo.confirm == '1'}>
+                    <{if $dlyinfo.logi_name == '门店自提'}>已自提<{else}>已配送<{/if}>,<{ if $dlyinfo.is_cod=='true'}>代收货款 <{$dlyinfo.order_info.receivable}>元<{else}>货款已支付<{/if}>
+                <{else}>
+                    <{$dlyinfo.logi_name}>,<{ if $dlyinfo.is_cod=='true'}>需代收货款 <{$dlyinfo.order_info.receivable}>元<{else}>货款已支付<{/if}>
+                <{/if}>
+                </span>
+            </div>
+        </li>
+        <li class="row">
+              <div class="grid-9">
+                  <span class="text-reverse">订 单 号：</span><em><{$dlyinfo.order_bn}></em>
+              </div>
+        </li>
+        <li class="row">
+            <div class="grid-1">
+                <span class="text-reverse">成单时间：</span>
+                <em>
+                    <{if $dlyinfo.is_cod == 'true'}>
+                    <{if $dlyinfo.order_info.createtime}><{$dlyinfo.order_info.createtime|date:"Y-m-d H:i:s"}><{/if}>
+                    <{else}>
+                    <{if $dlyinfo.order_info.paytime}><{$dlyinfo.order_info.paytime|date:"Y-m-d H:i:s"}><{/if}>
+                    <{/if}>
+                </em>
+            </div>
+            
+            <{if $dlyinfo.show_map}>
+            <div class="grid-4 text-right">
+                <a href="javascript:;" class="show_map_but" alt="<{$dlyinfo.addr}>"><i class="icon-location"></i> 线路查询</a>
+            </div>
+            <{/if}>
+        </li>
+        <li class="row">
+            <div class="grid-12">
+                <span class="text-reverse">收 货 人：</span><em><{$dlyinfo.consignee.name}></em>&nbsp;(<{$dlyinfo.consignee.mobile}><{if $dlyinfo.consignee.telephone}>/<em><{$dlyinfo.consignee.telephone}></em><{/if}>)
+            </div>
+        </li>
+        <li class="row">
+            <div class="grid-12"><span class="text-reverse">收货地址：</span><em><{$dlyinfo.consignee.addr}></em></div>
+        </li>
+        
+        <{if $dlyinfo.order_info.mark_text}>
+            <{foreach from=$dlyinfo.order_info.mark_text key=iKey item=iItem}>
+                <{foreach from=$iItem key=yKey item=markItem}>
+                <li class="row">
+                    <div class="grid-12"><span class="text-reverse" style="color: red"><{if $yKey == 0}>订单备注：<{else}>&nbsp;<{/if}></span><em><{$markItem.op_content}>&nbsp;<{$markItem.op_time}> by <{$markItem.op_name}></em></div>
+                </li>
+                <{/foreach}>
+            <{/foreach}>
+        <{/if}>
+    </ul>
+    <{if $dlyinfo.delivery_items}>
+    <ul class="no-bullet table bordered grid-table">
+        <li class="tr">
+          <div class="grid-3 th" style="font-size:0.75rem;">货号</div>
+          <div class="grid-7 th" style="font-size:0.75rem;">商品名称</div>
+          <div class="grid-1 th nowrap" style="font-size:0.75rem;">数量</div>
+        </li>
+        <{foreach from=$dlyinfo.delivery_items item=dly_item}>
+            <li class="tr">
+              <div class="grid-3 td item_bn" style="font-size:0.75rem;"><{$dly_item.bn}></div>
+              <div class="grid-7 td item_name" style="font-size:0.75rem;"><div class="title"><{$dly_item.product_name}></div></div>
+              <div class="grid-1 td" style="font-size:0.75rem;"><{$dly_item.number}></div>
+            </li>
+        <{/foreach}>
+    </ul>
+    <div class="text-right">共<{$dlyinfo.itemNum}>件商品，总金额：<{$dlyinfo.total_amount}></div>
+    <{/if}>
+<{/if}>
+<script>
+$('.show_map_but').on('click', function(e) {
+    var $this = $(this);
+    var store_addr = $this.attr("alt");
+    var position_url = '<{$delivery_link.mapLink}>';
+    
+    window.open(position_url+"?store_addr="+store_addr);
+});
+
+$('.grid-table .title').click(function(e) {
+  $(this).css('-webkit-line-clamp', $(this).css('-webkit-line-clamp') == 1 ? 'inherit' : '');
+});
+</script>

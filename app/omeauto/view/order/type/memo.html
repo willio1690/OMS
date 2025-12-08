@@ -1,0 +1,40 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .in_ul{clear: both;}
+    .in_ul li {font-size: 12px; float: left;}
+</style>
+<ul class="in_ul">
+    <li>
+        <span>备注类型：</span>
+    </li>
+    <li>
+        <input type="checkbox" name="memo_type[]" value="custom" <{if is_array($init.content.memo_type) && in_array("custom", $init.content.memo_type)}>checked<{/if}> />买家备注
+    </li>
+    <li>
+        <input type="checkbox" name="memo_type[]" value="shop" <{if is_array($init.content.memo_type) && in_array("shop", $init.content.memo_type)}>checked<{/if}> />客服备注
+    </li>
+</ul>
+<ul class="in_ul">
+    <li>
+        <span>筛选范围：</span>
+    </li>
+    <li>
+        <input type="radio" name="memo_scope" value="part" <{if "part" == $init.content.memo_scope || !$init.content.memo_scope}>checked<{/if}> />包含部分备注关键字
+    </li>
+    <li>
+        <input type="radio" name="memo_scope" value="all" <{if "all" == $init.content.memo_scope}>checked<{/if}> />包含全部备注关键字
+    </li>
+</ul>
+<ul class="in_ul">
+    <li>
+        <span>备注关键字：</span>
+    </li>
+    <li>
+        <div>多个关键字中使用#号关联，如：尽快发货#晚点发货</div>
+        <textarea name="memo_text" style="width: 310px; height: 138px;"><{$init.content.memo_text}></textarea>
+    </li>
+</ul>

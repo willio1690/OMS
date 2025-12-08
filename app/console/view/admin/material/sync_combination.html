@@ -1,0 +1,82 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division" id="materialDataSync">
+    <table>
+        <tbody>
+            <tr>
+                <th width="5%">仓库:</th>
+                <td width="17%">
+                    <select class="materialData" name="branch_id">
+                        <option value="">请选择</option>
+                        <{foreach from=$branches item=item}>
+                            <option value="<{$item.branch_id}>"><{$item.name}></option>
+                        <{/foreach}>
+                    </select>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <input type="hidden" class="materialData" name="id" value="-1" />
+    <div>统计:<span id="curTotal" style="color: red;">0</span>/<span id="total">0</span></div>
+    <div id="processBarBg" style="border:1px solid #999999; width:98%; height:25px;line-height:25px;padding:1px; background:#EEEEEE;">
+        <div style=" background:#3366cc; width:0px; padding-bottom:1px;overflow:hidden;" id='processBar'>&nbsp;</div>
+    </div>
+    <div class="table-action">
+        <{button label="开始" id="sync_btn"  type="button"}>
+    </div>
+    <div id='sync-error'></div>
+</div>
+
+
+
+<script>
+    (function(){
+        var materialData = JSON.decode('<{$material_data|json_encode}>');
+        $('total').set('text', materialData.length);
+        $('sync_btn').addEvent('click', function() {
+            var branch_id = $E('select[name=branch_id]').value;
+            if (!branch_id) return MessageBox.error('请选择仓库');
+            var _parent=this;
+            Ex_Loader('cmdrunner',function(){
+                new taskrunner(materialData.map(function(){return 'index.php?app=console&ctl=admin_goodssync&act=doSyncCombination'}), {
+                    container: $('materialDataSync'),
+                    dataClass: '.materialData',
+                    onLoad: function() {
+                        _parent.disabled = true;
+                        _parent.set('html', '<span><span>同步中...</span></span>');
+                    },
+                    onStart: function() {
+                        var rowData = materialData[this.prestep];
+                        $E('#materialDataSync input[name=id]').set('value', rowData.inner_product_id);
+                    },
+                    onComplete:function() {
+                        var num=this.step/this.num*100;
+                        $('processBar').setStyle('width',num+'%');
+                        $('curTotal').set('text', this.step);
+                    },
+                    onCheck:function(message) {
+                        if(message != '|ok.') {
+                            var strDiv = document.createElement('DIV');
+                            strDiv.set('text', message.slice(0, -4));
+                            $('sync-error').appendChild(strDiv);
+                        }
+                    },
+                    onError:function(text) {
+                        if (!text) {alert('未捕获到错误信息，可能执行超时');}
+                        _parent.set('html', '<span><span>同步失败</span></span>');
+                        _parent.disabled = false;
+                        if (this.iframe) this.iframe.destroy();
+                        if (this.form) this.form.destroy();
+                    },
+                    onSuccess:function() {
+                        if (this.iframe) this.iframe.destroy();
+                        _parent.set('html', '<span><span>处理已完成</span></span>');
+                    }
+                }).run();
+            });
+        });
+    }());
+</script>

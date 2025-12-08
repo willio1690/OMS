@@ -1,0 +1,46 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!-- <div class="action-bar clearfix">
+<div class="span-auto"><strong class="action-bar-info">科目操作：</strong></div>
+<div class="flt"><{button label='添加费用科目'}></div>
+<div class="flt"><{button label='删除费用科目'}></div>
+</div> -->
+<div class="division">
+    <table width="100%" class="gridlist" border="0" cellspacing="0" cellpadding="0">
+        <thead>
+        <tr>
+            <th></th>
+            <th><{t}>科目类型<{/t}></th>
+            <th><{t}>科目编码<{/t}></th>
+            <th><{t}>科目名称<{/t}></th>
+            <th><{t}>科目编号<{/t}></th>
+            <th><{t}>业务渠道<{/t}></th>
+            <th><{t}>是否与订单相关<{/t}></th>
+            <th><{t}>创建时间<{/t}></th>
+            <th><{t}>修改时间<{/t}></th>
+            <th><{t}>备注<{/t}></th>
+            <th><{t}>状态<{/t}></th>
+        </tr>
+        </thead>
+        <tbody>
+            <{foreach from=$fee_items item=item key=key}>
+            <tr>
+                <th><{if $item.inlay == 'false'}><input type='checkbox' name='fee_item_id[]' value='<{$item.fee_item_id}>'><{/if}></th>
+                <th><{$fee_type.fee_type}></th>
+                <th><{$fee_type.fee_type_code}></th>
+                <th><{$item.fee_item}></th>
+                <th><{$item.fee_item_code}></th>
+                <th><{$item.channel}></th>
+                <th><{if $item.related_order == 'false'}>否<{else}>是<{/if}></th>
+                <th><{if $item.createtime}><{$item.createtime|cdate:'FDATE_FTIME'}><{/if}></th>
+                <th><{if $item.last_modified}><{$item.last_modified|cdate:'FDATE_FTIME'}><{/if}></th>
+                <th><{$item.memo}></th>
+                <th><{if $item.delete == 'false'}>可用<{else}>不可用<{/if}></th>
+            </tr>
+            <{/foreach}>
+        </tbody>
+    </table>
+</div>

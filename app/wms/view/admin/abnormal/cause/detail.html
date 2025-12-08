@@ -1,0 +1,46 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form id="brandForm" action="index.php?app=wms&ctl=admin_abnormal_cause&act=save"  method="post">
+    <input type="hidden" name="ac_id" value="<{$abnormalCauseInfo.ac_id}>">
+    <div class="tableform">
+        <div class="division">
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <th><{t}>异常原因：<{/t}></th>
+                    <td><{input type="text" name="abnormal_cause" value=$abnormalCauseInfo.abnormal_cause vtype="required"}><em><font color='red'>*</font></em></td>
+                </tr>
+            </table>
+        </div>
+        <div class="table-action">
+            <{button type="submit" id="btn-brand"  label="保存"}>
+            <{button type='button' label='关闭' onclick='javascript:window.close();' isCloseDialogBtn="true"}>
+        </div>
+    </div>
+</form>
+<script>
+    $('brandForm').store('target',{
+        onRequest:function(){
+            $('btn-brand').set('disabled', 'true');
+        },
+        onComplete:function(jsontext){
+            var json = Json.evaluate(jsontext);
+            if (typeof(json.error) != 'undefined'){
+                $('btn-brand').set('disabled', '');
+            }else{
+                $('btn-brand').set('disabled', 'true');
+                if(parent && parent.finderGroup && parent.finderGroup['<{$env.get.finder_id}>']){
+                    parent.finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,parent.finderGroup['<{$env.get.finder_id}>']);
+                    $('brandForm').getParent('.dialog').retrieve('instance').close();
+                }
+            }
+        }
+    });
+    <{if $env.get._finder_name}>
+        $('brandForm').store('target',{
+            update:'messagebox'
+        });
+    <{/if}>
+</script>

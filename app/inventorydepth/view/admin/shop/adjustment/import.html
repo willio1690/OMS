@@ -1,0 +1,42 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div>
+    <div style="color:red;">*此发布功直接请求平台库存接口，不受任何规则限制</div>
+    <table>
+        <tr>
+            <td style="width: 30%;text-align: right;">
+                店铺：
+            </td>
+            <td>
+                <{input id="fabu_shop_id" name="shop_id" type="select" rows=$shop_request valueColumn="shop_id" labelColumn="name"}>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 30%;text-align: right;">
+                发布方式：
+            </td>
+            <td id="fabu_td">
+                
+            </td>
+        </tr>
+    </table>
+</div>
+<script type="text/javascript">
+    (function(){
+        var shop_request = JSON.decode('<{$shop_request|json_encode}>');
+        var mode_support = JSON.decode('<{$mode_support|json_encode}>');
+        $('fabu_shop_id').addEvent('change', function(){
+            var fabu = '<input type="radio" name="mode" value="ql" checked="checked" />全量';
+            var shop_id = this.value;
+            Object.each(shop_request, function(item){
+                if(shop_id == item.shop_id && mode_support.includes(item.shop_type)) {
+                    fabu = '<input type="radio" name="mode" value="ql" checked="checked" />全量 &nbsp;&nbsp;&nbsp;<input type="radio" name="mode" value="inc" />增量';
+                }
+            });
+            $('fabu_td').setHTML(fabu);
+        });
+    })();
+</script>

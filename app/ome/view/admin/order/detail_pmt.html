@@ -1,0 +1,44 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="division" style="overflow: scroll;">
+<h4>优惠方案</h4>
+<table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+
+  <thead>
+  <tr>
+      <th>优惠方案</th>
+      <th>优惠金额</th>
+      <{if $orderInfo.shop_type=='luban'}><th>优惠券ID</th><{/if}>
+    </tr>
+    </thead>
+      <tbody>
+  <{foreach from=$pmts item=pmt}>
+    <tr>
+      <td><{$pmt.pmt_describe}></td>
+      <td><{$pmt.pmt_amount}></td>
+      <{if $orderInfo.shop_type=='luban'}><td><{$pmt.coupon_id}></td><{/if}>
+    </tr>
+  <{/foreach}>
+  </tbody>
+</table>
+</div>
+<{if $coupon}>
+<div class="division">
+  <h4>优惠明细</h4>
+  <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+    <tr>
+      <{foreach from=$coupon.title key=key item=item}>
+        <tr>
+          <th><{$item}></th>
+          <{foreach from=$coupon.pmts item=pmt}>
+            <td><{$pmt[$key]}></td>
+          <{/foreach}>
+        </tr>
+      <{/foreach}>
+    </tr>
+  </table>
+</div>
+<{/if}>

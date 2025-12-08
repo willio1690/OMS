@@ -1,0 +1,259 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<style>
+    .notice-inline.error  {background-image:none;margin-left:25px}
+    .luckybag_hr {height:12px;margin-top:10px}
+    .luckybag_title {height:30px;line-height:30px}
+    .luckybag_title_name {float:left}
+    .luckybag_title_del {float:left;cursor:pointer;color:red;margin-left:6px}
+    .luckybag_title_material {float:right}
+    .luckybag_table {margin:4px 0;}
+    .luckybag_table_operation_th {width:50px;}
+    .luckybag_rule {height:30px}
+</style>
+    <input type="hidden" name="sm_id" value="<{$material_info.sm_id}>">
+    <div class="tableform">
+      <h3>查看快照</h3>
+      <div class="division">
+        <h5>基本信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+        <thead>
+            <tr>
+                <td width="10%" align="right" nowrap="nowrap">
+                    物料名称：
+                </td>
+                <td><{$data.sales_material_name}></td>
+            </tr>
+            <tr>
+                <td width="10%" align="right" nowrap="nowrap">
+                    物料编码：
+                </td>
+                <td><{$data.sales_material_bn}></td>
+            </tr>
+            <tr>
+                <td width="10%" align="right">物料类型：</td>
+                <td><{$data.type_name}></td>
+            </tr>
+            <tr>
+                <td width="10%" align="right">所属店铺：</td>
+                <td><{$data.shop_name}></td>
+            </tr>
+            <{if !$data.is_pkg && !$data.is_luckybag && !$data.is_pickone}>
+            <tr id="bind_basic_material">
+                <td width="10%" align="right">关联基础物料编码：</td>
+                <td><{$data.basic_material_bn}></td>
+            </tr>
+            <tr id="bind_basic_material">
+                <td width="10%" align="right">关联基础物料名称：</td>
+                <td><{$data.basic_material_name}></td>
+            </tr>
+            <{if $data.price_rate}>
+            <tr>
+                <td width="10%" align="right">价格贡献比分摊方式：</td>
+                <td>方式：<{$data.price_rate}>，字段：<{$data.price_field}>，标签：<{$data.price_label}></td>
+            </tr>
+            <{/if}>
+            <{if $data.price_rate && $data.bm_list.0.cost}>
+            <tr>
+                <td width="10%" align="right">成本价：</td>
+                <td><{$data.bm_list.0.cost}></td>
+            </tr>
+            <tr>
+                <td width="10%" align="right">零售价：</td>
+                <td><{$data.bm_list.0.retail_price}></td>
+            </tr>
+            <{/if}>
+            <{if $data.price_info}>
+            <tr>
+                <td width="10%" align="right">价格贡献比分摊信息：</td>
+                <td><{$data.price_info}></td>
+            </tr>
+            <{/if}>
+            <{/if}>
+          </thead>
+        </table>
+
+      <{if $data.is_pkg}>
+      <div id="promotion_items" style="margin-top:10px;">
+          <h5>组合关联基础物料</h5>
+          <div style="margin-bottom:10px;">
+            <span style="color:#007cba;">价格贡献比分摊方式：<{$data.price_rate}>，使用字段：<{$data.price_field}>，显示标签：<{$data.price_label}></span>
+          </div>
+          <div class="gridlist" style="padding:10px;">
+            <table class="gridlist" id="material_table"  style="margin:4px 0;">
+              <thead>
+                <tr>
+                  <th>编码</th>
+                  <th style="width:240px;">名称</th>
+                  <th>数量</th>
+                  <th>组合价格贡献占比(1-100整数数值)</th>
+                  <{if $data.price_rate}>
+                  <th>成本价</th>
+                  <th>零售价</th>
+                  <{/if}>
+                </tr>
+              </thead>
+              <tbody id="dataNode">
+                  <{foreach from=$data.bm_list item=item}>
+                  <tr>
+                      <th><{$item.material_bn}></th>
+                      <th><{$item.material_name}></th>
+                      <th><{$item.number}></th>
+                      <th><{$item.rate}></th>
+                      <{if $data.price_rate}>
+                      <th><{$item.cost|default:"0.00"}></th>
+                      <th><{$item.retail_price|default:"0.00"}></th>
+                      <{/if}>
+                  </tr>
+                <{/foreach}>
+              </tbody>
+            </table>
+          </div>
+      </div>
+      <{/if}>
+    </div>
+
+      <{if $data.is_luckybag}>
+      <div id="luckybag_rules" style="margin-top:10px;">
+          <h5>福袋商品规则</h5>
+          <div class="gridlist" style="padding:10px;">
+               <{foreach from=$data.luckybag_rules_list item=lb_rule}>
+             <div class="luckybag_rules_content_div">
+                 <div class="luckybag_title"><div class="luckybag_title_name"><b>组合名称</b> <{$lb_rule.lbr_name}></div></div>
+                 <table class="gridlist luckybag_table">
+                     <thead><tr><th>基础物料编码</th><th>基础物料名称</th><th>成本价</th></tr></thead>
+                     <tbody>
+                            <{foreach from=$lb_rule.bm_list item=bm_l}>
+                            <tr>
+                                <td><{$bm_l.material_bn}><input type="hidden" name="lbr[<{$lb_rule.load_part_number}>][bm_ids][]" value="<{$bm_l.bm_id}>" /></td>
+                                <td><{$bm_l.material_name}></td>
+                                <td><{$bm_l.cost}></td>
+                            </tr>
+                            <{/foreach}>
+                        </tbody>
+                 </table>
+                 <div class="luckybag_rule">
+                                                    组合规则：随机选 <{$lb_rule.sku_num}> 个sku，
+                                                    分别送 <{$lb_rule.send_num}> 件，
+                                                    单品售价 <{$lb_rule.price}> 元
+                        <div class="luckybag_hr"><hr /></div>
+                   </div>
+             </div>
+             <{/foreach}>
+          </div>
+      </div>
+      <{/if}>
+      
+      <{if $data.is_pickone}>
+      <div style="margin-top:10px;">
+          <h5>多选一关联基础物料</h5>
+          <div class="gridlist" style="padding:10px;">
+            <div>选择方式：<span><{$data.pickone_select_type_text}></span></div>
+            <table class="gridlist" style="margin:4px 0;">
+              <thead>
+                <tr>
+                  <th>编码</th>
+                  <th style="width:240px;">名称</th>
+                  <th>排序</th>
+                </tr>
+              </thead>
+              <tbody>
+                  <{foreach from=$data.pickone_rules_list item=item}>
+                  <tr>
+                      <th><{$item.material_bn}></th>
+                      <th><{$item.material_name}></th>
+                      <th><{$item.sort}></th>
+                  </tr>
+                <{/foreach}>
+              </tbody>
+            </table>
+          </div>
+      </div>
+      <{/if}>
+
+          <{if $data.is_fukubukuro}>
+          <div id="fukubukuro_rules" style="margin-top:10px;">
+              <h5>福袋组合规则</h5>
+              <div class="gridlist" style="padding:10px;">
+                  <div class="fukubukuro_rules_content_div">
+                      <div class="luckybag_title"><div class="fukubukuro_title_name"><b>福袋组合名称</b> <{$fudaiItem.combine_name}></div></div>
+                      <table class="gridlist luckybag_table">
+                          <thead>
+                              <tr>
+                                  <th>福袋组合编码</th>
+                                  <th style="width:240px;">福袋组合名称</th>
+                                  <th>福袋区间价</th>
+                                  <th>组合贡献价</th>
+                                  <th>组合价格贡献占比(1-100数值)</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                          <{foreach from=$data.fukubukuro_rules_list item=fudaiItem}>
+                          <tr>
+                              <td><{$fudaiItem.combine_bn}></td>
+                              <td><{$fudaiItem.combine_name}></td>
+                              <td><{$fudaiItem.combine_price}></td>
+                              <td><{$fudaiItem.rate_price}></td>
+                              <td><{$fudaiItem.rate}>%</td>
+                          </tr>
+                          <{/foreach}>
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+          </div>
+          <{/if}>
+
+          <h5 style="margin-top:10px;">发票信息</h5>
+          <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+              <thead>
+              <tr>
+                  <td width="10%" align="right" nowrap="nowrap">
+                      开票税率：
+                  </td>
+                  <td><{$data.tax_rate}></td>
+              </tr>
+              <tr>
+                  <td width="10%" align="right" nowrap="nowrap">
+                      开票名称：
+                  </td>
+                  <td><{$data.tax_name}></td>
+              </tr>
+              <tr>
+                  <td width="10%" align="right" nowrap="nowrap">
+                      发票分类编码：
+                  </td>
+                  <td><{$data.tax_code}></td>
+              </tr>
+              </thead>
+          </table>
+        <h5 style="margin-top:10px;">扩展信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+        <thead>
+            <tr>
+                <td width="10%" align="right" nowrap="nowrap">
+                    零售价：
+                </td>
+                <td><{$data.retail_price}></td>
+            </tr>
+            <tr>
+                <td width="10%" align="right" nowrap="nowrap">
+                    包装单位：
+                </td>
+                <td><{$data.unit}></td>
+            </tr>
+        </thead>
+        </table>
+      <div id="cc" class="noprint table-action">
+          <{button type="button" class="btn-secondary" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}>
+      </div>
+    </div>

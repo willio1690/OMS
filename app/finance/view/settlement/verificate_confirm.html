@@ -1,0 +1,48 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+ <table border="0">
+      <tbody>
+      <tr>
+            <td>
+              <b><{$info.msg}></b><br>
+              <br><br>
+              <b><{if $info.money_error}>误差金额：<{$info.money_error|cur}> &nbsp;&nbsp;&nbsp;&nbsp;<{/if}> 核销金额：<{$info.money|cur}> </b><br>
+             
+            </td>
+        </tr>
+     
+        
+        
+      </tbody>
+    </table>
+
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td>
+          <button class="btn btn-primary" id="sso-submit"><span><span><{t}>确认<{/t}></span></span></button>
+          <button class="btn btn-primary" id="sso-cancel"><span><span><{t}>关闭<{/t}></span></span></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</div>
+
+<script>
+(function(){
+    $('sso-cancel').addEvent('click',function(e){
+        $('sso-cancel').getParent('.dialog').retrieve('instance').close();
+    });
+
+    $('sso-submit').addEvent('click',function(e){
+        $('sso-cancel').getParent('.dialog').retrieve('instance').close();
+        verificate_callback();
+    });
+})();
+</script>

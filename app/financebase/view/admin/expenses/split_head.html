@@ -1,0 +1,67 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="filter-list" style="float:left;">
+    <div style="float:left;border: 1px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;">
+        <label>账单日期:&nbsp;</label>
+        <{input type="date" vtype="date" name="time_from" id="time_from" style="width:66px; font-family:arial;" value=$env.post.time_from}>&nbsp;&nbsp;至&nbsp;&nbsp;
+        <{input type="date" vtype="date" name="time_to" id="time_to" style="width:66px; font-family:arial;" value=$env.post.time_to}>
+    </div>
+    <div style="float:left;border: 1px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;">
+        <label>拆分日期:&nbsp;</label>
+        <{input type="date" vtype="date" name="split_time_from" style="width:66px; font-family:arial;" value=$env.post.split_time_from}>&nbsp;&nbsp;至&nbsp;&nbsp;
+        <{input type="date" vtype="date" name="split_time_to" style="width:66px; font-family:arial;" value=$env.post.split_time_to}>
+    </div>
+    <div style="float:left;border: 1px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;">
+        <label>选择店铺:</label>
+        <select name="shop_id" id="shop_id">
+            <option value="">全部</option>
+            <{foreach from=$shopdata item=val}>
+            <option value="<{$val.shop_id}>" <{if $env.post.shop_id == $val.shop_id}>selected="selected"<{/if}> ><{$val.name}></option>
+            <{/foreach}>
+        </select>
+    </div>
+    <div style="float:left;border: 1px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;">
+        <label>具体类别:</label>
+        <select name="bill_category" id="bill_category">
+            <option value="">全部</option>
+            <{foreach from=$billCategory item=val}>
+            <option value="<{$val.bill_category}>" <{if $env.post.bill_category == $val.bill_category}>selected="selected"<{/if}>><{$val.bill_category}></option>
+            <{/foreach}>
+        </select>
+    </div>
+    <div style="float:left;border: 1px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;">
+        <label>业务流水号:&nbsp;</label>
+        <{input type="text" name="trade_no" style="width:66px; font-family:arial;" value=$env.post.trade_no}>
+    </div>
+    <{if $env.get.view == 0}>
+    <div style="float:left;border: 1px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;">
+        <label>商品编码:&nbsp;</label>
+        <{input type="text" name="material_bn" style="width:66px; font-family:arial;" value=$env.post.material_bn}>
+    </div>
+    <div style="float:left;border: 1px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;">
+        <label>拆分状态:&nbsp;</label>
+        <{input type="select" name="split_status" options=array("0"=>"拆分项","1"=>"调整项","2"=>"红冲项") value=$env.post.split_status}>
+    </div>
+    <{/if}>
+    <{if $env.get.view == 2}>
+    <div style="float:left;border: 1px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;">
+        <label>失败原因:&nbsp;</label>
+        <{input type="text" name="split_fail_msg" style="width:120px; font-family:arial;" value=$env.post.split_fail_msg}>
+    </div>
+    <{/if}>
+</div>
+<div style="float:left;margin:5px 16px 2px 0;padding: 4px;height:26px;padding:0;">
+     <{button class="btn-primary" id="search_btn" label=$___desktop="立即筛选"|t:'desktop'}>
+</div>
+<script type="text/javascript">
+    (function () {
+        $('search_btn').addEvent('click', function(){
+            var finderId = $E('input[name="_finder[finder_id]"]').value;
+            var finder = finderGroup[finderId];
+            finder.refresh();
+        });
+    })();
+</script>

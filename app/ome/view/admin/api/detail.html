@@ -1,0 +1,791 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+/* 为API日志详情页面添加唯一作用域 */
+.api-log-detail {
+    /* 主布局 */
+    display: flex;
+    gap: 20px;
+    height: 500px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* 强制所有子元素不撑开容器 */
+.api-log-detail * {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.api-log-detail .main-container {
+    display: flex;
+    gap: 20px;
+    height: 500px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.api-log-detail .left-panel {
+    flex: 2;
+    min-width: 0;
+    max-width: calc(100% - 320px);
+    overflow: hidden;
+}
+
+.api-log-detail .right-panel {
+    width: 300px;
+    flex-shrink: 0;
+}
+
+/* Tab样式 */
+.api-log-detail .tab-container {
+    background: #fff;
+    border: 1px solid #e3e6f0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.api-log-detail .tab-header {
+    display: flex;
+    background: linear-gradient(135deg, #f8f9fc 0%, #f1f3f6 100%);
+    border-bottom: 1px solid #e3e6f0;
+    padding: 4px;
+    gap: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.api-log-detail .tab-link {
+    width: 33.333%;
+    min-width: 0;
+    max-width: 33.333%;
+    padding: 14px 20px;
+    background: transparent;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #6c757d;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+.api-log-detail .tab-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 8px;
+}
+
+.api-log-detail .tab-link:hover {
+    background: rgba(255, 255, 255, 0.8);
+    color: #495057;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+}
+
+.api-log-detail .tab-link:hover::before {
+    opacity: 0.1;
+}
+
+.api-log-detail .tab-link.active {
+    background: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+    border: 1px solid #dee2e6;
+    position: relative;
+}
+
+.api-log-detail .tab-link.active::before {
+    opacity: 0;
+}
+
+.api-log-detail .tab-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #6c757d;
+}
+
+.api-log-detail .tab-link.active span {
+    color: #495057;
+    font-size: 14px;
+}
+
+.api-log-detail .tab-link.active {
+    text-decoration: none;
+}
+
+.api-log-detail .tab-link span {
+    position: relative;
+    z-index: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    width: 100%;
+    text-align: center;
+    display: block;
+}
+
+.tab-content {
+    display: none;
+    padding: 0;
+    height: 450px;
+    width: 100%;
+    overflow: hidden;
+    flex: 1;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* JSON容器 */
+.api-log-detail .json-container {
+    height: 100%;
+    max-height: 450px;
+    overflow: auto;
+    background: #f8f9fa;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.api-log-detail pre {
+    padding: 20px;
+    background: #f8f9fa;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    margin: 0;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    border: none;
+    height: 100%;
+    max-height: 450px;
+    overflow: auto;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+/* JSON语法高亮 */
+.api-log-detail .key {
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+.api-log-detail .value-string {
+    color: #198754;
+}
+
+.api-log-detail .value-number {
+    color: #0dcaf0;
+    font-weight: 500;
+}
+
+.api-log-detail .value-boolean {
+    color: #6610f2;
+    font-weight: 600;
+}
+
+.api-log-detail .value-null {
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* JSON样式 */
+.api-log-detail .json-object {
+    position: relative;
+}
+
+.api-log-detail .json-array {
+    position: relative;
+}
+
+/* 复制按钮样式 */
+.api-log-detail .copy-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    z-index: 10;
+    text-align: center;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+}
+
+.api-log-detail .copy-button:hover {
+    background: #5a6268;
+}
+
+.api-log-detail .copy-button.copied {
+    background: #28a745;
+    color: white;
+}
+
+.api-log-detail .tab-content {
+    position: relative;
+}
+
+/* 右侧信息面板 */
+.api-log-detail .info-panel {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    height: fit-content;
+}
+
+.api-log-detail .info-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #007bff;
+}
+
+.api-log-detail .info-item {
+    display: flex;
+    margin-bottom: 15px;
+    align-items: flex-start;
+}
+
+.api-log-detail .info-label {
+    width: 80px;
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 13px;
+    text-align: right;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.api-log-detail .info-value {
+    flex: 1;
+    color: #212529;
+    word-break: break-all;
+    line-height: 1.4;
+}
+
+/* 状态样式 */
+.api-log-detail .status-success {
+    color: #198754;
+    font-weight: bold;
+    background: #d1e7dd;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.api-log-detail .status-fail {
+    color: #dc3545;
+    font-weight: bold;
+    background: #f8d7da;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.api-log-detail .status-running {
+    color: #ffc107;
+    font-weight: bold;
+    background: #fff3cd;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.api-log-detail .status-sending {
+    color: #17a2b8;
+    font-weight: bold;
+    background: #d1ecf1;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+    .api-log-detail .left-panel {
+        flex: 1.5;
+    }
+    
+    .api-log-detail .right-panel {
+        width: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .api-log-detail .main-container {
+        flex-direction: column;
+    }
+    
+    .api-log-detail .left-panel {
+        flex: 1;
+    }
+    
+    .api-log-detail .right-panel {
+        width: 100%;
+    }
+    
+    .api-log-detail .tab-container {
+        height: 500px;
+    }
+    
+    .api-log-detail .tab-content {
+        height: 450px;
+    }
+    
+    .api-log-detail .json-container {
+        height: 100%;
+        max-height: 450px;
+        overflow: auto;
+    }
+    
+    .api-log-detail pre {
+        max-height: 450px;
+        overflow: auto;
+    }
+}
+</style>
+<div class="api-log-detail" id="<{$dom_id}>">
+    <div class="main-container">
+    <!-- 左侧：JSON数据Tab -->
+    <div class="left-panel">
+        <div class="tab-container">
+            <div class="tab-header">
+                <a href="#" class="tab-link active" data-tab="params">
+                    <span>请求参数</span>
+                </a>
+                <a href="#" class="tab-link" data-tab="transfer">
+                    <span>转换参数</span>
+                </a>
+                <a href="#" class="tab-link" data-tab="response">
+                    <span>响应参数</span>
+                </a>
+            </div>
+            
+            <div class="tab-content active" id="<{$dom_id}>-params-tab">
+                <button class="copy-button" data-copy-target="<{$dom_id}>-api-params" title="复制请求参数">复制</button>
+                <div class="json-container">
+                    <pre id="<{$dom_id}>-api-params"><{$apilog.params}></pre>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="<{$dom_id}>-transfer-tab">
+                <button class="copy-button" data-copy-target="<{$dom_id}>-api-transfer" title="复制转换参数">复制</button>
+                <div class="json-container">
+                    <pre id="<{$dom_id}>-api-transfer"><{$apilog.transfer}></pre>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="<{$dom_id}>-response-tab">
+                <button class="copy-button" data-copy-target="<{$dom_id}>-api-response" title="复制响应参数">复制</button>
+                <div class="json-container">
+                    <pre id="<{$dom_id}>-api-response"><{$apilog.response}></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧：基本信息 -->
+    <div class="right-panel">
+        <div class="info-panel">
+            <div class="info-title">API日志详情</div>
+            
+            <div class="info-item">
+                <div class="info-label">消息ID</div>
+                <div class="info-value"><{$apilog.msg_id}></div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">日志ID</div>
+                <div class="info-value"><{$apilog.log_id}></div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">耗时</div>
+                <div class="info-value"><{$apilog.spendtime}>ms</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">状态</div>
+                <div class="info-value">
+                    <span class="status-<{$apilog.status}>"><{$apilog.status}></span>
+                </div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">请求地址</div>
+                <div class="info-value"><{$apilog.url}></div>
+            </div>
+            
+            <div class="info-item">
+                <div class="info-label">信息</div>
+                <div class="info-value"><{$apilog.msg}></div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<script type="text/javascript">
+// 使用命名空间避免全局变量冲突
+window.ApiLogDetail = window.ApiLogDetail || {};
+
+(function(){
+    // 获取当前实例的DOM ID
+    var domId = '<{$dom_id}>';
+    var instanceId = domId;
+    
+    // Tab切换功能
+    function switchTab(tabName) {
+        // 只处理当前实例的tab
+        var container = document.getElementById(domId);
+        if (!container) return;
+        
+        var links = container.querySelectorAll('.tab-link');
+        var contents = container.querySelectorAll('.tab-content');
+        
+        links.forEach(function(link) {
+            link.classList.remove('active');
+        });
+        
+        contents.forEach(function(content) {
+            content.classList.remove('active');
+        });
+        
+        // 激活选中的tab
+        var activeLink = container.querySelector('[data-tab="' + tabName + '"]');
+        var activeContent = container.querySelector('#' + domId + '-' + tabName + '-tab');
+        
+        if (activeLink) {
+            activeLink.classList.add('active');
+        }
+        
+        if (activeContent) {
+            activeContent.classList.add('active');
+        }
+    }
+    
+    // 复制到剪贴板功能
+    function copyToClipboard(elementId) {
+        var element = document.getElementById(elementId);
+        if (!element) return;
+        
+        var text = element.textContent || element.innerText;
+        if (!text || text.trim() === '' || text.trim() === '无数据') {
+            alert('没有可复制的内容');
+            return;
+        }
+        
+        // 创建临时文本区域
+        var textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+            var successful = document.execCommand('copy');
+            if (successful) {
+                // 显示复制成功反馈
+                var button = event.target;
+                var originalText = button.textContent;
+                button.textContent = '已复制';
+                button.classList.add('copied');
+                
+                setTimeout(function() {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            } else {
+                alert('复制失败，请手动复制');
+            }
+        } catch (err) {
+            alert('复制失败，请手动复制');
+        }
+        
+        document.body.removeChild(textArea);
+    }
+    
+    // 将函数绑定到当前实例
+    window.ApiLogDetail[instanceId] = {
+        switchTab: switchTab,
+        copyToClipboard: copyToClipboard
+    };
+    
+    // 为当前实例的按钮绑定事件
+    function bindEvents() {
+        var container = document.getElementById(domId);
+        if (!container) return;
+        
+        // 绑定tab切换事件
+        var tabLinks = container.querySelectorAll('.tab-link');
+        tabLinks.forEach(function(link) {
+            var tabName = link.getAttribute('data-tab');
+            if (tabName) {
+                link.onclick = function(e) {
+                    e.preventDefault();
+                    switchTab(tabName);
+                    return false;
+                };
+            }
+        });
+        
+        // 绑定复制按钮事件
+        var copyButtons = container.querySelectorAll('.copy-button');
+        copyButtons.forEach(function(button) {
+            var targetId = button.getAttribute('data-copy-target');
+            if (targetId) {
+                button.onclick = function(e) {
+                    e.preventDefault();
+                    copyToClipboard(targetId);
+                    return false;
+                };
+            }
+        });
+    }
+    
+
+    function formatJson(obj, indent) {
+        if (obj === null) {
+            return '<span class="value-null">null</span>';
+        }
+        if (Array.isArray(obj)) {
+            return formatArray(obj, indent);
+        } else if (typeof obj === 'object') {
+            return formatObj(obj, indent);
+        } else {
+            return formatValue(obj);
+        }
+    }
+
+    function formatValue(value) {
+        if (value === null) {
+            return '<span class="value-null">null</span>';
+        } else if (typeof value === 'boolean') {
+            return '<span class="value-boolean">' + JSON.stringify(value) + '</span>';
+        } else if (typeof value === 'number') {
+            return '<span class="value-number">' + JSON.stringify(value) + '</span>';
+        } else if (typeof value === 'string') {
+            return '<span class="value-string">' + JSON.stringify(value) + '</span>';
+        } else {
+            return '<span class="value-string">' + JSON.stringify(value) + '</span>';
+        }
+    }
+
+    function formatArray(arr, indent) {
+        if (arr.length === 0) {
+            return '[]';
+        }
+        
+        var prettyJson = '[\n';
+        prettyJson += arr.map(function(item, index) {
+            var itemIndent = indent + '    ';
+            var formatted = formatJson(item, itemIndent);
+            return itemIndent + formatted;
+        }).join(',\n');
+        prettyJson += '\n' + indent + ']';
+        
+        return prettyJson;
+    }
+
+    function formatObj(obj, indent) {
+        var keys = Object.keys(obj);
+        if (keys.length === 0) {
+            return '{}';
+        }
+        
+        var prettyJson = '{\n';
+        keys.forEach(function(key, index) {
+            var value = obj[key];
+            var keyIndent = indent + '    ';
+            var valueIndent = indent + '    ';
+            
+            prettyJson += keyIndent + '<span class="key">' + JSON.stringify(key) + '</span>: ';
+            prettyJson += formatJson(value, valueIndent);
+            
+            if (index < keys.length - 1) {
+                prettyJson += ',';
+            }
+            prettyJson += '\n';
+        });
+        prettyJson += indent + '}';
+        
+        return prettyJson;
+    }
+
+    // 格式化JSON数据
+    function formatJsonData(elementId, data) {
+        var element = $(elementId);
+        if (!element) return;
+        
+        var text = element.getText();
+        if (!text || text.trim() === '') {
+            element.setHTML('<span style="color: #6c757d; font-style: italic;">无数据</span>');
+            return;
+        }
+        
+        try {
+            var parsed = JSON.parse(text);
+            var formatted = formatJson(parsed, '');
+            element.setHTML(formatted);
+        } catch (error) {
+            // 如果不是有效的JSON，直接显示原始文本
+            element.setHTML('<span class="value-string">' + text + '</span>');
+        }
+    }
+
+    // 初始化所有JSON数据
+    formatJsonData(domId + '-api-params', '');
+    formatJsonData(domId + '-api-transfer', '');
+    formatJsonData(domId + '-api-response', '');
+    
+    // 默认显示第一个有数据的tab
+    function initDefaultTab() {
+        var tabs = ['params', 'transfer', 'response'];
+        for (var i = 0; i < tabs.length; i++) {
+            var pre = document.getElementById(domId + '-api-' + tabs[i]);
+            var text = pre.textContent;
+            if (text && text.trim() !== '' && text.trim() !== '无数据') {
+                switchTab(tabs[i]);
+                break;
+            }
+        }
+    }
+    
+    // 初始化当前实例
+    function init() {
+        bindEvents();
+        initDefaultTab();
+    }
+    
+    // 立即执行初始化
+    init();
+})();
+
+// 使用domready事件作为备用初始化
+window.addEvent('domready', function(e){
+    // 检查是否已经有实例初始化过
+    var container = document.getElementById('<{$dom_id}>');
+    if (container && !container.hasAttribute('data-initialized')) {
+        container.setAttribute('data-initialized', 'true');
+        
+        // 重新绑定事件（防止重复初始化）
+        var instanceId = Object.keys(window.ApiLogDetail)[0];
+        if (instanceId && window.ApiLogDetail[instanceId]) {
+            var instance = window.ApiLogDetail[instanceId];
+            
+            // 绑定tab切换事件
+            var tabLinks = container.querySelectorAll('.tab-link');
+            tabLinks.forEach(function(link) {
+                var tabName = link.getAttribute('data-tab');
+                if (tabName) {
+                    link.onclick = function(e) {
+                        e.preventDefault();
+                        // 直接调用switchTab函数，使用当前容器的domId
+                        var currentDomId = container.id;
+                        var currentContainer = document.getElementById(currentDomId);
+                        if (!currentContainer) return;
+                        
+                        var links = currentContainer.querySelectorAll('.tab-link');
+                        var contents = currentContainer.querySelectorAll('.tab-content');
+                        
+                        links.forEach(function(link) {
+                            link.classList.remove('active');
+                        });
+                        
+                        contents.forEach(function(content) {
+                            content.classList.remove('active');
+                        });
+                        
+                        // 激活选中的tab
+                        var activeLink = currentContainer.querySelector('[data-tab="' + tabName + '"]');
+                        var activeContent = currentContainer.querySelector('#' + currentDomId + '-' + tabName + '-tab');
+                        
+                        if (activeLink) {
+                            activeLink.classList.add('active');
+                        }
+                        
+                        if (activeContent) {
+                            activeContent.classList.add('active');
+                        }
+                        return false;
+                    };
+                }
+            });
+            
+            // 绑定复制按钮事件
+            var copyButtons = container.querySelectorAll('.copy-button');
+            copyButtons.forEach(function(button) {
+                var targetId = button.getAttribute('data-copy-target');
+                if (targetId) {
+                    button.onclick = function(e) {
+                        e.preventDefault();
+                        instance.copyToClipboard(targetId);
+                        return false;
+                    };
+                }
+            });
+        }
+    }
+});
+</script>

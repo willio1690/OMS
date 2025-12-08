@@ -1,0 +1,3 @@
+a:3:{s:9:"reason_id";s:1:"1";s:11:"reason_name";s:30:"人手不足，来不及配送";s:8:"disabled";s:5:"false";}
+a:3:{s:9:"reason_id";s:1:"2";s:11:"reason_name";s:27:"库存不足，无法接单";s:8:"disabled";s:5:"false";}
+a:3:{s:9:"reason_id";s:1:"3";s:11:"reason_name";s:33:"超出配送范围，无法送达";s:8:"disabled";s:5:"false";}

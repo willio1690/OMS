@@ -1,0 +1,129 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    #dataAction label{cursor:pointer;font-size:14px;font-family:Microsoft Yahei;}
+    .tips {text-align:center;padding:5px;font-size:14px;font-family:Microsoft Yahei;color:#F30;}
+    #dataAction .ok {background:url(<{$env.app.res_url}>/ok.png) right no-repeat #FFF;padding:0 20px 0 0;}
+</style>
+
+<div style="padding:0 0 0 0;">
+    <div style="margin-bottom:6px;padding:5px 15px; border:0;background:#F0F0F0;border-top:1px solid #bbb;border-bottom:1px solid #bbb;">
+        <form id="dataAction" action="index.php?<{$env.server.QUERY_STRING}>" method="POST">
+	        <h4>启用赠品设置：</h4>
+	           <table>
+		            <col width="100" />
+		            <tr>
+		                <td align="right" >
+		                  <input type="checkbox" name="gift_order_create_deal" value="true" <{if $gift_order_create_deal eq 'true'}>checked <{/if}>  /></td>
+		                <td><label>订单进入系统新增时处理赠品模块</label></td>
+		            </tr>
+		            <tr>
+		                <td>&nbsp;</td>
+		            </tr>
+                    <tr>
+                        <td align="right" >
+                          <input type="checkbox" name="gift_type[]" value="taobao"     onclick='show_set_taobao(this);'   <{if $set_gift_taobao eq 'on'}>checked <{/if}>  /></td>
+                          <input type="hidden" name="set_gift_taobao"  value='<{$set_gift_taobao}>' id="set_gift_taobao"  />
+                        <td><label>启用淘宝赠品模块</label><font color="gray">&nbsp;&nbsp;&nbsp;开启后，在订单获取或暂存区首次分派淘宝订单的时候会将淘宝优惠中赠品追加到订单上</font></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+		            <tr>
+		                <td align="right" >
+		                <input type="checkbox" name="gift_type[]" value="ERP"  onclick='show_set_erp(this);'    <{if $set_gift_erp eq 'on'}>checked <{/if}>/>
+		                <input type="hidden" name="set_gift_erp"  value='<{$set_gift_erp}>' id="set_gift_erp"  />
+		                </td>
+		                <td><label>启用本地赠品模块</label><font color="gray">&nbsp;&nbsp;&nbsp;在同时满足绑定crm且crm开启赠品的情况下，就算是勾选了此项也是只启用crm赠品模块。除此之外，勾选了此项则启用本地赠品模块！</font></td>
+		            </tr>
+		            <tr>
+		                <td></td><td>&nbsp;</td>
+		            </tr>
+	           </table>
+        
+		        <div id='set_erp' <{if $set_gift_erp neq 'on'}> style='display:none;'<{/if}> >
+			        <h4>出错处理：</h4>
+			        <table>
+			            <col width="100" />
+			            <tr>
+			                <td align="right" >
+			                    <input type="radio" name="erp_gift_error_setting" value="off"   <{if $erp_gift_error_setting  eq 'off'}>checked <{/if}>/>
+			                </td>
+			                <td>
+			                    <label >不添加赠品，继续审单发货</label><font color="gray">&nbsp;&nbsp;&nbsp;&nbsp;说明：当添加赠品发生错误时，不添加赠品,继续发货</font>
+			                </td>
+			            </tr>
+			            <tr>
+			                <td></td><td>&nbsp;</td>
+			            </tr>
+			            <tr>
+			                <td align="right" >
+			                    <input type="radio" name="erp_gift_error_setting" value="on" <{if $erp_gift_error_setting  eq 'on'}>checked <{/if}> />
+			                </td>
+			                <td>
+			                    <label >打标提醒，并人工处理</label>
+			                </td>
+			            </tr>
+			            <tr>
+			                <td></td><td>&nbsp;</td>
+			            </tr>
+			        </table>
+		        </div>
+        
+         <table>
+            <col width="100" />
+            <tr>    
+                <td></td>
+                <td><button type="button" id="save_set_data">保存</button></td>
+            </tr>
+        </table>
+        </div>
+        
+    </form>
+</div>
+
+<script>
+    
+(function(){
+    var dataAction = $('dataAction');
+    dataAction.getElement('#save_set_data').addEvent('click', function(){
+        setChartData();
+    });
+    
+    function setChartData(){
+        var params=dataAction.toQueryString();
+        dataAction.store('_data',params);
+        var url='index.php?<{$env.server.QUERY_STRING}>';
+        W.page(
+            url, 
+            {
+                data:params, 
+                method:'post',
+                onComplete:function(){
+                }
+            }
+        );
+    }
+    
+})();   
+function show_set_taobao(el){
+    if (!el.checked){
+        $('set_gift_taobao').set('value','off');
+    }else{
+        $('set_gift_taobao').set('value','on');
+    }
+}
+function show_set_erp(el){
+    if (!el.checked){
+        $('set_erp').hide();
+        $('set_gift_erp').set('value','off');
+    }else{
+        $('set_erp').show();
+        $('set_gift_erp').set('value','on');
+    }
+}
+
+</script>

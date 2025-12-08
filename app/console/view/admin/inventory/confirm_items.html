@@ -1,0 +1,114 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=console&ctl=admin_inventory_apply&act=finish_confirm" id="frm">
+            <{input type="hidden" name="inventory_apply_id" value=$main.inventory_apply_id}>
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th>盘点申请单：</th>
+                        <td><{$main.inventory_apply_bn}></td>
+                        <th>状态：</th>
+                        <td><{$main.status}></td>
+                        <th>仓库名称：</th>
+                        <td><{$main.branch_name}></td>
+                    </tr>
+                    <tr>
+                        <th>物料行数：</th>
+                        <td><{$main.sku_hang}></td>
+                        <th>物料总数：</th>
+                        <td><{$main.sku_total}></td>
+                        <th></th>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <h4>差异明细：</h4>
+            <table cellpadding="0"  cellspacing="0" class="gridlist" cellpadding="0">
+                <thead>
+                    <tr>
+                        <th>基础物料编码</th>
+                        <th>wms库存</th>
+                        <th>oms库存</th>
+                        <th>库存差异</th>
+                        <th>良/残品</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <{foreach from=$items item=item}>
+                    <tr>
+                        <td><{$item.material_bn}></td>
+                        <td><{$item.wms_stores}></td>
+                        <td><{$item.oms_stores}></td>
+                        <td><{$item.diff_stores}></td>
+                        <td><{if $item.m_type == 'zp'}>良品<{else}>残品<{/if}></td>
+                        <td><{$item.memo}></td>
+                    </tr>
+                    <{foreachelse}>
+                    <tr>
+                        <td>缺少差异</td>
+                    </tr>
+                    <{/foreach}>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' class="btn-primary"  label='保存' }>
+                    <{button type="button" id='close_btn' class="btn-secondary" label='关闭' }>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = opener.finderGroup['<{$env.get.finder_id}>'];
+        $('close_btn').addEvent('click', function(){
+            if(finder){
+                setTimeout(finder.refresh(),3000);
+            }
+            setTimeout('window.close()',200);
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    if(finder){
+                        setTimeout(finder.refresh(),3000);
+                    }
+                    setTimeout('window.close()',200);
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+    })();
+</script>

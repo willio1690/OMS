@@ -1,0 +1,21 @@
+<services>
+	<service id="passport">
+		<class>pam_passport_basic</class>
+		<class>pam_passport_oidc</class>
+	</service>
+	<service id="openapi.pam_callback">
+		<class>pam_callback</class>
+	</service>
+	<service id="openapi.sso">
+		<class>pam_passport_oidc</class>
+	</service>
+	<service id="openapi.idaas">
+		<class>pam_passport_idaas</class>
+	</service>
+	<service id="login_trust">
+		<class>pam_trust_tao</class>
+	</service>
+	<service id="desktop_finder.pam_mdl_log">
+        <class>pam_finder_log</class>
+    </service>
+</services>

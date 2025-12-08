@@ -1,0 +1,107 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $error}>
+  <div class="notice"><{$notice}></div>
+<{else}>
+<div class="tableform">
+  <form action="index.php?app=console&ctl=admin_vopurchase&act=get_order" method="post" id="orderForm">
+    <table cellspacing="0" cellpadding="0" border="0">
+    
+    
+        <tr>
+          <th>唯品会店铺：</th>
+          <td>
+          <select id="shop_id" name="shop_id">
+              <option value="">=请选择=</option>
+              
+              <{foreach from=$shop_list key=key item=val}>
+              <option value="<{$val.shop_id}>"><{$val.name}></option>
+              <{/foreach}>
+          </select>
+          </td>
+        </tr>
+        <tr>
+          <th>采购单单号：</th>
+          <td><{input name="purchase_bn" value="" id="purchase_bn"}></td>
+        </tr>
+        <tr>
+          <th>拣货单号：</th>
+          <td><{input name="pick_no" value="" id="pick_no"}></td>
+        </tr>
+        <tr>
+          <th>开始查询的的销售开始时间：</th>
+          <td><{input type="date" name="st_sell_st_time"}></td>
+        </tr>
+        <tr>
+          <th>结束查询的销售开始时间：</th>
+          <td><{input type="date" name="et_sell_st_time"}></td>
+        </tr>
+        <tr>
+          <th>PO开始时间开始：</th>
+          <td><{input type="date" name="st_po_start_time"}></td>
+        </tr>
+        <tr>
+          <th>PO开始时间结束：</th>
+          <td><{input type="date" name="et_po_start_time"}></td>
+        </tr>
+   </table>
+  </form>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td><{button type="button" class="btn-primary" id="btn_manual"  label="立即获取" }></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<{/area}>
+<script>
+(function(){
+
+    var _form = $('orderForm');
+    var btn =$('btn_manual');
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+
+    _form.store('target',{
+        onRequest:function(){
+            btn.disabled = true;
+        },
+        onSuccess:function(response){
+            try {
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.error){
+                    btn.disabled = false;
+                    return MessageBox.error(hash_res_obj.error);
+                }
+
+                var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                finder.refresh();
+                _dialogIns.close();
+            } catch (error) {
+                btn.disabled = false;
+                return MessageBox.error(error);
+            }
+        }
+    });
+  
+  btn.addEvent('click',function(){
+      
+      var shop_id = $("shop_id").value;
+
+      if(shop_id == "")
+      {
+          MessageBox.error("请选择店铺");
+          return false;
+      }
+      
+      _form.fireEvent('submit',{stop:$empty});
+  });
+})();
+</script>
+<{/if}>

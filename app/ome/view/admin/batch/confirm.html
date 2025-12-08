@@ -1,0 +1,134 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="notice c-red">注：仓库不满足发货条件时则审核失败，货到付款未支付不能拆单，批量审核失败的订单请单个审核
+    <br>
+    <{if $cpup_service == 'true'}>
+        <{if !empty($promise_service)}>
+        注：已选择的订单中包含物流服务标签：<span style="color: #ff6600; font-weight: bold;"><{$promise_service}></span>
+        <{elseif is_array($cpup)}>
+        注：已选择的订单中包含天猫时效订单
+            <{if in_array('201',$cpup)}>
+            <span style="color: #6666ff;">承诺按需配送</span>
+            <{/if}>
+            <{if in_array('202',$cpup)}>
+            <span style="color: #c64ae2;">承诺顺丰配送</span>
+            <{/if}>
+            <{if in_array('203',$cpup)}>
+            <span style="color: #4ae25e;">承诺发货</span>
+            <{/if}>
+            <{if in_array('204',$cpup)}>
+            <span style="color: #e2bc4a;">承诺送达</span>
+            <{/if}>
+            <{if in_array('210',$cpup)}>
+            <span style="color: #e2bc4a;">极速上门</span>
+            <{/if}>    
+                服务，如合并或修改仓配导致服务未履约消费者投诉，商家会有判责赔付风险。
+        <{/if}>
+    <{/if}>
+</div>
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tbody>
+        <tr>
+            <th>选择仓库：</th>
+            <td>
+                <select name="branch_id" class="x-input dailog-batch-ipt">
+                    <{foreach from=$branchList item=branch}>
+                    <option value='<{$branch.branch_id}>'><{$branch.name}></option>
+                    <{/foreach}>
+                    <option value="auto">智选仓库</option>
+                </select>
+
+                <font color="red">* 必填</font>
+            </td>
+        </tr>
+        <tr>
+            <th>选择物流：</th>
+            <td>
+                <select name='corp_id' class="x-input dailog-batch-ipt"></select>
+
+                <font color="red">* 必填</font>
+            </td>
+        </tr>
+        <tr>
+            <th>合单/拆单：</th>
+            <td>
+                <select name='combine_or_split' class="x-input dailog-batch-ipt">
+                    <option value='0'>逐个审单</option>
+                    <{if $splitSeting}><option value='1'>拆分订单</option><{/if}>
+                    <{if !$combineSeting}><option value='2'>合并订单</option><{/if}>
+                </select>
+            </td>
+        </tr>
+        <{if $splitSeting}>
+            <tr id="split_rule" style="display: none;">
+                <th>拆单规则：</th>
+                <td>
+                    <select name="split_id" class="x-input dailog-batch-ipt">
+                        <{foreach from=$order_split item=item}>
+                        <option value='<{$item.sid}>'><{$item.name}></option>
+                        <{/foreach}>
+                    </select>
+                </td>
+            </tr>
+        <{/if}>
+    </tbody>
+</table>
+<script type="text/javascript">
+    (function(){
+        if($E("select[name=combine_or_split]")) {
+            $E("select[name=combine_or_split]").addEvent('change', function () {
+                if(this.value == '1') {
+                    $('split_rule').show();
+                } else {
+                    $('split_rule').hide();
+                }
+            });
+        }
+
+        $E('select[name=branch_id]').addEvent('change',function(){
+            if (!this.value) return ;
+
+            var branch_id = this.value;
+            if(branch_id == 'auto') {
+                $E('select[name=corp_id]').empty();
+                $E('select[name=corp_id]').adopt(new Element('option',{
+                    text:'智选物流',
+                    value:'auto'
+                }));
+                return ;
+            }
+            new Request.JSON({
+                url:'index.php?app=ome&ctl=admin_batch_order&act=getCorpByBarnch',
+                data:{
+                    branch_id:branch_id
+                },
+                onRequest:function(){
+                    $E('select[name=corp_id]').empty();
+                },
+                onComplete:function(resp){
+                    if (resp.error) {
+                        return alert(resp.error);
+                    }
+
+                    if (resp.success) {
+                        resp.data.each(function(corp){
+                            $E('select[name=corp_id]').adopt(new Element('option',{
+                                text:corp.name,
+                                value:corp.corp_id
+                            }));
+                        });
+                    }
+                }
+            }).send();
+        });
+
+        $E('select[name=branch_id]').fireEvent('change');
+    })();
+</script>
+
+
+

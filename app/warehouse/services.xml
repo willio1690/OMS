@@ -1,0 +1,5 @@
+<services>
+    <service id="desktop_finder.warehouse_mdl_iso">
+        <class>warehouse_finder_iso</class> 
+    </service>
+</services>

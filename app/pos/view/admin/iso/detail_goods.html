@@ -1,0 +1,55 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{/capture}>
+
+<div class="division">
+    <table width="100%" class="gridlist" border="0" cellspacing="0" cellpadding="0">
+        <thead>
+            <tr>
+                <th><{t}>物料编码<{/t}></th>
+                <th><{t}>商品名称<{/t}></th>
+                <th><{t}>商品金额<{/t}></th>
+                <th><{t}>商品规格<{/t}></th>
+                <th><{t}>商品属性<{/t}></th>
+                <th><{t}>库位<{/t}></th>
+                <th><{t}>基本计量单位<{/t}></th>
+                <th><{t}>应收数量(基本单位)<{/t}></th>
+                <th><{t}>实收数量(基本单位)<{/t}></th>
+                <th><{t}>辅助计量单位<{/t}></th>
+                <th><{t}>应收数量(辅助单位)<{/t}></th>
+                <th><{t}>实收数量(辅助单位)<{/t}></th>
+                <th><{t}>批次号<{/t}></th>
+                <th><{t}>生成日期<{/t}></th>
+                <th><{t}>有效期至<{/t}></th>
+                <th><{t}>备注<{/t}></th>
+            </tr>
+        </thead>
+        <tbody>
+            <{foreach from=$order_items item=item}>
+                <tr>
+                    <td><{t}><{$item.goods_bn}><{/t}></td>
+                    <td> <{t}><{$item.goods_name}><{/t}></td>
+                    <td><{$item.price}></td>
+                    <td><{$item.specifications}></td>
+                    <td><{$item.goods_attr}></td>
+                    <td><{$item.storage_code}></td>
+                    <td><{$item.basic_calc_unit}></td>
+                    <td><{$item.plan_qty|default:'-'}></td>
+                    <td><{$item.actual_qty}></td>
+                    <td><{$item.assist_calc_unit}></td>
+                    <td><{$item.plan_qty_assist|default:'-'}></td>
+                    <td><{$item.actual_qty_assist}></td>
+                    <td><{$item.batch_code}></td>
+                    <td><{$item.product_date}></td>
+                    <td><{$item.expire_date}></td>
+                    <td><{$item.item_remark}></td>
+                </tr>
+            <{/foreach}>
+        </tbody>
+    </table>
+</div>

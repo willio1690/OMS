@@ -1,0 +1,36 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<link href="../app/wms/statics/wms.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<div class="tableform">
+    <h4>唯一码信息:</h4>
+    <div class="division">
+        <{if count($items) > 0}>
+        <table border="0" cellspacing="0" class="gridlist" cellpadding="0">
+            <thead>
+            <tr>
+                <th>基础物料编码:</th>
+                <th>基础物料名称:</th>
+                <th>唯一码</th>
+                <th>状态</th>
+            </tr></thead>
+            <tbody><{foreach from=$items item=item}>
+            <tr>
+                <td><{$item.bn}></td>
+                <td><{$item.product_name}></td>
+                <td><{$item.serial_number}></td>
+                <td><{if $item.status == 0}>已质检<{elseif $item.status == 1}>已出库<{elseif $item.status == 2}>已作废<{/if}></td>
+            </tr>
+            <{/foreach}>
+            </tbody>
+        </table>
+        <{else}>
+            <span>没有关联的唯一码信息</span>
+        <{/if}>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<desktop>
+    <permissions>
+        <permission id="wap_branch_product" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>供货管理(Wap)</permission>
+        <permission id="wap_store_stock" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>门店库存(Wap)</permission>
+        <permission id="wap_order_index" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>订单查看(Wap)</permission>
+        <permission id="wap_order_confirm" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>订单确认(Wap)</permission>
+        <permission id="wap_order_consign" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>订单发货(Wap)</permission>
+        <permission id="wap_order_sign" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>签收核销(Wap)</permission>
+        <permission id="wap_aftersale_returnproduct" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>门店退货(Wap)</permission>
+        <permission id="wap_aftersale_changeproduct" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>门店换货(Wap)</permission>
+        <permission id="wap_store_setting" show='ome_roles:show_o2o_branch' save='ome_roles:save_role'>门店设置(Wap)</permission>
+      
+    </permissions>
+
+    <workground name="门店管理" id="o2o_center" order="1000" icon="icon-mendianguanli-01">
+        <menugroup name="门店信息管理" en="wap-store-information-management">
+            <menu controller='admin_branch_product' action='index' permission='wap_branch_product' display='false' order='1001'>全部供货管理</menu>
+            <menu controller='admin_branch_product' action='unrelation' permission='wap_branch_product' display='false' order='1001'>未关联供货管理</menu>
+            <menu controller='admin_branch_product' action='relation' permission='wap_branch_product' display='false' order='1001'>已关联供货管理</menu>
+            <menu controller='admin_store' action='stock' permission='wap_store_stock' display='false' order='1002'>门店库存</menu>
+            <menu controller='admin_order' action='index' permission='wap_order_index' display='false' order='1020'>订单查看</menu>
+            <menu controller='admin_order' action='confirm' permission='wap_order_confirm' display='false' order='1021'>订单确认</menu>
+            <menu controller='admin_order' action='consign' permission='wap_order_consign' display='false' order='1022'>订单发货</menu>
+            <menu controller='admin_order' action='sign' permission='wap_order_sign' display='false' order='1023'>签收核销</menu>
+            <menu controller='admin_aftersale_returnproduct' action='index' permission='wap_aftersale_returnproduct' display='false' order='1024'>退货列表</menu>
+            <menu controller='admin_aftersale_changeproduct' action='index' permission='wap_aftersale_changeproduct' display='false' order='1025'>门店换货</menu>
+            <menu controller='admin_store' action='setting' permission='wap_store_setting' display='false' order='1040'>门店设置</menu>
+          
+            
+        </menugroup>
+    </workground>
+</desktop>

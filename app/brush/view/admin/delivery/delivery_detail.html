@@ -1,0 +1,215 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<link href="../app/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+
+<form name="form1" method="POST" action="index.php?app=brush&ctl=admin_delivery&act=doDetail">
+    <div class="tableform">
+        <style>
+            .logi-no-input {
+                width: 150px;
+                height: 20px;
+            }
+        </style>
+        <h4><{if $dly.is_encrypt}><a class="delivery-sensitive-btn data-hide" href="javascript:void(0);"></a><{/if}>发货单信息:</h4>
+        <div class="division" id="deliveryinfo">
+            <table border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <th>发货单号：</th>
+                    <td><{$dly.delivery_bn}></td>
+                    <th>订单号：</th>
+                    <td><{foreach from=$order_bn item=item}><{$item}><br><{/foreach}></td>
+                    <th>配送方式：</th>
+                    <td><{$dly.delivery}></td>
+                    <th>会员：</th>
+                    <td>
+                        <span sensitive-field="uname"><{$dly.member_name|ciphertext:'delivery','uname',$dly.shop_type}></span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>收货人：</th>
+                    <td><span sensitive-field="ship_name"><{$dly.ship_name|ciphertext:'delivery','ship_name',$dly.shop_type}></span></td>
+                    <th>电话：</th>
+                    <td><span sensitive-field="ship_tel"><{$dly.ship_tel|ciphertext:'delivery','ship_tel',$dly.shop_type}></span></td>
+                    <th>手机：</th>
+                    <td><span sensitive-field="ship_mobile"><{$dly.ship_mobile|ciphertext:'delivery','ship_mobile',$dly.shop_type}></span></td>
+                    <th>Email：</th>
+                    <td><{$dly.ship_email}></td>
+                </tr>
+                <tr>
+                    <th>邮编：</th>
+                    <td><{$dly.ship_zip}></td>
+                    <th>物流公司：</th>
+                    <td>
+                        <{if $write != '1'}>
+                            <{input type="select" name="dly[logi_id]" rows=$dly_corp valueColumn="corp_id" labelColumn="name" value=$dly.logi_id}>
+                        <{else}>
+                            <input type="hidden" name="dly[logi_id]" value="<{$dly.logi_id}>"><{$dly.logi_name}>
+                        <{/if}>
+                    </td>
+                    <th>物流费用：</th>
+                    <td><{$dly.delivery_cost_actual|cur}></td>
+                    <th>预计物流费用：</th>
+                    <td><{$dly.delivery_cost_expect|cur}></td>
+                </tr>
+                <tr>
+                    <th>重量：</th>
+                    <td>
+                        <{if $dly.status=='succ'}>
+                            <{input type="text" name="weight" value=$dly.weight vtype="number"}>
+                        <{else}>
+                            <{$dly.weight}>
+                        <{/if}>
+                    </td>
+                    <th>商品重量:</th>
+                    <td><{$dly.net_weight}></td>
+                    <th>生成时间：</th>
+                    <td><{$dly.create_time}></td>
+                    <th>物流运单号：</th>
+                    <td><{if $write != '1'}>
+                            <input type="text" name="dly[logi_no]" size="10" value="<{$dly.logi_no}>" class="logi-no-input"/>
+                        <{else}>
+                            <input type="hidden" name="dly[logi_no]" size="10" value="<{$dly.logi_no}>"/><{$dly.logi_no}>
+                        <{/if}>
+                    </td>
+
+                </tr>
+                <tr>
+                    <th>订单支付方式：</th>
+                    <td><b><font color="orange"><{if $dly.is_cod=='true'}>货到付款<{else}>款到发货<{/if}></font></b></td>
+                    <th>发货区域：</th>
+                    <td><{$dly.ship_area|region}></td>
+                    <th>配送地址：&nbsp;</th>
+                    <td><span sensitive-field="ship_addr"><{$dly.ship_addr|ciphertext:'delivery','ship_addr',$dly.shop_type}></span></td>
+                    <th>&nbsp;</th>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <th>发票抬头：</th>
+                    <td><{$tax_titles}></td>
+                    <th>客户备注：</th>
+                    <th colspan="5">
+                        <{$dly.memo}>
+                    </th>
+                </tr>
+            </table>
+        </div>
+        <div class="tableform">
+            <table width="100%" cellspacing="0" cellpadding="0" border="0" class="finderInform">
+                <tbody>
+                <tr>
+                    <th><strong>客户备注：</strong></th>
+
+                    <{if $custom_mark}>
+                    <{foreach from=$custom_mark key=key item=v}>
+                    <td>
+                        <{foreach from=$v item=items}>
+                        <div>
+                            <b><{$items.op_content|escape:"HTML"}></b> <{$key}>&nbsp;<{$items.op_time}> by
+                            <{$items.op_name}>
+                        </div>
+                        <{/foreach}>
+                    </td>
+                    <{/foreach}>
+                    <{/if}>
+
+                </tr>
+
+                <tr>
+                    <th><strong>商家备注：</strong></th>
+
+                    <{if $mark_text}>
+
+                    <{foreach from=$mark_text key=key item=val}>
+                    <td>
+                        <{foreach from=$val item=items}>
+                        <div>
+                            <b><{$items.op_content|escape:"HTML"}></b> <{$key}> &nbsp;<{$items.op_time}> by
+                            <{$items.op_name}>
+                        </div>
+                        <{/foreach}>
+                    </td>
+                    <{/foreach}>
+                    <{/if}>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h4>操作日志:</h4>
+
+        <div class="division">
+            <table border="0" cellspacing="0" class="gridlist" cellpadding="0">
+                <thead>
+                <tr>
+                    <th>操作时间</th>
+                    <th>操作员</th>
+                    <th>操作类型</th>
+                    <th>操作内容</th>
+                </tr>
+                </thead>
+                <tbody>
+                <{foreach from=$log item=item}>
+                <tr>
+                    <td><{$item.operate_time}></td>
+                    <td><{$item.op_name}></td>
+                    <td><{$item.operation}></td>
+                    <td><{$item.memo}></td>
+                </tr>
+                <{/foreach}>
+                </tbody>
+            </table>
+        </div>
+
+        <{foreach from=$orderLogs item=item key=key}>
+        <h4>订单 <span class="red"><{$key}></span> 操作记录</h4>
+
+        <div class="division">
+            <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+                <thead>
+                <tr>
+                    <th>操作时间</th>
+                    <th>操作人</th>
+                    <th>行为</th>
+                    <th>操作内容</th>
+                </tr>
+                </thead>
+                <tbody>
+                <{foreach from=$item item=log}>
+                <tr>
+                    <td><{$log.operate_time}></td>
+                    <td><{$log.op_name}></td>
+                    <td><{$log.operation}></td>
+                    <td><{$log.memo}></td>
+                </tr>
+                <{/foreach}>
+                </tbody>
+            </table>
+        </div>
+        <{/foreach}>
+
+        <br/>
+        <h4>仓库备注:</h4>
+
+        <div class="division">
+            <textarea name="dly[memo]" rows="6" cols="60"><{$dly.memo}></textarea>
+            <input type="hidden" name="dly[delivery_id]" value="<{$dly.delivery_id}>"/>
+        </div>
+
+    </div>
+    <div style="text-align:center;">
+        <{button type="submit" label="提交" }>
+    </div>
+</form>
+<script type="text/javascript">
+// 敏感数据处理
+if ($defined($E('.delivery-sensitive-btn')))
+  $E('.delivery-sensitive-btn').addEvent('click',function(e){
+        Ex_Loader('security',function(){new Security({url:'index.php?app=brush&ctl=admin_delivery&act=showSensitiveData&p[0]=<{$dly.delivery_id}>',clickElement:$(e.target)}).desHtml($('deliveryinfo')); });
+  });
+</script>

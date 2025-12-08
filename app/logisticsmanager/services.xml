@@ -1,0 +1,32 @@
+<services>
+    <service id="desktop_finder.logisticsmanager_mdl_channel">
+        <class>logisticsmanager_finder_channel</class>
+    </service>
+
+    <service id="desktop_finder.logisticsmanager_mdl_express_template">
+        <class>logisticsmanager_finder_express_template</class>
+    </service>
+
+    <service id="desktop_finder_column_modifier.logisticsmanager_mdl_express_template.default">
+        <class>logisticsmanager_modifier_column_express_template</class>
+    </service>
+    <service id="desktop_finder.logisticsmanager_mdl_warehouse">
+        <class>logisticsmanager_finder_warehouse</class>
+    </service>
+    <service id="extend_filter_logisticsmanager_mdl_warehouse">
+        <class>logisticsmanager_finder_extend_filter_warehouse</class>
+    </service>
+    <service id="operation_log">
+        <class>logisticsmanager_operation_log</class>
+    </service>
+    <service id="openapi.logisticsmanager.channel">
+        <class>logisticsmanager_rpc_response_channel</class>
+    </service>
+
+    <service id="openapi.template">
+        <class>logisticsmanager_template_lodop</class>
+    </service>
+     <service id="desktop_finder.logisticsmanager_mdl_cloudprint">
+        <class>logisticsmanager_finder_cloudprint</class>
+    </service>
+</services>

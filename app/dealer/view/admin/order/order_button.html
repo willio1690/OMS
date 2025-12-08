@@ -1,0 +1,63 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?<{$env.server.QUERY_STRING}>" id="order_process" method="post">
+  <input type="hidden" name="order[plat_order_id]" value="<{$order.plat_order_id}>"/>
+  <input type="hidden" name="order_action" id="order_action" value="" />
+  <div class="action-bar clearfix">
+    <div class="span-auto"><strong class="action-bar-info">订单操作：</strong></div>
+      <{if $order.status == 'active' && $order.ship_status == '0' && !in_array($order.process_status, array('cancel'))}>
+      <div class="flt">
+        <{button label="订单拦截" onclick="new Dialog('index.php?app=dealer&ctl=admin_platform_orders&act=do_cancel&p[0]={$order.plat_order_id}&finder_id={$env.get.finder_id}',{width:700,height:300,title:'订单拦截'})"}>&nbsp;
+      </div>
+      <{/if}>
+    </div>
+</form>
+
+<script>
+  function update(order_id)
+  {
+
+    alert(order_id+'========');
+
+
+      var finder_id = '<{$env.get.finder_id}>';
+      var oldsource = '<{$env.get.act}>';
+      var base_url = '<{$base_url}>';
+      var remote_url = base_url+'/index.php?app=ome&ctl=admin_order&act=update_iframe&p[0]='+order_id+'&finder_id='+finder_id;
+
+      new Request({
+         url:'index.php?app=ome&ctl=admin_order&act=update_type',
+         method:'get',
+         onComplete:function (rs){
+            var rs = JSON.decode(rs);
+            if (rs.data.edit_type == 'local')
+            {
+                var p = window.open('about:blank');
+                p.location = 'index.php?app=ome&ctl=admin_order&act=view_edit&p[0]='+order_id+'&finder_id='+finder_id+'&oldsource='+oldsource;
+            }else{
+              <{if $order.process_status == 'splited'}>
+                if(!confirm('该订单还存在发货单，是否需要进行打回？')){
+                    return false;
+                }else{
+                    var p = window.open('about:blank');
+                    p.location =  remote_url;
+                }
+              <{else}>
+                var p = window.open('about:blank');
+                p.location =  remote_url;
+              <{/if}>
+            }            
+         }
+      }).send('p[0]='+order_id);
+  }  function modify_time(){
+    $('order_action').value = "order_limit_time";
+    $('order_process').fireEvent('submit',{stop:$empty});
+  }
+
+
+
+
+</script>

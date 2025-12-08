@@ -1,0 +1,112 @@
+<?php
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+class billcenter_mdl_sales extends dbeav_model
+{
+    /**
+     * 生成VOP销售单单号
+     *
+     * @return string
+     **/
+    private function gen_sale_bn()
+    {
+        $prefix = 'GXSO'.date("Ymd");
+
+        $sign   = kernel::single('eccommon_guid')->incId('GXSO', $prefix, 6);
+
+        return $sign;
+    }
+
+    /**
+     * 生成VOP销售单
+     *
+     *
+     * @param array $data Description
+     * @return array
+     **/
+    public function create_sales($data)
+    {
+        // 数据验证
+        if (!$data['bill_bn']) {
+            return [false, '业务单号不能为空'];
+        }
+
+        foreach ($data['items'] as $key => $item) {
+            if (!$item['material_bn']){
+                return [false, '商品编码为空'];
+            }
+
+            if (!$item['bm_id']) {
+                return [false, '基础物料ID为空'];
+            }
+         }
+
+        $sales = [
+            'sale_bn' => $this->gen_sale_bn(),
+            'bill_bn' => $data['bill_bn'],
+            'order_bn' => $data['order_bn'],
+            'bill_type' => $data['bill_type'],
+            'bill_id' => $data['bill_id'],
+            'shop_id' => $data['shop_id'],
+            'shop_bn' => $data['shop_bn'] ?? '',
+            'shop_name' => $data['shop_name'] ?? '',
+            'sale_time' => $data['sale_time'],
+            'ship_time' => $data['ship_time'] ?? $data['sale_time'],
+            'original_bn' => $data['original_bn'],
+            'original_id' => $data['original_id'],
+            'branch_id' => $data['branch_id'],
+            'branch_bn' => $data['branch_bn'] ?? '',
+            'branch_name' => $data['branch_name'] ?? '',
+            'logi_code' => $data['logi_code'],
+            'logi_no' => $data['logi_no'],
+            'po_bn'   => $data['po_bn'] ?? '',
+            'total_amount'   => $data['total_amount'],
+            'settlement_amount'   => $data['settlement_amount'],
+            'total_sale_price'    => $data['total_sale_price'] ?? 0,
+            'sku_qty'   => 0,//总数量
+            'item_lines'   => 0,//总行数
+        ];
+
+
+        if (!$this->insert($sales)) {
+            return [false, $this->db->errorinfo()];
+        }
+
+        $items = [];
+        $sku_qty = 0;
+        $item_lines = 0;
+        foreach ($data['items'] as $item) {
+
+            // 批量插入如果数据有NULL会导致一行缺失，故使用??
+            $items[] = [
+                'sale_id' => $sales['id'],
+                'material_bn' => $item['material_bn'] ?? '',
+                'barcode' => $item['barcode'] ?? '',
+                'material_name' => $item['material_name'] ?? '',
+                'bm_id' => $item['bm_id'] ?? 0,
+                'nums' => $item['nums'] ?? 0,
+                'price' => $item['price'] ?? 0,
+                'amount' => $item['amount'] ?? 0,
+                'settlement_amount' => $item['settlement_amount'] ?? 0,
+                'sale_price' => $item['sale_price'] ?? 0,
+                'original_item_id' => $item['original_item_id'] ?? 0,
+            ];
+            $sku_qty += (int)$item['nums'];
+            $item_lines ++;
+        }
+
+        $itemMdl = app::get('billcenter')->model('sales_items');
+        $sql = ome_func::get_insert_sql($itemMdl, $items);
+
+        if (!$this->db->exec($sql)) {
+            return [false, $this->db->errorinfo()];
+        }
+    
+        app::get('billcenter')->model('sales')->update(['sku_qty'=>$sku_qty,'item_lines'=>$item_lines],['id'=>$sales['id']]);
+        
+        return [true];
+    }
+}

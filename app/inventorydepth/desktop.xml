@@ -1,0 +1,51 @@
+<desktop>
+	<permissions>
+            <permission id="inventorydepth_shop">店铺资源</permission>
+            <permission id="inventorydepth_sync_set">库存同步设置</permission>
+            <permission id="inventorydepth_adjustment_index">回写库存管理</permission>
+            <permission id="inventorydepth_stock_release_index">库存发布</permission>
+            <permission id="inventorydepth_regulation_stockindex">回写库存规则</permission>
+            <permission id="inventorydepth_regulation_apply_stockindex">回写规则应用</permission>
+            <permission id="inventorydepth_shop_frame_index">上下架管理</permission>
+            <permission id="inventorydepth_shop_frame_batch">批量上下架</permission>
+            <permission id="inventorydepth_regulation_frameIndex">上下架规则</permission>
+            <permission id="inventorydepth_regulation_apply_frameindex">上下架规则应用</permission>
+            <permission id="inventorydepth_shop_export">店铺商品导出</permission>
+            <permission id="inventorydepth_regulation_task_index">活动库存管控</permission>
+            <permission id="platform_mapping">平台商品列表</permission>
+            <permission id="shop_adjustment_list">在售库存管理列表</permission>
+            <permission id="shop_frame_list">上下架管理列表</permission>
+            <permission id="inventorydepth_platform_sku_stock_set">平台SKU库存设置</permission>
+        <permission id="shop_adjustment_delete">停售库存批量删除</permission>
+    </permissions>
+
+     <workground name="资源管理" id="resource_center"  order="500" icon="icon-jiemianguanli02">
+        <menugroup name="店铺商品管理" en="shop-product-management">
+            <menu controller='shop' action='index' permission='inventorydepth_shop' display='true' order='100100'>前端店铺</menu>
+            <menu controller='sync_set' action='index' permission='inventorydepth_sync_set' display='true' order='100200'>库存同步设置</menu>
+        </menugroup>
+        <menugroup name="在售库存管理" en="sales-stock-management">
+            <menu controller='shop_adjustment' action='index'  params='p[0]:stock' permission='inventorydepth_adjustment_index' display='true' order='200100' target="dialog::{}">库存管理</menu>
+            <menu controller='stock_release' action='index'  permission='inventorydepth_stock_release_index' display='true' order='200150'>库存发布</menu>
+            <menu controller='regulation' action='stockIndex' permission='inventorydepth_regulation_stockindex' display='true' order='200200'>库存规则</menu>
+            <menu controller='regulation_apply' action='stockIndex' permission='inventorydepth_regulation_apply_stockindex' display='true' order='200300'>规则应用</menu>
+            <menu controller='regulation_task' action='index' permission='inventorydepth_regulation_task_index' display='true' order='200400'>活动库存管控</menu>
+            <menu controller='shop_skustockset' action='index' permission='inventorydepth_platform_sku_stock_set' display='true' order='200400'>平台SKU库存设置</menu>
+            <menu controller='shop_adjustment' action='index' permission='shop_adjustment_list' display='false' order='7'>在售库存管理</menu>
+            <menu controller='shop_frame' action='index' permission='shop_frame_list' display='false' order='7'>上下架管理列表</menu>
+            <menu controller='shop_adjustment' action='batch_delete' permission='shop_adjustment_delete' display='false' order='7'>停售库存批量删除</menu>
+        </menugroup>
+        <menugroup name="上下架管理" en="loading-unloading-management">
+            <menu controller='shop' action='jump' params='p[0]:item' permission='inventorydepth_shop_frame_index' display='false' order='300100' target="dialog::{}">上下架管理</menu>
+            <menu controller='shop' action='jump' params='p[0]:warning' permission='inventorydepth_shop_frame_batch' display='false' order='300200' target="dialog::{}">批量上下架</menu>
+            <menu permission='inventorydepth_shop_export' display='false' >店铺商品导出</menu>
+			<!--<menu controller='regulation' action='frameIndex' permission='inventorydepth_regulation_frameIndex' display='true' order='8000600'>上下架规则</menu>-->
+			<!--<menu controller='regulation_apply' action='frameIndex' permission='inventorydepth_shop' display='true' order='8000700'>规则应用</menu>-->
+        </menugroup>
+    </workground>
+    <workground name="基础档案" id="goods_manager"  order="600" icon="icon-jichudangan-01">
+        <menugroup name="渠道管理" en="channel-management">
+            <menu controller='shop_mapping' action='index' permission='platform_mapping' display='true' order='1000201'>平台商品列表</menu>
+        </menugroup>
+    </workground>
+</desktop>

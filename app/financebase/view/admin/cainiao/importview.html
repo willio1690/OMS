@@ -1,0 +1,47 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="system-setting" class="tableform tableform-tabs">
+        <form action='index.php?app=financebase&ctl=admin_shop_settlement_cainiao&act=doImport&type=<{$setting.type}>&finder_id=<{$env.get.finder_id}>' method='post' target="uploadframe" enctype="multipart/form-data" id="import_form" class="tableform">
+            <br>
+            <{$setting.name}><br>
+            选择文件:
+            <input type='file' name='import_file' id='ImportCSV'/>
+<!--            <input type='file' name='import_file' accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id='ImportCSV'/>-->
+            &nbsp;
+<!--            <button id="downloadTemplate" onclick="javascript:window.location.href='index.php?app=financebase&ctl=admin_shop_settlement_cainiao&act=template&type=<{$setting.type}>'" class="btn filterBtn btn-thirdly" type="button"><span><span>下载模板</span></span></button>-->
+            <button id="downloadTemplate" onclick="javascript:window.location.href='/app/financebase/statics/import/cainiao/<{$setting.type}>.xls'" class="btn filterBtn btn-thirdly" type="button"><span><span>下载模板</span></span></button>
+            <br />
+            <br />
+            <{if $setting.type == 'sale'}>
+            选择销售周期: <{input type="date" vtype="date" name="start_time" id="start_time" style="width:66px; font-family:arial;" value=''}>&nbsp;&nbsp;至&nbsp;&nbsp;
+            <{input type="date" vtype="date" name="end_time" id="end_time" style="width:66px; font-family:arial;" value=''}>
+            <{/if}>
+
+            <br/>
+            <br/>
+            <div class="table-action">
+                <{button label=$___desktop="导入"|t:'desktop' id="ImportBtn"  type="submit"}>
+<!--                <button id="btn-submit" class="btn btn-primary" type="button" onclick="onSub()" disabled=""><span><span>确定</span></span></button>-->
+            </div>
+        </form>
+
+    </div>
+
+</div>
+<script>
+    (function(){
+        var state;
+        $('ImportBtn').addEvent('click',function(e){
+            if(state||!$('ImportCSV').value.length)return false;
+            state=true;
+            this.style.cursor='not-allowed';
+        });
+        $('ImportCSV').addEvent('change',function(e){
+            state=false;
+            $('ImportBtn').style.cursor='pointer';
+        });
+    })();
+</script>

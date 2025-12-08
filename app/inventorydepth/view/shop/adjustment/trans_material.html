@@ -1,0 +1,384 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<style>
+    .notice-inline.error  {background-image:none;margin-left:25px}    
+</style>
+<form method="post" id="sales_material_form" action="index.php?app=inventorydepth&ctl=shop_adjustment&act=toAdd">
+<input type="hidden" name="shop_sku_id" value="<{$shop_sku_info.shop_sku_id}>">
+    <div class="tableform">
+      <!--<h3>转换成本地物料</h3>-->
+      
+        <h5>基本信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+        <thead>
+            <tr>
+                <td width="10%" align="right" nowrap="nowrap">
+                    物料名称：
+                </td>
+                <td>
+                    <input type="text" name="sales_material_name" size="60" vtype="required" value="<{$shop_sku_info.shop_title}>"/>
+                    <span style="color:red;">*</span>
+                </td>
+                <td>物料类型：</td>
+                <td>
+                    <select name="goods_type">
+                            <option value="0">--请选择物料类型--</option>
+                            <{foreach from=$goods_types item=types}>
+                                <option value="<{$types.type_id}>"><{$types.name}></option>
+                            <{/foreach}>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td width="10%" align="right" nowrap="nowrap">
+                    物料编码：
+                </td>
+                <td>
+                    <input type="text" name="sales_material_bn" vtype="required" value="<{$shop_sku_info.shop_product_bn}>"/>
+                    <span style="color:red;">*</span>
+                </td>
+                <td>物料规格：</td>
+                <td>
+                    <input type="text" name="material_specification" maxlength="20" />
+                    <{help}><{t}>规格将在备货单和发货单中展示<{/t}><{/help}>
+                </td>
+            </tr>
+            <tr>
+              <td align="right">物料条码：</td>
+              <td>
+                  <input type="text" name="material_code" vtype="required" onkeyup="value=value.replace(/[^\w]/ig,'')" value="<{$shop_sku_info.shop_barcode}>" />
+                <span style="color:red;">*</span>
+              </td>
+              <td>物料品牌：</td>
+              <td>
+                  <select id="brand_id" name="brand_id">
+                            <option value="0">--请选择品牌--</option>
+                            <{foreach from=$material_brand item=brand}>
+                            <option value="<{$brand.brand_id}>"><{$brand.brand_name}></option>
+                            <{/foreach}>
+                </select>
+              </td>
+            </tr>
+            <tr>
+              <td align="right">启用唯一码：</td>
+              <td>
+                  <input type="radio" value="true" name="serial_number" >是
+                  <input type="radio" value="false" name="serial_number" checked="checked">否
+              </td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="10%" align="right">物料类型：</td>
+                <td>
+                <input type="radio" name="sales_material_type" value="1" checked="checked"/> 普通 <input type="radio" name="sales_material_type" value="2" /> 组合 <input type="radio" name="sales_material_type" value="3" /> 赠品
+                </td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td width="10%" align="right">所属店铺：</td>
+                <td>
+                    <select id="shop_id" name="shop_id">
+                        <{foreach from=$shops item=shop}>
+                            <option value="<{$shop.shop_id}>" <{if $shop.shop_id == $shop_sku_info.shop_id}>selected="selected"<{/if}>>
+                                <{$shop.name}>
+                            </option>
+                        <{/foreach}>
+                    </select><span id="shop_text" style="display:none;">全部店铺</span>
+                </td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr id="bind_basic_material">
+                <td width="10%" align="right">关联基础物料：</td>
+                <td><input type="radio" name="gen_mode" value="1" checked="checked">自动生成基础物料<input type="radio" name="gen_mode" value="2">人工绑定已有基础物料<br/><br/>
+                    <span id="manual_mode" style="display:none;">
+                    <{input type='material_object' object='basic_material@material' breakpoint='0' name='bm_id' textcol='material_name' value=$data.pgid callback='material_object_callback' replacehtml=$replacehtml emptytext='选取基础物料' style='float:left;width:200px;' filter='visibled=1' }>
+                    </span>
+                </td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+          </thead>
+        </table>
+
+      <div id="promotion_items" style="margin-top:10px;display:none">
+<h5>组合关联基础物料</h5>
+          <div class="gridlist" style="padding:10px;">
+            
+            <{button label="物料库频道" id="material-find-btn" }>
+
+            <table class="gridlist" id="material_table"  style="margin:4px 0;">
+              <thead>
+                <tr>
+                  <th>编码</th>
+                  <th style="width:240px;">名称</th>
+                  <th>数量</th>
+                  <th>价格贡献占比(1-100整数数值)</th>
+                  <th style="width:30px;">删除</th>
+                </tr>
+              </thead>
+              <tbody id="dataNode">
+                  <tr>
+                      <td colspan="7" style="padding:0;"><div class="note" style="margin:0;"> 暂无物料信息 </div></td>
+                  </tr>
+              </tbody>
+            </table>
+              <div align="right">
+                  <{button type="button" id="material-delall-btn" label="全部删除" }>
+              </div>
+          </div>
+      </div>
+
+        <h5 style="margin-top:10px;">扩展信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+        <thead>
+            <tr>
+              <td align="right" nowrap="nowrap">成本价：</td>
+              <td><input name="cost" type="text" onkeyup="value=value.replace(/[^\d\.]/ig,'')" value="0.00" maxlength="10"/>
+              &nbsp;&nbsp;<span style="color:red;">默认为0</span></td>
+            </tr>
+            <tr>
+                <td width="10%" align="right" nowrap="nowrap">
+                    售价：
+                </td>
+                <td>
+                    <input name="retail_price" type="text" id="retail_price" onkeyup="value=value.replace(/[^\d\.]/ig,'')" value="<{$shop_sku_info.shop_price}>" maxlength="10" />
+                </td>
+            </tr>
+            <tr>
+              <td align="right" nowrap="nowrap">重量：</td>
+              <td><input name="weight" type="text" onkeyup="value=value.replace(/[^\d\.]/ig,'')" value="0" maxlength="10" />&nbsp;&nbsp;<span style="color:red;">重量单位:克(g)</span></td>
+            </tr>
+            <tr>
+                <td width="10%" align="right" nowrap="nowrap">
+                    包装单位：
+                </td>
+                <td>
+                    <input type="text" name="unit" value="" />
+                </td>
+            </tr>
+        </thead>
+        </table>
+    
+
+      <div id="cc" class="noprint table-action">
+          <{button type="button" id="sales_material_btn" label="保 存"}> &nbsp;
+          <{button type="button" class="btn-secondary" id="return-btn" label="关 闭" isCloseDialogBtn="true"}>
+      </div>
+    </div>
+</form>
+<script>
+(function() {
+    window.addEvent('domready', function() {
+        $ES('input[name=sales_material_type]').each(function(item){
+            item.addEvent('click',function(e){
+                if(this.value == '1' || this.value == '3'){
+                    $('promotion_items').setStyle('display','none');
+                    $('bind_basic_material').setStyle('display','table-row');
+                    if(this.value == '3'){
+                        $('shop_id').setStyle('display','none');
+                        $('retail_price').set('readonly',true);
+                        $('shop_text').setStyle('display','block');
+                        $('shop_id')[0].selected = true;
+                        $('retail_price').set('value','0.00');
+                    }else{
+                        $('shop_id').setStyle('display','block');
+                        $('retail_price').set('readonly',false);
+                        $('shop_text').setStyle('display','none');
+                    }
+                }else{
+                    $('promotion_items').setStyle('display','block');
+                    $('bind_basic_material').setStyle('display','none');
+                    $('shop_id').setStyle('display','block');
+                    $('retail_price').set('readonly',false);
+                    $('shop_text').setStyle('display','none');
+                }
+            })
+        });
+
+        $ES('input[name=gen_mode]').each(function(item){
+            item.addEvent('click',function(e){
+                 if(this.value == '1'){
+                    $('manual_mode').setStyle('display','none');
+                 }else{
+                    $('manual_mode').setStyle('display','inline');
+                 }
+            })
+        });
+
+        var callurl='index.php?app=material&ctl=admin_material_basic&act=getMaterial',store=[];
+
+        var tpl='<tr key="{bm_id}" id="bm_{bm_id}" title="点击选取/反选此条记录">'
+            +'  <td>{material_bn}</td><td class="material-name">{material_name}</td>'
+            +'  <td><input type="text" value="{material_num}" key="num" vtype="number&amp;&amp;required" tname="at[_PRIMARY_]" size="6"></td>'
+            +'  <td><input type="text" vtype="number&amp;&amp;required"  tname="pr[_PRIMARY_]" key="rate" value="{rate}" size="5"></td>'
+            +'  <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>'
+            +'</tr>';
+
+        $('material-find-btn').addEvent('click',function(e){
+            var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=material&ctl=admin_material_basic&act=findMaterial');
+            new finderDialog(url,{params:{url:callurl,name:'bm_id[]'},width:1000,height:660,
+                onCallback:function(rs){
+                    if(!rs)return;
+                    rs=JSON.decode(rs);
+                    init(rs);
+                }
+            });
+        });
+
+        var pag,rows;
+        function emptyData(){
+            var noData='<tr>'
+                +'<td colspan="8" style="padding:0;"><div class="note" style="margin:0;"> 暂无物料信息 </div></td>'
+                +'</tr>';
+            $('dataNode').set('html',noData);
+        }
+
+        function createProduct(data){
+            pag=new PageData(tpl,data,{'updateMain':$('dataNode'),'pageNum':5,PRIMARY_ID:'bm_id',
+            'onShow':function(){
+                 var _this=this;
+                 $$('#dataNode input[type]').addEvent('change',function(e){
+                     var pid=this.getParent('tr').get('key'),value=this.value;
+
+                    _this.editData(pid,[this.get('key'),value]);
+                });
+
+                rows=$ES('#dataNode tr');
+                rows.each(function(item,i){
+                    item.addEvent('click',function(e){
+                        this.toggleClass('selected');
+                    });
+                    item.getElement('.btn-delete-item').addEvent('click',function(e){
+                        if(_this.selectData(item.get('key')) && confirm('确定要删除 '+ _this.selectData(item.get('key'))['material_name'] +' 吗？')) _this.delData(item.get('key'));
+                        if(!$E('#dataNode tr')) emptyData();
+                    });
+                    item.getElement('input[tname^=at]').addEvent('keypress',function(e){
+                        if(e.code==13) $E('#pfba input').focus();
+                    });
+                });
+
+                if(this.data.length) rows[0].getElement('input[key^=num]').focus();
+
+               $ES('.material-name').removeEvent('mouseover').addEvent('mouseover',function(e){
+                if (this.get('visibility')=='false')
+                {
+                 var e  = new Event(e), el = e.target;
+                 visiTips.attach(el);
+                 el.addEvent('mouseleave',function(){
+                  this.removeClass('active');
+                 });
+                 el.fireEvent('mouseenter',e);
+                }
+                });
+            }
+            });
+        }
+
+        function init(rs){
+            var tmparr=findProduct(rs,'bm_id');
+             store.unshift.apply(store,tmparr.reverse());
+             createProduct(store);
+        }
+
+        function findProduct(arr,PRIMARY){
+            if(!store.length)return arr;
+            store.each(function(a){
+                arr.each(function(b){
+                    if(a[PRIMARY]==b[PRIMARY])arr.erase(b);
+                });
+            });
+            return arr;
+        }
+
+        function delProduct(obj,arr){
+            arr.each(function(d){obj.delData(d);});
+        }
+
+        $('material-delall-btn').addEvent('click',function(e){
+            if(!pag||!pag.data)return;
+            var delarr=[];
+            pag.data.each(function(d){
+                 delarr.push(d['bm_id']);
+            });
+            if(confirm('确认删除全部物料吗？')){
+                delProduct(pag,delarr);
+                emptyData();
+            }
+        });
+
+        $('sales_material_btn').addEvent('click',function(e){
+            var _this=this;
+            var form=this.getParent('form');
+            if(pag){
+                var data=pag.toHideInput($('dataNode').getElement('tr'));
+                form.store('target',{extraData:data,
+                    onRequest:function(){
+                        _this.disabled=true;
+                    },
+                    onComplete:function(jsontext){
+                        try{
+                            var json = JSON.decode(jsontext);
+                            if (typeof(json.error)!='undefined'){
+                                _this.disabled=false;
+                            }else{
+                                _this.disabled=true;
+                                $('sales_material_btn').getParent('.dialog').retrieve('instance').close();
+                                window.finderGroup['<{$env.get.finder_id}>'].refresh();
+                            }
+                        }catch(e){}
+                    }
+                });
+            }else{
+                form.store('target',{
+                    onRequest:function(){
+                        _this.disabled=true;
+                    },
+                    onComplete:function(jsontext){
+                        try{
+                            var json = JSON.decode(jsontext);
+                            if (typeof(json.error)!='undefined'){
+                                _this.disabled=false;
+                            }else{
+                                _this.disabled=true;
+                                $('sales_material_btn').getParent('.dialog').retrieve('instance').close();
+                                window.finderGroup['<{$env.get.finder_id}>'].refresh();
+                            }
+                        }catch(e){}
+                    }
+                });
+            }
+            form.fireEvent('submit',e);
+        });
+    });
+})();
+
+        function material_object_callback(rs,handle){
+            var p_node = handle.getParent('div');
+            var html = '已选择了1个物料,'+"<a href='javascript:void(0);' onclick='material_selected_show();'>查看关联的物料.</a>";
+            if ($defined($('hand-selected-product')))
+            {
+                $('hand-selected-product').setHTML(html);
+            } else {
+                var div = new Element('div',{'html':html,'id':'hand-selected-product'});
+                div.injectAfter(p_node); 
+            }
+        }
+
+        function material_selected_show(){
+            new Dialog('index.php?app=material&ctl=admin_material_sales&act=showMaterials',{
+                ajaxoptions:{data:$('hand-selected-product').getPrevious('div'),method:'post'}
+            });
+        }
+</script>

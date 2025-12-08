@@ -1,0 +1,557 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="giftpackage_list" <{if empty($conf.objs)}> style="display:none" <{/if}>>
+  <input type="hidden" name="objtype[]" value="giftpackage"/>
+  <h5 style="text-align:center;">礼盒</h5>
+<{if empty($delivery_list)}>
+  <table class="gridlist" width="100%" cellspacing="0" cellpadding="0" border="0" >
+    <thead>
+      <tr>
+        <th>销售物料编码</th>
+        <th>销售物料名称</th>
+        <th>购买数量</th>
+        <th>单价</th>
+        <th>优惠价格</th>
+        <th>销售价格</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <{foreach from=$conf.objs item=obj}>
+      <tr id="tr_<{$obj.obj_id}>" oid="<{$obj.obj_id}>" <{if $obj.delete == 'true'}>style="background-color: #DBDBDB;" g-del="b"  class='disabled'<{else}>g-del="a"<{/if}> g-type="<{$obj.obj_type}>" g-pid="<{$obj.goods_id}>" g-shop-pid="<{$obj.shop_goods_id}>" aid="<{$obj.obj_id}>" g-bn="<{$obj.bn}>" g-pname="<{$obj.name}>" >
+        <td class="obj_bn <{$obj.obj_type}>class">
+          <span class="number"><{$obj.bn}></span>
+          <input type="hidden" value="<{$obj.bn}>" name="bn_list[]" /></td>
+        <td class="obj_name"><{$obj.name}><input name="giftpackage_ids[]" id="giftpackage_ids_<{$obj.obj_id}>" type="text" value="<{$obj.goods_id}>" style="display:none;" /></td>
+        <td class="obj_num"><input type="hidden" value="<{$obj.obj_id}>" name="giftpackage[obj][<{$obj.obj_id}>][]" />
+          <input atype="num" aid="<{$obj.obj_id}>" name="giftpackage[num][<{$obj.obj_id}>]" type="text" size="5" value="<{$obj.quantity}>" vtype="required&&unsignedint" id="num_<{$obj.obj_id}>" <{if $obj.delete == 'true'}>disabled="true"<{/if}> onchange="changetotalgiftpackage(this);total();" onclick='edit_checked("<{$obj.obj_id}>","<{$obj.bn}>");' /></td>
+        <td class="obj_price"><input name="giftpackage[price][<{$obj.obj_id}>]" type="text" size="8" value="<{$obj.price}>" vtype="required&&unsigned" atype="price" id="pr_<{$obj.obj_id}>" aid="<{$obj.obj_id}>" <{if $obj.delete == 'true'}>disabled="true"<{/if}> onchange="changetotalgiftpackage(this);total();" onclick='edit_checked("<{$obj.obj_id}>","<{$obj.bn}>");' /></td>
+        <td class="obj_pmt"><input type="text" id="pmt_<{$obj.obj_id}>" aid="<{$obj.obj_id}>" vtype="unsigned" atype="pmt_price" value="<{$obj.pmt_price|default:0}>" class="giftpackage_pmt_price"  name="giftpackage[obj_pmt_price][<{$obj.obj_id}>]" size="6" <{if $obj.delete == 'true'}>disabled="true"<{/if}>  onchange="changetotalgiftpackage(this);total();" onclick='edit_checked("<{$obj.obj_id}>","<{$obj.bn}>");' /></td>
+        <td class="obj_total"><input type="text" class="giftpackagetotal" style="display:none" id="giftpackagetotal_<{$obj.obj_id}>" size="2" value="0" <{if $obj.delete == 'true'}>disabled="true"<{/if}> /><input type="text" size="5" id="giftpackagesalepr_<{$obj.obj_id}>" readonly="readonly" <{if $obj.delete == 'true'}>disabled="true"<{/if}> class="none_input<{if $obj.obj_type != 'gift' && $obj.order_items|@count == '1'}> giftpackagesaleprice<{/if}>" value="<{$obj.sale_price}>">
+          <input type="hidden" size="5" id="giftpackagepmtpr_<{$obj.obj_id}>" readonly="readonly" <{if $obj.delete == 'true'}>disabled="true"<{/if}> class="none_input<{if $obj.obj_type != 'gift' && $obj.order_items|@count == '1'}> giftpackagepmtprice<{/if}>" value="<{$obj.pmt_order_price}>">
+        </td>
+        <td class="item_op" objid="<{$obj.obj_id}>">
+        <{if $obj.delete == 'false'}>
+          <{button type="button" label="删除" id="d_{$obj.obj_id}" onclick="del_giftpackage('{$obj.obj_id}');" }></td>
+        <{else}>
+        <{button type="button" label="恢复" id="d_{$obj.obj_id}" onclick="del_giftpackage('{$obj.obj_id}');" }></td>
+        <{/if}>
+      </tr>
+    <{/foreach}>
+    <tr><td colspan="9" style="background:#f0f0f0;height:10px;"></td></tr>
+  </tbody>
+</table>
+<{else}>
+  <table class="gridlist" width="100%" cellspacing="0" cellpadding="0" border="0" >
+    <thead>
+      <tr>
+        <th>销售物料编码</th>
+        <th>销售物料名称</th>
+        <!--<th>规格</th>-->
+        <th>购买数量</th>
+        <th>可编辑数量</th>
+        <th>单价</th>
+        <th>优惠价格</th>
+        <th>销售价格</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <{foreach from=$conf.objs item=obj}>
+      <tr id="tr_<{$obj.obj_id}>" oid="<{$obj.obj_id}>" <{if $obj.delete == 'true'}>style="background-color: #DBDBDB;" g-del="b"  class='disabled'<{else}>g-del="a"<{/if}> g-type="<{$obj.obj_type}>" g-pid="<{$obj.goods_id}>" g-shop-pid="<{$obj.shop_goods_id}>" aid="<{$obj.obj_id}>" g-bn="<{$obj.bn}>" g-pname="<{$obj.name}>" >
+        <td class="obj_bn <{$obj.obj_type}>class">
+          <span class="number"><{$obj.bn}></span>
+          <input type="hidden" value="<{$obj.bn}>" name="bn_list[]" /></td>
+        <td class="obj_name"><{$obj.name}><input name="giftpackage_ids[]" id="giftpackage_ids_<{$obj.obj_id}>" type="text" value="<{$obj.goods_id}>" style="display:none;" /></td>
+        <td class="obj_num"><input type="hidden" value="<{$obj.obj_id}>" name="giftpackage[obj][<{$obj.obj_id}>][]" /><input atype="num" aid="<{$obj.obj_id}>" name="giftpackage[num][<{$obj.obj_id}>]" type="text" size="5" value="<{$obj.quantity}>" id="num_<{$obj.obj_id}>" <{if $obj.delete == 'true'}>disabled="true"<{else}>readonly="readonly" style="color:#666;"<{/if}> /><input type="hidden" value="<{$obj.quantity}>" id="old_giftpackage_nums_<{$obj.obj_id}>" /></td>
+        <td class="obj_buy_nums">
+        <{if $obj.left_nums <= 0}>
+            <input aid="<{$obj.obj_id}>" name="giftpackage[item_buy_nums][<{$obj.obj_id}>]" type="text" size="5" value="<{$obj.left_nums}>" id="item_buy_nums_<{$obj.obj_id}>" disabled="true" />
+        <{else}>
+            <input atype="num" aid="<{$obj.obj_id}>" name="giftpackage[item_buy_nums][<{$obj.obj_id}>]" type="text" size="5" value="<{$obj.left_nums}>" id="item_buy_nums_<{$obj.obj_id}>" <{if $obj.delete == 'true'}>disabled="true"<{/if}> onchange="split_changetotalgiftpackage(this);total();" />
+        <{/if}>
+        <{if $obj.make_nums}><br />(<font color="#f00;">已发货：<{$obj.make_nums}></font>)<input type="hidden" value="<{$obj.make_nums}>" id="split_send_<{$obj.obj_id}>" /><{/if}>
+        </td>
+        <td class="obj_price"><input name="giftpackage[price][<{$obj.obj_id}>]" type="text" size="8" value="<{$obj.price}>" vtype="required&&unsigned" atype="price" id="pr_<{$obj.obj_id}>" aid="<{$obj.obj_id}>" <{if $obj.delete == 'true'}>disabled="true"<{elseif $obj.make_nums > 0}>readonly="readonly" style="color:#666;"<{else}>onchange="changetotalgiftpackage(this);total();"<{/if}> /></td>
+        <td class="obj_pmt"><input type="text" id="pmt_<{$obj.obj_id}>" aid="<{$obj.obj_id}>" vtype="unsigned" atype="pmt_price" value="<{$obj.pmt_price|default:0}>" class="giftpackage_pmt_price"  name="giftpackage[obj_pmt_price][<{$obj.obj_id}>]" size="6" <{if $obj.delete == 'true'}>disabled="true"<{elseif $obj.make_nums > 0}>readonly="readonly" style="color:#666;"<{else}>onchange="changetotalgiftpackage(this);total();"<{/if}> /></td>
+        <td class="obj_total"><input type="text" class="giftpackagetotal" style="display:none" id="giftpackagetotal_<{$obj.obj_id}>" size="2" value="0" <{if $obj.delete == 'true'}>disabled="true"<{/if}> /><input type="text" size="5" id="giftpackagesalepr_<{$obj.obj_id}>" readonly="readonly" <{if $obj.delete == 'true'}>disabled="true"<{/if}> class="none_input<{if $obj.obj_type != 'gift' && $obj.order_items|@count == '1'}> giftpackagesaleprice<{/if}>" value="<{$obj.sale_price}>">
+        <input type="hidden" size="5" id="giftpackagepmtpr_<{$obj.obj_id}>" readonly="readonly" <{if $obj.delete == 'true'}>disabled="true"<{/if}> class="none_input<{if $obj.obj_type != 'gift' && $obj.order_items|@count == '1'}> giftpackagepmtprice<{/if}>" value="<{$obj.pmt_order_price}>">
+        </td>
+        <td class="item_op" objid="<{$obj.obj_id}>">
+        <{if empty($obj.make_nums)}>
+            <{if $obj.delete == 'false'}>
+                <{button type="button" label="删除" id="d_{$obj.obj_id}" onclick="del_giftpackage('{$obj.obj_id}');" }>
+            <{else}>
+                <{button type="button" label="恢复" id="d_{$obj.obj_id}" onclick="del_giftpackage('{$obj.obj_id}');" }>
+            <{/if}>
+        <{else}>
+            <span style="color:red;"><{if $obj.left_nums <= 0}>已拆分完<{else}>部分拆分<{/if}></span>
+        <{/if}>
+        </td>
+      </tr>
+    <{/foreach}>
+    <tr><td colspan="10" style="background:#f0f0f0;height:10px;"></td></tr>
+  </tbody>
+</table>
+<input type="hidden" name="is_split" value="1"/>
+<{/if}>
+</div>
+<script>
+if($$('.adjunctclass,.giftclass').length){
+    $$('.adjunctclass,.giftclass').each(function(e){
+      var div = new Element('div').inject(e,'top');
+      new Element('div').inject(div);
+    });
+}
+
+function giftpackageinit(rs){
+  rs.each(function (i){
+        var pid = i.sm_id,ishave='false',aid='';
+        $ES('#giftpackage_list tbody tr').each(function (e){
+            if (e.get('g-pid') == pid && e.get('g-type') == 'giftpackage'){
+                ishave='true';
+                aid=e.get('aid');
+            }
+        });
+        if (ishave=='true'){
+            if ($("num_"+aid).disabled){
+                alert("请恢复货品："+i.sales_material_name);
+            }else {
+                alert("有此货品："+i.sales_material_name);
+                $("num_"+aid).focus();
+            }
+            return;
+        }else {
+            giftpackagecreate(pid,i);
+        }
+    });
+    if ($('giftpackage_list').style.display=='none'){
+        $('giftpackage_list').style.display = "";
+    }
+}
+
+function giftpackagecreate(pid,rs){
+    <{if $delivery_list}>
+
+    var trr = new Element('tr', {id:'tr_'+pid,oid:pid,'aid':pid,'g-pid':pid,'g-type':'giftpackage','g-del':'a',html:'<td>'+rs.sales_material_bn+'</td><td>'+rs.sales_material_name+'<input name="giftpackage_ids[]" id="giftpackage_ids_'+pid+'" type="text" value="'+rs.sm_id+'" style="display:none;" /></td><td style="display:none;">'+(rs.spec_info||'-')+'</td><td><input type="text" onchange="changetotalgiftpackage(this);total();" id="num_'+pid+'" vtype="required&amp;&amp;unsignedint" value="1" size="5" name="giftpackage[newnum]['+pid+']" aid="'+pid+'" atype="num"></td><td>0</td><td><input type="text" onchange="changetotalgiftpackage(this);total();" id="pr_'+pid+'" vtype="required&amp;&amp;unsigned" value="'+rs.price+'" size="8" name="giftpackage[newprice]['+pid+']" aid="'+pid+'" atype="price" value="0"></td><td><input type="text" onchange="changetotalgiftpackage(this);total();" size="6" name="giftpackage[new_obj_pmt_price]['+pid+']" value="0" atype="pmt_price" vtype="unsigned" aid="'+pid+'" id="pmt_'+pid+'"></td><td><input type="text" value="0" size="2" id="giftpackagetotal_'+pid+'" style="display:none;" class="giftpackagetotal"><input type="text" size="5" class="none_input giftpackagesaleprice" value="0" readonly="readonly" id="giftpackagesalepr_'+pid+'"></td><td><button class="btn" onclick="del_giftpackage_new('+pid+');" id="d_'+pid+'" type="button"><span><span>删除</span></span></button></td>'}).inject($E('#giftpackage_list tbody'));
+    <{else}>
+    var trr = new Element('tr', {id:'tr_'+pid,oid:pid,'aid':pid,'g-pid':pid,'g-type':'giftpackage','g-del':'a',html:'<td>'+rs.sales_material_bn+'</td><td>'+rs.sales_material_name+'<input name="giftpackage_ids[]" id="giftpackage_ids_'+pid+'" type="text" value="'+rs.sm_id+'" style="display:none;" /></td><td><input type="text" onchange="changetotalgiftpackage(this);total();" id="num_'+pid+'" vtype="required&amp;&amp;unsignedint" value="1" size="5" name="giftpackage[newnum]['+pid+']" aid="'+pid+'" atype="num"></td><td><input type="text" onchange="changetotalgiftpackage(this);total();" id="pr_'+pid+'" vtype="required&amp;&amp;unsigned" value="'+rs.price+'" size="8" name="giftpackage[newprice]['+pid+']" aid="'+pid+'" atype="price" value="0"></td><td><input type="text" onchange="changetotalgiftpackage(this);total();" size="6" name="giftpackage[new_obj_pmt_price]['+pid+']" value="0" atype="pmt_price" vtype="unsigned" aid="'+pid+'" id="pmt_'+pid+'"></td><td><input type="text" value="0" size="2" id="giftpackagetotal_'+pid+'" style="display:none;" class="giftpackagetotal"><input type="text" size="5" class="none_input giftpackagesaleprice" value="0" readonly="readonly" id="giftpackagesalepr_'+pid+'"></td><td><button class="btn" onclick="del_giftpackage_new('+pid+');" id="d_'+pid+'" type="button"><span><span>删除</span></span></button></td>'}).inject($E('#giftpackage_list tbody'));
+    <{/if}>
+
+    changetotalgiftpackage($('pr_'+pid));
+    total();
+    edit_checked(pid,rs.bn);
+}
+
+function edit_checked(obj_id,$obj_bn){
+    if (/^ECS_CARD_[0-9]{1,}$/.test($obj_bn)){
+        var num = $('num_'+obj_id).value;
+        if(num >=1){
+            $('num_'+obj_id).set('readonly',true);
+        }
+        $('pr_'+obj_id).set('readonly',true);
+        $('pmt_'+obj_id).set('readonly',true);
+    }
+}
+
+
+function changetotalgiftpackage(e){
+    var id = e.get('aid'),l=0,_ca = e.getNext('.error');
+    if(e.disable) return;
+    if (/^\d+(\.\d+)?$/.test(e.value)){
+        if(e.get('atype') == 'num'){
+            if (parseInt(e.value) <= 0){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }else{
+                if (_ca) _ca.remove();
+            }
+
+            $('giftpackagetotal_'+id).value = parseFloat($('num_'+id).value * $('pr_'+id).value).toFixed(3);
+
+            var giftpackagesalepr_ = (parseFloat($('num_'+id).value)*parseFloat($('pr_'+id).value) - parseFloat($('pmt_'+id).value)).toFixed(3);
+            if (/^[-|0-9]*[0-9|.]+$/.test(giftpackagesalepr_))
+            {
+                $('giftpackagesalepr_'+id).set('value', giftpackagesalepr_);
+            }else{
+                return;
+            }
+
+            var ptr,oid,m=0;
+            if((ptr = e.getParent('tr').getPrevious('tr.ColColorGray'))) {
+                oid = ptr.get('oid');
+                ptr.getAllNext('tr').each(function(item){
+                    if(oid == item.get('oid')){
+                        m += parseFloat($('num_'+item.get('aid')).value)*parseFloat($('pr_'+item.get('aid')).value) - parseFloat($('pmt_'+item.get('aid')).value);
+                    }
+                });
+                var giftpackagealepr = (m - parseFloat($('obj_pmt_'+oid).value)).toFixed(3);
+                if (/^[-|0-9]*[0-9|.]+$/.test(giftpackagealepr))
+                {
+                  $('giftpackagesalepr_'+oid).set('value', giftpackagealepr);
+                }else{
+                    return;
+                }
+            }
+            if($('giftpackagetotal_'+oid)){
+                var giftpackagetotalsub = 0;
+                $('giftpackagetotal_'+oid).getParent('tr').getAllNext('tr[oid='+oid+']').length && $('giftpackagetotal_'+oid).getParent('tr').getAllNext('tr[oid='+oid+']').each(function(e){
+                    giftpackagetotalsub += parseFloat(e.getElement('[id^=giftpackagetotal_]').value);
+                });
+                $('giftpackagetotal_'+oid).value = parseFloat(giftpackagetotalsub).toFixed(3);
+            }
+
+        }else if (e.get('atype') == 'price'){
+
+            if (parseInt(e.value) < 0){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }else{
+                if (_ca) _ca.remove();
+            }
+
+            $('giftpackagetotal_'+id).value = parseFloat($('num_'+id).value).toFixed(3)*parseFloat($('pr_'+id).value).toFixed(3);
+  
+            var giftpackagesalepr_ = (parseFloat($('num_'+id).value)*parseFloat($('pr_'+id).value) - parseFloat($('pmt_'+id).value)).toFixed(3);
+            
+            if (/^[-|0-9]*[0-9|.]+$/.test(giftpackagesalepr_))
+            {
+
+                $('giftpackagesalepr_'+id).set('value', giftpackagesalepr_);
+            }else{
+                return;
+            }
+
+            var ptr,oid,m=0;
+            if((ptr = e.getParent('tr').getPrevious('tr.ColColorGray'))) {
+                oid = ptr.get('oid');
+                ptr.getAllNext('tr').each(function(item){
+                    if(oid == item.get('oid')){
+                        m += parseFloat($('num_'+item.get('aid')).value)*parseFloat($('pr_'+item.get('aid')).value) - parseFloat($('pmt_'+item.get('aid')).value);
+                    }
+                });
+                
+                var giftpackagesalepr = (m - parseFloat($('obj_pmt_'+oid).value)).toFixed(3);
+                if (/^[-|0-9]*[0-9|.]+$/.test(giftpackagesalepr))
+                {
+                    $('giftpackagesalepr_'+oid).set('value', giftpackagesalepr);
+                }else{
+                    return;
+                }
+            }
+            if($('giftpackagetotal_'+oid)){
+                var giftpackagetotalsub = 0;
+                $('giftpackagetotal_'+oid).getParent('tr').getAllNext('tr[oid='+oid+']').each(function(e){
+                    giftpackagetotalsub += parseFloat(e.getElement('[id^=giftpackagetotal_]').value);
+                });
+                $('giftpackagetotal_'+oid).value = parseFloat(giftpackagetotalsub).toFixed(3);
+            }
+        }else if (e.get('atype') == 'pmt_price'){
+
+            if (parseInt(e.value) < 0){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }else {
+                if (_ca) _ca.remove();
+            }
+
+            var giftpackagesalepr = (parseFloat($('num_'+id).value)*parseFloat($('pr_'+id).value) - parseFloat($('pmt_'+id).value)).toFixed(3);
+            if (/^[-|0-9]*[0-9|.]+$/.test(giftpackagesalepr))
+            {
+                $('giftpackagesalepr_'+id).set('value', giftpackagesalepr);
+            }else{
+                return;
+            }
+
+            var ptr,oid,aid,m=0;
+            if((ptr = e.getParent('tr').getPrevious('tr.ColColorGray'))) {
+                oid = ptr.get('oid');
+                ptr.getAllNext('tr').each(function(item){
+                    aid = item.get('aid');
+                    if(oid == item.get('oid')){
+                        m += parseFloat($('num_'+aid).value)*parseFloat($('pr_'+aid).value) - parseFloat($('pmt_'+aid).value);
+                    }
+                });
+                
+                var giftpackagesalepr = (m - parseFloat($('obj_pmt_'+oid).value)).toFixed(3);
+                if (/^[-|0-9]*[0-9|.]+$/.test(giftpackagesalepr))
+                {
+                    $('giftpackagesalepr_'+oid).set('value', giftpackagesalepr);
+                }else{
+                    return;
+                }
+            }
+        }else if (e.get('atype') == 'obj_pmt_price'){
+            if (parseInt(e.value) < 0){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }else {
+                if (_ca) _ca.remove();
+            }
+            e.getParent('tr').getAllNext('tr').each(function(item){
+                if(e.getParent('tr').get('oid') == item.get('oid')){
+                    l += parseFloat($('num_'+item.get('aid')).value)*parseFloat($('pr_'+item.get('aid')).value) - parseFloat($('pmt_'+item.get('aid')).value);
+                }
+            });
+            
+            var giftpackagesalepr = (l - parseFloat($('obj_pmt_'+id).value)).toFixed(3);
+            if (/^[-|0-9]*[0-9|.]+$/.test(giftpackagesalepr))
+            {
+                $('giftpackagesalepr_'+id).set('value', giftpackagesalepr);
+            }else{
+                return;
+            }
+        }
+    }else{
+        if (!_ca){
+            new Element('span',{'class':"error caution notice-inline",html:"请录入数值"}).injectAfter(e);
+            e.set('value', '0');
+        }
+    }
+}
+
+
+$('giftpackage_list').getElements("input[atype]").each(function(e){
+    changetotalgiftpackage(e);
+});
+
+function total_giftpackage(){
+    var total = 0,amount = 0;
+    $('giftpackage_list').getElements("input.giftpackagetotal").each(function(item,k){
+        if(!item.disabled)total += parseFloat(item.value);
+    });
+    $('giftpackage_list').getElements('.giftpackagesaleprice').each(function(item,k){
+        if(!item.disabled)amount += parseFloat(item.value);
+    });
+    return [total,amount];
+ }
+
+  function del_giftpackage(id){
+    
+    var oid = $("tr_"+id).get('oid');
+    var subtotal = 0;
+    var saleprice = 0;
+    var lesssub = 0;
+    var lesssale = 0;
+    var pmtorderprice = 0;
+    if($('tr_'+id).get('g-del') == 'a'){
+      if(($("tr_"+id).get('g-type') == 'giftpackage') && $('tr_'+oid) && ($("tr_"+id).get('g-bn') == $('tr_'+oid).get('g-bn'))){
+        $$('#giftpackage_list tbody tr[oid='+oid+']').each(function(e){
+            if(e.hasClass('disabled')){
+                lesssub += parseFloat(e.getElement('[id^=giftpackagetotal_]').value);
+                lesssale += parseFloat(e.getElement('[id^=giftpackagesalepr_]').value);
+            }
+            else {
+              e.addClass('disabled').set('g-del','b');
+              e.getElements('input').length && e.getElements('input[type=text]').set('disabled',true);
+              e.get('g-type') == 'adjunct' || e.get('g-type') == 'gift' ? e.getElement('button').hide() : e.getElement('button') && e.getElement('button').getElement('span span').set('text','恢复');            
+            }
+        });
+        if(lesssub >0){
+            subtotal = parseFloat($('giftpackagetotal_'+oid).value) - lesssub;
+            saleprice = parseFloat($('giftpackagesalepr_'+oid).value) - lesssub;
+        }
+
+        pmtorderprice = parseFloat($('giftpackagepmtpr_'+oid).value);
+        
+        /***
+        if(pmtorderprice>0){
+          var pmt_order = $('pmt_order').value;
+
+          pmt_order = parseFloat(pmt_order)-pmtorderprice;
+          if(pmt_order < 0){
+              var discount = $('discount').value;
+              discount = parseFloat(discount)-pmt_order;
+              $('discount').value = parseFloat(discount.toFixed(3));
+              pmt_order = 0;
+          }
+          pmt_order = parseFloat(pmt_order).toFixed(3);
+          $('pmt_order').set('value', pmt_order);
+          $('pmt_order_show').set('text', '¥'+pmt_order).set('val', pmt_order);
+        }
+        ***/
+      }
+      else {
+        subtotal = $('giftpackagetotal_'+id).value;
+        saleprice = $('giftpackagesalepr_'+id).value;
+        $("num_"+id).disabled=true;
+        $("pr_"+id).disabled=true;
+        $("pmt_"+id).disabled=true;
+        $("giftpackagetotal_"+id).disabled=true;
+        $("giftpackagesalepr_"+id).disabled=true;
+        
+        $("giftpackage_ids_"+id).disabled=true;
+        
+        $("tr_"+id).addClass('disabled').set('g-del','b');
+        $("d_"+id).getElement('span span').set('text','恢复');
+      }
+    }
+    else if($('tr_'+id).get('g-del') == 'b'){
+      if(($("tr_"+id).get('g-type') == 'giftpackage') && $('tr_'+oid) && ($("tr_"+id).get('g-bn') == $('tr_'+oid).get('g-bn'))) {
+        $$('#giftpackage_list tbody tr[oid='+oid+']:not(:disabled)').each(function(e){
+            if(!e.hasClass('disabled')){
+                lesssub += parseFloat(e.getElement('[id^=giftpackagetotal_]').value);
+                lesssale += parseFloat(e.getElement('[id^=giftpackagesalepr_]').value);
+            }
+            else {
+              e.removeClass('disabled').set('g-del','a');
+              e.getElements('input').length && e.getElements('input[type=text]').set('disabled',false);
+              e.getElement('button') && e.getElement('button').show().getElement('span span').set('text','删除');
+            }
+        });
+        if(lesssub >0){
+            subtotal = parseFloat($('giftpackagetotal_'+oid).value) - lesssub;
+            saleprice = parseFloat($('giftpackagesalepr_'+oid).value) - lesssub;
+        }
+        
+        /***
+        pmtorderprice = parseFloat($('giftpackagepmtpr_'+oid).value);
+        if(pmtorderprice>0){
+          var pmt_order = $('pmt_order').value;
+
+          pmt_order = parseFloat(pmt_order)+pmtorderprice;
+          pmt_order = parseFloat(pmt_order).toFixed(3);
+          $('pmt_order').set('value', pmt_order);
+          $('pmt_order_show').set('text', '¥'+pmt_order).set('val', pmt_order);
+        }
+        ***/
+      }
+      else {
+        if($('tr_'+oid) && $('tr_'+oid).hasClass('disabled')) return;
+        $("num_"+id).disabled=false;
+        $("pr_"+id).disabled=false;
+        $("pmt_"+id).disabled=false;
+        $("giftpackagetotal_"+id).disabled=false;
+        $("giftpackagesalepr_"+id).disabled=false;
+        
+        $("giftpackage_ids_"+id).disabled=true;
+        
+        $("tr_"+id).removeClass('disabled').set('g-del','a');
+        $("d_"+id).getElement('span span').set('text','删除');
+        subtotal = $('giftpackagetotal_'+id).value;
+        saleprice = $('giftpackagesalepr_'+id).value;
+      }
+    }
+    delgiftpackagetotal(id,subtotal,saleprice);
+
+  }
+
+function delgiftpackagetotal(id,subtotal,saleprice)
+{
+    //计算相关金额
+    total();
+}
+
+//删除新增商品
+function del_giftpackage_new(id){
+
+    var subtotal = $('giftpackagetotal_'+id).value;
+    var saleprice = $('giftpackagesalepr_'+id).value;
+    $('tr_'+id).set('g-del','b');
+    delgiftpackagetotal(id,subtotal,saleprice);
+    $("tr_"+id).remove();
+    if (!$E('#giftpackage_list tbody').getElement('td')){
+        $('#giftpackage_list').hide();
+    }
+    total();
+}
+
+//[拆单]部分拆分编辑购买数量
+function split_changetotalgiftpackage(e){
+    var id = e.get('aid'),l=0,_ca = e.getNext('.error');
+    if(e.disable) return;
+    
+    var split_buy_nums      = 0;
+    var split_send_nums     = 0;
+    var split_edit_nums     = 0;
+    if($('old_giftpackage_nums_'+id))
+    {
+        split_buy_nums      = parseInt($('old_giftpackage_nums_'+id).value);
+    }
+    if($('split_send_'+id))
+    {
+        split_send_nums     = parseInt($('split_send_'+id).value);
+    }
+    
+    if (/^\d+(\.\d+)?$/.test(e.value)){
+        if(e.get('atype') == 'num'){
+            if (parseInt(e.value) < 0){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }
+            else if(parseInt(e.value) == 0 && split_send_nums == 0)
+            {
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }
+            else{
+                if (_ca) _ca.remove();
+            }
+            
+            split_edit_nums     = split_send_nums + parseInt(e.value);
+            $('num_'+id).value  = split_edit_nums;
+            
+            $('giftpackagetotal_'+id).value = parseFloat($('num_'+id).value * $('pr_'+id).value).toFixed(3);
+
+            var giftpackagesalepr_ = (parseFloat($('num_'+id).value)*parseFloat($('pr_'+id).value) - parseFloat($('pmt_'+id).value)).toFixed(3);
+            if (/^[-|0-9]*[0-9|.]+$/.test(giftpackagesalepr_))
+            {
+                $('giftpackagesalepr_'+id).set('value', giftpackagesalepr_);
+            }else{
+                return;
+            }
+
+            var ptr,oid,m=0;
+            if((ptr = e.getParent('tr').getPrevious('tr.ColColorGray'))) {
+                oid = ptr.get('oid');
+                ptr.getAllNext('tr').each(function(item){
+                    if(oid == item.get('oid')){
+                        m += parseFloat($('num_'+item.get('aid')).value)*parseFloat($('pr_'+item.get('aid')).value) - parseFloat($('pmt_'+item.get('aid')).value);
+                    }
+                });
+                var giftpackagealepr = (m - parseFloat($('obj_pmt_'+oid).value)).toFixed(3);
+                if (/^[-|0-9]*[0-9|.]+$/.test(giftpackagealepr))
+                {
+                  $('giftpackagesalepr_'+oid).set('value', giftpackagealepr);
+                }else{
+                    return;
+                }
+            }
+            if($('giftpackagetotal_'+oid)){
+                var giftpackagetotalsub = 0;
+                $('giftpackagetotal_'+oid).getParent('tr').getAllNext('tr[oid='+oid+']').length && $('giftpackagetotal_'+oid).getParent('tr').getAllNext('tr[oid='+oid+']').each(function(e){
+                    giftpackagetotalsub += parseFloat(e.getElement('[id^=giftpackagetotal_]').value);
+                });
+                $('giftpackagetotal_'+oid).value = parseFloat(giftpackagetotalsub).toFixed(3);
+            }
+
+        }
+    }else{
+        if (!_ca){
+            new Element('span',{'class':"error caution notice-inline",html:"请录入数值"}).injectAfter(e);
+            e.set('value', '0');
+        }
+    }
+}
+</script>

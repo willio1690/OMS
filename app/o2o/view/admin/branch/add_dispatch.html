@@ -1,0 +1,326 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<div class="tableform newOrder">
+    <h3>关联物料</h3>
+    <form action="index.php?app=o2o&ctl=admin_branch_product&act=do_save" method="post" class="division" id="newOrderForm">
+        <div class="gray_form" style="margin-top:20px;">
+            <table class="gridlist" style="*width:97%;">
+                <div style="float:left;width:60%;">
+                    <div style="float:left">
+                        <div style="margin:2px 16px 2px 0;padding: 4px;height:26px; width:100%;">
+                            <div style="float:left;">组织架构：</div>
+                            <div style="float:left;"><{input type='organization' app='organization' show="onlytree" effect="organization_stores_list"}></div>
+                        </div>
+                        <div style="margin:2px 16px 2px 0;padding: 4px;height:26px; width:100%;">
+                            <div style="float:left;">选择门店：</div>
+                            <div style="float:left;" id="organization_stores_list"></div>
+                            <div style="float:left;color:red">&nbsp;*<{help}><{t}>筛选特定门店请做选择,组织架构是用来过滤此门店下拉的列表。 <{/t}><{/help}></div>
+                        </div>
+                    </div>
+                </div>
+            </table>
+        </div>
+        <div class="gray_form" style="margin-top:20px;">
+            <p class="clearfix"><strong class="fl">选择物料  <{button label="添加销售物料" id="add-material-btn" }>  </strong> </p>
+            </p>
+            <table class="gridlist" style="*width:97%;">
+                <thead>
+                <tr>
+                    <th>销售物料编码</th>
+                    <th>销售物料名称</th>
+                    <th style="width:30px;">删除</th>
+                </tr>
+                </thead>
+                <tbody id="proNode">
+
+                </tbody>
+            </table>
+        </div>
+        <{button type="button" class="btn-primary" id="btn_submit" label="提交" }>
+    </form>
+</div>
+
+<script>
+    //根据组织架构加载选择门店的option
+    function load_organization_stores_list(org_id,value,action){
+        if (action == "onchange" && org_id == '_NULL_') {
+            //在选择过程中 选择了 “请选择...” 选择门店options 这里自动显示父类下拉框的门店信息
+            var org_id = "";
+            if (value) {
+                var arr_cur_select = value.split(":");
+                org_id = arr_cur_select[2];
+            }
+        }
+        new Request({
+            url : "index.php?app=o2o&ctl=admin_branch_product&act=organization_stores_list",
+            async : false,
+            method : 'post',
+            data : {
+                p_org_id : org_id,
+            },
+            onComplete : function(store_html) {
+                $("organization_stores_list").set('html', store_html);
+            }
+        }).send();
+    }
+    var visiTips = new Tips({
+        onShow:function(tip,el){
+            el.addClass('active');
+            tip.setStyle('display','block');
+        },
+        text: function(element){
+            if(element.get('visibility')=='false'){
+                return '隐藏商品';
+            }else{
+                return '';
+            }
+        }
+    });
+</script>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <{button type="button" class="btn-primary" id="btn_submit" label="提交" disabled='disabled'}>
+</div>
+<{/area}>
+<script>
+    // 订单类
+    var Order = {
+        addrTpl:'<li id="{addrid}" number="{number}" is_encrypt="{is_encrypt}" order_id="{order_id}"><input type="radio" name="address_id" value="{area}" /><q>{addr}</q><b>{name}</b><i>{zip}</i><em>{mobile}</em>&nbsp; &nbsp; &nbsp; <span>{telephone}</span> &nbsp; &nbsp; &nbsp;  <strong>{email}</strong>&nbsp; &nbsp; &nbsp;  <cid>{certId}</cid> <a class="edit-addr">编辑</a></li>',
+        memberlist:[],
+        memberTpl:'<tr id="{memberid}"><td><input type="radio" name="id" value="{member_id}" /></td><td><a class="edit-member"><span>编辑</span></a></td><td>{uname}</td><td>{sex}</td><td>{mobile}</td><td>{area}</td><td>{email}</td></tr>',
+        setAddr:function(data,cur){
+            var html = '';
+            if (typeOf(data) == 'array') {
+                for(var i=0;i<data.length;i++){
+                    data[i]['number']=i;
+                    data[i]['addrid']= 'addr'+i;
+                    html+=this.addrTpl.substitute(data[i]);
+                }
+            }
+
+            if (!html) return ;
+
+            cur = cur ? cur : 0;
+
+        },
+    };
+
+    (function(){
+        var callurl='index.php?app=ome&ctl=admin_order&act=getSalesMaterialByAddNormalOrder', store=[];
+        var options={
+            'getVar':'bn',
+            'delay':800,
+            'fxOptions':false,
+            callJSON:function(){return window.autocompleter_json;},
+            injectChoice:function(json){
+                var choice = new Element('li', {'html': this.markQueryValue(json[this.options.getVar])});
+                choice.store('_data',json);
+                choice.inputValue = json[this.options.getVar];
+                this.addChoiceEvents(choice).inject(this.choices);
+            },
+            onHide:function(){
+                if(!this.selected)return;
+                this.element.value = '';
+                var _json=this.selected.retrieve('_data');
+                _json=$splat(_json);
+                init(_json);
+            },
+            onFocus:function(ipt){
+            }
+        };
+
+        var fdoc=document.createDocumentFragment();
+
+        var pag;
+
+        var tpl='<tr key="{product_id}"  id="goods_{product_id}">\
+            <td>{sales_material_bn}</td>\
+            <td class="material-name">{sales_material_name}</td>\
+            <td style="display: none"><input type="text" value="{num}"  key="num" vtype="unsignedint" tname="num[]" size="6"></td>\
+            <td style="display: none"><input type="text" value="{product_id}"  key="product_id" vtype="unsignedint" tname="bm_id[]" size="6"></td>\
+            <td style="display: none"><input type="text" {tpl_price_readonly} value="{price}" key="price"  vtype="unsigned"  tname="price[]" size="6">元</td>\
+            <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>\
+          </tr>';
+
+        function createProduct(data){
+            pag=new PageData(tpl,data,{'updateMain':$('proNode'),'pageNum':10,PRIMARY_ID:'product_id',
+                'onShow':function(){
+                    var _this=this;
+                    $$('#proNode input[type]').addEvent('change',function(e){
+                        if(!validatorMap[this.get('vtype')][1](this, this.getValue())){return ;}
+                        var pid=this.getParent('tr').get('key'),value=this.value;
+                        _this.editData(pid,[this.get('key'),value]);
+                    });
+
+                    rows=$$('#proNode tr');
+                    rows.each(function(item,i){
+                        // item.getElement('.btn_delete').addEvent('click',function(e){
+                        item.getElement('.btn-delete-item').addEvent('click',function(e){
+                            // if(_this.selectData(item.get('key')) && confirm('确定要删除 '+ _this.selectData(item.get('key'))['name'] +' 吗？')){
+                            if(_this.selectData(item.get('key')) && confirm('确定要删除 '+ _this.selectData(item.get('key'))['sales_material_name'] +' 吗？')){
+                                _this.delData(item.get('key'));
+                            }
+                        });
+                        item.getElement('input[key=price]').addEvents({
+                            'blur':function(){
+                                var notice;
+                                if ($defined(this.getNext('span.error')))
+                                {
+                                    this.getNext('span.error').destroy();
+                                }
+                                if(!validatorMap['unsigned'][1](this, this.getValue())){
+                                    notice=new Element('span.error',{html:'请输入数值！'}).injectAfter(this);
+                                    notice.destroy.delay(4000,notice);
+                                }else {
+                                    cost_item(_this.data);
+                                }
+                            },
+                            'focus':function(){
+                                if(this.getNext('span.error')) this.getNext('span.error').destroy();
+                            }
+                        });
+
+                        item.getElement('input[key=num]').addEvents({
+                            'keypress':function(e){
+                                if(e.code==13) item.getElement('input[key=price]').focus();
+                            },
+                            'blur':function(){
+                                var notice;
+
+                                if(!validatorMap['unsignedint'][1](this, this.getValue())) {
+                                    notice=new Element('span.error',{html:'请输入数值！'}).injectAfter(this);
+                                    notice.destroy.delay(4000,notice);
+                                    return;
+                                }
+
+                                if(this.value.toInt() > this.getParent('td').getPrevious().get('text').trim().toInt()){
+                                    notice=new Element('span.notice',{html:'购买数量超出库存数量！'}).injectAfter(this);
+                                    notice.destroy.delay(4000,notice);
+                                }
+
+                                cost_item(_this.data);
+                            },
+                            'focus':function(){
+                                if(this.getNext('span.notice')) this.getNext('.notice').destroy();
+                                if(this.getNext('span.error')) this.getNext('span.error').destroy();
+                            }
+
+                        });
+                    });
+                    //var len = this.data.length ? (this.data.length > this.options.pageNum ? (this.options.current == this.getTotal() ? this.data.length-this.options.pageNum*(this.options.current-1) : this.options.pageNum) : this.data.length) : 0;
+                    if(this.data.length) rows[0].getElement('input[key^=num]').focus();
+                    $ES('.product-name').each(function(item){
+                        if (item.get('visibility')=='false')
+                        {
+                            item.setStyle('color','#808080');
+                        }
+                    });
+                    $ES('.product-name').removeEvent('mouseover').addEvent('mouseover',function(e){
+                        if (this.get('visibility')=='false')
+                        {
+                            var e  = new Event(e), el = e.target;
+                            visiTips.attach(el);
+                            el.addEvent('mouseleave',function(){
+                                this.removeClass('active');
+                            });
+                            el.fireEvent('mouseenter',e);
+                        }
+                    });
+                }
+            });
+        }
+
+
+        $('add-material-btn').addEvent('click',function(e){
+            var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=o2o&ctl=admin_branch_product&act=get_product_info');
+            new finderDialog(url,{params:{url:callurl,name:'sm_id[]'},width:1000,height:660,
+                onCallback:function(rs){
+                    if(!rs)return;
+                    rs=JSON.decode(rs);
+                    init(rs);
+                }
+            });
+        });
+
+
+        $('btn_submit').addEvent('click',function(e){
+            if( $('proNode').getHTML().trim() == '') {
+                var tip=$('add-material-btn').getParent().getElement('.error') || new Element('span.error').inject($('add-material-btn').getParent());
+                tip.setHTML('请先添加商品');
+                tip.destroy.delay(4000,tip);
+                MessageBox.error('表单验证失败:请先添加商品');
+                e.stop();
+                return;
+            }
+
+            var _this=this;
+            var form = $('newOrderForm');
+
+            if(pag){
+                var data=pag.toHideInput($('proNode').getElement('tr'));
+                form.store('target',{extraData:data,
+                    onRequest:function(){
+                        $('btn_submit').set('disabled', 'true');
+                        $('btn_submit').getElements('span')[1].set('text','处理中');
+                    },
+                    onComplete:function(jsontext){
+                        try{
+                            var json = JSON.decode(jsontext);
+                            if (typeof(json.error)!='undefined'){
+                                _this.disabled=false;
+                            }else{
+                                _this.disabled=true;
+
+                                if(opener.finderGroup['<{$env.get.finder_id}>'])
+                                {
+                                    opener.finderGroup['<{$env.get.finder_id}>'].unselectAll();
+                                    opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                                    setTimeout('window.close()',200);
+                                }
+
+                            }
+                        }catch(e){}
+                    }
+                });
+            }
+            form.fireEvent('submit',e);
+        });
+
+        function init(rs){
+            var tmparr=findProduct(rs,'product_id');
+            store.unshift.apply(store,tmparr.reverse());
+            createProduct(store,tpl);
+        }
+        function findProduct(arr,PRIMARY){
+            if(!store.length)return arr;
+            store.each(function(a){
+                arr.each(function(b){
+                    if(a[PRIMARY]==b[PRIMARY])arr.erase(b);
+                });
+            });
+            return arr;
+        }
+
+        $$('input[name=disc],input[name=cost_shipping]').addEvent('change',function(){
+            sumOrderAmount();
+        });
+
+        function validProduct(element,msg){
+            element=$(element);
+            new Element('span.error',{html:msg}).injectAfter(element);
+            element.removeEvents('blur').addEvent('blur',function(){
+                if(validate(element)) element.removeEvent('blur',arguments.callee);
+            });
+        }
+
+    })();
+</script>

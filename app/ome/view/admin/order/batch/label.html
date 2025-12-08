@@ -1,0 +1,68 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="finder-detail">
+    <style>
+    #sel_label_form li {width:140px; overflow: hidden; float: left; margin-bottom: 10px; font-size: 12px; line-height: 20px;}
+    .current-set {color: red; font-weight: 700;}
+    </style>
+    <input type="hidden" name='select_labels' id="select_labels" value='' class="dailog-batch-ipt" />
+    <input type="hidden" name='select_oper_action' id="select_oper_action" value='add' class="dailog-batch-ipt" />
+    <div class="division" id="sel_label_form">
+        <table width="100%" cellspacing="0" cellpadding="0">
+            <tbody>
+                <tr>
+                    <td><input name="oper_action" type="radio" checked="checked" value="add" class="dailog-batch-ipt" /> 添加以下标记</td>
+                </tr>
+                <tr>
+                  <td><input name="oper_action" type="radio" value="delete" class="dailog-batch-ipt" /> 清除以下标记</td>
+                </tr>
+                <tr>
+                    <td>
+                    <div id="label_list_div" style="min-height:200px; padding-left:18px;">
+                    <ul id="label_list_ul" class="label_list_ul">
+                        <{foreach from=$labelList item=labelItem key=labelKey}>
+                        <li><span><input type="checkbox" name="label_ids[]" id="label_id_<{$labelItem.label_id}>" value="<{$labelItem.label_id}>" class="dailog-batch-ipt" /> <{$labelItem.label_name}>
+                        <span style="background-color:<{$labelItem.label_color}>;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></span></li>
+                        <{/foreach}>
+                    </ul>
+                    </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+$$('input[name^=label_ids]').addEvent('click', function(){
+    var select_i = 0;
+    var selectLables = '';
+    $$('input[name^=label_ids]').each(function(item, index){
+        if(item.checked){
+            select_i++;
+            
+            selectLables += (','+ item.value);
+        }
+    });
+    
+    if(select_i > 10){
+        alert("一次最多可选择10个标签");
+        return false;    
+    }
+    
+    $('select_labels').set('value', selectLables);
+    
+    return true;
+});
+
+//操作模式
+$$('input[name^=oper_action]').addEvent('click', function(){
+    $$('input[name^=oper_action]').each(function(item, index){
+        if(item.checked){
+            $('select_oper_action').set('value', item.value);
+        }
+    });
+});
+</script>

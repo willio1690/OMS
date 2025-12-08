@@ -1,0 +1,447 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>退货入库</title>
+  <link rel="stylesheet" type="text/css" href="<{$env.app.res_url}>/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="<{$env.app.res_url}>/css/new_checkorder.css" />
+  <script src="<{$env.app.res_url}>/js/axios.min.js"></script>
+  <script src="<{$env.app.res_url}>/js/flexible.js"></script>
+  <style>
+    /* 数量输入框样式 */
+    .quantity-input {
+      width: 60px;
+      height: 24px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 12px;
+      text-align: center;
+      background: #fff;
+      color: #333;
+    }
+
+    .quantity-input:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    .quantity-input:invalid {
+      border-color: #dc3545;
+      background-color: #fff5f5;
+    }
+
+    /* 输入框容器样式 */
+    .text_30 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 错误提示样式 */
+    .quantity-error {
+      color: #dc3545;
+      font-size: 10px;
+      margin-top: 2px;
+    }
+
+    /* 去除复选框后的布局优化 */
+    .goods-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .goods-item:last-child {
+      border-bottom: none;
+    }
+
+    .footer {
+      padding: 16px;
+      background: #fff;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .footer-btn {
+      width: 100%;
+      max-width: 300px;
+      height: 44px;
+      background: #000;
+      color: #d4ca99;
+      border: none;
+      border-radius: 22px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .footer-btn:hover {
+      background: #333;
+    }
+
+    .footer-btn:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page flex-col">
+    <!-- heder -->
+    <div class="section_1">
+      <div class="text-wrapper_1 flex-row align-center justify-between">
+        <img src="<{$env.app.res_url}>/img/icon-back.png" class="icon-back">
+        <span class="text_1">退货入库</span>
+        <img src="<{$env.app.res_url}>/img/icon-refresh.png" class="icon-refresh">
+        <input type="hidden" name="return_id" value="<{$returns.return_id}>">
+      </div>
+    </div>
+    <div class="main flex-col">
+      <{foreach from=$items item=reship_item}>
+        <div class="goods-item flex-row align-center">
+          <div class="section_6 flex-row flex-shrink-1 align-center">
+            <img class="image_2" referrerpolicy="no-referrer"
+              src="<{$reship_item.goods_img_url}>" />
+            <div class="text-group_1 flex-col">
+              <div class="status-info"> <span class="text_28 flex-shrink-1"><{$reship_item.name}></span>
+              </div>
+              <span class="text_29">商品货号：<{$reship_item.bn}></span>
+              <span class="text_30">退货数量:<input type="number" class="quantity-input" name="quantity_<{$reship_item.bn}>" value="<{$reship_item.num}>" min="1" max="<{$reship_item.num}>" data-max="<{$reship_item.num}>" data-bn="<{$reship_item.bn}>" onchange="validateQuantity(this)" oninput="validateQuantity(this)"></span>
+            </div>
+          </div>
+        </div>
+      <{/foreach}>
+
+
+    </div>
+    <div class="footer justify-center">
+      <button class="footer-btn" onclick="submitAccept()">退货入库</button>
+    </div>
+  </div>
+  <div class="mask" id="mask"></div>
+  <div class="toast" id="toast"></div>
+  <!-- 弹窗组件 -->
+  <!-- 弹窗组件模板 -->
+  <div class="modal" id="commonModal" style="display: none;">
+    <div class="modal-mask"></div>
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title"></h3>
+        <span class="modal-close">×</span>
+      </div>
+      <div class="modal-content">
+        <!-- 动态内容区域 -->
+      </div>
+      <div class="modal-footer justify-between">
+        <button class="modal-btn modal-cancle">取消</button>
+        <button class="modal-btn modal-confirm">确定</button>
+      </div>
+    </div>
+  </div>
+  <!-- 引入共用的js -->
+  <script src="<{$env.app.res_url}>/js/common.js"></script>
+  <script>
+    // 初始化弹窗实例
+    const modal = new Modal();
+
+    // 数量验证函数
+    function validateQuantity(input) {
+      const value = parseInt(input.value);
+      const max = parseInt(input.getAttribute('data-max'));
+      const bn = input.getAttribute('data-bn');
+      
+      // 检查是否为有效数字
+      if (isNaN(value) || value < 1) {
+        input.value = 1;
+        showToast('退货数量不能小于1');
+        return false;
+      }
+      
+      // 检查是否超过最大数量
+      if (value > max) {
+        input.value = max;
+        showToast(`退货数量不能大于${max}`);
+        return false;
+      }
+      
+      // 检查是否为整数
+      if (!Number.isInteger(value)) {
+        input.value = Math.floor(value);
+        showToast('退货数量必须为整数');
+        return false;
+      }
+      
+      return true;
+    }
+
+    // 获取所有数量输入框的值
+    function getAllQuantities() {
+      const quantities = {};
+      document.querySelectorAll('.quantity-input').forEach(input => {
+        const bn = input.getAttribute('data-bn');
+        const value = parseInt(input.value) || 0;
+        quantities[bn] = value;
+      });
+      return quantities;
+    }
+
+    // 请求配置和方法封装
+    const request2 = axios.create({
+      baseURL: '/index.php/wap/aftersale_returnproduct', // 设置基础URL
+      timeout: 10000,  // 设置超时时间
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+
+    // API 方法封装
+    const api = {
+      // 发货
+      doReship(params) {
+        return request2.post('/doReship', params, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      },
+    };
+
+
+
+    // 页面加载时初始化数量输入框
+    document.addEventListener('DOMContentLoaded', function() {
+      // 初始化所有数量输入框
+      document.querySelectorAll('.quantity-input').forEach(input => {
+        // 确保初始值有效
+        validateQuantity(input);
+        
+        // 添加键盘事件监听
+        input.addEventListener('keydown', function(e) {
+          // 只允许数字、退格键、删除键、方向键
+          if (!/[0-9]/.test(e.key) && 
+              !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+            e.preventDefault();
+          }
+        });
+        
+        // 添加粘贴事件监听
+        input.addEventListener('paste', function(e) {
+          e.preventDefault();
+          const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+          const numericValue = pastedText.replace(/[^0-9]/g, '');
+          if (numericValue) {
+            this.value = numericValue;
+            validateQuantity(this);
+          }
+        });
+      });
+    });
+
+    // 获取所有商品数据
+    function getAllOrders() {
+      const orders = [];
+      document.querySelectorAll('.goods-item').forEach(item => {
+        const quantityInput = item.querySelector('.quantity-input');
+          const goodsInfo = {
+            goodsNo: item.querySelector('.text_29').textContent.split('：')[1],
+          quantity: parseInt(quantityInput.value) || 0
+          };
+        orders.push(goodsInfo);
+      });
+      return orders;
+    }
+
+    // 同意
+    function submitAccept() {
+      var location_url = '<{$wait_return_url}>';
+
+      // 验证所有数量输入
+      const quantityInputs = document.querySelectorAll('.quantity-input');
+      let isValid = true;
+      quantityInputs.forEach(input => {
+        if (!validateQuantity(input)) {
+          isValid = false;
+        }
+      });
+
+      if (!isValid) {
+        return;
+      }
+
+      // 收集所有商品的数量信息
+      const itemsData = [];
+      document.querySelectorAll('.goods-item').forEach(item => {
+        const quantityInput = item.querySelector('.quantity-input');
+        const bn = item.querySelector('.text_29').textContent.split('：')[1];
+        
+        itemsData.push({
+          bn: bn,
+          num: parseInt(quantityInput.value) || 0
+        });
+      });
+
+      // 显示加载状态
+      showLoading('正在处理退货入库...');
+
+      // 创建FormData对象
+      const formData = new FormData();
+      formData.append('return_id', document.querySelector(`[name="return_id"]`).value);
+      formData.append('action', 'accept');
+      
+      // 添加商品数据
+      itemsData.forEach((item, index) => {
+        formData.append(`items[${index}][bn]`, item.bn);
+        formData.append(`items[${index}][num]`, item.num);
+      });
+
+      api.doReship(formData).then(res => {
+        hideLoading();
+        if (res.data.res === 'succ') {
+          showToast('退货入库成功');
+          // 可以根据需要添加其他操作，比如跳转页面
+          window.location.href = location_url;
+        } else {
+          showToast(res.data.msg || '退货入库失败');
+        }
+      }).catch(err => {
+        hideLoading();
+        console.error('退货入库失败:', err);
+        showToast('退货入库失败，请重试');
+      });
+    }
+
+
+    function submitRefuse() {
+      showRefuseModal()
+    }
+
+    // 日期选择
+    function showRefuseModal() {
+      var location_url = '<{$wait_return_url}>';
+      modal.show({
+        title: '验货退款',
+        confirmText: '拒绝',
+        fields: [
+          {
+            type: 'textarea',
+            name: 'refuse_reason',
+            label: '拒绝理由',
+            placeholder: '请填写拒绝原因',
+            required: true
+          },
+          {
+            type: 'image',
+            name: 'refuseImage',
+            label: '拒绝理由图片',
+            required: true
+          },
+        ],
+        onConfirm: async (formData) => {
+          // 创建FormData对象
+          const formDataObj = new FormData();
+          var reship_id = document.querySelector(`[name="reship_id"]`).value;
+          // 添加拒绝理由
+          formDataObj.append('reship_id', reship_id);
+          formDataObj.append('action', 'refuse');
+          formDataObj.append('refuse_reason', formData.refuse_reason);
+
+          // 添加图片数据
+          formData.refuseImage.forEach((base64, index) => {
+            // 将base64转换为blob
+            const byteString = atob(base64.split(',')[1]);
+            const mimeString = base64.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+              ia[i] = byteString.charCodeAt(i);
+            }
+            const blob = new Blob([ab], { type: mimeString });
+
+            // 验证Blob是否有效
+            if (blob.size === 0) {
+              console.error('Blob无效，无法创建URL');
+              return; // 如果Blob无效，终止当前循环
+            }
+
+            // 创建Object URL并验证
+            const objectUrl = URL.createObjectURL(blob);
+            const img = new Image();
+            img.onload = () => {
+              console.log(`Blob验证成功: ${objectUrl}`);
+              // 在页面中显示图像
+              URL.revokeObjectURL(objectUrl); // 释放URL对象
+            };
+            img.onerror = () => {
+              console.error('Blob验证失败，无法加载图像');
+            };
+            img.src = objectUrl; // 尝试加载Blob
+
+            // 添加到FormData
+            formDataObj.append(`refuseImage[${index}]`, blob);
+
+          });
+
+          // 替换原formData
+          formData = formDataObj;
+          console.log("~ onConfirm: ~ formData2:", formData)
+          showLoading("正在请求中...");
+          var refuse_url = "<{$do_reship_url}>";
+          const result = request({
+            url: refuse_url, // 提交售后申请审核api
+            method: 'post',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            },
+          }).then(result=>{
+            if (result.res === 'succ') {
+              showToast('提交成功');
+              // 可以根据需要添加其他操作，比如跳转页面
+              window.location.href = location_url;
+            } else {
+              showToast(result.msg || '提交失败');
+            }
+            hideLoading();
+          }).catch(e=>{
+            console.log(e)
+            hideLoading();
+            showToast('网络请求失败，请稍后重试');
+          });
+
+          // 拒绝
+          // const params = {
+          //   reship_id: document.querySelector(`[name="reship_id"]`).value,
+          //   action: 'refuse',
+          //   refuse_reason: formData.refuse_reason,
+          //   refuseImage: formData.refuseImage
+          // }
+
+          // api.doReship(params).then(res => {
+          //   if (res.data.res === 'succ') {
+          //     showToast('提交成功');
+          //     // 可以根据需要添加其他操作，比如跳转页面
+          //     window.location.href = location_url;
+          //   } else {
+          //     showToast(res.data.msg || '提交失败');
+          //   }
+          // }).catch(err => {
+          //   showToast('提交失败');
+          // });
+
+          modal.hide();
+        }
+      });
+    }
+
+  </script>
+</body>
+
+</html>

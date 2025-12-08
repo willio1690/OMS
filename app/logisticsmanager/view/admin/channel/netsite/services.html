@@ -1,0 +1,15 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table>
+    <{if $expType}>
+    <tr>
+        <th>产品类型：</th>
+        <td>
+            <{input type="select" name="exp_type" options=$expType required="true"}>
+        </td>
+    </tr>
+    <{/if}>
+</table>

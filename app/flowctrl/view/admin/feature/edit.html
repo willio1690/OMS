@@ -1,0 +1,102 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<{if $error_msg}>
+    <div class="error"><{$error_msg}></div>
+<{else}>
+    <form action="" method="post" id="feature_manage">
+    <{input type="hidden" name="ft_id" id="ft_id" value=$feature_info.ft_id }>
+        <div class="division">
+                <table width="100%" cellspacing="0" cellpadding="0">
+                    <tbody>
+                        <tr>
+                            <th width="60"><label for="dom_el_bc">特性名称：</label> </th>
+                            <td ><{input type="text&&required" name="name" value=$feature_info.ft_name }></td>
+                        </tr>
+                        <tr>
+                            <th width="60"><label for="dom_el_bc">事件节点：</label> </th>
+                            <td >
+                            <{if $readonly.type == true}>
+                                <{foreach from=$nodes item=node}><{if $node.code == $feature_info.type }><{$feature.name}><{/if}><{/foreach}><input type="hidden" id="now_node" name="node" value="<{$feature_info.type}>">&nbsp;&nbsp;<span style="color:red;">(已有关联基础物料不能修改)</span>
+                            <{else}>
+                                <{input type="select" id="node" name="node" vtype="required" rows=$nodes valueColumn="code" labelColumn="name" value=$feature_info.type default="-1"}>
+                            <{/if}>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+        </div>
+
+        <div class="division" id="conf_item">
+            <{include file="admin/feature/conf_item.html"}>
+        </div>
+
+        <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td colspan="2" align="center">
+                    <{button class="btn-primary" label="确定" type="button" id="msaveBtn"}>
+                    <{button class="btn-primary" label="取消" type="button" id="mcancelBtn"}>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+    </form>
+<script> 
+    (function() {
+        var form = $('feature_manage');
+        //关闭按钮
+        $('mcancelBtn').addEvent('click', function(){
+            $('mcancelBtn').getParent('.dialog').retrieve('instance').close();
+        });
+
+        //保存按钮
+        $('msaveBtn').addEvent('click', function(){
+            new Request ({
+                url:'index.php?app=flowctrl&ctl=admin_feature&act=toEdit',
+                method:'post',
+                data:form.toQueryString(),
+                onRequest: function () {
+                    $('msaveBtn').set('disabled', 'true');
+                    $('mcancelBtn').set('disabled', 'true');
+                },
+                onSuccess: function(result) {
+                    if (result =='SUCC') {
+                        finderGroup["<{$env.get.finder_id}>"].refresh.delay(400,finderGroup["<{$env.get.finder_id}>"]);
+                        $('msaveBtn').getParent('.dialog').retrieve('instance').close();
+                    } else {
+                        $('msaveBtn').set('disabled', '');
+                        $('mcancelBtn').set('disabled', '');
+                        //提示信息
+                        alert(result);
+                    }
+                }
+            }).send();
+        });
+
+        if($('node')){
+            $('node').addEvent('change',function() {
+                new Request.HTML({
+                    url:'index.php?app=flowctrl&ctl=admin_feature&act=getNodesCnfByFeature',
+                    method:'post',
+                    update:$('conf_item'),
+                    data:{'node':this.value,'ft_id':$('ft_id').value},
+                }).send();
+            });
+
+            $('node').fireEvent('change');
+        }else{
+            new Request.HTML({
+                url:'index.php?app=flowctrl&ctl=admin_feature&act=getNodesCnfByFeature',
+                method:'post',
+                update:$('conf_item'),
+                data:{'node':$('now_node').value,'ft_id':$('ft_id').value},
+            }).send();
+        }
+    })();
+</script>
+<{/if}>
+</div>

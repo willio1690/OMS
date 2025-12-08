@@ -1,0 +1,18 @@
+<app>
+    <name>O2O业务管理</name>
+    <description>O2O业务管理</description>
+
+    <author>
+        <name>淘管开发团队</name>
+        <email>taog@shopex.cn</email>
+        <url>http://www.shopex.cn</url>
+    </author>
+
+    <version>1.0.0</version>
+    <license>shopex license</license>
+    <parent_model_class>dbeav_model</parent_model_class>
+     
+    <depends>
+        <app>organization</app>
+    </depends>
+</app>

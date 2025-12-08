@@ -1,0 +1,9 @@
+<services>
+    <service id="desktop_finder.flowctrl_mdl_feature"> 
+        <class>flowctrl_finder_feature</class>
+    </service>
+    <service id="desktop_finder.flowctrl_mdl_feature_group"> 
+        <class>flowctrl_finder_feature_group</class>
+    </service>
+</services>
+

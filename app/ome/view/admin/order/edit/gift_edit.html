@@ -1,0 +1,462 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="gift_list" <{if empty($conf.objs)}> style="display:none" <{/if}>>
+  <input type="hidden" name="objtype[]" value="gift"/>
+  <h5 style="text-align:center;">赠品</h5>
+  
+<{if empty($delivery_list)}>
+  <table class="gridlist" width="100%" cellspacing="0" cellpadding="0" border="0" >
+    <thead>
+      <tr>
+        <th>销售物料编码</th>
+        <th>销售物料名称</th>
+        <th>购买数量</th>
+        <th>物料价格</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <{foreach from=$conf.objs item=obj}>
+        <{foreach from=$obj.order_items item=item}>
+          <{if $item.delete == 'true'}>
+            <{assign var='g_del' value="true"}>
+          <{else}>
+            <{assign var='g_del' value="false"}>
+          <{/if}>
+        <{/foreach}>
+      <tr id="tr_<{$obj.obj_id}>" oid="<{$obj.obj_id}>" <{if $obj.delete == 'true'}>style="background-color: #DBDBDB;" g-del="b"<{else}>g-del="a"<{/if}> g-type="<{$obj.obj_type}>" g-id="<{$obj.goods_id}>"  g-pid="<{$obj.goods_id}>" g-shop-pid="<{$obj.shop_goods_id}>" aid="<{$obj.obj_id}>" g-bn="<{$obj.bn}>" g-pname="<{$obj.name}>">
+        <td class="item_bn">
+          <span class="number"><{$obj.bn}></span>
+          <input type="hidden" value="<{$obj.bn}>" name="bn_list[]" /></td>
+        <td class="item_name"><{$obj.name}></td>
+        <td class="item_num"><input type="hidden" value="<{$obj.obj_id}>" name="gift[obj][<{$obj.obj_id}>][]" />
+          <input atype="gift_num_obj" aid="<{$obj.obj_id}>" obj-goods-id="<{$obj.goods_id}>" name="gift[num][<{$obj.obj_id}>]" type="text" size="5" value="<{$obj.quantity}>" vtype="required&&unsignedint" id="num_<{$obj.obj_id}>" <{if $obj.delete == 'true'}>disabled="true"<{/if}> onchange="changetotalgift(this); total();" /></td>
+        <td class="item_price"><input name="gift[price][<{$obj.obj_id}>]" type="text" size="8" value="<{$obj.price}>" vtype="required&&unsigned" id="pr_<{$obj.obj_id}>" disabled="true" onchange="total();" /></td>
+        <td class="item_op" objid="<{$obj.obj_id}>">
+          <{if $obj.delete == 'false'}>
+          <{button type="button" label="删除" id="d_{$obj.obj_id}" onclick="del_gift('{$obj.obj_id}')" }></td>
+        <{else}>
+        <{button type="button" label="恢复" id="d_{$obj.obj_id}" onclick="del_gift('{$obj.obj_id}')" }></td>
+      <{/if}>
+      </tr>
+        <{foreach from=$obj.order_items item=item}>
+          <tr id="tr_<{$item.item_id}>" o-id="<{$obj.obj_id}>" g-id="<{$obj.goods_id}>" g-pid="<{$item.product_id}>"
+              g-type="<{$item.item_type}>" g-type="<{$item.item_type}>" g-shop-pid="<{$item.shop_product_id}>"
+              aid="<{$item.item_id}>" <{if $item.delete == 'true'}>style="background-color: #D8D8D8;"
+              g-del="b"<{else}> g-del="a"<{/if}>>
+            <td class="item_bn"><{$item.bn}></td>
+            <td class="item_name"><{$item.name}><input name="product_ids[]" id="product_ids_<{$item.item_id}>"
+                                                       type="text" value="<{$item.product_id}>" style="display:none;"/>
+            </td>
+            <!--
+          <td class="item_addon"><{$item.addon}></td>
+          -->
+            <td class="item_num">
+              <input type="hidden" value="<{$item.item_id}>" />
+              <input type="text" class="none_input" id="num_<{$item.item_id}>" name="gift[item_num][<{$obj.obj_id}>][<{$item.item_id}>]"
+                     pg-id="<{$obj.goods_id}>" aid="<{$item.item_id}>" size="4" readonly="true"
+                     js="<{$item.quantity/$obj.quantity}>" <{if $item.delete == 'true'}>disabled="true"<{/if}>
+                     value="<{$item.quantity}>"/>
+            </td>
+            <td class="item_price">
+              <input type="text" class="none_input" value="0" id="pr_<{$item.item_id}>"
+                     name="gift[iprice][<{$obj.obj_id}>]" size="8" readonly="true" aid="<{$item.item_id}>"/></td>
+            <td class="goods_num"><input type="text" id="pmtpr_<{$item.item_id}>" g-id="" aid="<{$obj.goods_id}>"
+                                         atype="gift_item_pmt_price" value="0" class="goods_pmt_price none_input"
+                                         vtype="unsigned" name="gift[item_pmt_price][<{$item.item_id}>]" size="6"
+                                         readonly="readonly" <{if $g_del == 'true'}>disabled="true"<{/if}>
+                                         onchange="changetotalgift(this);total();"/></td>
+            <td class="item_op"></td>
+          </tr>
+        <{/foreach}>
+
+      <{/foreach}>
+  </tbody>
+</table>
+
+<{else}>
+  <table class="gridlist" width="100%" cellspacing="0" cellpadding="0" border="0" >
+    <thead>
+      <tr>
+        <th>销售物料编码</th>
+        <th>销售物料名称</th>
+        <th>购买数量</th>
+        <th>可编辑数量</th>
+        <th>物料价格</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+    <{foreach from=$obj.order_items item=item}>
+      <{if $item.delete == 'true'}>
+        <{assign var='g_del' value="true"}>
+      <{else}>
+        <{assign var='g_del' value="false"}>
+      <{/if}>
+    <{/foreach}>
+      <{foreach from=$conf.objs item=obj}>
+      <tr id="tr_<{$obj.obj_id}>" oid="<{$obj.obj_id}>" <{if $obj.delete == 'true'}>style="background-color: #DBDBDB;" g-del="b"<{else}>g-del="a"<{/if}> g-type="<{$obj.obj_type}>" g-pid="<{$obj.goods_id}>" g-shop-pid="<{$obj.shop_goods_id}>" aid="<{$obj.obj_id}>" g-bn="<{$obj.bn}>" g-pname="<{$obj.name}>">
+        <td class="item_bn">
+          <span class="number"><{$obj.bn}></span>
+          <input type="hidden" value="<{$obj.bn}>" name="bn_list[]" /></td>
+        <td class="item_name"><{$obj.name}></td>
+        <td class="item_num"><input type="hidden" value="<{$obj.obj_id}>" name="gift[obj][<{$obj.obj_id}>][]" />
+          <input atype="gift_num_obj" obj-goods-id="<{$obj.goods_id}>" aid="<{$obj.obj_id}>" name="gift[num][<{$obj.obj_id}>]" type="text" size="5" value="<{$obj.quantity}>" vtype="required&&unsignedint" id="gift_num_<{$obj.obj_id}>"  <{if $obj.delete == 'true'}>disabled="true"<{else}>readonly="readonly" style="color:#666;"<{/if}> onchange="changetotalgift(this); total();" /><input type="hidden" value="<{$obj.quantity}>" id="old_gift_nums_<{$obj.obj_id}>" /></td>
+        
+        <td class="gift_buy_nums">
+        <{if $obj.left_nums <= 0}>
+        <input aid="<{$obj.obj_id}>" name="gift[gift_buy_nums][<{$obj.obj_id}>]" type="text" size="5" value="<{$obj.left_nums}>" id="gift_buy_nums_<{$obj.obj_id}>" disabled="true" />
+        <{else}>
+          
+        <input atype="gift_num_obj" aid="<{$obj.obj_id}>" obj-goods-id="<{$obj.goods_id}>" name="gift[gift_buy_nums][<{$obj.obj_id}>]" type="text" size="5" value="<{$obj.left_nums}>" id="gift_buy_nums_<{$obj.obj_id}>" <{if $obj.delete == 'true'}>disabled="true"<{/if}> onchange="split_changetotal_gift(this);" />
+        <{/if}>
+        <{if $obj.make_nums}><br />(<font color="#f00;">已发货：<{$obj.make_nums}></font>)<input type="hidden" value="<{$obj.make_nums}>" id="split_gift_send_<{$obj.obj_id}>" /><{/if}>
+        </td>
+        
+        <td class="item_price"><input name="gift[price][<{$obj.obj_id}>]" type="text" size="8" value="<{$obj.price}>" vtype="required&&unsigned" id="pr_<{$obj.obj_id}>" disabled="true" /></td>
+        <td class="item_op" objid="<{$obj.obj_id}>">
+        <{if empty($obj.make_nums)}>
+            <{if $obj.delete == 'false'}>
+             <{button type="button" label="删除" id="d_{$obj.obj_id}" onclick="del_gift('{$obj.obj_id}')" }></td>
+            <{else}>
+             <{button type="button" label="恢复" id="d_{$obj.obj_id}" onclick="del_gift('{$obj.obj_id}')" }></td>
+            <{/if}>
+        <{else}>
+         <span style="color:red;"><{if $obj.left_nums <= 0}>已拆分完<{else}>部分拆分<{/if}></span>
+        <{/if}>
+      </tr>
+        <{foreach from=$obj.order_items item=item}>
+          <tr id="tr_<{$item.item_id}>" o-id="<{$obj.obj_id}>" g-id="<{$obj.goods_id}>" g-pid="<{$item.product_id}>"
+              g-type="<{$item.item_type}>" gift-type="<{$item.item_type}>" g-shop-pid="<{$item.shop_product_id}>"
+              aid="<{$item.item_id}>" <{if $item.delete == 'true'}>style="background-color: #D8D8D8;"
+              g-del="b"<{else}> g-del="a"<{/if}>>
+            <td class="item_bn"><{$item.bn}></td>
+            <td class="item_name"><{$item.name}><input name="product_ids[]" id="product_ids_<{$item.item_id}>"
+                                                       type="text" value="<{$item.product_id}>" style="display:none;"/>
+            </td>
+            <!--
+          <td class="item_addon"><{$item.addon}></td>
+          -->
+            <td class="item_num">
+              <input type="hidden" value="<{$item.item_id}>" />
+              <input type="text" class="none_input" id="num_<{$item.item_id}>" name="gift[inum][<{$obj.obj_id}>]"
+                     pg-id="<{$obj.goods_id}>" aid="<{$item.item_id}>" size="4" readonly="true"
+                     js="<{$item.quantity/$obj.quantity}>" <{if $item.delete == 'true'}>disabled="true"<{/if}>
+                     value="<{$item.quantity}>"/>
+            </td>
+            <td>-</td>
+            <td class="item_price">
+              <input type="text" class="none_input" value="0" id="pr_<{$item.item_id}>"
+                     name="gift[iprice][<{$obj.obj_id}>]" size="8" readonly="true" aid="<{$item.item_id}>"/></td>
+            <td class="goods_num"><input type="text" g-id="" aid="<{$obj.goods_id}>"
+                                         value="<{$item.pmt_price|default:0}>" class="goods_pmt_price none_input"
+                                         vtype="unsigned" name="gift[item_pmt_price][<{$item.item_id}>]" size="6"
+                                         readonly="readonly" <{if $g_del == 'true'}>disabled="true"<{/if}>
+                                         onchange="total();"/></td>
+            <td class="item_op"></td>
+          </tr>
+        <{/foreach}>
+
+      <{/foreach}>
+  </tbody>
+</table>
+<{/if}>
+</div>
+<script>
+  function total_gift(){
+    var total = 0;
+    $('gift_list').getElements("input[type=text]").each(function (e){
+        if (!e.disabled){
+            if (/^\d+(\.\d+)?$/.test(e.value)){
+                if (e.get('atype') == 'num'){
+                    if (parseInt(e.value) <= 0){
+                        var _ca = e.getNext();
+                        if (!_ca) new Element('span',{'class':"error caution notice-inline",html:"请录入不小于0的数"}).injectAfter(e);
+                    }else {
+                        var _ca = e.getNext();
+                        if (e.value > 0){
+                            if (_ca) _ca.remove();
+                        }
+                    }
+                    id = e.get('aid');
+                    total += parseFloat(e.value).toFixed(3)*parseFloat($('pr_'+id).value).toFixed(3);
+                }else if (e.get('atype') == 'newnum'){
+                    if (parseInt(e.value) <= 0){
+                        var _ca = e.getNext();
+                        if (!_ca) new Element('span',{'class':"error caution notice-inline",html:"请录入不小于0的数"}).injectAfter(e);
+                    }else {
+                        var _ca = e.getNext();
+                        if (e.value > 0){
+                            if (_ca) _ca.remove();
+                        }
+                    }
+                    id = e.get('aid');
+                    total += parseFloat(e.value).toFixed(3)*parseFloat($('newpr_'+id).value).toFixed(3);
+                }
+            }
+            else{
+              var _ca = e.getNext();
+              if (!_ca) new Element('span',{'class':"error caution notice-inline",html:"请录入不小于0的数"}).injectAfter(e);
+            }
+        }
+      });
+      return [total,total];
+  }
+  function del_gift(id){
+
+    var gift_num_id = "";
+    <{if empty($delivery_list)}>
+        gift_num_id = "num_"+id;
+    <{else}>
+        gift_num_id = "gift_num_"+id;
+    <{/if}>
+
+    if($('tr_'+id).get('g-del') == 'a'){
+        $(gift_num_id).disabled=true;
+        $("pr_"+id).disabled=true;
+        $("tr_"+id).setStyle('background-color','#D8D8D8').set('g-del','b');
+        $("d_"+id).getElement('span').getElement('span').set('text','恢复');
+    }
+    else {
+        $(gift_num_id).disabled=false;
+        $("pr_"+id).disabled=false;
+        $("tr_"+id).setStyle('background-color','').set('g-del','a');
+        $("d_"+id).getElement('span').getElement('span').set('text','删除');
+    }
+
+
+    $ES('#gift_list tbody tr').each(function (e) {
+      if (e.get('o-id') == id) {
+        if (e.get('newg') == '1') {
+          e.remove();
+        } else {
+          if (e.get('g-del') == 'b') {
+            e.getElements('input[type=text]').each(function (a) {
+              a.disabled = false;
+            });
+            if ($("bt_" + id)) $("bt_" + id).getElement('span').getElement('span').set('text', '删除');
+            e.set('g-del', 'a');
+            e.setStyle('background-color', '');
+          } else {
+            e.getElements('input[type=text]').each(function (a) {
+              a.disabled = true;
+            });
+            if ($("bt_" + id)) $("bt_" + id).getElement('span').getElement('span').set('text', '恢复');
+            e.set('g-del', 'b');
+            e.setStyle('background-color', '#D8D8D8');
+          }
+        }
+      }
+    });
+    
+    
+    
+    total();
+  }
+
+  //[拆单]部分拆分编辑购买数量
+  function split_changetotal_gift(e){
+    changetotalgift(e);
+ var id = e.get('aid'),l=0,_ca = e.getNext('.error');
+    if(e.disable) return;
+ 
+ var split_gift_buy_nums  = 0;
+ var split_gift_send_nums = 0;
+ var split_gift_edit_nums = 0;
+ if($('old_gift_nums_'+id))
+ {
+  split_gift_buy_nums  = parseInt($('old_gift_nums_'+id).value);
+ }
+ if($('split_gift_send_'+id))
+ {
+  split_gift_send_nums = parseInt($('split_gift_send_'+id).value);
+ }
+ 
+ if (/^\d+(\.\d+)?$/.test(e.value)){
+        if(e.get('atype') == 'gift_num_obj'){
+            if (parseInt(e.value) < 0){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }
+   else if(parseInt(e.value) == 0 && split_gift_send_nums == 0)
+   {
+    if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+   }
+   else{
+                if (_ca) _ca.remove();
+            }
+   
+   split_gift_edit_nums = split_gift_send_nums + parseInt(e.value);
+   $('gift_num_'+id).value  = split_gift_edit_nums;
+           //$('gifttotal_'+id).value = parseFloat($('num_'+id).value * $('pr_'+id).value).toFixed(3);
+        }
+    }else{
+        if (!_ca){
+            new Element('span',{'class':"error caution notice-inline",html:"请录入数值"}).injectAfter(e);
+            e.set('value', '0');
+        }
+    }
+  }
+
+
+  function giftinit(rs){
+
+    rs.each(function (i){
+      var pid = i.sm_id,ishave='false',aid='';
+      $ES('#gift_list tbody tr').each(function (e){
+        if (e.get('g-pid') == pid && e.get('g-type') == 'gift'){
+          ishave='true';
+          aid=e.get('aid');
+        }
+      });
+      if (ishave=='true'){
+        if ($("num_"+aid).disabled){
+          alert("请恢复货品："+i.sales_material_name);
+        }else {
+          alert("有此货品："+i.sales_material_name);
+          $("num_"+aid).focus();
+        }
+        return;
+      }else {
+        giftcreate(pid,i);
+      }
+    });
+    if ($('gift_list').style.display=='none'){
+      $('gift_list').style.display = "";
+    }
+  }
+
+  function giftcreate(pid,rs){ 
+    // console.log("pid:"+ pid);
+    var items = rs['items'];
+    rs.price = 0;
+ <{if $delivery_list}>
+    var trr = new Element('tr', {id:'tr_'+pid,oid:pid,'aid':pid,'g-pid':pid,'g-type':'gift','g-del':'a',html:'<td>'+rs.sales_material_bn+'</td><td>'+rs.sales_material_name+'<input name="gift_ids[]" id="gift_ids_'+pid+'" type="text" value="'+rs.sm_id+'" style="display:none;" /></td><td><input type="text" obj-goods-id=' + pid + ' atype="gift_num_obj" onchange="changetotalgift(this); total();" id="num_'+pid+'" vtype="required&amp;&amp;unsignedint" value="1" size="5" name="gift[newnum]['+pid+']" aid="'+pid+'" atype="num"></td><td>0</td><td><input type="text" onchange=" total();"    id="pr_'+pid+'" vtype="required&amp;&amp;unsigned" value="'+rs.price+'" size="8" name="gift[newprice]['+pid+']" aid="'+pid+'" atype="price" value="0"></td><td><button class="btn" onclick="del_gift_new('+pid+');" id="d_'+pid+'" type="button"><span><span>删除</span></span></button></td>'}).inject($E('#gift_list tbody'));
+ <{else}>
+    var trr = new Element('tr', {id:'tr_'+pid,oid:pid,'aid':pid,'g-pid':pid,'g-type':'gift','g-del':'a',html:'<td>'+rs.sales_material_bn+'</td><td>'+rs.sales_material_name+'<input name="gift_ids[]" id="goods_ids_'+pid+'" type="text" value="'+rs.sm_id+'" style="display:none;" /></td><td><input type="text" onchange="changetotalgift(this);total();" id="num_'+pid+'" vtype="required&amp;&amp;unsignedint" value="1"  atype="gift_num_obj" obj-goods-id=' + pid + ' size="5" name="gift[newnum]['+pid+']" aid="'+pid+'" atype="num"></td><td><input type="hidden" id="pr_'+pid+'" vtype="required&amp;&amp;unsigned" value="'+rs.price+'" size="8" name="gift[newprice]['+pid+']" aid="'+pid+'" atype="price" value="0"></td><td><button class="btn" onclick="del_gift_new('+pid+');" id="d_'+pid+'" type="button"><span><span>删除</span></span></button></td>'}).inject($E('#gift_list tbody'));
+ <{/if}>
+    items.each(function (e) {
+      creategiftproduct(rs, e);
+    });
+    total();
+}
+
+  function creategiftproduct(rs, e) {
+    var gid = rs.sm_id;
+    var pid = e.bm_id;
+    <{if $delivery_list}>
+    var trr = new Element('tr', {
+      id: 'tr_' + pid,
+      'g-id': gid,
+      'g-pid': pid,
+      'g-type': 'gift',
+      'aid': pid,
+      'g-del': 'a',
+      'newg': '1',
+      html: '<td>' + e.material_bn + '</td><td>' + e.material_name + '<input name="product_ids[]" id="product_ids_' + pid + '" type="text" value="' + pid + '" style="display:none;" /></td><td><input type="hidden" value="' + e.material_bn + '" name="bn_list[]"><input type="text" class="none_input" id="num_' + pid + '" name="gift[giftnum][' + gid + '][' + pid + ']" pg-id="' + gid + '" aid="' + pid + '" size="4" readonly="readonly" js="' + e.number + '" value="' + e.number + '"></td><td>-</td><td><input type="text" class="none_input" readonly="readonly" value="0" id="pr_' + pid + '" name="gift[giftpr][' + gid + '][' + pid + ']" size="8" readonly="true"></td><td><input type="text" id="pmtpr_' + pid + '" g-id="" class="goods_pmt_price none_input" aid="' + gid + '" atype="giftpmt_price" value="0" vtype="unsigned" name="gift[new_item_pmt_price][' + gid + '][' + pid + ']" size="6" onchange="changetotalgift(this);total();"></td><td>&nbsp;</td>'
+    }).inject($E('#gift_list tbody'));
+    <{else}>
+    var trr = new Element('tr', {
+      id: 'tr_' + pid,
+      'pg-id': pid,
+      'g-id': gid,
+      'g-pid': pid,
+      'g-type': 'gift',
+      'aid': pid,
+      'g-del': 'a',
+      'newg': '1',
+      html: '<td>' + e.material_bn + '</td><td>' + e.material_name + '<input name="product_ids[]" id="product_ids_' + pid + '" type="text" value="' + pid + '" style="display:none;" /></td><td><input type="hidden" value="' + e.material_bn + '" name="bn_list[]"><input type="text" class="none_input" id="num_' + pid + '" name="gift[giftnum][' + gid + '][' + pid + ']" pg-id="' + gid + '" aid="' + pid + '" size="4" readonly="readonly" js="' + e.number + '" value="' + e.number + '"></td><td><input type="text" class="none_input" readonly="readonly" value="0" id="pr_' + pid + '" name="gift[giftpr][' + gid + '][' + pid + ']" size="8" readonly="true"></td><td><input type="text" id="pmtpr_' + pid + '" g-id="" class="goods_pmt_price none_input" aid="' + gid + '" atype="giftpmt_price" value="0" vtype="unsigned" name="gift[new_item_pmt_price][' + gid + '][' + pid + ']" size="6" onchange="changetotalgift(this);total();"></td><td>&nbsp;</td>'
+    }).inject($E('#gift_list tbody'));
+    <{/if}>
+  }
+
+//删除新增商品
+function del_gift_new(id){
+
+   
+    $('tr_'+id).set('g-del','b');
+    
+    $("tr_"+id).remove();
+    if (!$E('#gift_list tbody').getElement('td')){
+        $('#gift_list').hide();
+    }
+  
+  $ES('#gift_list tbody tr[g-type]').each(function (e) {
+    // console.log("gid:" + e.get('g-id')+", id:" + id);
+    
+    if (e.get('g-id') == id) {
+      if (e.get('newg') == '1') {
+        e.remove();
+      } else {
+        // console.log("del:"+ e.get('g-del') );
+        if (e.get('g-del') == 'b') {
+          e.getElements('input[type=text]').each(function (a) {
+            a.disabled = false;
+          });
+          if ($("bt_" + id)) $("bt_" + id).getElement('span').getElement('span').set('text', '删除');
+          e.setProperty('g-del', 'a');
+          e.setStyle('background-color', '');
+        } else {
+          e.getElements('input[type=text]').each(function (a) {
+            a.disabled = true;
+          });
+          if ($("bt_" + id)) $("bt_" + id).getElement('span').getElement('span').set('text', '恢复');
+          e.setProperty('g-del', 'b');
+          e.setStyle('background-color', '#D8D8D8');
+        }
+      }
+    }
+  });
+    
+ total();
+}
+
+  function changetotalgift(e) {
+
+    var id = e.get('aid'), l = 0, _ca = e.getNext('.error');
+
+    // console.log("changetotalgift, id=" + id + ", atype=" + e.get('atype')+ ", value=" + e.value + ", obj-goods-id="+ e.get('obj-goods-id'));
+    if (e.disable) return;
+    if (/^\d+(\.\d+)?$/.test(e.value)) {
+      if (e.get('atype') == 'gift_num_obj') {
+        if (parseInt(e.value) <= 0) {
+          if (!_ca) {
+            new Element('span', {'class': 'error caution notice-inline', html: '请录入不小于0的数'}).injectAfter(e);
+            e.set('value', '0');
+          }
+          return;
+        } else {
+          if (_ca) _ca.remove();
+        }
+        if (e.get('obj-goods-id') != null || e.get('obj-goods-id') != '') {
+          $('gift_list').getElements('input[type=text]').each(function (eee) {
+            // console.log("pg-id=" + eee.get('pg-id') + ", obj-goods-id=" + e.get('obj-goods-id'));
+            if (eee.get('pg-id') == e.get('obj-goods-id')) {
+              // console.log("eee.value=" + eee.value + ", js=" + eee.get('js') + ", e.value=" + e.value);
+              eee.value = eee.get('js') * e.value;
+            }
+          });
+        }
+        // $('gifttotal_' + id).value = parseFloat($('giftnum_' + id).value).toFixed(3) * parseFloat($('giftpr_' + id).value).toFixed(3);
+        return;
+      } 
+    } else {
+      if (!_ca) {
+        new Element('span', {'class': "error caution notice-inline", html: "请录入数值"}).injectAfter(e);
+        e.set('value', '0');
+      }
+    }
+
+  }
+
+</script>

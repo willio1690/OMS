@@ -1,0 +1,35 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <h4>凭证查看
+    <input type="button" id='return_message' name='return_message' value='下载凭证'>
+    </h4>
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" class="gridlist">
+        <tbody>
+            <{foreach from=$return_product_youzan.online_memo item=memo}>
+            <tr>
+                <td>
+    <{$memo.created}> &nbsp;&nbsp;<{$memo.content}><{if $memo.pic_url}><br><img src='<{$memo.pic_url}>' height='50' onclick="showimage('<{$memo.pic_url}>')" alt='点击查看大图' style="cursor:pointer;"><{/if}>
+    </td>
+            </tr>
+                <{/foreach}>
+        </tbody>
+    </table>
+</div>
+<script>
+if ($('return_message'))
+{
+	$('return_message').addEvent('click',function(e){
+		var url = 'index.php?app=ome&ctl=admin_return&act=refund_message&p[0]=<{$return_product_youzan.return_id}>&p[1]=return&shop_type=youzan&finder_id=<{$env.get.finder_id}>';
+        new Dialog(url,{title:'淘宝凭证',width:500,height:300});
+	
+	});
+}
+function showimage(imgpath){
+    var url = 'index.php?app=ome&ctl=admin_return&act=showImage&p[0]='+imgpath;
+    new Dialog(url,{title:'查看凭证大图',width:500,height:300});
+}
+</script>

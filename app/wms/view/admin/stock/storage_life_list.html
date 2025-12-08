@@ -1,0 +1,69 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="gEditor-Body">
+      <div class="spage-main-box">
+          <div class="tableform">
+          <div id="x-g-basic" class="goods-detail">
+              <div class="edit_box">
+                  <div id="ajax_get_div_contents">
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="gridlist">
+                        <thead>
+                          <tr>
+                            <th width="90">序号</th>
+                            <th>保质期条码</th>
+                            <th nowrap="nowrap">生产日期</th>
+                            <th nowrap="nowrap">过期日期</th>
+                            <th width="90">入库数量</th>
+                            <th width="90">剩余数量</th>
+                            <th width="90">预占数量</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <{foreach from=$storage_life_list key=key item=items}>
+                          <tr <{if $key % 2 == 0}>style="background-color: #fff;"<{else}>style="border-bottom: 1px solid #e3e6eb;border-top: 1px solid #e3e6eb;"<{/if}> >
+                            <td>&nbsp;&nbsp;<{++$key}></td>
+                            <td><{$items.expire_bn}></td>
+                            <td nowrap="nowrap"><{$items.production_date|cdate:'FDATE'}></td>
+                            <td nowrap="nowrap"><{$items.expiring_date|cdate}></td>
+                            <td><{$items.in_num}></td>
+                            <td><{$items.balance_num}></td>
+                            <td><{$items.freeze_num}></td>
+                          </tr>
+                          <{/foreach}>
+                        </tbody>
+                    </table>
+                  </div>
+              </div>
+          </div>
+          </div>
+      </div>
+      <div id="cc" class="noprint table-action">
+          <{button label="导 出" type="button" id="btn_submit" name="btn_submit"}> &nbsp; <{button label="关 闭" id="cancelBtn" class="btn btn-secondary" isCloseDialogBtn='true'}>
+      </div>
+    </div>
+<style type="text/css">
+.dialog .dialog-content-body { background:#fff; border:none; }
+.dialog .tableform { background: none repeat scroll 0 0 #F8F8F8; border: 1px solid #D9D9D9; }
+
+.gridlist thead th { height:30px; line-height:30px; font-weight:bold; padding-left:12px; }
+.gridlist tbody td { height:30px; line-height:30px; }
+
+.edit_box { padding:10px 20px 5px 20px; }
+.h_10px { clear:both; width:100%; height:10px; }
+.h_20px { clear:both; width:100%; height:20px; }
+
+strong { font-weight:700; }
+.memo { font-size:18px; }
+</style>
+<script>
+(function()
+{
+    $('btn_submit').addEvent('click',function()
+	{
+		window.location.href	= "index.php?app=wms&ctl=admin_stock&act=export_expire&p[0]=<{$bm_id}>&p[1]=<{$branch_id}>";
+    });
+})();
+</script>

@@ -1,0 +1,307 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+    <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        /* 日志备注容器样式优化 */
+        .log-memo-container {
+            max-width: 100%;
+            box-sizing: border-box;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        /* 表格单元格内容优化 */
+        .gridlist td {
+            vertical-align: top;
+            padding: 8px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        /* 操作内容列宽度控制 */
+        .gridlist th:nth-child(4),
+        .gridlist td:nth-child(4) {
+            max-width: 400px;
+            min-width: 200px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .gridlist th:nth-child(4),
+            .gridlist td:nth-child(4) {
+                max-width: 300px;
+                min-width: 150px;
+            }
+        }
+        
+        /* 日志备注展开/收起动画 */
+        .log-memo-long {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* 悬停效果 */
+        .log-memo-container a:hover {
+            text-decoration: underline !important;
+        }
+    </style>       
+<{/capture}>
+
+<div class="division">
+    <h4>本单操作记录</h4>
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+        <thead>
+        <tr>
+            <th>操作时间</th>
+            <th>操作人</th>
+            <th>行为</th>
+            <th>操作内容</th>
+        </tr>
+        </thead>
+        <tbody>
+        <{foreach from=$history item=his name=history_loop}>
+        <tr>
+            <td><{$his.operate_time}></td>
+            <td><{$his.op_name}></td>
+            <td><{$his.operation}></td>
+            <{if $his.flag == 'true'}>
+                <td>
+                    <{if $his.is_long}>
+                        <div class="log-memo-container" style="margin: 8px 0; max-width: 100%;">
+                            <div id="short_<{$his.log_id}>" class="log-memo-short" style="background: #f8f9fa; padding: 8px; border-radius: 4px; border-left: 3px solid #007bff; word-wrap: break-word; overflow-wrap: break-word;">
+                                <div style="color: #495057; line-height: 1.4; font-size: 13px;"><{$his.short_memo}>...</div>
+                                <div style="margin-top: 6px;">
+                                    <a href="javascript:void(0)" onclick="toggleMemo('<{$his.log_id}>')" style="color: #007bff; text-decoration: none; font-size: 12px; cursor: pointer;">
+                                        <i class="icon-chevron-down"></i> 展开详情
+                                    </a>
+                                </div>
+                            </div>
+                            <div id="long_<{$his.log_id}>" class="log-memo-long" style="display: none; background: #fff; padding: 12px; border-radius: 4px; border: 1px solid #dee2e6; margin-top: 5px; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%;">
+                                <div style="color: #212529; line-height: 1.5; white-space: pre-wrap; font-size: 13px;"><{$his.memo}></div>
+                                <div style="margin-top: 8px; text-align: right;">
+                                    <a href="javascript:void(0)" onclick="toggleMemo('<{$his.log_id}>')" style="color: #6c757d; text-decoration: none; font-size: 12px; cursor: pointer;">
+                                        <i class="icon-chevron-up"></i> 收起
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <{else}>
+                        <{$his.memo}>
+                    <{/if}>
+                    <a target='_blank' href='index.php?app=ome&ctl=admin_order&act=show_operation&order_id=<{$order_id}>&log_id=<{$his.log_id}>&finder_vid=<{$env.get.finder_vid}>&finder_id=<{$env.get.finder_id}>'>查看快照</a>
+                </td>
+            <{else}>
+                <td>
+                    <{if $his.is_long}>
+                        <div class="log-memo-container" style="margin: 8px 0; max-width: 100%;">
+                            <div id="short_<{$his.log_id}>" class="log-memo-short" style="background: #f8f9fa; padding: 8px; border-radius: 4px; border-left: 3px solid #007bff; word-wrap: break-word; overflow-wrap: break-word;">
+                                <div style="color: #495057; line-height: 1.4; font-size: 13px;"><{$his.short_memo}>...</div>
+                                <div style="margin-top: 6px;">
+                                    <a href="javascript:void(0)" onclick="toggleMemo('<{$his.log_id}>')" style="color: #007bff; text-decoration: none; font-size: 12px; cursor: pointer;">
+                                        <i class="icon-chevron-down"></i> 展开详情
+                                    </a>
+                                </div>
+                            </div>
+                            <div id="long_<{$his.log_id}>" class="log-memo-long" style="display: none; background: #fff; padding: 12px; border-radius: 4px; border: 1px solid #dee2e6; margin-top: 5px; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%;">
+                                <div style="color: #212529; line-height: 1.5; white-space: pre-wrap; font-size: 13px;"><{$his.memo}></div>
+                                <div style="margin-top: 8px; text-align: right;">
+                                    <a href="javascript:void(0)" onclick="toggleMemo('<{$his.log_id}>')" style="color: #6c757d; text-decoration: none; font-size: 12px; cursor: pointer;">
+                                        <i class="icon-chevron-up"></i> 收起
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <{else}>
+                        <{$his.memo}>
+                    <{/if}>
+                </td>
+            <{/if}>
+        </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+</div>
+
+<div class="division">
+    <h4>发货单操作记录</h4>
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+        <thead>
+        <tr>
+            <th>操作时间</th>
+            <th>操作人</th>
+            <th>操作类型</th>
+            <th>操作内容</th>
+        </tr>
+        </thead>
+        <tbody>
+        <{foreach from=$deliverylog item=log name=delivery_loop}>
+        <tr>
+            <td><{$log.operate_time}></td>
+            <td><{$log.op_name}></td>
+            <td><{$log.operation}></td>
+            <td>
+                <{if $log.is_long}>
+                    <div class="log-memo-container" style="margin: 8px 0; max-width: 100%;">
+                        <div id="short_<{$log.log_id}>" class="log-memo-short" style="background: #fff3cd; padding: 8px; border-radius: 4px; border-left: 3px solid #ffc107; word-wrap: break-word; overflow-wrap: break-word;">
+                            <div style="color: #856404; line-height: 1.4; font-size: 13px;"><{$log.short_memo}>...</div>
+                            <div style="margin-top: 6px;">
+                                <a href="javascript:void(0)" onclick="toggleMemo('<{$log.log_id}>')" style="color: #856404; text-decoration: none; font-size: 12px; cursor: pointer;">
+                                    <i class="icon-chevron-down"></i> 展开详情
+                                </a>
+                            </div>
+                        </div>
+                        <div id="long_<{$log.log_id}>" class="log-memo-long" style="display: none; background: #fff; padding: 12px; border-radius: 4px; border: 1px solid #dee2e6; margin-top: 5px; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%;">
+                            <div style="color: #212529; line-height: 1.5; white-space: pre-wrap; font-size: 13px;"><{$log.memo}></div>
+                            <div style="margin-top: 8px; text-align: right;">
+                                <a href="javascript:void(0)" onclick="toggleMemo('<{$log.log_id}>')" style="color: #6c757d; text-decoration: none; font-size: 12px; cursor: pointer;">
+                                    <i class="icon-chevron-up"></i> 收起
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <{else}>
+                    <{$log.memo}>
+                <{/if}>
+            </td>
+        </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+</div>
+
+<{foreach from=$orderLogs item=item key=key}>
+<div class="division">
+    <h4>合并发货的订单 <span class="red"><{$key}></span> 操作记录</h4>
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+        <thead>
+        <tr>
+            <th>操作时间</th>
+            <th>操作人</th>
+            <th>行为</th>
+            <th>操作内容</th>
+        </tr>
+        </thead>
+        <tbody>
+        <{foreach from=$item item=log name=batch_order_loop}>
+        <tr>
+            <td><{$log.operate_time}></td>
+            <td><{$log.op_name}></td>
+            <td><{$log.operation}></td>
+            <td>
+                <{if $log.is_long}>
+                    <div class="log-memo-container" style="margin: 8px 0; max-width: 100%;">
+                        <div id="short_<{$log.log_id}>" class="log-memo-short" style="background: #e2e3e5; padding: 8px; border-radius: 4px; border-left: 3px solid #6c757d; word-wrap: break-word; overflow-wrap: break-word;">
+                            <div style="color: #383d41; line-height: 1.4; font-size: 13px;"><{$log.short_memo}>...</div>
+                            <div style="margin-top: 6px;">
+                                <a href="javascript:void(0)" onclick="toggleMemo('<{$log.log_id}>')" style="color: #383d41; text-decoration: none; font-size: 12px; cursor: pointer;">
+                                    <i class="icon-chevron-down"></i> 展开详情
+                                </a>
+                            </div>
+                        </div>
+                        <div id="long_<{$log.log_id}>" class="log-memo-long" style="display: none; background: #fff; padding: 12px; border-radius: 4px; border: 1px solid #dee2e6; margin-top: 5px; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%;">
+                            <div style="color: #212529; line-height: 1.5; white-space: pre-wrap; font-size: 13px;"><{$log.memo}></div>
+                            <div style="margin-top: 8px; text-align: right;">
+                                <a href="javascript:void(0)" onclick="toggleMemo('<{$log.log_id}>')" style="color: #6c757d; text-decoration: none; font-size: 12px; cursor: pointer;">
+                                    <i class="icon-chevron-up"></i> 收起
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <{else}>
+                    <{$log.memo}>
+                <{/if}>
+            </td>
+        </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+</div>
+<{/foreach}>
+
+<{foreach from=$deliveryHistorylog item=item key=key}>
+<div class="division">
+    <h4>发货单 <span class="red"><{$key}><{if $item.0.status=='return_back'}>(已退回)<{else}> (已作废)<{/if}></span> 操作记录</h4>
+    <table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+        <thead>
+        <tr>
+            <th>操作时间</th>
+            <th>操作人</th>
+            <th>行为</th>
+            <th>操作内容</th>
+        </tr>
+        </thead>
+        <tbody>
+        <{foreach from=$item item=log name=history_delivery_loop}>
+        <tr>
+            <td><{$log.operate_time}></td>
+            <td><{$log.op_name}></td>
+            <td><{$log.operation}></td>
+            <td>
+                <{if $log.is_long}>
+                    <div class="log-memo-container" style="margin: 8px 0; max-width: 100%;">
+                        <div id="short_<{$log.log_id}>" class="log-memo-short" style="background: #f8d7da; padding: 8px; border-radius: 4px; border-left: 3px solid #dc3545; word-wrap: break-word; overflow-wrap: break-word;">
+                            <div style="color: #721c24; line-height: 1.4; font-size: 13px;"><{$log.short_memo}>...</div>
+                            <div style="margin-top: 6px;">
+                                <a href="javascript:void(0)" onclick="toggleMemo('<{$log.log_id}>')" style="color: #721c24; text-decoration: none; font-size: 12px; cursor: pointer;">
+                                    <i class="icon-chevron-down"></i> 展开详情
+                                </a>
+                            </div>
+                        </div>
+                        <div id="long_<{$log.log_id}>" class="log-memo-long" style="display: none; background: #fff; padding: 12px; border-radius: 4px; border: 1px solid #dee2e6; margin-top: 5px; word-wrap: break-word; overflow-wrap: break-word; max-width: 100%;">
+                            <div style="color: #212529; line-height: 1.5; white-space: pre-wrap; font-size: 13px;"><{$log.memo}></div>
+                            <div style="margin-top: 8px; text-align: right;">
+                                <a href="javascript:void(0)" onclick="toggleMemo('<{$log.log_id}>')" style="color: #6c757d; text-decoration: none; font-size: 12px; cursor: pointer;">
+                                    <i class="icon-chevron-up"></i> 收起
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <{else}>
+                    <{$log.memo}>
+                <{/if}>
+            </td>
+        </tr>
+        <{/foreach}>
+        </tbody>
+    </table>
+</div>
+<{/foreach}>
+
+<script type="text/javascript">
+/**
+ * 切换日志备注的展开/收起状态
+ * @param {string} memoId 备注的唯一标识
+ */
+function toggleMemo(memoId) {
+    var shortElement = document.getElementById('short_' + memoId);
+    var longElement = document.getElementById('long_' + memoId);
+    
+    if (shortElement && longElement) {
+        var shortDisplay = shortElement.style.display;
+        
+        if (shortDisplay === 'none' || shortDisplay === '') {
+            // 当前是收起状态，需要展开：隐藏短文本，显示长文本
+            shortElement.style.display = 'none';
+            longElement.style.display = 'block';
+        } else {
+            // 当前是展开状态，需要收起：显示短文本，隐藏长文本
+            shortElement.style.display = 'block';
+            longElement.style.display = 'none';
+        }
+    }
+}
+
+// 页面加载完成后初始化样式
+document.addEventListener('DOMContentLoaded', function() {
+    // 为所有日志备注容器添加响应式样式
+    var memoContainers = document.querySelectorAll('.log-memo-container');
+    memoContainers.forEach(function(container) {
+        // 确保容器不会超出表格宽度
+        container.style.maxWidth = '100%';
+        container.style.boxSizing = 'border-box';
+    });
+});
+</script>

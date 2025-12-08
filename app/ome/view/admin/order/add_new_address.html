@@ -1,0 +1,166 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+  <form action="index.php?app=ome&ctl=admin_order&act=getConsingee" method="post" id="newAddrForm">
+    <input id="number" name="number" type="hidden" size="32" value="<{$env.POST.number}>" />
+    <table border="0">
+      <tbody>
+        <tr>
+          <th style=" white-space:nowrap;">收货人姓名：</th>
+          <td>
+            <input id="name" name="name" type="text" vtype="required" size="15" value="<{$env.POST.name}>" /><em class="red">*</em></td>
+          <th>&nbsp;</th>
+          <td>&nbsp;</td>
+        </tr>
+        <tr>
+          <th style=" white-space:nowrap;">固定电话：</th>
+          <td><input id="telephone" name="telephone" type="text" size="15" value="<{$env.POST.telephone}>" /></td>
+          <th>邮政编码：</th>
+          <td><input id="zip" name="zip" type="text" size="6" value="<{$env.POST.zip}>" /></td>
+        </tr>
+        <tr>
+          <th>手机号码：</th>
+          <td colspan="3"><input id="mobile" name="mobile" type="text" size="15" value="<{$env.POST.mobile}>" /><em class="red" style="font-weight:normal;">*注：手机号与固话必须选填一项，如是门店自提必须填写手机号！</em></td>
+        </tr>
+        <tr>
+          <th>收货地区：</th>
+          <td colspan="3"><{input type='region' app='eccommon' name="area_" vtype="area" value=$region }> <em class="red">*</em></td>
+        </tr>
+        <tr>
+          <th>收货地址：</th>
+          <td colspan="3"><input id="addr" name="addr" type="text"  vtype="required" size="32" value="<{$env.POST.addr}>" /><em class="red">*</em></td>
+        </tr>
+        <tr>
+          <th>电子邮件：</th>
+          <td><input id="email" name="email" type="text" vtype="email" size="32" value="<{$env.POST.email}>" /></td>
+          <th></th>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="table-action">
+      <{button label="确定" class="btn-primary" id="btn_submit_addr"}> &nbsp; &nbsp;
+      <{button label="取消" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+  </form>
+</div>
+<script>
+  (function(){
+
+   function is_phone(str){
+
+        var partten = /^[\d-]+$/;
+        if(partten.test(str)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    function is_mobile(str){
+
+        var partten = /^[\d-]{8,16}$/;
+        if(partten.test(str)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    function getDeliveryTemp(j){
+      return '<li><input type="radio" name="logi_id" value="'+j.corp_id+'" /> <label>'+j.name +'</label></li>';
+    }
+    function validateTip(element,msg){
+      element=$(element);
+      var tip;
+      if($('validateTip')) tip=$('validateTip');
+      else tip=new Element('span#validateTip.error.caution.notice-inline',{html:msg}).injectAfter(element).hide();
+      if(element.value==""){
+        tip.show();
+        setTimeout(function(){tip.hide()},4000);
+        return false;
+      }
+      else{
+        tip.hide();
+        return true;
+      }
+    }
+
+    $('btn_submit_addr').addEvent('click',function(){
+      if(!validate($('newAddrForm')))return;
+      if(!validateTip($E('input[name=area_]'),'本项必选！'))return;
+
+      //固定电话与手机必填一项
+      var gd_tel,mobile;
+      gd_tel = $('telephone').value.replace(" ","");
+      mobile = $('mobile').value.replace(' ','');
+      if (!gd_tel && !mobile){
+         alert('固定电话与手机号码必需填写一项');
+         $('telephone').focus();
+         return false;
+      }
+      if (gd_tel){
+          if (is_phone(gd_tel) === false){
+              alert('请填写正确的固定电话');
+              $('telephone').focus();
+              return false;
+          }
+      }
+      if (mobile){
+         if ( is_mobile(mobile) === false){
+              alert('请输入正确的手机号码');
+              $('mobile').focus();
+              return false;
+         }
+         if (mobile[0] == '0'){
+              alert('手机号码前请不要加0');
+              $('mobile').focus();
+              return false;
+         }
+      }
+
+      //simple_region
+      regionStr = '';
+      areaStr = $E('input[name=area_]').get('value');
+      if(areaStr){
+          areaList = areaStr.split(':');
+          regionStr = areaList[1];
+          regionStr = regionStr.replace(/\//g, "-");
+      }
+
+      var newaddr = {
+        area:$E('input[name=area_]').get('value'),
+        addr:$E('input[name=addr]').get('value'),
+        name:$E('input[name=name]').get('value'),
+        zip:$E('input[name=zip]').get('value'),
+        mobile:mobile,
+        telephone:$E('input[name=telephone]').get('value'),
+        email:$E('input[name=email]').get('value'),
+        simple_name:$E('input[name=name]').get('value'),
+        simple_mobile:mobile,
+        simple_telephone:$E('input[name=telephone]').get('value'),
+        simple_region:regionStr,
+        simple_address:$E('input[name=addr]').get('value'),
+      };
+
+      var addrlist = Order.addrlist;
+
+      var number = $E('input[name=number]').get('value');
+      if ( number == ''){
+        addrlist.push(newaddr);
+        number = addrlist.length-1;
+      } else {
+        addrlist[number]=newaddr;
+      }
+      
+      Order.setAddr(addrlist,number);
+
+      $('newAddrForm').getParent('.dialog').retrieve('instance').close();
+          //}
+        //}).send($('newAddrForm'));
+    });
+  })()
+</script>

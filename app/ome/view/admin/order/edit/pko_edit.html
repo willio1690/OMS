@@ -1,0 +1,558 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="pko_list" <{if empty($conf.objs)}> style="display:none" <{/if}>>
+  <input type="hidden" name="objtype[]" value="pko"/>
+  <h5 style="text-align:center;">多选一</h5>
+<{if empty($delivery_list)}>
+  <table class="gridlist" width="100%" cellspacing="0" cellpadding="0" border="0" >
+    <thead>
+      <tr>
+        <th>销售物料编码</th>
+        <th>销售物料名称</th>
+        <th>购买数量</th>
+        <th>单价</th>
+        <th>优惠价格</th>
+        <th>销售价格</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <{foreach from=$conf.objs item=obj}>
+      <tr id="tr_<{$obj.obj_id}>" oid="<{$obj.obj_id}>" <{if $obj.delete == 'true'}>style="background-color: #DBDBDB;" g-del="b"  class='disabled'<{else}>g-del="a"<{/if}> g-type="<{$obj.obj_type}>" g-pid="<{$obj.goods_id}>" g-shop-pid="<{$obj.shop_goods_id}>" aid="<{$obj.obj_id}>" g-bn="<{$obj.bn}>" g-pname="<{$obj.name}>" >
+        <td class="obj_bn <{$obj.obj_type}>class">
+          <span class="number"><{$obj.bn}></span>
+          <input type="hidden" value="<{$obj.bn}>" name="bn_list[]" /></td>
+        <td class="obj_name"><{$obj.name}><input name="pko_ids[]" id="pko_ids_<{$obj.obj_id}>" type="text" value="<{$obj.goods_id}>" style="display:none;" /></td>
+        <td class="obj_num"><input type="hidden" value="<{$obj.obj_id}>" name="pko[obj][<{$obj.obj_id}>][]" />
+          <input atype="num" aid="<{$obj.obj_id}>" name="pko[num][<{$obj.obj_id}>]" type="text" size="5" value="<{$obj.quantity}>" vtype="required&&unsignedint" id="num_<{$obj.obj_id}>" <{if $obj.delete == 'true'}>disabled="true"<{/if}> onchange="changetotalpko(this);total();" onclick='edit_checked("<{$obj.obj_id}>","<{$obj.bn}>");' /></td>
+        <td class="obj_price"><input name="pko[price][<{$obj.obj_id}>]" type="text" size="8" oninput="value=value.toString().match(/^\d+(?:\.\d{0,2})?/)" value="<{$obj.price}>" vtype="required&&unsigned" atype="price" id="pr_<{$obj.obj_id}>" aid="<{$obj.obj_id}>" <{if $obj.delete == 'true'}>disabled="true"<{/if}> onchange="changetotalpko(this);total();" onclick='edit_checked("<{$obj.obj_id}>","<{$obj.bn}>");' /></td>
+        <td class="obj_pmt"><input type="text" id="pmt_<{$obj.obj_id}>" aid="<{$obj.obj_id}>" vtype="unsigned" atype="pmt_price" oninput="value=value.toString().match(/^\d+(?:\.\d{0,2})?/)" value="<{$obj.pmt_price|default:0}>" class="pko_pmt_price"  name="pko[obj_pmt_price][<{$obj.obj_id}>]" size="6" <{if $obj.delete == 'true'}>disabled="true"<{/if}>  onchange="changetotalpko(this);total();" onclick='edit_checked("<{$obj.obj_id}>","<{$obj.bn}>");' /></td>
+        <td class="obj_total"><input type="text" class="pkototal" style="display:none" id="pkototal_<{$obj.obj_id}>" size="2" value="0" <{if $obj.delete == 'true'}>disabled="true"<{/if}> /><input type="text" size="5" id="pkosalepr_<{$obj.obj_id}>" readonly="readonly" <{if $obj.delete == 'true'}>disabled="true"<{/if}> class="none_input<{if $obj.obj_type != 'gift' && $obj.order_items|@count == '1'}> pkosaleprice<{/if}>" value="<{$obj.sale_price}>">
+          <input type="hidden" size="5" id="pkopmtpr_<{$obj.obj_id}>" readonly="readonly" <{if $obj.delete == 'true'}>disabled="true"<{/if}> class="none_input<{if $obj.obj_type != 'gift' && $obj.order_items|@count == '1'}> pkopmtprice<{/if}>" value="<{$obj.pmt_order_price}>">
+        </td>
+        <td class="item_op" objid="<{$obj.obj_id}>">
+        <{if $obj.delete == 'false'}>
+          <{button type="button" label="删除" id="d_{$obj.obj_id}" onclick="del_pko('{$obj.obj_id}');" }></td>
+        <{else}>
+        <{button type="button" label="恢复" id="d_{$obj.obj_id}" onclick="del_pko('{$obj.obj_id}');" }></td>
+        <{/if}>
+      </tr>
+    <{/foreach}>
+    <tr><td colspan="9" style="background:#f0f0f0;height:10px;"></td></tr>
+  </tbody>
+</table>
+<{else}>
+  <table class="gridlist" width="100%" cellspacing="0" cellpadding="0" border="0" >
+    <thead>
+      <tr>
+        <th>销售物料编码</th>
+        <th>销售物料名称</th>
+        <!--<th>规格</th>-->
+        <th>购买数量</th>
+        <th>可编辑数量</th>
+        <th>单价</th>
+        <th>优惠价格</th>
+        <th>销售价格</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <{foreach from=$conf.objs item=obj}>
+      <tr id="tr_<{$obj.obj_id}>" oid="<{$obj.obj_id}>" <{if $obj.delete == 'true'}>style="background-color: #DBDBDB;" g-del="b"  class='disabled'<{else}>g-del="a"<{/if}> g-type="<{$obj.obj_type}>" g-pid="<{$obj.goods_id}>" g-shop-pid="<{$obj.shop_goods_id}>" aid="<{$obj.obj_id}>" g-bn="<{$obj.bn}>" g-pname="<{$obj.name}>" >
+        <td class="obj_bn <{$obj.obj_type}>class">
+          <span class="number"><{$obj.bn}></span>
+          <input type="hidden" value="<{$obj.bn}>" name="bn_list[]" /></td>
+        <td class="obj_name"><{$obj.name}><input name="pko_ids[]" id="pko_ids_<{$obj.obj_id}>" type="text" value="<{$obj.goods_id}>" style="display:none;" /></td>
+        <td class="obj_num"><input type="hidden" value="<{$obj.obj_id}>" name="pko[obj][<{$obj.obj_id}>][]" /><input atype="num" aid="<{$obj.obj_id}>" name="pko[num][<{$obj.obj_id}>]" type="text" size="5" value="<{$obj.quantity}>" id="num_<{$obj.obj_id}>" <{if $obj.delete == 'true'}>disabled="true"<{else}>readonly="readonly" style="color:#666;"<{/if}> /><input type="hidden" value="<{$obj.quantity}>" id="old_pko_nums_<{$obj.obj_id}>" /></td>
+        <td class="obj_buy_nums">
+        <{if $obj.left_nums <= 0}>
+            <input aid="<{$obj.obj_id}>" name="pko[item_buy_nums][<{$obj.obj_id}>]" type="text" size="5" value="<{$obj.left_nums}>" id="item_buy_nums_<{$obj.obj_id}>" disabled="true" />
+        <{else}>
+            <input atype="num" aid="<{$obj.obj_id}>" name="pko[item_buy_nums][<{$obj.obj_id}>]" type="text" size="5" value="<{$obj.left_nums}>" id="item_buy_nums_<{$obj.obj_id}>" <{if $obj.delete == 'true'}>disabled="true"<{/if}> onchange="split_changetotalpko(this);total();" />
+        <{/if}>
+        <{if $obj.make_nums}><br />(<font color="#f00;">已发货：<{$obj.make_nums}></font>)<input type="hidden" value="<{$obj.make_nums}>" id="split_send_<{$obj.obj_id}>" /><{/if}>
+        </td>
+        <td class="obj_price"><input name="pko[price][<{$obj.obj_id}>]" type="text" size="8" oninput="value=value.toString().match(/^\d+(?:\.\d{0,2})?/)" value="<{$obj.price}>" vtype="required&&unsigned" atype="price" id="pr_<{$obj.obj_id}>" aid="<{$obj.obj_id}>" <{if $obj.delete == 'true'}>disabled="true"<{elseif $obj.make_nums > 0}>readonly="readonly" style="color:#666;"<{else}>onchange="changetotalpko(this);total();"<{/if}> /></td>
+        <td class="obj_pmt"><input type="text" id="pmt_<{$obj.obj_id}>" aid="<{$obj.obj_id}>" vtype="unsigned" atype="pmt_price" oninput="value=value.toString().match(/^\d+(?:\.\d{0,2})?/)" value="<{$obj.pmt_price|default:0}>" class="pko_pmt_price"  name="pko[obj_pmt_price][<{$obj.obj_id}>]" size="6" <{if $obj.delete == 'true'}>disabled="true"<{elseif $obj.make_nums > 0}>readonly="readonly" style="color:#666;"<{else}>onchange="changetotalpko(this);total();"<{/if}> /></td>
+        <td class="obj_total"><input type="text" class="pkototal" style="display:none" id="pkototal_<{$obj.obj_id}>" size="2" value="0" <{if $obj.delete == 'true'}>disabled="true"<{/if}> /><input type="text" size="5" id="pkosalepr_<{$obj.obj_id}>" readonly="readonly" <{if $obj.delete == 'true'}>disabled="true"<{/if}> class="none_input<{if $obj.obj_type != 'gift' && $obj.order_items|@count == '1'}> pkosaleprice<{/if}>" value="<{$obj.sale_price}>">
+        <input type="hidden" size="5" id="pkopmtpr_<{$obj.obj_id}>" readonly="readonly" <{if $obj.delete == 'true'}>disabled="true"<{/if}> class="none_input<{if $obj.obj_type != 'gift' && $obj.order_items|@count == '1'}> pkopmtprice<{/if}>" value="<{$obj.pmt_order_price}>">
+        </td>
+        <td class="item_op" objid="<{$obj.obj_id}>">
+        <{if empty($obj.make_nums)}>
+            <{if $obj.delete == 'false'}>
+                <{button type="button" label="删除" id="d_{$obj.obj_id}" onclick="del_pko('{$obj.obj_id}');" }>
+            <{else}>
+                <{button type="button" label="恢复" id="d_{$obj.obj_id}" onclick="del_pko('{$obj.obj_id}');" }>
+            <{/if}>
+        <{else}>
+            <span style="color:red;"><{if $obj.left_nums <= 0}>已拆分完<{else}>部分拆分<{/if}></span>
+        <{/if}>
+        </td>
+      </tr>
+    <{/foreach}>
+    <tr><td colspan="10" style="background:#f0f0f0;height:10px;"></td></tr>
+  </tbody>
+</table>
+<input type="hidden" name="is_split" value="1"/>
+<{/if}>
+</div>
+<script>
+if($$('.adjunctclass,.giftclass').length){
+    $$('.adjunctclass,.giftclass').each(function(e){
+      var div = new Element('div').inject(e,'top');
+      new Element('div').inject(div);
+    });
+}
+
+function pkoinit(rs){
+  rs.each(function (i){
+        var pid = i.sm_id,ishave='false',aid='';
+        $ES('#pko_list tbody tr').each(function (e){
+            if (e.get('g-pid') == pid && e.get('g-type') == 'pko'){
+                ishave='true';
+                aid=e.get('aid');
+            }
+        });
+        if (ishave=='true'){
+            if ($("num_"+aid).disabled){
+                alert("请恢复货品："+i.sales_material_name);
+            }else {
+                alert("有此货品："+i.sales_material_name);
+                $("num_"+aid).focus();
+            }
+            return;
+        }else {
+            pkocreate(pid,i);
+        }
+    });
+    if ($('pko_list').style.display=='none'){
+        $('pko_list').style.display = "";
+    }
+}
+
+function pkocreate(pid,rs){
+    <{if $delivery_list}>
+
+    var trr = new Element('tr', {id:'tr_'+pid,oid:pid,'aid':pid,'g-pid':pid,'g-type':'pko','g-del':'a',html:'<td>'+rs.sales_material_bn+'</td><td>'+rs.sales_material_name+'<input name="pko_ids[]" id="pko_ids_'+pid+'" type="text" value="'+rs.sm_id+'" style="display:none;" /></td><td style="display:none;">'+(rs.spec_info||'-')+'</td><td><input type="text" onchange="changetotalpko(this);total();" id="num_'+pid+'" vtype="required&amp;&amp;unsignedint" value="1" size="5" name="pko[newnum]['+pid+']" aid="'+pid+'" atype="num"></td><td>0</td><td><input type="text" onchange="changetotalpko(this);total();" id="pr_'+pid+'" vtype="required&amp;&amp;unsigned" value="'+rs.price+'" size="8" name="pko[newprice]['+pid+']" aid="'+pid+'" atype="price" value="0"></td><td><input type="text" onchange="changetotalpko(this);total();" size="6" name="pko[new_obj_pmt_price]['+pid+']" value="0" atype="pmt_price" vtype="unsigned" aid="'+pid+'" id="pmt_'+pid+'"></td><td><input type="text" value="0" size="2" id="pkototal_'+pid+'" style="display:none;" class="pkototal"><input type="text" size="5" class="none_input pkosaleprice" value="0" readonly="readonly" id="pkosalepr_'+pid+'"></td><td><button class="btn" onclick="del_pko_new('+pid+');" id="d_'+pid+'" type="button"><span><span>删除</span></span></button></td>'}).inject($E('#pko_list tbody'));
+    <{else}>
+    var trr = new Element('tr', {id:'tr_'+pid,oid:pid,'aid':pid,'g-pid':pid,'g-type':'pko','g-del':'a',html:'<td>'+rs.sales_material_bn+'</td><td>'+rs.sales_material_name+'<input name="pko_ids[]" id="pko_ids_'+pid+'" type="text" value="'+rs.sm_id+'" style="display:none;" /></td><td><input type="text" onchange="changetotalpko(this);total();" id="num_'+pid+'" vtype="required&amp;&amp;unsignedint" value="1" size="5" name="pko[newnum]['+pid+']" aid="'+pid+'" atype="num"></td><td><input type="text" onchange="changetotalpko(this);total();" id="pr_'+pid+'" vtype="required&amp;&amp;unsigned" value="'+rs.price+'" size="8" name="pko[newprice]['+pid+']" aid="'+pid+'" atype="price" value="0"></td><td><input type="text" onchange="changetotalpko(this);total();" size="6" name="pko[new_obj_pmt_price]['+pid+']" value="0" atype="pmt_price" vtype="unsigned" aid="'+pid+'" id="pmt_'+pid+'"></td><td><input type="text" value="0" size="2" id="pkototal_'+pid+'" style="display:none;" class="pkototal"><input type="text" size="5" class="none_input pkosaleprice" value="0" readonly="readonly" id="pkosalepr_'+pid+'"></td><td><button class="btn" onclick="del_pko_new('+pid+');" id="d_'+pid+'" type="button"><span><span>删除</span></span></button></td>'}).inject($E('#pko_list tbody'));
+    <{/if}>
+
+    changetotalpko($('pr_'+pid));
+    total();
+    edit_checked(pid,rs.bn);
+}
+
+function edit_checked(obj_id,$obj_bn){
+    if (/^ECS_CARD_[0-9]{1,}$/.test($obj_bn)){
+        var num = $('num_'+obj_id).value;
+        if(num >=1){
+            $('num_'+obj_id).set('readonly',true);
+        }
+        $('pr_'+obj_id).set('readonly',true);
+        $('pmt_'+obj_id).set('readonly',true);
+    }
+}
+
+
+function changetotalpko(e){
+    var id = e.get('aid'),l=0,_ca = e.getNext('.error');
+    if(e.disable) return;
+    if (/^\d+(\.\d+)?$/.test(e.value)){
+        if(e.get('atype') == 'num'){
+            if (parseInt(e.value) <= 0){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }else{
+                if (_ca) _ca.remove();
+            }
+
+            $('pkototal_'+id).value = parseFloat($('num_'+id).value * $('pr_'+id).value).toFixed(3);
+
+            var pkosalepr_ = (parseFloat($('num_'+id).value)*parseFloat($('pr_'+id).value) - parseFloat($('pmt_'+id).value)).toFixed(3);
+            if (/^[-|0-9]*[0-9|.]+$/.test(pkosalepr_))
+            {
+                $('pkosalepr_'+id).set('value', pkosalepr_);
+            }else{
+                return;
+            }
+
+            var ptr,oid,m=0;
+            if((ptr = e.getParent('tr').getPrevious('tr.ColColorGray'))) {
+                oid = ptr.get('oid');
+                ptr.getAllNext('tr').each(function(item){
+                    if(oid == item.get('oid')){
+                        m += parseFloat($('num_'+item.get('aid')).value)*parseFloat($('pr_'+item.get('aid')).value) - parseFloat($('pmt_'+item.get('aid')).value);
+                    }
+                });
+                var pkoalepr = (m - parseFloat($('obj_pmt_'+oid).value)).toFixed(3);
+                if (/^[-|0-9]*[0-9|.]+$/.test(pkoalepr))
+                {
+                  $('pkosalepr_'+oid).set('value', pkoalepr);
+                }else{
+                    return;
+                }
+            }
+            if($('pkototal_'+oid)){
+                var pkototalsub = 0;
+                $('pkototal_'+oid).getParent('tr').getAllNext('tr[oid='+oid+']').length && $('pkototal_'+oid).getParent('tr').getAllNext('tr[oid='+oid+']').each(function(e){
+                    pkototalsub += parseFloat(e.getElement('[id^=pkototal_]').value);
+                });
+                $('pkototal_'+oid).value = parseFloat(pkototalsub).toFixed(3);
+            }
+
+        }else if (e.get('atype') == 'price'){
+
+            if (parseInt(e.value) < 0){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }else{
+                if (_ca) _ca.remove();
+            }
+
+            $('pkototal_'+id).value = parseFloat($('num_'+id).value).toFixed(3)*parseFloat($('pr_'+id).value).toFixed(3);
+  
+            var pkosalepr_ = (parseFloat($('num_'+id).value)*parseFloat($('pr_'+id).value) - parseFloat($('pmt_'+id).value)).toFixed(3);
+            
+            if (/^[-|0-9]*[0-9|.]+$/.test(pkosalepr_))
+            {
+
+                $('pkosalepr_'+id).set('value', pkosalepr_);
+            }else{
+                return;
+            }
+
+            var ptr,oid,m=0;
+            if((ptr = e.getParent('tr').getPrevious('tr.ColColorGray'))) {
+                oid = ptr.get('oid');
+                ptr.getAllNext('tr').each(function(item){
+                    if(oid == item.get('oid')){
+                        m += parseFloat($('num_'+item.get('aid')).value)*parseFloat($('pr_'+item.get('aid')).value) - parseFloat($('pmt_'+item.get('aid')).value);
+                    }
+                });
+                
+                var pkosalepr = (m - parseFloat($('obj_pmt_'+oid).value)).toFixed(3);
+                if (/^[-|0-9]*[0-9|.]+$/.test(pkosalepr))
+                {
+                    $('pkosalepr_'+oid).set('value', pkosalepr);
+                }else{
+                    return;
+                }
+            }
+            if($('pkototal_'+oid)){
+                var pkototalsub = 0;
+                $('pkototal_'+oid).getParent('tr').getAllNext('tr[oid='+oid+']').each(function(e){
+                    pkototalsub += parseFloat(e.getElement('[id^=pkototal_]').value);
+                });
+                $('pkototal_'+oid).value = parseFloat(pkototalsub).toFixed(3);
+            }
+        }else if (e.get('atype') == 'pmt_price'){
+
+            if (parseInt(e.value) < 0){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }else {
+                if (_ca) _ca.remove();
+            }
+
+            var pkosalepr = (parseFloat($('num_'+id).value)*parseFloat($('pr_'+id).value) - parseFloat($('pmt_'+id).value)).toFixed(3);
+            if (/^[-|0-9]*[0-9|.]+$/.test(pkosalepr))
+            {
+                $('pkosalepr_'+id).set('value', pkosalepr);
+            }else{
+                return;
+            }
+
+            var ptr,oid,aid,m=0;
+            if((ptr = e.getParent('tr').getPrevious('tr.ColColorGray'))) {
+                oid = ptr.get('oid');
+                ptr.getAllNext('tr').each(function(item){
+                    aid = item.get('aid');
+                    if(oid == item.get('oid')){
+                        m += parseFloat($('num_'+aid).value)*parseFloat($('pr_'+aid).value) - parseFloat($('pmt_'+aid).value);
+                    }
+                });
+                
+                var pkosalepr = (m - parseFloat($('obj_pmt_'+oid).value)).toFixed(3);
+                if (/^[-|0-9]*[0-9|.]+$/.test(pkosalepr))
+                {
+                    $('pkosalepr_'+oid).set('value', pkosalepr);
+                }else{
+                    return;
+                }
+            }
+        }else if (e.get('atype') == 'obj_pmt_price'){
+            if (parseInt(e.value) < 0){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }else {
+                if (_ca) _ca.remove();
+            }
+            e.getParent('tr').getAllNext('tr').each(function(item){
+                if(e.getParent('tr').get('oid') == item.get('oid')){
+                    l += parseFloat($('num_'+item.get('aid')).value)*parseFloat($('pr_'+item.get('aid')).value) - parseFloat($('pmt_'+item.get('aid')).value);
+                }
+            });
+            
+            var pkosalepr = (l - parseFloat($('obj_pmt_'+id).value)).toFixed(3);
+            if (/^[-|0-9]*[0-9|.]+$/.test(pkosalepr))
+            {
+                $('pkosalepr_'+id).set('value', pkosalepr);
+            }else{
+                return;
+            }
+        }
+    }else{
+        if (!_ca){
+            new Element('span',{'class':"error caution notice-inline",html:"请录入数值"}).injectAfter(e);
+            e.set('value', '0');
+        }
+    }
+}
+
+
+$('pko_list').getElements("input[atype]").each(function(e){
+    changetotalpko(e);
+});
+
+function total_pko(){
+    var total = 0,amount = 0;
+    $('pko_list').getElements("input.pkototal").each(function(item,k){
+        if(!item.disabled)total += parseFloat(item.value);
+    });
+    $('pko_list').getElements('.pkosaleprice').each(function(item,k){
+        if(!item.disabled)amount += parseFloat(item.value);
+    });
+    return [total,amount];
+ }
+
+  function del_pko(id){
+    
+    var oid = $("tr_"+id).get('oid');
+    var subtotal = 0;
+    var saleprice = 0;
+    var lesssub = 0;
+    var lesssale = 0;
+    var pmtorderprice = 0;
+    if($('tr_'+id).get('g-del') == 'a'){
+      if(($("tr_"+id).get('g-type') == 'pko') && $('tr_'+oid) && ($("tr_"+id).get('g-bn') == $('tr_'+oid).get('g-bn'))){
+        $$('#pko_list tbody tr[oid='+oid+']').each(function(e){
+            if(e.hasClass('disabled')){
+                lesssub += parseFloat(e.getElement('[id^=pkototal_]').value);
+                lesssale += parseFloat(e.getElement('[id^=pkosalepr_]').value);
+            }
+            else {
+              e.addClass('disabled').set('g-del','b');
+              e.getElements('input').length && e.getElements('input[type=text]').set('disabled',true);
+              e.get('g-type') == 'adjunct' || e.get('g-type') == 'gift' ? e.getElement('button').hide() : e.getElement('button') && e.getElement('button').getElement('span span').set('text','恢复');            
+            }
+        });
+        if(lesssub >0){
+            subtotal = parseFloat($('pkototal_'+oid).value) - lesssub;
+            saleprice = parseFloat($('pkosalepr_'+oid).value) - lesssub;
+        }
+
+        pmtorderprice = parseFloat($('pkopmtpr_'+oid).value);
+        
+        /***
+        if(pmtorderprice>0){
+          var pmt_order = $('pmt_order').value;
+
+          pmt_order = parseFloat(pmt_order)-pmtorderprice;
+          if(pmt_order < 0){
+              var discount = $('discount').value;
+              discount = parseFloat(discount)-pmt_order;
+              $('discount').value = parseFloat(discount.toFixed(3));
+              pmt_order = 0;
+          }
+          pmt_order = parseFloat(pmt_order).toFixed(3);
+          $('pmt_order').set('value', pmt_order);
+          $('pmt_order_show').set('text', '¥'+pmt_order).set('val', pmt_order);
+        }
+        ***/
+        
+      }
+      else {
+        subtotal = $('pkototal_'+id).value;
+        saleprice = $('pkosalepr_'+id).value;
+        $("num_"+id).disabled=true;
+        $("pr_"+id).disabled=true;
+        $("pmt_"+id).disabled=true;
+        $("pkototal_"+id).disabled=true;
+        $("pkosalepr_"+id).disabled=true;
+        
+        $("pko_ids_"+id).disabled=true;
+        
+        $("tr_"+id).addClass('disabled').set('g-del','b');
+        $("d_"+id).getElement('span span').set('text','恢复');
+      }
+    }
+    else if($('tr_'+id).get('g-del') == 'b'){
+      if(($("tr_"+id).get('g-type') == 'pko') && $('tr_'+oid) && ($("tr_"+id).get('g-bn') == $('tr_'+oid).get('g-bn'))) {
+        $$('#pko_list tbody tr[oid='+oid+']:not(:disabled)').each(function(e){
+            if(!e.hasClass('disabled')){
+                lesssub += parseFloat(e.getElement('[id^=pkototal_]').value);
+                lesssale += parseFloat(e.getElement('[id^=pkosalepr_]').value);
+            }
+            else {
+              e.removeClass('disabled').set('g-del','a');
+              e.getElements('input').length && e.getElements('input[type=text]').set('disabled',false);
+              e.getElement('button') && e.getElement('button').show().getElement('span span').set('text','删除');
+            }
+        });
+        if(lesssub >0){
+            subtotal = parseFloat($('pkototal_'+oid).value) - lesssub;
+            saleprice = parseFloat($('pkosalepr_'+oid).value) - lesssub;
+        }
+        pmtorderprice = parseFloat($('pkopmtpr_'+oid).value);
+        
+        /***
+        if(pmtorderprice>0){
+          var pmt_order = $('pmt_order').value;
+
+          pmt_order = parseFloat(pmt_order)+pmtorderprice;
+          pmt_order = parseFloat(pmt_order).toFixed(3);
+          $('pmt_order').set('value', pmt_order);
+          $('pmt_order_show').set('text', '¥'+pmt_order).set('val', pmt_order);
+        }
+        ***/
+      }
+      else {
+        if($('tr_'+oid) && $('tr_'+oid).hasClass('disabled')) return;
+        $("num_"+id).disabled=false;
+        $("pr_"+id).disabled=false;
+        $("pmt_"+id).disabled=false;
+        $("pkototal_"+id).disabled=false;
+        $("pkosalepr_"+id).disabled=false;
+        
+        $("pko_ids_"+id).disabled=true;
+        
+        $("tr_"+id).removeClass('disabled').set('g-del','a');
+        $("d_"+id).getElement('span span').set('text','删除');
+        subtotal = $('pkototal_'+id).value;
+        saleprice = $('pkosalepr_'+id).value;
+      }
+    }
+    delpkototal(id,subtotal,saleprice);
+
+  }
+
+function delpkototal(id,subtotal,saleprice)
+{
+    //计算相关金额
+    total();
+}
+
+//删除新增商品
+function del_pko_new(id){
+
+    var subtotal = $('pkototal_'+id).value;
+    var saleprice = $('pkosalepr_'+id).value;
+    $('tr_'+id).set('g-del','b');
+    delpkototal(id,subtotal,saleprice);
+    $("tr_"+id).remove();
+    if (!$E('#pko_list tbody').getElement('td')){
+        $('#pko_list').hide();
+    }
+    total();
+}
+
+//[拆单]部分拆分编辑购买数量
+function split_changetotalpko(e){
+    var id = e.get('aid'),l=0,_ca = e.getNext('.error');
+    if(e.disable) return;
+    
+    var split_buy_nums      = 0;
+    var split_send_nums     = 0;
+    var split_edit_nums     = 0;
+    if($('old_pko_nums_'+id))
+    {
+        split_buy_nums      = parseInt($('old_pko_nums_'+id).value);
+    }
+    if($('split_send_'+id))
+    {
+        split_send_nums     = parseInt($('split_send_'+id).value);
+    }
+    
+    if (/^\d+(\.\d+)?$/.test(e.value)){
+        if(e.get('atype') == 'num'){
+            if (parseInt(e.value) < 0){
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }
+            else if(parseInt(e.value) == 0 && split_send_nums == 0)
+            {
+                if (!_ca){
+                    new Element('span',{'class':'error caution notice-inline',html:'请录入不小于0的数'}).injectAfter(e);
+                    e.set('value', '0');
+                }
+                return;
+            }
+            else{
+                if (_ca) _ca.remove();
+            }
+            
+            split_edit_nums     = split_send_nums + parseInt(e.value);
+            $('num_'+id).value  = split_edit_nums;
+            
+            $('pkototal_'+id).value = parseFloat($('num_'+id).value * $('pr_'+id).value).toFixed(3);
+
+            var pkosalepr_ = (parseFloat($('num_'+id).value)*parseFloat($('pr_'+id).value) - parseFloat($('pmt_'+id).value)).toFixed(3);
+            if (/^[-|0-9]*[0-9|.]+$/.test(pkosalepr_))
+            {
+                $('pkosalepr_'+id).set('value', pkosalepr_);
+            }else{
+                return;
+            }
+
+            var ptr,oid,m=0;
+            if((ptr = e.getParent('tr').getPrevious('tr.ColColorGray'))) {
+                oid = ptr.get('oid');
+                ptr.getAllNext('tr').each(function(item){
+                    if(oid == item.get('oid')){
+                        m += parseFloat($('num_'+item.get('aid')).value)*parseFloat($('pr_'+item.get('aid')).value) - parseFloat($('pmt_'+item.get('aid')).value);
+                    }
+                });
+                var pkoalepr = (m - parseFloat($('obj_pmt_'+oid).value)).toFixed(3);
+                if (/^[-|0-9]*[0-9|.]+$/.test(pkoalepr))
+                {
+                  $('pkosalepr_'+oid).set('value', pkoalepr);
+                }else{
+                    return;
+                }
+            }
+            if($('pkototal_'+oid)){
+                var pkototalsub = 0;
+                $('pkototal_'+oid).getParent('tr').getAllNext('tr[oid='+oid+']').length && $('pkototal_'+oid).getParent('tr').getAllNext('tr[oid='+oid+']').each(function(e){
+                    pkototalsub += parseFloat(e.getElement('[id^=pkototal_]').value);
+                });
+                $('pkototal_'+oid).value = parseFloat(pkototalsub).toFixed(3);
+            }
+
+        }
+    }else{
+        if (!_ca){
+            new Element('span',{'class':"error caution notice-inline",html:"请录入数值"}).injectAfter(e);
+            e.set('value', '0');
+        }
+    }
+}
+</script>

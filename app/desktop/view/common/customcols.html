@@ -1,0 +1,112 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form id="customcols-form" action="index.php?<{$env.SERVER.QUERY_STRING}>" method="POST">
+  <div class="tableform">
+    <div id="add-errorinfo" class="error" style="display:none;"></div>
+    <div class="division">
+      <div>
+        <{button label="添加字段" class="addspec" id="addspec" icon="btn_add.gif" app="desktop"}>
+        <span class="notice-inline"></span>
+      </div>
+
+      <table border="0" cellspacing="0" cellpadding="0" class="gridlist  text-spec-value-table">
+        <caption>↓拖动可以排序</caption>
+        <thead>
+          <tr>
+            <th style="width:30px" title="拖动可以排序">拖动</th>
+            <th><{t}>字段名称<{/t}></th>
+            <th><{t}>字段描述<{/t}></th>
+            <th style="width:30px;"><{t}>操作<{/t}></th>
+          </tr>
+        </thead>
+      </table>
+      <div class="sepc_value_table text-spec-value-table" id="spec_body">
+
+            <{foreach from=$cols item=col}>
+            <table class="gridlist" border="0" cellpadding="0" cellspacing="0">
+                <tbody><tr>
+                    <td style="width:30px" class="move-handler" title="拖动可以排序"><{img src="bundle/grippy.gif" app="desktop"}></td>
+                    <td><{input type="text" name="cols[{$col.id}][col_key]" value="{$col.col_key}" size="40" maxlength="40" vtype="required"}></td>
+                    <td><{input type="text" name="cols[{$col.id}][col_name]" value="{$col.col_name}" size="40" maxlength="40"}></td>
+                    <td style="width:30px"><input class="col-id" type="hidden" name="cols[<{$col.id}>][id]" value="<{$col.id}>"/><{img app="desktop" src="bundle/delete.gif" class="delete" title="删除" style="cursor:pointer;" }></td></tr></tbody>
+            </table>
+            <{/foreach}>
+      </div>
+    </div>
+  </div>
+
+</form>
+
+<{area inject='.mainFoot'}>
+<div class="table-action">
+  <{button label="保存" type="submit" class="btn-primary" id="customcols-submit"}>
+  <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+</div>
+<{/area}>
+
+<script>
+(function(){
+    var new_spec_item = 0;
+    var getTemp = function(i){
+      return '<tbody><tr><td style="width:30px" class="move-handler" title="拖动可以排序"><{img src="bundle/grippy.gif" app="desktop"}></td>'+
+      '<td><{input type="text" name="cols[new_'+i+'][col_key]" value="" maxlength="40" vtype="required"}></td>'+
+      '<td><{input type="text" name="cols[new_'+i+'][col_name]" value=""}></td>'+
+      '<td style="width:40px"><input type="hidden" name="cols[new_'+i+'][col_id]" value=""/><{img app="desktop" src="bundle/delete.gif" class="delete" title="删除" style="cursor:pointer;" }></td></tr></tbody>';
+    };
+
+    $('addspec').addEvent('click',function(e){
+        var newRow=new Element('table.gridlist[border=0][cellpadding=0][cellspacing=0]',{
+            html:getTemp(new_spec_item++)}).inject($('spec_body'),'top');
+
+        new Sortables($('spec_body'),{clone:true,opacity:.5,handle:'.move-handler',onStart:function(){
+          $('spec_body').addClass('move-active');
+        },onComplete:function(){
+          $('spec_body').removeClass('move-active');
+        }
+        });
+
+        bindEditEvent(newRow);
+    })
+    var bindEditEvent=function(row){
+
+
+      var del=row.getElement('img.delete');
+      if(del) del.addEvent('click',function(){
+        if(!this.getParent('td').getElement('.col-id')){
+          if(confirm('删除后不可恢复，确认删除本行吗？')){
+            row.remove();
+          }
+          return;
+        };
+      });
+
+    };
+    $('customcols-submit').addEvent('click',function(){
+        $('customcols-form').fireEvent('submit',{stop:function(){}});
+    })
+  
+    $('customcols-form').store('target', {
+        onRequest:function(){
+            $E('#customcols-submit').disabled = true
+
+            $E('#customcols-submit span span').setText('提交中...')
+
+            $('add-errorinfo').hide()
+        },
+        onComplete:function(resp){
+            $E('#customcols-submit').disabled = false
+            $E('#customcols-submit span span').setText('确定')
+
+            resp = JSON.decode(resp);
+            if (resp.error){
+                return $('add-errorinfo').setText(resp.error).show();
+            }
+
+            $('customcols-form').getParent('.dialog').retrieve('instance').close();
+        }
+    })
+})();
+</script>

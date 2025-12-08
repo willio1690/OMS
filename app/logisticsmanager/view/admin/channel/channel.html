@@ -1,0 +1,843 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+select{width:120px;}
+</style>
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=logisticsmanager&ctl=admin_channel&act=do_save" id="form_channel">
+        <input type="hidden" name="channel_id" value="<{$channel.channel_id}>">
+        <input type="hidden" name="bind_status" value="<{$channel.bind_status}>">
+
+        <!-- 无作用，只为处理该死的360自动填充密码 -->
+        <input type="text" style="visibility: hidden;" autocomplete = "off"/>
+        <input type="password" style="visibility: hidden;" autocomplete = "off"/>
+        <!-- 无作用，只为处理该死的360自动填充密码 -->
+
+        <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+            <tr>
+                <th>名称：</th>
+                <td><{input type="text" name="name" id="name" value=$channel.name size="30" vtype="required"}></td>
+            </tr>
+
+            <tr>
+                <th>来源类型：</th>
+                <td>
+                    <{if $channel.channel_type}>
+                        <{input type="select" id='channel_type' name='channel_type' rows=$channels value=$channel.channel_type valueColumn="code" labelColumn="name" disabled="disabled"}>
+                        <input type="hidden" name="channel_type" value="<{$channel.channel_type}>">
+                    <{else}>
+                        <{input type="select" id='channel_type' name='channel_type' rows=$channels value=$channels.0.code valueColumn="code" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+
+            <tr>
+                <th>物流公司：</th>
+                <td id='logistics_td'>
+                    <{if $channel.channel_type}>
+                        <{if $channel.logistics_code != 'yto4gj'}>
+                            <{assign var='disabled' value="disabled"}>
+                        <{/if}>
+                        <{input type="select" id='logistics_code' name='logistics_code' rows=$logistics value=$channel.logistics_code valueColumn="code" labelColumn="name" disabled=$disabled}>
+                    <{else}>
+                        <{input type="select" id='logistics_code' name='logistics_code' rows=$logistics value=$logistics.0.code valueColumn="code" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="ems">
+        <tbody>
+            <tr>
+                <th>客户号：</th>
+                <td><{input type="text" name="emsuname" value=$channel.emsuname size="30"}></td>
+            </tr>
+            <tr>
+                <th>密码：</th>
+                <td><{input type="password" name="emspasswd" value=$channel.emspasswd size="30"}></td>
+            </tr>
+        </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="360buy">
+            <tbody>
+            <tr>
+            <th>店铺:</th>
+            <td><{if $channel.shop_id}>
+                        <{input type="select" name='jd_shop_id' rows=$jdshopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" }>
+                    <{else}>
+                        <{input type="select" name='jd_shop_id' rows=$jdshopList  valueColumn="shop_id" labelColumn="name"}>
+                    <{/if}></td>
+             </tr>
+                <tr>
+                    <th>商家编码：</th>
+                    <td><{input type="text" name="jdbusinesscode" value=$channel.jdbusinesscode size="30"}></td>
+                </tr>
+
+            </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="taobao">
+        <tbody>
+            <tr>
+                <th>主店铺：</th>
+                <td>
+                    <{if $channel.shop_id}>
+                        <{input type="select" name='taobao_shop_id' rows=$shopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                        <{input type="select" name='taobao_shop_id' rows=$shopList value=$shopList.0.shop_id valueColumn="shop_id" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+            <tr id='taobao_logistics_type_tr' style='display:none'>
+                <th>快递类型：</th>
+                <td id='taobao_logistics_type'>
+
+                </td>
+            </tr>
+        </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="pdd">
+        <tbody>
+            <tr>
+                <th>主店铺：</th>
+                <td>
+                    <{if $channel.shop_id}>
+                        <{input type="select" name='pdd_shop_id' rows=$pddshopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                        <{input type="select" name='pdd_shop_id' rows=$pddshopList value=$shopList.0.shop_id valueColumn="shop_id" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="douyin">
+        <tbody>
+            <tr>
+                <th>主店铺：</th>
+                <td>
+                    <{if $channel.shop_id}>
+                        <{input type="select" name='douyin_shop_id' rows=$douyinshopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                        <{input type="select" name='douyin_shop_id' rows=$douyinshopList value=$shopList.0.shop_id valueColumn="shop_id" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="meituan4bulkpurchasing">
+        <tbody>
+            <tr>
+                <th>主店铺：</th>
+                <td>
+                    <{if $channel.shop_id}>
+                        <{input type="select" name='meituan4bulkpurchasing_shop_id' rows=$meituan4bulkpurchasingshopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                        <{input type="select" name='meituan4bulkpurchasing_shop_id' rows=$meituan4bulkpurchasingshopList value=$shopList.0.shop_id valueColumn="shop_id" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="youzan">
+            <tbody>
+                <tr>
+                    <th>主店铺：</th>
+                    <td>
+                        <{if $channel.shop_id}>
+                            <{input type="select" name='youzan_shop_id' rows=$youzanshopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" disabled="disabled"}>
+                        <{else}>
+                            <{input type="select" name='youzan_shop_id' rows=$youzanshopList value=$shopList.0.shop_id valueColumn="shop_id" labelColumn="name"}>
+                        <{/if}>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="kuaishou">
+            <tbody>
+            <tr>
+                <th>主店铺：</th>
+                <td>
+                    <{if $channel.shop_id}>
+                    <{input type="select" name='kuaishou_shop_id' rows=$shopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                    <{input type="select" name='kuaishou_shop_id' rows=$kuaishoushopList value=$shopList.0.shop_id valueColumn="shop_id" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="wphvip">
+            <tbody>
+            <tr>
+                <th>主店铺：</th>
+                <td>
+                    <{if $channel.shop_id}>
+                    <{input type="select" name='wphvip_shop_id' rows=$shopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                    <{input type="select" name='wphvip_shop_id' rows=$wphvipshopList value=$shopList.0.shop_id valueColumn="shop_id" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="aikucun">
+            <tbody>
+            <tr>
+                <th>主店铺：</th>
+                <td>
+                    <{if $channel.shop_id}>
+                    <{input type="select" name='aikucun_shop_id' rows=$shopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                    <{input type="select" name='aikucun_shop_id' rows=$akcshopList value=$shopList.0.shop_id valueColumn="shop_id" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="xhs">
+        <tbody>
+            <tr>
+                <th>主店铺：</th>
+                <td>
+                    <{if $channel.shop_id}>
+                        <{input type="select" name='xhs_shop_id' rows=$xhsshopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                        <{input type="select" name='xhs_shop_id' rows=$xhsshopList value=$shopList.0.shop_id valueColumn="shop_id" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+            <tr>
+                <th>电子面单版本：</th>
+                <td>
+                    <{if $channel.ver}>
+                        <{input type="select" required="required" name='billVersion' rows=$xhsbillversion value=$channel.ver valueColumn="billVersion" labelColumn="name"}>
+                    <{else}>
+                        <{input type="select" required="required" name='billVersion' rows=$xhsbillversion value=$xhsbillversion.0.billVersion valueColumn="billVersion" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="wxshipin">
+        <tbody>
+            <tr>
+                <th>主店铺：</th>
+                <td>
+                    <{if $channel.shop_id}>
+                        <{input type="select" name='wxshipin_shop_id' rows=$wxshipinshopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                        <{input type="select" name='wxshipin_shop_id' rows=$wxshipinshopList value=$shopList.0.shop_id valueColumn="shop_id" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="dewu">
+            <tbody>
+            <tr>
+                <th>主店铺：</th>
+                <td>
+                    <{if $channel.shop_id}>
+                    <{input type="select" name='dewu_shop_id' rows=$shopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                    <{input type="select" name='dewu_shop_id' rows=$dewushopList value=$shopList.0.shop_id valueColumn="shop_id" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="sf">
+        <tbody>
+            <tr>
+                <th>付款方式：</th>
+                <td id='sf_pay_method_td'>
+                    <{if $channel.pay_method}>
+                        <{input type="select" name='sf_pay_method' rows=$pay_method value=$channel.pay_method valueColumn="code" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                        <{input type="select" name='sf_pay_method' rows=$pay_method value=$pay_method.0.code valueColumn="code" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+            <tr>
+                <th>使用自研KEY：</th>
+                <td><input type="checkbox" name="sfapiversion" value="v2" <{if $channel.sfapiversion == "v2"}>checked="checked"<{/if}> size="30"></td>
+            </tr>
+            <tr>
+                <th>顾客编码：</th>
+                <td><{input type="text" name="sfbusinesscode" value=$channel.sfbusinesscode size="30"}></td>
+            </tr>
+            <tr>
+                <th>校验码：</th>
+                <td><{input type="text" name="sfpassword" value=$channel.sfpassword size="30"}></td>
+            </tr>
+            <tr>
+                <th>月结号：</th>
+                <td><{input type="text" name="sfcustid" value=$channel.sfcustid size="30"}></td>
+            </tr>
+        </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="yunda">
+        <tbody>
+            <tr>
+                <th>客户号：</th>
+                <td><{input type="text" name="yundauname" value=$channel.yundauname size="30"}></td>
+            </tr>
+            <tr>
+                <th>密码：</th>
+                <td><{input type="text" name="yundapassword" value=$channel.yundapassword size="30"}></td>
+            </tr>
+        </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="sto">
+        <tbody>
+            <tr>
+                <th>客户名称：</th>
+                <td><{input type="text" name="sto_custname" value=$channel.sto_custname size="30"}></td>
+            </tr>
+            <tr>
+                <th>网点名称：</th>
+                <td><{input type="text" name="sto_cutsite" value=$channel.sto_cutsite size="30"}></td>
+            </tr>
+            <tr>
+                <th>密码：</th>
+                <td><{input type="password" name="sto_cutpwd" value=$channel.sto_cutpwd size="30"}></td>
+            </tr>
+        </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="hqepay">
+        <tbody>
+            <tr>
+                <th>快递类型：</th>
+                <td id='hqepay_logistics_type'>
+
+                </td>
+            </tr>
+             <tr>
+                <th>付款方式：</th>
+                <td id='hqepay_pay_method_td'>
+                    <{if $channel.pay_method}>
+                        <{input type="select" name='hqepay_pay_method' rows=$pay_method value=$channel.pay_method valueColumn="code" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                        <{input type="select" name='hqepay_pay_method' rows=$pay_method value=$pay_method.0.code valueColumn="code" labelColumn="name"}>
+                    <{/if}>
+
+                </td>
+            </tr>
+            <tr>
+                <th>客户号：</th>
+                <td><{input type="text" name="hqepay_uname" value=$channel.hqepay_uname size="30"}></td>
+            </tr>
+            <tr id="hqepay_password">
+                <th>密码：</th>
+                <td><{input  type="password"  name="hqepay_password" vtype="required" value=$channel.hqepay_password size="30"}>&nbsp;<em class="c-red">*</em></td>
+            </tr>
+            <tr>
+                <th>隐私面单：</th>
+                <td><input type="checkbox" name="hqepay_safemail" value="1" <{if $channel.hqepay_safemail==1}>checked="checked"<{/if}> ></td>
+            </tr>
+        </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="unionpay">
+           <tr>
+               <th>付款方式：</th>
+               <td id='unionpay_pay_method_td'>
+                   <{if $channel.pay_method}>
+                        <{input type="select" id='unionpay_pay_method' name='unionpay_pay_method' rows=$pay_method value=$channel.pay_method valueColumn="code" labelColumn="name" disabled="disabled"}>
+                   <{else}>
+                        <{input type="select" id='unionpay_pay_method' name='unionpay_pay_method' rows=$pay_method value=$pay_method.0.code valueColumn="code" labelColumn="name"}>
+                   <{/if}>
+
+               </td>
+           </tr>
+
+           <tr>
+               <th>客户号：</th>
+               <td><{input type="text" name="unionpay_uname" value=$channel.unionpay_uname size="30"}></td>
+           </tr>
+           <tr id="unionpay_password">
+               <th>密码：</th>
+               <td ><{input  type="password"  name="unionpay_password" vtype="required" value=$channel.unionpay_password size="30"}>&nbsp;<em class="c-red">*</em></td>
+           </tr>
+           <tr id="unionpay_month_code">
+               <th>月结号：</th>
+               <td><{input type="text"   name="unionpay_month_code" vtype="required"  value=$channel.unionpay_month_code size="30"}>&nbsp;<em class="c-red">*</em></td>
+           </tr>
+       </table>
+       <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="jdalpha">
+         <tbody>
+              <tr>
+                <th>主店铺：</th>
+                <td>
+                    <{if $channel.shop_id}>
+                        <{input type="select" name='jdalpha_shop_id' rows=$shopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                        <{input type="select" name='jdalpha_shop_id' rows=$jdshopList value=$shopList.0.shop_id valueColumn="shop_id" labelColumn="name"}>
+                    <{/if}>
+                </td>
+             </tr>
+             <tr id='jdalpha_logistics_type_tr' style='display:none'>
+                <th >快递类型：</th>
+                <td id='jdalpha_logistics_type'>
+                </td>
+             </tr>
+             <tr id='jdalpha_pay_method_tr' style='display:none'>
+                <th >付款方式：</th>
+                <td id='jdalpha_pay_method_td'>
+                    <{if $channel.pay_method}>
+                        <{input type="select" name='jdalpha_pay_method' rows=$pay_method value=$channel.pay_method valueColumn="code" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                        <{input type="select" name='jdalpha_pay_method' rows=$pay_method value=$pay_method.0.code valueColumn="code" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+            <tr id='jdalpha_vendorcode_tr' style='display:none'>
+                <th >商家ID：</th>
+                <td><{input type="text" vtype="required"  name="jdalpha_vendorcode" value=$channel.jdalpha_vendorcode  size="30"}><font color='red'>&nbsp; &nbsp;* &nbsp;必填</font></td>
+            </tr>
+            <tr>
+                <th id='notice'>承运商发货网点编码：</th>
+                <td><{input type="text" vtype="required"  name="jdalpha_businesscode" value=$channel.jdalpha_businesscode size="30"}><font color='red'>&nbsp; &nbsp;* &nbsp;必填</font></td>
+            </tr>
+        </tbody>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="bbd">
+           <tr><th></th><td></td></tr>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="vopjitx">
+           <tr><th></th><td></td></tr>
+        </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="yto4gj">
+           <tr>
+               <th>key：</th>
+               <td><{input type="text" vtype="required" name="yto4gjkey" value=$channel.yto4gjkey size="30"}><em class="c-red">* 必填</em></td>
+           </tr>
+           <tr>
+               <th>secret：</th>
+               <td><{input type="text" vtype="required" name="yto4gjsecret" value=$channel.yto4gjsecret size="30"}><em class="c-red">* 必填</em></td>
+           </tr>
+        </table>
+
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="pinjun">
+            <tr>
+               <th>付款方式：</th>
+               <td id='pinjun_pay_method_td'>
+                   <{if $channel.pay_method}>
+                        <{input type="select" id='pinjun_pay_method' name='pinjun_pay_method' rows=$pay_method value=$channel.pay_method valueColumn="code" labelColumn="name" disabled="disabled"}>
+                   <{else}>
+                        <{input type="select" id='pinjun_pay_method' name='pinjun_pay_method' rows=$pay_method value=$pay_method.0.code valueColumn="code" labelColumn="name"}>
+                   <{/if}>
+               </td>
+            </tr>
+            <tr>
+               <th>appKey：</th>
+               <td><{input type="text" name="pinjun_uname" vtype="required" value=$channel.pinjun_uname size="30"}>
+                   <em class="c-red">* 必填</em>
+               </td>
+            </tr>
+            <tr id="pinjun_password">
+               <th>appSerect：</th>
+               <td><{input  type="password"  name="pinjun_password" vtype="required" value=$channel.pinjun_password size="30"}> 
+                   <em class="c-red">* 必填</em>
+               </td>
+            </tr>
+            <tr id="pinjun_month_code">
+                <th>月结号：</th>
+                <td><{input type="text"   name="pinjun_month_code"  value=$channel.pinjun_month_code size="30"}></td>
+            </tr>
+       </table>
+        <table class="waybill_source_config" width="100%" cellspacing="0" cellpadding="0" border="0" id="jdgxd">
+            <tbody>
+            <tr>
+                <th>店铺:</th>
+                <td><{if $channel.shop_id}>
+                    <{input type="select" name='jdgxd_shop_id' rows=$jdshopList value=$channel.shop_id valueColumn="shop_id" labelColumn="name" }>
+                    <{else}>
+                    <{input type="select" name='jdgxd_shop_id' rows=$jdshopList  valueColumn="shop_id" labelColumn="name"}>
+                    <{/if}></td>
+            </tr>
+            <tr>
+                <th>结算方式：</th>
+                <td id='jdgxd_pay_method_td'>
+                    <{if $channel.pay_method}>
+                    <{input type="select" name='jdgxd_pay_method' rows=$pay_method value=$channel.pay_method valueColumn="code" labelColumn="name" disabled="disabled"}>
+                    <{else}>
+                    <{input type="select" name='jdgxd_pay_method' rows=$pay_method value=$pay_method.0.code valueColumn="code" labelColumn="name"}>
+                    <{/if}>
+                </td>
+            </tr>
+            <tr>
+                <th>商家编码：</th>
+                <td><{input type="text" name="jdgxd_vendorcode" value=$channel.jdgxd_vendorcode size="30"}></td>
+            </tr>
+            <tr>
+                <th>月结号：</th>
+                <td><{input type="text" name="jdgxd_month_code"  value=$channel.jdgxd_month_code size="30"}></td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="table-action">
+            <{button label="提交" type="submit" name="submit" id="btn-submit"}>
+            <{button label="关闭" type="button" id="btn-close" isCloseDialogBtn="true"}>
+        </div>
+        </form>
+        <div id="msgError"></div>
+    </div>
+</div>
+<script>
+var exp_type  = "<{$channel.exp_type}>";
+
+var channelServiceCode = '<{$channel.service_code}>';
+(function() {
+    var channel_type = "<{$channel.channel_type}>";
+    setChannelType(channel_type);
+    set_logistics(channel_type);//快递鸟，有些物流使用月结号，有些使用秘钥，这里需要做相关引导
+
+    $('form_channel').store('target', {
+        update: 'msgError',
+        clearUpdateMap: false,
+        onRequest: function () {
+            //提交按钮:disabled
+            $('btn-submit').set('disabled', 'true');
+            $('btn-submit').getElements('span')[1].set('text', '正在保存');
+        },
+        onComplete: function (result) {
+            if (result != 'SUCC') {
+                $('msgError').className = 'error';
+                //提交按钮:enabled
+                $('btn-submit').set('disabled', '');
+                $('btn-submit').getElements('span')[1].set('text', '提交');
+            } else {
+                //提交按钮:disabled
+                var findId = "<{$env.get.finder_id}>";
+                if (findId != '') {
+                    finderGroup["<{$env.get.finder_id}>"].refresh.delay(400, finderGroup["<{$env.get.finder_id}>"]);
+                }
+                $('btn-submit').getParent('.dialog').retrieve('instance').close();
+            }
+        }
+    });
+    $('channel_type').addEvent('change', function () {
+        var type = $("channel_type").value;
+        setChannelType(type);
+        if(!type) return ;
+        new Request({
+            url: 'index.php?app=logisticsmanager&ctl=admin_channel&act=getLogistics',
+            data: 'type=' + type,
+            method: 'post',
+            onSuccess: function (response) {
+                var temp = '<select name="logistics_code" class="x-input-select inputstyle">';
+                if (response) {
+                    var result = JSON.decode(response);
+                    Object.each(result, function (i, index) {
+                        temp += '<option value=' + i.code + '>' + i.name + '</option>';
+                    });
+                }
+                temp += '</select>';
+                $('logistics_td').show();
+                $('logistics_td').set('html', temp);
+                setInterval(set_logistics(type), 300);
+                $E('[name="logistics_code"]').addEvent('change', function(e) {
+                    set_logistics(type);
+                });
+            }
+        }).send();
+        if (paymethodlist(type)) {
+            getPayMethodList(type, function () {
+                if (type == 'hqepay' || type =='jdalpha' || type =='pinjun' || type =='jdgxd') {
+                    $(type+'_pay_method_td').setHTML($(type+'_pay_method_td').getHTML() + '&nbsp;<em class="c-red">*</em>');
+                }
+            });
+        }
+    });
+    function setChannelType(channel_type) {
+        $('logistics_td').hide();
+        $$('.waybill_source_config').each(function(item, index){
+            if(item.id == channel_type) {
+                item.show();
+                $('logistics_td').show();
+            } else {
+                item.hide();
+            }
+        });
+    }
+
+    function paymethodlist(type) {
+        var typelist = Array('sf', 'hqepay','unionpay','jdalpha','pinjun','jdgxd');
+        var status = false;
+        for (var i in typelist) {
+            if (typelist[i] == type) {
+                status = true;
+                break;
+            }
+        }
+        return status;
+    }
+
+    //物流变更
+    function set_logistics(channel_type) {
+
+        var logistics_code = $E("select[name=logistics_code]").value;
+        if (channel_type == 'hqepay' || channel_type == 'unionpay' ) {
+            if (logistics_code) {
+                change_ExpType(channel_type,logistics_code);
+            }
+        }
+        if(channel_type == 'aikucun' || channel_type == 'taobao' || channel_type=='sf' || channel_type == 'hqepay' || channel_type == '360buy' || channel_type == 'pdd' || channel_type=='yto4gj' || channel_type=='douyin'|| channel_type=='kuaishou' || channel_type == 'wphvip' || channel_type == 'xhs' || channel_type == 'wxshipin' || channel_type == 'dewu' || channel_type=='meituan4bulkpurchasing' || channel_type=='jdalpha' || channel_type=='jdgxd' || channel_type=='youzan') {
+            var param = new Hash();
+            if(channel_type == 'taobao') {
+                param.set('shop_id', $E('[name="taobao_shop_id"]').getValue());
+                if(logistics_code == 'SF' || logistics_code == 'LE04284890' || logistics_code == 'LE38288910'){
+                    change_ExpType(channel_type,logistics_code);
+                    $('taobao_logistics_type_tr').show();
+                }else{
+                    $('taobao_logistics_type_tr').hide();
+                }
+                
+            } else if(channel_type == 'pdd') {
+                param.set('shop_id', $E('[name="pdd_shop_id"]').getValue());
+            } else if(channel_type == 'yto4gj') {
+                param.set('channel_id', $E('[name="channel_id"]').getValue());
+            }
+            getLogisticsSpecial(channel_type, logistics_code, 'service_code', param);
+        }
+
+        if(channel_type == 'jdalpha'){
+            deal_jdalpha(logistics_code);
+            change_ExpType(channel_type,logistics_code);
+            if(logistics_code == 'SF'){
+            	$('jdalpha_logistics_type_tr').show();
+            	$('jdalpha_pay_method_tr').show();
+                $('jdalpha_vendorcode_tr').show();
+            } else if (logistics_code == 'JDDJ') {
+                $('jdalpha_logistics_type_tr').hide();
+                $('jdalpha_pay_method_tr').hide();
+                $('jdalpha_vendorcode_tr').hide();
+            }else{
+                $('jdalpha_logistics_type_tr').hide();
+                $('jdalpha_pay_method_tr').hide();
+                $('jdalpha_vendorcode_tr').show();
+            }
+        }
+    }
+
+    <{if $channel.channel_type == 'yto4gj' && $channel.logistics_code == 'yto4gj'}>
+    $E('[name="logistics_code"]').addEvent('change', function(e) {
+        set_logistics('yto4gj');
+    });
+    <{/if}>
+
+    $E('[name="taobao_shop_id"]').addEvent('change',function(){
+        set_logistics('taobao');
+    });
+    $E('[name="pdd_shop_id"]').addEvent('change',function(){
+        set_logistics('pdd');
+    });
+    $E('[name="douyin_shop_id"]').addEvent('change',function(){
+        set_logistics('douyin');
+    });
+    $E('[name="kuaishou_shop_id"]').addEvent('change',function(){
+        set_logistics('kuaishou');
+    });
+    $E('[name="xhs_shop_id"]').addEvent('change',function(){
+        set_logistics('xhs');
+    });
+    $E('[name="wxshipin_shop_id"]').addEvent('change',function(){
+        set_logistics('wxshipin');
+    });
+    $E('[name="dewu_shop_id"]').addEvent('change',function(){
+        set_logistics('dewu');
+    });
+    $E('[name="jdgxd_shop_id"]').addEvent('change',function(){
+        set_logistics('jdgxd');
+    });
+
+    function change_ExpType(channel_type,logistics_code) {
+        new Request({
+            url: 'index.php?app=logisticsmanager&ctl=admin_channel&act=get_ExpType',
+            data: 'logistics_cod=' + logistics_code+'&channel_type='+channel_type,
+            method: 'post',
+            onSuccess: function (response) {
+                var logistics_type_html = '<select name="exp_type"    class="x-input-select inputstyle"> ';
+                if (response) {
+                    var result = JSON.decode(response);
+                    //兼容之前没有快递类型的
+                    if (!exp_type) {
+                        logistics_type_html += '<option value=0 selected="selected">请选择</option>';
+                    }
+                    Object.each(result, function (i, index) {
+                        if (index == exp_type) {
+                            logistics_type_html += '<option value=' + index + ' selected="selected">' + i + '</option>';
+                        } else {
+                            logistics_type_html += '<option value=' + index + '>' + i + '</option>';
+                        }
+                    });
+                }
+                logistics_type_html += '</select><em class="c-red">&nbsp;&nbsp;*</em>';
+                var logistics_type = channel_type+'_logistics_type';
+                $(logistics_type).set('html', logistics_type_html);
+            }
+        }).send();
+
+    }
+
+    function getPayMethodList(type, func) {
+        new Request({
+            url: 'index.php?app=logisticsmanager&ctl=admin_channel&act=getPayMethod',
+            data: 'type=' + type,
+            method: 'post',
+            onSuccess: function (response) {
+                var temp1 = '<select name="'+type+'_pay_method" class="x-input-select inputstyle">';
+                if (response) {
+                    var result = JSON.decode(response);
+                    Object.each(result, function (i, index) {
+                        temp1 += '<option value=' + i.code + '>' + i.name + '</option>';
+                    });
+                }
+                $(type + '_pay_method_td').show();
+                $(type + '_pay_method_td').set('html', temp1);
+                func();
+            }
+        }).send();
+    }
+
+    function getLogisticsSpecial(type, logistics, method, param) {
+        if($$('.special_select')) {
+            $$('.special_select').each(function(item){
+                item.destroy();
+            });
+        }
+        new Request({
+            url: 'index.php?app=logisticsmanager&ctl=admin_channel&act=getLogisticsSpecial',
+            data: 'type=' + type + '&logistics=' + logistics + '&method=' + method + '&' + param.toQueryString(),
+            method: 'post',
+            onSuccess: function (response) {
+                console.log(1, channelServiceCode);
+                if(channelServiceCode) {
+                    var objChannelServiceCode = JSON.decode(channelServiceCode);
+                    var rsp = JSON.decode(response);
+                    for (var i in objChannelServiceCode) {
+                        if (rsp[i]) {
+                            console.log(i, objChannelServiceCode);
+                            rsp[i].value = objChannelServiceCode[i] && typeof objChannelServiceCode[i].value != 'undefined' ?
+                                    objChannelServiceCode[i].value : '';
+                        }
+                    }
+                    response = JSON.encode(rsp);
+                }
+                logisticsSpecialHtml(response, type, logistics);
+            }
+        }).send();
+    }
+
+    function logisticsSpecialHtml(response, type, logistics) {
+        if(response) {
+            var oInput = document.createElement('INPUT');
+            oInput.className = 'special_select';
+            oInput.type = 'hidden';
+            oInput.name = type + '_' + logistics + '_all';
+            oInput.value = response;
+            oInput.inject($('form_channel'), 'top');
+            var rsp = JSON.decode(response);
+            var strDisabled = '';
+            if($E('[name="channel_id"]').value) {
+                //strDisabled = ' disabled="disabled" ';
+            }
+            Object.each(rsp, function(result) {
+                var oTr = document.createElement('TR');
+                oTr.className = 'special_select';
+                var sTr = '<th>' + (result.required?'<em class="c-red">*</em>':'') + result.text + '：</th><td>';
+                var temp1 = '';
+                var oName = type + '_' + logistics + '[' + result.code + ']';
+                result.value = typeof result.value == 'undefined' ? '' : result.value;
+                switch (result.input_type) {
+                    case 'select':
+                        if (result.options) {
+                            temp1 = '<select name="' + oName + '" ' + strDisabled +' class="x-input-select inputstyle">';
+                            Object.each(result.options, function (item, index) {
+                                temp1 += '<option value="' + index + '" '+ (result.value == index ? 'selected="selected"' : '') +'>' + item + '</option>';
+                            });
+                            temp1 += '</select>';
+                        }
+                        break;
+                    case 'checkbox':
+                        temp1 = '<input type="checkbox" name="' + oName + '" value="1" ' + (result.value == 1 ? 'checked="checked"' : '') + strDisabled + ' />';
+                        break;
+                    default :
+                        temp1 = '<input type="text" name="' + oName + '" value="' + result.value + '"' + strDisabled + ' />';
+                        break;
+                }
+                if(result.require) {
+                    temp1 = temp1.replace(oName+'"', oName+'" vtype="required"');
+                    temp1 += '<span style="color: red" >&nbsp; &nbsp;* &nbsp;必填</span>';
+                }
+                sTr += temp1 + '</td>';
+                oTr.setHTML(sTr);
+                oTr.inject($(type));
+            });
+
+            var platform = '';
+            switch (type){
+                case 'taobao':platform='淘宝';break;
+                case 'sf':platform='顺丰';break;
+            }
+            if(platform) {
+                var oTr = document.createElement('TR');
+                oTr.className = 'special_select';
+                var sTr = '<td colspan="2" style="color:red">注：请先到' + platform + '平台配置好服务</td>';
+                oTr.setHTML(sTr);
+                oTr.inject($(type));
+            }
+        }
+    }
+
+    //京东阿尔发的处理
+    function deal_jdalpha(logistics_code){
+        //京东阿尔发承运商的类型，加盟或直营
+        var logistics_mode = {
+                'ZTO': 'join',
+                'YUNDA': 'join',
+                'STO': 'join',
+                'UC': 'join',
+                'QFKD': 'join',
+                'GTO': 'join',
+                'UAPEX': 'join',
+                'SURE': 'join',
+                'FAST': 'join',
+                'EMS':'direct',
+                'EMSBZ':'direct',
+                'ZJS':'direct',
+                'POSTB':'direct',
+                'ky-express':'direct',
+                'SF':'direct',
+                'YTO':'join',
+                'ANWL':'join',
+                'DBKD':'direct',
+                'ZYKD':'join',
+                'FENGWANG':'join',
+                'SXJD':'join',
+                'JTSD':'join',
+                'DSBK':'direct',
+                'JDDJ':'self',
+                'DDKY':'direct',
+            };
+        //加盟型，比填承运商发货网点
+        if (logistics_mode[logistics_code] == 'join') {
+            $('notice').set('html','承运商发货网点编码：');
+        } else if (logistics_mode[logistics_code] == 'self') {
+            $('notice').set('html','商家编码：');
+        } else{
+            //直营型，必填商家结算编码
+            $('notice').set('html','财务结算编码：');
+        }
+    }
+})();
+</script>

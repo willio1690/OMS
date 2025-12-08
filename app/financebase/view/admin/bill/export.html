@@ -1,0 +1,130 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=financebase&ctl=admin_shop_settlement_bill&act=doExport&finder_id=<{$env.get.finder_id}>" method="post" id="form1" isCloseDialog>
+     <div class="tableform">
+      <div class="division">
+ <table width="100%" border="0" cellpadding="0" cellspacing="0" class="girdlist">
+
+<tr><th>所选店铺</th><td id="bill-shop">
+  <select name="shop_id" id="export_shop_id" vtype="required">
+  <{foreach from=$shop_list item=item}>
+<option value="<{$item.shop_id}>" ><{$item.name}></option>
+<{/foreach}>
+</select>
+</td></tr>
+
+<tr><th>账单时间</th><td id="bill-date">
+
+</td></tr>
+<tr><th>具体类别</th><td>
+                <select name="bill_category" id="export_bill_category">
+                    <option value="all">全部</option>
+                    <{foreach from=$billCategory item=val}>
+                    <option value="<{$val.bill_category}>"><{$val.bill_category}></option>
+                    <{/foreach}>
+                </select></td></tr>
+<tr><th>匹配状态</th><td id="bill-status">
+
+</td></tr>
+ </table>
+
+<div class="table-action">
+      <{button label="确定" id="btn-submit" class="btn-primary" disabled="disabled"}> &nbsp; &nbsp;
+      <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+<input type='hidden' id='finder_id' name='finder_id' value='<{$finder_id}>'>
+<input type="hidden" name="time_from" id="time_from" type="text" value=""> 
+<input type="hidden" name="time_to" id="time_to" type="text" value=""> 
+<input type="hidden" name="bill_status" id="bill_status" type="text" value=""> 
+  </div>  </div>
+</form>
+<script>
+
+
+(function(){
+
+   
+    var time_from = $("time_from").value;
+    var time_to = $("time_to").value;
+    var shop_id = $("shop_id").value;
+    var bill_status = $("bill_status").value;
+
+
+ 
+    $('time_from').set('value',time_from);
+    $('time_to').set('value',time_to);
+    $('bill_status').set('value',bill_status);
+
+    $('bill-date').setHTML(time_from + ' 至 ' + time_to);
+    for(var i=0;i<$("bill_status").length;i++){
+        if($("bill_status").options[i].value == bill_status){
+            $('bill-status').setHTML($("bill_status").options[i].text);
+        }
+    }
+
+    $('btn-submit').set('disabled',false);
+    if(shop_id != 0){
+      for(var i=0;i<document.getElementById("export_shop_id").length;i++){
+          if(document.getElementById("export_shop_id").options[i].value == shop_id){
+              document.getElementById("export_shop_id").options[i].selected = true;
+          }
+      }
+    }
+
+
+    var _data = {'shop_id':shop_id,'time_from':time_from,'time_to':time_to,'bill_status':bill_status};
+      new Request({
+             url : "index.php?app=financebase&ctl=admin_shop_settlement_bill&act=checkExport",
+             method : "post",
+             data: _data,
+             onComplete:function(result){
+                 if(result == 1){
+                    $('btn-submit').set('disabled',false);
+                 }else{
+                  $('btn-submit').set('disabled',true);
+                    alert("无账单数据！");
+                 }
+             }
+      }).send();
+    
+
+})();
+
+
+
+
+$('btn-submit').addEvent('click',function(e){
+
+
+
+    var shop_id = $('export_shop_id').get('value');
+    var time_from = $('time_from').get('value');
+    var time_to = $('time_to').get('value');
+    var bill_status = $('bill_status').get('value');
+    var bill_category = $('export_bill_category').value;
+
+
+
+    this.getParent('.dialog').retrieve('instance').close();
+
+    window.open('index.php?app=financebase&ctl=admin_shop_settlement_bill&act=doExport&p[0]='+shop_id+'&p[1]='+time_from+'&p[2]='+time_to+'&p[3]='+bill_status+'&bill_category='+bill_category);
+              
+  // finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+  //             _this.getParent('.dialog').retrieve('instance').close();
+
+
+  // var _this = this;_this.set('disabled',true);
+  // var _data = _this.form.toQueryString().replace(/\+/g,"%2B");
+  // new Request.JSON({
+  //           url:_this.form.get('action'),
+  //           data:_data,
+  //           onComplete:function(rs){
+  //             finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+  //             _this.getParent('.dialog').retrieve('instance').close();
+  //           }
+  //       }).send();
+});
+</script>

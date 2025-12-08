@@ -1,0 +1,76 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class='division'>
+<form method='post' action='index.php?app=inventorydepth&ctl=regulation_task&act=save' id='regulation-apply-form'>
+    <input type='hidden' name='init_bn' value="<{$data.bn|default:$init_bn}>">
+    <input type='hidden' name='id' value="<{$data.id|default:''}>">
+    <div class='tableform'>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tbody>
+              
+                <tr>
+                    <th><span class="red">*</span> 活动名称:</th>
+                    <td><{input type='text' name='task_name'  id="task_name" vtype='required'}></td>
+                </tr>
+                <tr>
+                    <th><span class="red">*</span> 活动开始时间:</th>
+                    <td><{input type='time' name='start_time' value=$data.start_time vtype='required'}></td>
+                </tr>
+                <tr>
+                    <th><span class="red">*</span> 活动结束时间:</th>
+                    <td><{input type='time' name='end_time' value=$data.start_time vtype='required'}></td>
+                </tr>
+                <tr>
+                    <th><span class="red">*</span>前端店铺</th>
+                    <td><select name="shop_id">
+                    <{foreach from=$support_shops item=shop}>
+                        <option value='<{$shop.shop_id}>'><{$shop.name}></option>
+                        <{/foreach}>
+                    </select></td>
+                </tr>
+               
+                  
+                
+            </tbody>
+        </table>
+    </div>
+    <div class='table-action'>
+        <{button type='button' label='确认' id='regulation-apply-submit'}>
+        <{button type='button' label='关闭' isCloseDialogBtn="true"}>
+    </div>
+</form>
+</div>
+<script>
+
+void function(){
+
+    $('regulation-apply-submit').addEvent('click',function(){
+        var form = $('regulation-apply-form');
+        var task_name = $('task_name').value;
+        if (task_name == ''){
+            alert('活动名称不可为空!');
+            return false;
+        }
+        W.page(form.action,{
+            data:form,
+            onComplete:function(resp){
+                resp = JSON.decode(resp);
+                if (resp.error)
+                {
+                    MessageBox.error(resp.error);
+                    return ;
+                }
+
+                finderGroup["<{$env.get._finder.finder_id}>"].refresh.delay(400,parent.finderGroup["<{$env.get._finder.finder_id}>"]);
+                $('regulation-apply-form').getParent('.dialog').retrieve('instance').close();
+            }
+        });
+    });
+
+    
+    
+}();
+</script>

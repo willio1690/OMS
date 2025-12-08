@@ -1,0 +1,29 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="mt-10">
+    <div>拆单维度:
+        <select name="split_config[dimension]">
+            <option value="0" <{if !$data.split_config.dimension}>selected="selected"<{/if}> >基础物料</option>
+            <option value="1" <{if $data.split_config.dimension == 1}>selected="selected"<{/if}> >销售物料</option>
+        </select>
+    </div>
+    <div>
+        拆单顺序: 
+    </div>
+    <div>
+        <select name="split_config[s_type]">
+            <option value="0" <{if !$data.split_config.s_type}>selected="selected"<{/if}> >仅电商仓</option>
+            <option value="5" <{if $data.split_config.s_type == 5}>selected="selected"<{/if}> >仅门店仓</option>
+            <option value="1" <{if $data.split_config.s_type == 1}>selected="selected"<{/if}> >先电商仓再门店仓</option>
+            <option value="2" <{if $data.split_config.s_type == 2}>selected="selected"<{/if}> >先门店仓再电商仓</option>
+            <option value="3" <{if $data.split_config.s_type == 3}>selected="selected"<{/if}> >同时门店仓电商仓,优先门店仓</option>
+            <option value="4" <{if $data.split_config.s_type == 4}>selected="selected"<{/if}> >同时电商仓门店仓,优先电商仓</option>
+        </select>
+    </div>
+</div>
+<{if $env.post.from != 'split'}>
+    <{include file="order/type/split/fromsplit.html"}>
+<{/if}>

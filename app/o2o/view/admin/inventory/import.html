@@ -1,0 +1,32 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form id="import_form" class="tableform" enctype="multipart/form-data"  method="post" action="index.php?app=o2o&ctl=admin_inventory&act=index&action=to_import&finder_id=<{$env.get.finder_id}>">
+<input type="hidden" name="app" value="o2o" />
+<input type="hidden" name="model" value="inventory" />
+
+<div class="division">
+<table cellpadding="0" cellspacing="0" border="0">
+    <tr>
+        <th><{t}>上传文件：<{/t}></th>
+        <td><input id="ImportCSV" type="file" name="import_file"></td>
+    </tr>
+    <tr>
+        <th>&nbsp;</th>
+        <td><{button class="btn-primary" label="上传" type="submit"}></td>
+    </tr>
+</table>
+</div>
+</form>
+<script>
+$('import_form').store('target', {
+    onComplete: function(jsontext) {
+        $('import_form').getParent('.dialog').retrieve('instance').close();
+        window.finderGroup['<{$env.get.finder_id}>'].refresh(true);
+   }
+});
+</script>
+
+

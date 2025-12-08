@@ -1,0 +1,73 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=console&ctl=admin_vopurchase&act=createPick&p[0]=<{$data.po_id}>&finder_id=<{$finder_id}>" method="post" id="disForm">
+<input name="single" value="<{$single}>" type="hidden">
+<input name="po_id" value="<{$data.po_id}>" type="hidden">
+<table class="tableform">
+    <tbody>
+    <tr>
+        <th style="font-size:14px;">采购单号：</th>
+        <td nowrap="nowrap" style="font-size:14px;"><{$data.po_bn}></td>
+    </tr>
+    <tr>
+        <th style="font-size:14px;">拣货数量：</th>
+        <td style="font-size:14px;"><{$data.unpick_num}></td>
+    </tr>
+    </tbody>
+</table>
+</form>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+  <table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+      <tr>
+        <td><button class="btn btn-primary" id="btnSubmit" ><span><span><{t}>确 定<{/t}></span></span></button><{button type="button" class="btn" id="btn-close" label="关 闭" }></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<{/area}>
+<script>
+$('btn-close').addEvent('click',function(e)
+{
+     var _this=this;
+     
+    _this.getParent('.dialog').retrieve('instance').close();
+    window.finderGroup['<{$finder_id}>'].refresh();
+});
+
+$('btnSubmit').addEvent('click',function(e){
+    var po_id = "<{$data.po_id}>";
+    var _this = this;
+    
+    new Request({url:'index.php?app=console&ctl=admin_vopurchase&act=createPick',
+        method:'post',
+        data:'po_id='+po_id,
+        onRequest:function(){
+            $('btnSubmit').set('disabled', 'true');
+            $('btnSubmit').getElements('span')[1].set('text','正在执行中...'); 
+        },
+        onComplete:function(json){
+            if(!json) return;
+            
+            ret = JSON.decode(json);
+            if (ret.success) {
+                _this.getParent('.dialog').retrieve('instance').close();
+                window.finderGroup['<{$finder_id}>'].refresh();
+            }
+            else
+            {
+                MessageBox.error(ret.error);
+                
+                $('btnSubmit').set('disabled', '');
+                $('btnSubmit').getElements('span')[1].set('text','确 定');
+                
+                return false;
+            }
+        }
+    }).send();
+});
+</script>

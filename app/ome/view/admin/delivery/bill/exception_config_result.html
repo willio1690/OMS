@@ -1,0 +1,52 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="config_result_content" style="margin-top: 20px;">
+  <h3>预警配置信息</h3>
+  <div id="config_data" style="border: 1px solid #ddd; padding: 15px; background-color: #f9f9f9; min-height: 200px;">
+    <{if $config_data}>
+      <table class="table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background-color: #f5f5f5;">
+            <th style="width: 200px; text-align: left; padding: 12px; border: 1px solid #ddd;">配置项</th>
+            <th style="width: 100px; text-align: center; padding: 12px; border: 1px solid #ddd;">配置值</th>
+            <th style="text-align: left; padding: 12px; border: 1px solid #ddd;">说明</th>
+          </tr>
+        </thead>
+        <tbody>
+          <{foreach from=$config_data key=key item=value}>
+            <{assign var="label" value=$config_labels.$key}>
+            <{if $label}>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold; color: #333;"><{$label.name}></td>
+                <td style="padding: 12px; border: 1px solid #ddd; text-align: center; font-size: 16px; color: #007bff; font-weight: bold;"><{$value}> <{$label.unit}></td>
+                <td style="padding: 12px; border: 1px solid #ddd; color: #666;"><{$label.desc}></td>
+              </tr>
+            <{else}>
+              <tr>
+                <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold;"><{$key}></td>
+                <td style="padding: 12px; border: 1px solid #ddd; text-align: center;"><{$value}></td>
+                <td style="padding: 12px; border: 1px solid #ddd; color: #999;">-</td>
+              </tr>
+            <{/if}>
+          <{/foreach}>
+        </tbody>
+      </table>
+      
+      <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #007bff; border-radius: 4px;">
+        <h4 style="margin: 0 0 10px 0; color: #007bff;">配置说明</h4>
+        <p style="margin: 0; color: #666; line-height: 1.6;">
+          以上配置项用于定义物流包裹异常预警的时间阈值。当包裹状态达到预警条件时，系统会提前进行预警提示，
+          帮助商家及时发现和处理潜在的物流异常问题。
+        </p>
+      </div>
+    <{else}>
+      <div style="text-align: center; padding: 40px; color: #666;">
+        <p style="font-size: 16px; margin-bottom: 10px;">暂无配置数据</p>
+        <p style="font-size: 14px; color: #999;">该店铺可能未配置预警参数或配置数据为空</p>
+      </div>
+    <{/if}>
+  </div>
+</div> 

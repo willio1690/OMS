@@ -1,0 +1,35 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">       
+<{/capture}>
+
+
+<div class="division">
+<h4>服务列表</h4>
+<table cellspacing="0" class="gridlist" cellpadding="0" border="0" width="100%">
+
+  <thead>
+  <tr>
+
+      <th>名称</th>
+      <th>数量</th>
+      <th>总费用</th>
+    </tr>
+    </thead>
+      <tbody>
+  <{foreach from=$service_list item=service}>
+    <tr>
+
+      <td><{$service.title}></td>
+      <td><{$service.num}></td>
+      <td><{$service.total_fee}></td>
+    </tr>
+  <{/foreach}>
+  </tbody>
+</table>
+</div>
+</div>

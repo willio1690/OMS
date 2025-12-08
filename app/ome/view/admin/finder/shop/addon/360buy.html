@@ -1,0 +1,79 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table>
+    <tr>
+        <th>商家编码：</th>
+        <td><{input type="text" name="config[customer_code]" value=$shop.config.customer_code}></td>
+    </tr>
+    <tr>
+        <th>二级商户号：</th>
+        <td><{input type="text" name="config[member_id]"  value=$shop.config.member_id}></td>
+    </tr>
+    <tr>
+        <th>渠道类型：</th>
+        <td><{input type="select" name="config[platform_type]" options=["normal"=>"普通","platform"=>"一盘货"] value=$shop.config.platform_type|default:"normal"}></td>
+    </tr>
+    <tr>
+        <th>CLPS合作伙伴编码：</th>
+        <td><{input type="text" name="config[tenantid]" value=$shop.config.tenantid}></td>
+    </tr>
+    <tr>
+        <th>CLPS供方事业部编码：</th>
+        <td><{input type="text" name="config[ownercode]" value=$shop.config.ownercode}></td>
+    </tr>
+    <tr>
+        <th>用方事业部编码：</th>
+        <td><{input type="text" name="config[targetdeptno]" value=$shop.config.targetdeptno}></td>
+    </tr>
+    <tr>
+        <th>自动下载直赔单：</th>
+        <td><{input type="radio" name="config[compensate]" value=$shop.config.compensate|default:'no' options=array('sync'=>'是','no'=>'否') separator="&nbsp;"}></td>
+    </tr>
+    <tr>
+        <th>接收京东子单：</th>
+        <td><{input type="radio" name="config[jdzd]" value=$shop.config.jdzd|default:'no' options=array('sync'=>'是','no'=>'否') separator="&nbsp;"}></td>
+    </tr>
+    <tr>
+        <th>自动下载POP店帐单：</th>
+        <td><{input type="radio" name="config[download_settle_bill]" value=$shop.config.download_settle_bill|default:"no" options=array("yes"=>"是","no"=>"否") separator="&nbsp;"}></td>
+    </tr>
+</table>
+<h5>京东自营相关配置</h5>
+<table>
+     <tr>
+        <th>自动下载实销实结明细：</th>
+        <td><{input type="radio" name="config[account_orders]" value=$shop.config.account_orders|default:'no' options=array('sync'=>'是','no'=>'否') separator="&nbsp;"}></td>
+    </tr>
+    <tr>
+        <th>自动下载结算单：</th>
+        <td><{input type="radio" name="config[account_settlement]" value=$shop.config.account_settlement|default:'no' options=array('sync'=>'是','no'=>'否') separator="&nbsp;"}></td>
+    </tr>
+    <tr>
+        <th>自动下载主库退货单：</th>
+        <td><{input type="radio" name="config[jdlvmi_reship]" value=$shop.config.jdlvmi_reship|default:'no' options=array('sync'=>'是','no'=>'否') separator="&nbsp;"}></td>
+    </tr>
+    <tr>
+        <th>自动下载EDI账单：</th>
+        <td><{input type="radio" name="config[ediwssync]" value=$shop.config.ediwssync|default:'no' options=array('sync'=>'是','no'=>'否') separator="&nbsp;"}></td>
+    </tr>
+</table>
+<h5>EDI相关配置</h5>
+<table>
+  
+    
+     <tr>
+        <th>EDI用户名：</th>
+        <td><{input type="text" name="config[ediwsuser]" value=$shop.config.ediwsuser}></td>
+    </tr>
+     <tr>
+        <th>EDI密码：</th>
+        <td><{input type="text" name="config[ediwspwd]" value=$shop.config.ediwspwd}></td>
+    </tr>
+     <tr>
+        <th>京东入仓仓库编码：</th>
+        <td><{input type="text" name="config[ediwbranch_bn]" value=$shop.config.ediwbranch_bn}></td>
+    </tr>
+</table>

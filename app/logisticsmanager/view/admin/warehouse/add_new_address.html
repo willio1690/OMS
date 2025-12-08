@@ -1,0 +1,106 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+  <form action="index.php?app=ome&ctl=admin_order&act=getConsingee" method="post" id="newAddrForm">
+    <input id="number" name="number" type="hidden" size="32" value="<{$env.POST.number}>" />
+    <table border="0">
+      <tbody>
+       
+         <tr>
+          <th>收货地区：</th>
+          <td colspan="3"><{input type='region' app='eccommon' name="area_" vtype="area" value=$region }> <em class="red">*</em></td>
+        </tr>
+        <tr>
+          <th>收货地址：</th>
+          <td colspan="3"><input id="addr" name="addr" type="text"  vtype="required" size="32" value="<{$env.POST.addr}>" /><em class="red">*</em></td>
+        </tr>
+       
+      </tbody>
+    </table>
+    <div class="table-action">
+      <{button label="确定" class="btn-primary" id="btn_submit_addr"}> &nbsp; &nbsp;
+      <{button label="取消" class="btn-secondary" isCloseDialogBtn="true" id='btn_close'}>
+    </div>
+  </form>
+</div>
+<script>
+  (function(){
+
+   
+
+    function getDeliveryTemp(j){
+      return '<li><input type="radio" name="logi_id" value="'+j.corp_id+'" /> <label>'+j.name +'</label></li>';
+    }
+    function validateTip(element,msg){
+      element=$(element);
+      var tip;
+      if($('validateTip')) tip=$('validateTip');
+      else tip=new Element('span#validateTip.error.caution.notice-inline',{html:msg}).injectAfter(element).hide();
+      if(element.value==""){
+        tip.show();
+        setTimeout(function(){tip.hide()},4000);
+        return false;
+      }
+      else{
+        tip.hide();
+        return true;
+      }
+    }
+
+    $('btn_submit_addr').addEvent('click',function(){
+      if(!validate($('newAddrForm')))return;
+      if(!validateTip($E('input[name=area_]'),'本项必选！'))return;
+
+
+      var areas = $E('input[name=area_]').get('value');
+      areas = areas.split(':');
+
+      //校验地址
+      new Request({
+            url:'index.php?app=logisticsmanager&ctl=admin_warehouse&act=checkArea',
+            data:'areas'+areas[1],
+            method:'post',
+            onSuccess:function(rs){
+              var rs = JSON.decode(rs);
+              if(rs.rsp=='fail'){
+                alert('地址库信息不存在');
+              }else{
+
+                var newaddr = {
+                  area:$E('input[name=area_]').get('value'),
+                  addr:$E('input[name=addr]').get('value'),
+                  areas:areas[1],
+                };
+
+              var addrlist = Order.addrlist;
+
+              var number = $E('input[name=number]').get('value');
+              if ( number == ''){
+                addrlist.push(newaddr);
+                number = addrlist.length-1;
+              } else {
+                addrlist[number]=newaddr;
+              }
+      
+              Order.setAddr(addrlist,number);
+
+              $('newAddrForm').getParent('.dialog').retrieve('instance').close();
+
+              }
+            }
+        }).send();
+     
+   
+
+      
+    
+    });
+    $('btn_close').addEvent('click',function(){
+      $('newAddrForm').getParent('.dialog').retrieve('instance').close();
+      
+    });
+  })()
+</script>

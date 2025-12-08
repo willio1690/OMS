@@ -1,0 +1,56 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div id="add-errorinfo" class="error" style="display:none;"></div>
+    <form id="add-form" method="post" action="index.php?app=ome&ctl=admin_reship&act=doaddmemo">
+        <div class="division">
+            <table cellspacing="0" cellpadding="0" border="0">
+                <tbody>
+                    <tr>
+                        <th><em class="c-red">*</em> 备注</th>
+                        <td><textarea name='memo' vtype="required"></textarea></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+       <input type="hidden" name="reship_id" value="<{$reship_id}>">
+    </form>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <{button label="确定" class="btn-primary" id="add-submit"}>
+    <{button label="取消" class="btn-secondary" isCloseDialogBtn="true" }>
+</div>
+<{/area}>
+  
+<script type="text/javascript">
+(function(){
+    $('add-submit').addEvent('click',function(){
+        $('add-form').fireEvent('submit',{stop:function(){}});
+    })
+  
+    $('add-form').store('target', {
+        onRequest:function(){
+            $E('#add-submit').disabled = true
+
+            $E('#add-submit span span').setText('提交中...')
+
+            $('add-errorinfo').hide()
+        },
+        onComplete:function(resp){
+            $E('#add-submit').disabled = false
+            $E('#add-submit span span').setText('确定')
+
+            resp = JSON.decode(resp);
+            if (resp.error){
+                return $('add-errorinfo').setText(resp.error).show();
+            }
+
+            $('add-form').getParent('.dialog').retrieve('instance').close();
+        }
+    })
+})()  
+</script>

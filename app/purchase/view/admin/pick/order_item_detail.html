@@ -1,0 +1,50 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+  <link href="../apps/ome/statics/ome.css" rel="stylesheet" type="text/css">
+<{/capture}>
+<form name="form1" id="memo_form" method="POST" action="index.php?<{$env.server.QUERY_STRING}>">
+<div class="tableform">
+<h4>拣货订单明细</h4>
+<div class="division">
+<table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+    <tbody>
+    <tr>
+        <th style='text-align:right;'>订单号:</th>
+        <td style='text-align:left;padding-left:5px;'><{$itemInfo.order_sn}></td>
+        <th style='text-align:right;'>原订单号:</th>
+        <td style='text-align:left;padding-left:5px;'><{$itemInfo.old_order_sn}></td>
+        <th style='text-align:right;'>订单状态:</th>
+        <td style='text-align:left;padding-left:5px;'><{$itemInfo.stat}></td>
+    </tr>
+    <tr>
+        <th style='text-align:right;'>采购单号:</th>
+        <td style='text-align:left;padding-left:5px;'><{$itemInfo.po}></td>
+        <th style='text-align:right;'>拣货单号:</th>
+        <td style='text-align:left;padding-left:5px;'><{$itemInfo.pick_no}></td>
+        <th style='text-align:right;'>送货单号:</th>
+        <td style='text-align:left;padding-left:5px;'><{$itemInfo.vip_delivery_no}></td>
+    </tr>
+    <tr>
+        <th style='text-align:right;'>处理状态:</th>
+        <td style='text-align:left;padding-left:5px;'><{$itemInfo.status_value}></td>
+        <th style='text-align:right;'>条形码:</th>
+        <td style='text-align:left;padding-left:5px;'><{$itemInfo.good_sn}></td>
+        <th style='text-align:right;'>数量:</th>
+        <td style='text-align:left;padding-left:5px;'><{$itemInfo.amount}></td>
+    </tr>
+    <tr>
+        <th style='text-align:right;'>下单时间:</th>
+        <td style='text-align:left;padding-left:5px;'><{$itemInfo.add_time|date_format:"%Y-%m-%d %H:%M:%S"}></td>
+        <th style='text-align:right;'>更新时间:</th>
+        <td style='text-align:left;padding-left:5px;'><{$itemInfo.update_time|date_format:"%Y-%m-%d %H:%M:%S"}></td>
+        <th style='text-align:right;'>创建时间:</th>
+        <td style='text-align:left;padding-left:5px;'><{$itemInfo.at_time}></td>
+    </tr>
+    </tbody>
+</table>
+</div>
+</form>

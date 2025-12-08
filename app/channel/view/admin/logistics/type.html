@@ -1,0 +1,35 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=channel&ctl=admin_logistics_exrecommend&act=save" method="post" id="form1" >
+        <div class="borderGray" style="font-size:16px;padding:20px 10px;margin-bottom:5px;border:1px solid #eee; background:#f6f6f6">
+                        智选物流策略:
+            <br/>
+            <div style='margin-left:100px;'>
+                <{foreach from=$exrecommend_types item=data key=k}>
+                    <input type="radio" name="exrecommend_type" value="<{$k}>" <{if $set_exrecommend_type == $k}>checked='checked'<{/if}> > <{$data}>
+                    <br/>
+                <{/foreach}>
+                </div>
+        </div>
+        <div id="cc" class="noprint table-action">
+          <{button  type="button" class="btn" id="exrecommend" label="确定"}> &nbsp;
+       </div>
+</form>
+<script>
+(function(){    
+    $('exrecommend').addEvent("click",function(){
+        _form = $('form1');
+        _form.store('target',{
+        onSuccess:function(){
+            $('exrecommend').getParent('.dialog').retrieve('instance').close();
+        }
+        });
+        _form.fireEvent('submit',{stop:$empty});
+    });
+})();
+
+
+</script>

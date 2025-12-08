@@ -1,0 +1,139 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<script>
+	var item_i = 1;
+ </script>
+ <div class="tableform">
+	<h3>盘点结果回传</h3>
+    <div class="division">
+	 <form action="index.php?app=omevirtualwms&ctl=admin_wms&act=doSubmit" method="post" id="form-inventory" >
+	  <input type="hidden" name='flag' value='inventory' />
+	  <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tbody>
+			
+              <tr>
+				<th>盘点单编号</th>
+				<td><input type="text" vtype="required" name="inventory_bn" value="<{$inventory_bn}>"></td>
+			  </tr>
+			  			  <tr>
+				<th>第三方仓储</th>
+				<td>
+					<select name="node_id" onchange="set_branch(this.options[this.selectedIndex].value)">
+						<{foreach from=$wms item=wms}>
+							<option value="<{$wms.node_id}>"><{$wms.wms_name}></option>
+						<{/foreach}>
+					</select>
+				</td>
+			</tr>
+			   <tr>
+				<th>仓库名称</th>
+				<td>
+				<div id="branch_select">
+					<select name="warehouse" required="true">
+						<{foreach from=$branchs item=branch}>
+							<option value="<{$branch.branch_bn}>"><{$branch.name}></option>
+						<{/foreach}>
+					</select>
+				</div>
+				</td>
+			  </tr>
+			  <tr>
+				<th>备注</th>
+				<td><input type="text" name="memo"></td>
+			  </tr>
+			  <tr>
+				<th>操作时间</th>
+				<td><input type="hidden" name="operate_time" value="<{$operate_time}>"><{$operate_time}></td>
+			  </tr>
+			  <!--
+			   <tr>
+				<th>盘点单编号</th>
+				<td><input type="text" name="inventory_bn"></td>
+			  </tr>
+			   <tr>
+				<th>仓库编号</th>
+				<td><input type="text" name="warehouse"></td>
+			  </tr>
+			  <tr>
+				<th>备注</th>
+				<td><input type="text" name="remark"></td>
+			  </tr>
+			  <tr>
+				<th>操作时间</th>
+				<td><input type="text" name="operate_time"></td>
+			  </tr>
+			  -->
+			  <tr>
+				<th>task</th>
+				<td><input type="text" name="task" value="<{$task}>"></td>
+			  </tr>
+            </tbody>
+        </table>
+		<div class="tableform">
+		<div><span style="font-weight:bold;">盘点商品明细:</span><span class="sysiconBtn addorder"  style="float:right;margin-right:150px;height:1.5em;" onclick="addInventory();">添加商品</span></div>
+
+		<div id="listArea" class="division">
+			<!--<{foreach from=$data.product item=data name=product key=key}>
+				<div id="stockin_" style="margin-bottom:3px;border:1px solid #ccc;">
+					<table width="100%" cellspacing="0" cellpadding="0" border="0">
+						<tr>
+							<th>基础物料名称</th>
+							<td><{$data.name}></td>
+							<th>基础物料编码</th>
+							<td><input type="text" name="product[<{$key}>][]" value="<{$data.bn}>"></td>
+						</tr>
+						<tr>
+							<th style="width:70px;">良品入货数量</th>
+							<td><input type="text" name="product[<{$key}>][]" value="<{$data.normal_num}>"></td> 
+							<th style="width:70px;">不良品入货数量</th>
+							<td><input type="text" name="product[<{$key}>][]" value="<{$data.defective_num}>"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onclick="delStockin('stockin_');" style="cursor:pointer;color:red;">X</span></td>
+						</tr>
+					</table>
+				</div>
+			<{/foreach}>-->
+		</div>
+		</div>
+        <div class="table-action">
+            <{button label="提交" type="submit" name="submit" id="btn-inventory"}>
+        </div>
+	</form>
+  </div>
+</div>
+<script>
+addInventory();
+function addInventory(){
+	var i = item_i++;
+	var content='\
+		<div id="inventory_'+i+'" style="margin-bottom:3px;border:1px solid #ccc;">\
+		<table width="100%" cellspacing="0" cellpadding="0" border="0">\
+		<tr><th>货品编号'+i+'</th>\
+		<td><input type="text" vtype="required" name="product['+i+'][]"></td>\
+		<th>良品'+i+'</th>\
+		<td><input type="text" vtype="required" name="product['+i+'][]"></td></tr>\
+		<tr><th style="width:70px;">残品'+i+'</th>\
+		<td><input type="text" value="0" vtype="required" name="product['+i+'][]"></td>\
+		<th style="width:70px;">全量'+i+'</th> \
+		<td><input type="text" value="0" vtype="required" name="product['+i+'][]"> </td><td><span onclick="delInventory(\'inventory_'+i+'\');" style="cursor:pointer;color:red;margin-left:100px;">X</span></td> \
+		</tr>\
+		<table>\
+		</div>\
+	';
+	$E('#listArea').adopt(new Element('div').set('html',content).getFirst());
+	
+}
+delInventory=function(o){
+  $(o).remove();
+}
+
+function set_branch(node_id){
+	new Request.HTML({
+	url:'<{link app="omevirtualwms" ctl="admin_wms" act="back_branch"}>',
+	update:$('branch_select'),
+	method:'post',
+	data:'node_id='+encodeURIComponent(node_id)
+	}).send();
+}
+</script> 

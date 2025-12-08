@@ -1,0 +1,198 @@
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+.form-layout {
+    background: #EEF5F9;
+    padding-bottom: 76px;
+}
+
+.form-layout .form-layout-block {
+    background: #FFFFFF;
+    box-shadow: 0 0 2px 0 #DFE7F3;
+    border-radius: 2px;
+    margin-bottom: 16px;
+}
+
+.form-layout .form-layout-block > h3 {
+    font-weight: 500;
+    color: #1F273A;
+    font-size: 16px;
+    height: 54px;
+    box-sizing: border-box;
+    padding: 16px;
+    width: 100%;
+    border-bottom: 1px solid #E8E8E8;
+}
+
+.form-layout .form-layout-block > .form-layout-fields {
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.form-layout .form-layout-block .form-field {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+    width: 25%;
+    padding-right: 20px;
+    box-sizing: border-box;
+    margin-bottom: 32px;
+}
+
+.form-layout .form-layout-block .form-field .form-field-label {
+    display: inline-block;
+    color: #666666;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-layout .form-layout-block .form-field .form-field-label i {
+    font-size: 12px;
+    color: #999999;
+    cursor: pointer;
+}
+
+.form-layout .form-layout-block .form-field .form-input {
+    width: 100%;
+}
+
+.form-layout .form-layout-block .form-field  .form-disabled {
+    pointer-events: none;
+    background: #F0F2F5!important;
+}
+
+.form-layout .form-layout-block .form-field  .form-disabled.form-radios,
+.form-layout .form-layout-block .form-field  .form-disabled.form-checkbox {
+    background: none!important;
+}
+
+.form-layout .form-layout-block .form-field .form-checkbox,
+.form-layout .form-layout-block .form-field .form-radios,
+.form-layout .form-layout-block .form-field .form-radios label,
+.form-layout .form-layout-block .form-field .form-checkbox label{
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.form-layout .form-layout-block .form-field .form-checkbox,
+.form-layout .form-layout-block .form-field .form-radios {
+    flex-wrap: wrap;
+}
+
+.form-layout .form-layout-block .form-field .form-checkbox > label,
+.form-layout .form-layout-block .form-field .form-radios > label {
+    margin-right: 12px;
+}
+
+.form-layout .form-layout-block .form-field .form-checkbox > label {
+    margin-left: 8px;
+}
+
+.form-layout .form-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    background: #ffffff;
+    padding: 10px 0 10px calc(var(--sidebar-width) / 2);
+    box-shadow: 0px 0px 4px 0px rgb(0 21 41 / 12%);
+}
+
+.form-layout .form-actions .btn,
+.form-layout .form-actions button {
+    min-width: 80px;
+    padding: 0;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.form-layout .form-actions button.btn-default:hover {
+    color: #FFFFFF;
+}
+
+.form-layout .form-field .input-search {
+    display: flex;
+    width: 100%
+}
+.form-layout .form-layout-fields-column {
+    flex-direction: column;
+}
+.form-layout  .form-layout-fields-column .form-field  {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.form-layout  .form-layout-fields-column .form-remark {
+    font-size: 12px;
+    color: #999999;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 206px;
+    margin-top: 8px;
+}
+.form-layout  .form-layout-fields-column .form-field .form-field-label{
+    width: 200px;
+    text-align: right;
+    margin-bottom: 0;
+    margin-right: 10px;
+}
+.form-layout .form-layout-fields-column .form-field .form-input  {
+    width: 35%;
+}
+.form-layout .form-layout-fields-column .omeauto_memberidconf {
+    color: black;
+}
+.form-layout .form-layout-fields-column .omeauto_memberidconf_remark  {
+    color: black;
+}
+.gridlist .row .row-line {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.gridlist .row .row-line label {
+    margin-left: 10px;
+}
+
+.form-layout .object-select {
+    width: 100%;
+    position: relative;
+}
+
+.form-layout .object-select::after {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-top: 2px solid #333333;
+    border-right: 2px solid #333333;
+    position: absolute;
+    right: 6px;
+    top: 10px;
+    transform: rotate(135deg);
+}
+
+.form-layout .object-select .label{
+    width: 100%;
+    background: #fff;
+    border: 1px solid #ebebeb;
+    height: 32px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    line-height: 32px;
+}
+
+.form-layout .object-select .handle {
+    display: none;
+}

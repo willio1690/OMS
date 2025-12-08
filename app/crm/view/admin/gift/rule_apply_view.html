@@ -1,0 +1,80 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form class="tableform" id="form_member_lv">
+
+    <div class="division1">
+        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <th><em class="c-red">*</em><{t}>规则名称：<{/t}></th>
+                <td><b><{$rule.title}></b>
+                </td>
+            </tr>
+            <tr>
+                <th><em class="c-red">*</em><{t}>生效时间：<{/t}></th>
+                <td>
+                    <{assign var="opt" value=array('sendtime'=>'订单处理时间','createtime'=>'订单创建时间','pay_time'=>'订单付款时间')}>
+                    <{$opt[$rule.time_type]}> &nbsp;
+
+                    <{$rule.start_time|date_format:"%Y-%m-%d"}> ~
+                    <{$rule.end_time|date_format:"%Y-%m-%d"}>
+                </td>
+            </tr>
+            <tr>
+                <th><em class="c-red">*</em><{t}>是否排他：<{/t}></th>
+                <td>
+                    <{if $rule.is_exclude=='1'}>是<{/if}>
+                    <{if $rule.is_exclude=='2'}>否<{/if}>
+                </td>
+            </tr>
+            <tr>
+                <th><{t}>状态：<{/t}></th>
+                <td>
+                    <{if($rule.status)}>
+                        启用
+                    <{else}>
+                        关闭
+                    <{/if}>
+                </td>
+            </tr>
+            <tr>
+                <th><{t}>指定店铺：<{/t}></th>
+                <td>
+                    <{if($rule.shop_ids)}>
+                    <{$rule.shop_ids}>
+                    <{else}>
+                    <font color=gray>无限制</font>
+                    <{/if}>
+                </td>
+            </tr>
+
+
+            <tr>
+                <th><{t}>指定区域：<{/t}></th>
+                <td>
+                    <{if(!$rule.filter_arr.province)}><font color=gray>无限制</font><{/if}>
+
+                    <{foreach from=$rule.filter_arr.province item=item}>
+                    <{$item}>；
+                    <{/foreach}>
+                </td>
+            </tr>
+            <tr>
+                <th><{t}>叠加或排他：<{/t}></th>
+                <td>
+                    <{if($rule.filter_arr.add_or_divide == 'add')}>叠加<{/if}>
+                    <{if($rule.filter_arr.add_or_divide == 'divide')}>排他<{/if}>
+                </td>
+            </tr>
+            <tr>
+                <th><{t}>赠品规则：<{/t}></th>
+                <td>
+                    <{input type='object' object='gift_rule_base@crm' multiple='true' name='filter_arr[id]' textcol='rule_bn' emptytext='赠品规则' value=$rule.filter_arr.id}>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</form>

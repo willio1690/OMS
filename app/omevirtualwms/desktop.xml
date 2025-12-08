@@ -1,0 +1,35 @@
+<desktop>
+    <workground name="模拟仓储" id="ocswms" controller='admin_wms' action='show' order="1600" icon="icon-monicangwuliu-01">
+        <menugroup name="仓储物流状态回传" order='2' en="wms-logistics-status-return">
+            <menu controller='admin_wms' action='getinfo' permission='start_ocswms' display='false' order='8000101'>开始模拟</menu>
+            <menu controller='admin_wms' action='show2' permission='ocswms'  params='flag:stockin' display='true'  order='5'>入库单回传</menu>
+            <menu controller='admin_wms' action='show2' permission='ocswms'  params='flag:stockout' display='true'  order='6'>出库单回传</menu>
+            <menu controller='admin_wms' action='show2' permission='ocswms'  params='flag:stockdump' display='true'  order='7'>转储单回传</menu>
+            <menu controller='admin_wms' action='show2' permission='ocswms'  params='flag:delivery' display='true'  order='8'>发货单回传</menu>
+            <menu controller='admin_wms' action='show' permission='ocswms' params='flag:inventory' display='true' order='10'>盘点结果回传</menu>
+            <menu controller='admin_wms' action='show2' permission='ocswms'  params='flag:reship' display='true'  order='9'>退货单回传</menu>
+            <menu controller='admin_wms' action='show' permission='ocswms'  params='flag:account' display='true'  order='11'>库存异动回传</menu>
+            <menu controller='admin_wms' action='show2' permission='ocswms'  params='flag:vopstockout' display='true'  order='99'>唯品会出库单回传</menu>
+            <menu controller='admin_wms' action='show2' permission='ocswms'  params='flag:storeprocess' display='true'  order='999'>加工单回传</menu>
+        </menugroup> 
+         <menugroup name="配置" order='1' en="mock-wms-setting">
+            <menu controller='admin_wms' action='config' permission='ocswms' display='false'>wms配置</menu>
+            <menu controller='admin_wms' action='callback_config' permission='ocswms' display='true'>callback配置</menu>
+        </menugroup>
+		<menugroup name="前端店铺模拟" order='3' en="front-shop-simulation">
+			<menu controller='admin_order' action='virtual_order' permission='ocswms' display='true'>订单添加模拟</menu>
+		</menugroup>
+
+    </workground>
+
+	<workground name="模拟仓储" id="ocswms" order="1600" icon="icon-monicangwuliu-01">
+        <menugroup name="callback回传" en="mock-wms-callback">
+            <menu controller='admin_wms' action='callback' permission='ocswms' display='true'  order='2'>callback回传</menu>
+        </menugroup>
+    </workground>
+
+    <permissions>
+        <permission id="ocswms">模拟仓储物流</permission>
+        <permission id="start_ocswms">开始模拟</permission>
+    </permissions>
+</desktop>

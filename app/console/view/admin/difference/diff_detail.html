@@ -1,0 +1,238 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<link rel="stylesheet" type="text/css" href="<{$env.app.res_url}>/style.css" media="screen"/>
+<div id="allocation-error"  class="error" style="display:none;"></div>
+<div class="form-layout">
+    <input type="hidden" name="cpfr_id" value="<{$cpfr.cpfr_id}>">
+
+    <form name="form1" id="disForm" action="index.php?app=<{$env.get.app}>&ctl=<{$env.get.ctl}>&act=saveEdit" method="post">
+        <input type="hidden" name="diff_id" value="<{$data.diff_id}>">
+        <input type="hidden" id="packaging_status" name="packaging_status" value="<{$data.packaging_status}>">
+
+
+
+
+        <div class="form-layout-block">
+            <h2><{if $title }><{$title}><{else}>差异处理<{/if}></h2>
+            <div class="form-layout-fields">
+                <div class="form-field" style="width: 25%">
+                    <span class="form-field-label">业务类型：</span>
+                    <{$data.business_type}>
+                </div>
+                <div class="form-field" style="width: 25%">
+                    <span class="form-field-label">发货时间：</span>
+                    <{$data.from_time}>
+                </div>
+                <div class="form-field" style="width: 25%">
+                    <span class="form-field-label">审核状态：</span>
+                    <{$data.check_status_value}>
+                </div>
+
+                <div class="form-field" style="width: 25%">
+                    <span class="form-field-label">差异单号：</span>
+                    <{$data.diff_bn}>
+                </div>
+                <div class="form-field" style="width: 25%">
+                    <span class="form-field-label">发货数量：</span>
+                    <{$data.from_nums}>
+                </div>
+                <div class="form-field" style="width: 25%">
+                    <span class="form-field-label">收货时间：</span>
+                    <{$data.to_time}>
+                </div>
+
+                <div class="form-field" style="width: 25%">
+                    <span class="form-field-label">原始单号：</span>
+                    <{$data.original_bn}>
+                </div>
+                <div class="form-field" style="width: 25%">
+                    <span class="form-field-label">发货仓编码 ：</span>
+                    <{$data.from_branch_bn}>
+                </div>
+                <div class="form-field" style="width: 25%">
+                    <span class="form-field-label">外箱状态：</span>
+                    
+                    <{if $data.check_status == '1'}>
+                    <div class="search-value">
+                        <input type="radio" onchange="getPackagingStatus(this.value)" name="diff_packaging_status" value="intact" <{if $data.packaging_status == 'intact'}> checked<{/if}>>完好
+                        <input type="radio" onchange="getPackagingStatus(this.value)" name="diff_packaging_status" value="broken" <{if $data.packaging_status == 'broken'}> checked<{/if}>>有破损
+                    </div>
+                    <{else}>
+                    <div class="search-value"><{$data.packaging_status_value}></div>
+                    <{/if}>
+                </div>
+
+                <div class="form-field" style="width: 25%">
+                    <span class="form-field-label">处理状态：</span>
+                    <{$data.diff_status_value}>
+                </div>
+                <div class="form-field" style="width: 25%">
+                    <span class="form-field-label">收货仓编码 ：</span>
+                    <{$data.to_branch_bn}>
+                </div>
+            </div>
+        </div>
+        <div class="form-layout-block">
+            <h3>差异明细商品</h3>
+            <div>
+                <div class="content-container" style="width: 100%">
+                    <table class="gridlist" >
+                        <thead>
+                        <tr>
+                            <th class="w-80">基础物料名称</th>
+                            <th class="w-80">基础物料编码</th>
+                            <th class="w-80">条形码</th>
+                            <th class="w-80">发货数量</th>
+                            <th class="w-80">收货数量</th>
+                            <th class="w-80">差异数量</th>
+                            <th class="w-80">责任方</th>
+                            <th class="w-80">差异备注</th>
+                            <th class="w-80">处理状态</th>
+                            <th class="w-80">调整单号</th>
+                            <th>操作人员</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <{foreach from=$data.items item=item}>
+                        <tr>
+                            <td><{$item.product_name}></td>
+                            <td><{$item.bn}></td>
+                            <td><{$item.barcode}></td>
+                            <td><{$item.from_item_num}></td>
+                            <td><{$item.to_item_num}></td>
+                            <td><{$item.diff_item_num}></td>
+                            <td>
+                                <select id="responsible" class="x-input-select inputstyle" style="width:95px;" vtype="required" name="responsible[<{$item.diff_items_id}>]" <{if $data.check_status!=1 or $data.diff_status!=1 or $item.diff_status!=1}>disabled<{/if}> >
+                                <{foreach from=$responsible key=key item=r_v}>
+                                <{if $item.diff_reason != 'more' or $r_v!='第三方物流'}>
+                                <option value='<{$key}>' <{if $item.responsible==$key}>selected<{/if}> ><{$r_v}></option>
+                                <{/if}>
+                                <{/foreach}>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="hidden" name="diff_reason[<{$item.diff_items_id}>]" value=<{$item.diff_reason}> >
+                                <input type="text" name="diff_memo[<{$item.diff_items_id}>]" <{if $item.diff_memo}>value="<{$item.diff_memo}>"<{else}>value="<{$diff_reason[$item.diff_reason]}>"<{/if}> size="30" <{if $data.check_status!=1 or $data.diff_status!=1}>disabled<{/if}> />
+                            </td>
+                            <td><{$item.diff_status_value}></td>
+                            <td><{$item.adjustment_bn}></td>
+                            <td><{$item.operator}></td>
+                        </tr>
+                        <{/foreach}>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-layout-block"  >
+            <div class="table-action text_left" style="text-align: center;">
+
+                <button class="btn btn-primary" id="btnSubmit" <{if $data.check_status!=1 or $data.diff_status!=1}>disabled<{/if}> ><span><span><{t}>保存<{/t}></span></span></button>
+                <{if $data.check_status == '1'}>
+                <{button class="btn-primary" label="确定责任处理" id="check-btn"}>
+<!--                <{button class="btn-primary" label="确定责任处理" onclick="checkDetail1111('{$data.diff_id}','{$page}','{$view}')" id="check-btn"}>-->
+                <{/if}>
+            </div>
+        </div>
+    </form>
+</div>
+<style type="text/css">
+    .dialog .dialog-content-body {
+        background: #fff;
+        border: none;
+    }
+
+    .dialog .tableform {
+        background: none repeat scroll 0 0 #F8F8F8;
+        border: 1px solid #D9D9D9;
+    }
+
+    .gridlist thead th {
+        height: 27px;
+        line-height: 27px;
+        padding-left: 12px;
+    }
+
+    .edit_box {
+        padding: 10px 20px 5px 20px;
+    }
+
+    .h_10px {
+        clear: both;
+        width: 100%;
+        height: 10px;
+    }
+
+    .goods_list input {
+        width: 100%;
+    }
+</style>
+<script type="text/javascript">
+    var flag = true;
+    $('btnSubmit').addEvent('click',function(e){
+        if(flag){
+            // $('btnSubmit').set('disabled', 'true');
+            // flag = false;
+            if('<{$env.get.single}>'){
+                //finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+            }
+            $('disForm').fireEvent('submit',{stop:$empty});
+        }
+    });
+
+    (function(){
+        $('check-btn').addEvent('click',function(){
+            var _this=this;
+            var diff_id = '<{$data.diff_id}>';
+            var page = '<{$page}>';
+            var form = this.getParent('form');
+            if(! validate(form)) return;
+            new Request({url:form.action,method:'post',data:form.toQueryString(),
+                onRequest:function(){
+                    MessageBox.show('正在提交表单');
+                    $('check-btn').set('disabled', 'true');
+                },
+                onComplete:function(json){
+                    json = JSON.decode(json);
+                    if (json.error) {
+                        $('allocation-error').setText(json.error).show();
+                    }else{
+                        checkDetail(diff_id,page);
+                    }
+                }
+            }).send();
+        });
+    })()
+
+    function checkDetail(diff_id,page)
+    {
+        W.page('index.php?app=console&ctl=admin_difference_inventory&act=doCheckDetail',{
+            method:'POST',
+            data:{'diff_id':diff_id},
+            onComplete:function(resp){
+                resp = JSON.decode(resp)
+                if (resp.error) {
+                    $('allocation-error').setText(resp.error).show();
+                }else{
+                    var url = '&page='+page+'&id='+diff_id;
+                    W.page('index.php?app=console&ctl=admin_difference_inventory&act=index&newAction=receiving_inventory_detail'+url);
+                }
+                $('allocation-error').hide();
+            },
+            onRequest: function(resp){
+                $('allocation-error').hide();
+            }
+
+        });
+    }
+    function getPackagingStatus(packagingStatus)
+    {
+        document.getElementById("packaging_status").value = packagingStatus;
+    }
+
+</script>

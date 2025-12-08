@@ -1,0 +1,121 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $dataList}>
+<style>
+	.text_11{
+		width: 5.3125rem;
+	}
+</style>
+    <{foreach from=$dataList item=item}>
+	<div class="list-item">
+		
+		<div class="text-wrapper_5 flex-row justify-between">
+			<span class="text_11">渠道：</span>
+			<span class="text_12"><{$item.shops.shop_type_name}></span>
+			<span class="status-order"><{$item.status_text}></span>
+		</div>
+		<div class="text-wrapper_5 flex-row justify-between">
+			<span class="text_11">门店：</span>
+			<span class="text_12"><{$item.shops.shop_name}></span>
+		</div>
+		<div class="text-wrapper_5 flex-row justify-between">
+			<span class="text_11">订单号：</span>
+			<span class="text_12"><{$item.order_bn}>
+				<{if $item.is_change_order}>
+					<span style="color: #FF0000">换货</span>
+				<{/if}>
+			</span>
+		</div>
+		<div class="text-wrapper_5 flex-row justify-between">
+			<span class="text_11">退货单号：</span>
+			<span class="text_12"><{$item.original_reship_bn}></span>
+		</div>
+		<div class="text-wrapper_5 flex-row justify-between">
+			<span class="text_11">售后申请时间：</span>
+			<span class="text_12"><{$item.returns.add_time}></span>
+			
+		
+			
+			
+		</div>
+		<{if $item.return_logi_no}>
+		<div class="text-wrapper_5 flex-row justify-between">
+			<span class="text_11">退货运单号：</span>
+			<span class="text_12"><{$item.return_logi_no}></span>
+		</div>
+		<{/if}>
+		<div class="text-wrapper_5 flex-row pr">
+			<span class="text_11">收件人：</span>
+			<span class="text_26 sensitive-text" data-decryptAddress="false" data-orderid="<{$item.order_id}>" data-raw="<{$item.ship_name}>（<{$item.ship_mobile}>）"
+				  data-masked="<{$item.ship_name}>（<{$item.ship_mobile}>）"><{$item.ship_name}>（<{$item.ship_mobile}>）</span>
+			<span class="text_27 copy-btn" data-copy="<{$item.decrypt_ship_mobile}>"></span>
+			<div class="toggle-visibility label_1">
+				<i class="eye-icon hidden"></i>
+			</div>
+			<!-- <img class="label_1 toggle-visibility" referrerpolicy="no-referrer" src="./icon-eye.png" /> -->
+		</div>
+		<div class="text-wrapper_5 flex-row">
+			<span class="text_11">收货地址：</span>
+			<span class="text_26 sensitive-text flex-shrink-1" data-raw="<{$item.ship_addr}>" data-masked="<{$item.ship_addr}>"><{$item.ship_addr}></span> <span
+				class="text_27 copy-btn" data-copy="<{$item.ship_addr}>"></span>
+		</div>
+
+		
+		<div class="hr"></div>
+		<!-- goodsInfo -->
+		<{foreach from=$item.return_product_items item=data_item}>
+			<div class="section_6 flex-row">
+				<img class="image_2" referrerpolicy="no-referrer"
+					 src="<{$data_item.goods_img_url|default:'/app/wap/statics/img/default_goods_img.png'}>" />
+				<div class="text-group_1 flex-col">
+					<span class="text_28"><{$data_item.name}></span>
+					<span class="text_29">商户货号：<{$data_item.bn}></span>
+					<span class="text_30"><{$data_item.num}><{$data_item.unit}>；</span>
+					
+				</div>
+			</div>
+		<{/foreach}>
+		<{if $item.change_items}>
+		<div class="return_goods">
+			<{if $item.reship_bn}>
+			<div class="text-wrapper_5 flex-row justify-between align-center">
+				<span class="text_32">换货单号：</span>
+				<span class="text_33"><{$item.reship_bn}></span>
+			</div>
+			<{/if}>
+			<div class="text-wrapper_5 flex-row justify-between align-center">
+				<span class="text_32">申请理由：</span>
+				<span class="text_33"><{$item.content}></span>
+			</div>
+			<{foreach from=$item.change_items item=citem}>
+				<div class="section_6 flex-row">
+					<img class="image_2" referrerpolicy="no-referrer"
+						 src="<{$citem.goods_img_url|default:'/app/wap/statics/img/default_goods_img.png'}>" />
+					<div class="text-group_1 flex-col">
+						<div class="status-info"> <span class="text_28 flex-shrink-1"><{$citem.name}></span>
+						</div>
+						<span class="text_29">商品货号：<{$citem.bn}></span>
+						<span class="text_30"><{$citem.num}>件；<{$citem.specifications}></span>
+						<!-- <span class="text_31">￥1800.00</span> -->
+					</div>
+				</div>
+			<{/foreach}>
+		</div>
+		<{/if}>
+
+	
+		<div class="section_7 flex-row justify-end">
+			<{if $item.status == 1}>
+			
+		<div class="text-wrapper_12 flex-col">
+			<a class="text_38" style="text-decoration:none;" href="<{$item.reship_href}>">退货入库</a>
+		</div>
+			<{/if}>
+		</div>
+	</div>
+        
+    <{/foreach}>
+<{/if}>

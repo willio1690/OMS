@@ -1,0 +1,121 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<h4>选择覆盖区域</h4>
+<div class="division">
+    <div>
+        <{input type='region' id='chose_area' app='eccommon' name="area"}>
+        <{button label="添加" id="add_area" }>
+    </div>
+    <br/>
+    <div>
+        <table class="gridlist">
+            <thead>
+                <tr>
+                    <th>区域</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="dataNode">
+                <{foreach from=$area_items item=item}>
+                    <tr class="areas">
+                        <td id="area_<{$item.area_id}>">
+                            <{$item.name}>
+                            <input type="hidden" name="chose_area[]" value="<{$item.area_id}>">
+                            <input type="hidden" id="child_area_<{$item.area_id}>" name="child_chose_area[<{$item.area_id}>]" value="<{$item.childs}>">
+                        </td>
+                        <td class="area_btns">
+                            <{if $item.haschild}><a class="i" href="javascript:void(0);" onClick="selectRegion(this)"><{img app="desktop" src="bundle/editcate.gif" border="0" alt="编辑下级区域" }></a><{/if}>&nbsp;&nbsp;<{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}>
+                        </td>
+                    </tr>
+                <{/foreach}>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    function selectRegion(el){
+        var pid = $(el).getParent('tr').getElement('input[name^=chose_area[]]').value;
+        var url = "index.php?app=eccommon&ctl=regions&act=getChlidById&p[0]="+pid;
+        new Dialog(url,{width:400,height:400,title:'选择下级区域',
+            onClose:function(){
+            }
+        });
+    }
+
+    window.addEvent('domready', function() {
+        var dataNode = $('dataNode');
+        $('add_area').addEvent('click',function(e){
+            var chose_area = '';
+            var area_arr = [];
+            var exist_area = '';
+            var exist_area_key = [];
+            var search_area_key = [];
+            var i = 0;
+            var has_exist = false;
+
+            chose_area = $('chose_area').value;
+            if(!chose_area){
+                alert('请选择覆盖区域');
+                return false;
+            }
+
+            area_arr = chose_area.split(':');
+
+            $ES('.areas').each(function(item){
+                exist_area = item.getChildren('td')[0].getText();
+                exist_area_key = exist_area.split('/');
+                search_area_key = area_arr[1].split('/');
+
+                if(exist_area_key[0] == search_area_key[0]){
+                    alert('已经存在相关的上级或下级地区');
+                    has_exist = true;
+                    return false;
+                }
+            });
+
+            if(!has_exist && area_arr[2]){
+                var html = '<td id="area_'+area_arr[2]+'">'+area_arr[1]+'<input type="hidden" name="chose_area[]" value="'+area_arr[2]+'"><input type="hidden" id="child_area_'+area_arr[2]+'" name="child_chose_area['+area_arr[2]+']" value=""></td><td class="area_btns">';
+                
+                var html_edit    = '<a class="i" href="javascript:void(0);" onClick="selectRegion(this)"><{img app="desktop" src="bundle/editcate.gif" border="0" alt="编辑下级区域" }></a>';
+                var html_del     = '<{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}>';
+                
+                new Request({
+                    url:"index.php?app=o2o&ctl=admin_autostore&act=getAreaHaschild", method:'post', data:'region_id='+ area_arr[2], async:false,
+                    onSuccess:function(json){
+                        if (json == 'true'){
+                            html    = html + html_edit;
+                        }else {
+                            
+                        }
+                    }
+                }).send();
+                
+                html    = html + html_del;
+                html    = html + '</td>';
+                
+                if(!$('area_'+area_arr[2])){
+                    new Element('tr[class=areas]',{html:html}).inject('dataNode');
+                }
+            }
+
+            $ES('.btn-delete-item').each(function(item){
+                item.removeEvent('click').addEvent('click',function(e){
+                    if(confirm('确定要删除区域'+this.getParent('tr').getChildren('td')[0].getText()+'吗？'))
+                    {
+                         this.getParent('tr').destroy();
+                    }
+                });
+            });
+        });
+        
+        $$('.btn-delete-item').addEvent("click",function(){
+            if(confirm('确定要删除区域'+this.getParent('tr').getChildren('td')[0].getText()+'吗？'))
+            {
+                this.getParent('tr').destroy();
+            }
+        });
+    });
+</script>

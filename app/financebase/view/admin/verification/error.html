@@ -1,0 +1,172 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.shop-name{
+    color:red;font-weight:bold;
+}
+.rules{
+  margin-bottom: 5px;
+}
+.rules select{
+  margin-right: 5px;
+}
+.rule_tr{
+  margin: 10px 0;
+}
+</style>
+<div class="tableform">
+    <div class="division">
+        <form action="index.php?app=financebase&ctl=admin_shop_settlement_verification&act=saveVerificationError" id="form-rule" method="post">
+            <input name="id" type="hidden" value="<{$shop_info.id}>">
+                <!-- <input name="old_money" type="hidden" value="<{$shop_info.money}>"> -->
+                    <table border="0" cellpadding="0" cellspacing="0" id="rule-section" width="100%">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    <em class="c-red">
+                                        *
+                                    </em>
+                                    差异类型：
+                                </th>
+                                <td>
+                                    <input name="name" class="x-input" type="text" value="<{$shop_info.name}>" vtype="required">
+                                    </input>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <em class="c-red">
+                                        *
+                                    </em>
+                                    所属店铺：
+                                </th>
+                                <td>
+                                    <{input type="select" name="shop_id" rows=$shop_list valueColumn="shop_id" labelColumn="name" value=$shop_info.shop_id required=true}>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    优先级：
+                                </th>
+                                <td>
+                                    <input name="priority" class="x-input" style="width:50px;" type="text" value="<{$shop_info.priority|default:0}>" vtype="required&&unsigned">
+                                    </input>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    是否核销：
+                                </th>
+                                <td>
+                                    <input type="radio" name="is_verify" value="0" <{if $shop_info.is_verify != "1"}>checked<{/if}>  >否
+                                    <input type="radio" name="is_verify" value="1" <{if $shop_info.is_verify == "1"}>checked<{/if}>  >是
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>
+                                    核销方式：
+                                </th>
+                                <td>
+                                    <input type="radio" name="verify_mode" value="0" <{if $shop_info.verify_mode != "1"}>checked<{/if}>  >按订单总额核销
+                                    <input type="radio" name="verify_mode" value="1" <{if $shop_info.verify_mode == "1"}>checked<{/if}>  >订单收入和退款分别核销
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                        <tbody>
+                            <tr>
+                                <th>核销规则：</th>
+                                <td>
+                                    <{foreach from=$shop_info.rule item=item key=key}>
+                                    <div style="margin-bottom: 5px;" data-nkey="<{$shop_info.rule|count}>">
+                                        <span class="rule-and"><{if $key == 0}>&nbsp;&nbsp;&nbsp;<{else}>且<{/if}></span>
+                                        <{input type="select" name="rule[{$key}][operator]" options=array("than"=>"大于","lthan"=>"小于","nequal"=>"等于","sthan"=>"小于等于","bthan"=>"大于等于") required=true value=$item.operator}>
+                                        <{input type="text" size=20 name="rule[{$key}][operand]" style="margin-left:5px;" value=$item.operand vtype="required&&number"}>
+
+                                        <{if $key == 0}>
+                                            <a href="javascript:void(0);" class="rule-add">[ + ]</a>
+                                        <{else}>
+                                            <a href="javascript:void(0);" class="rule-sub">[ - ]</a>
+                                        <{/if}>
+                                    </div>
+                                    <{/foreach}>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="table-action">
+                        <{button label="提交" type="submit" name="submit" id="btn-rule"}>    <{button isCloseDialogBtn="true" label="关闭" onclick="javascript:void(window.close());" class="btn-secondary" type="button"}>
+                    </div>
+                </input>
+            </input>
+        </form>
+    </div>
+</div>
+<script>
+$('form-rule').store('target',{
+    onRequest:function(){
+       $('btn-rule').set('disabled', 'true');
+       
+    },
+    onComplete:function(jsontext){
+       var json = Json.evaluate(jsontext);
+       if (typeof(json.error) != 'undefined'){
+           $('btn-rule').set('disabled', '');
+           try{
+               parent.finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,parent.finderGroup['<{$env.get.finder_id}>']);
+           }catch(e){}
+       }else{
+           $('btn-rule').set('disabled', 'true');
+           $('form-rule').getParent('.dialog').retrieve('instance').close();
+           // parent.finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,parent.finderGroup['<{$env.get.finder_id}>']);
+           // window.close();
+            try{
+                var _dialogIns = $('btn-rule').getParent('.dialog').retrieve('instance');
+            }catch(e){}
+
+            if(_dialogIns){
+                // setTimeout(finder.refresh(),30000);
+                _dialogIns.close();
+            }
+       }
+    }
+});
+
+$E('.rule-add').addEvent('click',function(){
+
+    var key = this.getParent('div').dataset.nkey.toInt();
+
+    this.getParent('div').dataset.nkey=key+1;
+
+    var nextEl = this.getParent('div').clone();
+    nextEl.getElement('.rule-and').set('text', '且');
+    // nextEl.getElement('input').set('value','');
+    nextEl.getElement('select').set('name','rule['+key+'][operator]');
+    nextEl.getElement('input').set('name','rule['+key+'][operand]');
+
+    var sub = new Element('a',{
+        'href':'javascript:void(0);',
+        'events':{
+            'click':function(){
+                this.getParent('div').remove();
+            }
+        },
+        'text':'[ - ]',
+        'class':'',
+    })
+    sub.replaces(nextEl.getElement('.rule-add'));
+
+    this.getParent('td').adopt(nextEl);
+});
+
+if ($defined($ES('.rule-sub'))) {
+    $ES('.rule-sub').addEvent('click',function(){
+        this.getParent('div').remove();
+    });
+}
+
+</script>

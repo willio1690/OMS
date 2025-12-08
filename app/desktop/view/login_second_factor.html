@@ -1,0 +1,224 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<html>
+<head>
+    <title>二次验证</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta http-equiv="X-Requested-By" content="shopex-ui">
+    <style type="text/css">
+
+        .content {
+            width: 100%;
+        }
+
+        .skeleton{
+            width: 990px;
+            padding: 0px 15px;
+        }
+
+        .box {
+            margin: 60px auto 0px;
+            color: #333;
+        }
+
+        .form {
+            float: left;
+
+        }
+
+        .line {
+            overflow: hidden;
+            clear:both;
+        }
+
+        .label {
+
+            text-align: left;
+            float: left;
+            display: inline-block;
+            height: 20px;
+            margin-top: 3px;
+        }
+
+        .narrow{
+            width: 70px;
+        }
+
+        .wide{
+            width: 90px;
+        }
+
+
+        .green {
+            color: green;
+        }
+
+        .red {
+            color: red;
+        }
+
+        #send_tips{
+            float: left;
+            display: inline-block;
+        }
+
+
+        .button-validate {
+            background: #f63;
+            color: #fff;
+            height: 24px;
+            line-height: 22px;
+            padding: 0 5px;
+            margin: 0px 5px;
+            border: 1px solid #D55226;
+            float: left;
+        }
+
+
+        input[disabled="disabled"],
+        button[disabled="disabled"],
+        .disabled {
+            color: #ff;
+            background: #B3764D;
+            border-color: #BDB8B8;
+        }
+
+        .input-text {
+            height: 20px;
+            padding-left: 4px;
+            float: left;
+            width: 120px;
+        }
+
+
+        .tips {
+
+            margin: 30px 0px;
+        }
+
+        .tips h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .tips p {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .top-header-menu {
+            width: 100%;
+            height: 60px;
+            background-color: #134671;
+            position: relative;
+        }
+
+        .top-header-menu .top-menu-cont {
+            height: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+
+        .top-header-menu .top-menu-cont .top-logo-link {
+            color: #FFFFFF;
+            display: block;
+            text-decoration: none;
+            width: 240px;
+            font-size: 20px;
+            line-height: 60px;
+            height: 60px;
+            padding-left: 0px;
+            padding-top: 1px;
+            font-weight: 400;
+        }
+
+        #footer {
+            background-color: #333;
+            padding: 20px 0;
+            color: #fff;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        #footer .fcontainer .aboutus {
+            color: #fff;
+            width: 100%;
+            font-size: 12px;
+            overflow: hidden;
+        }
+
+        #footer .fcontainer {
+            margin: 0 auto;
+        }
+
+        #footer .fcontainer .aboutus p.ft_copy {
+            float: left;
+        }
+
+        #footer .fcontainer .aboutus p.ft_union {
+            float: right;
+        }
+
+        #footer .fcontainer .aboutus a {
+            margin: 0 3px;
+            color: #fff;
+        }
+    </style>
+<body>
+<div class="top-header-menu">
+    <div class="skeleton top-menu-cont" style="width: 990px;">
+        <a class="top-logo-link" href="#" data-spm-anchor-id="0.0.0.0">商派 | 阿里云IDAAS身份验证</a>
+    </div>
+</div>
+<div class="content">
+    <div class="skeleton box" style="width: 990px; margin: 20px auto 0px;">
+        <div class="line tips" style="margin: 10px 0px;">
+            <p>为了保护您的帐号安全，商派ERP系统正在使用阿里云IDAAS身份验证服务。请获取手机验证码，完成以下操作：</p>
+        </div>
+        <div class="line" style="height: 30px">
+            <span class="label narrow">手机号码：</span>
+            <span class="label wide"><{$phoneNumber}></span>
+        </div>
+        <div class="line operate" style="height: 25px">
+            <span class="label narrow"></span>
+            <div id="send_tips"></div>
+        </div>
+        <div class="line operate" style="height: 60px">
+            <span class="label narrow">验证码：</span>
+            <form name="mobileVerifyForm" id="captcha_form" action="<{$env.BASE_URL}>/index.php/openapi/idaas/callback" method="post" class="form">
+                <input type="hidden" name="fid" value="<{$fid}>" >
+                <input type="hidden" name="username" value="<{$username}>" >
+                <input type="hidden" name="phoneNumber" value="<{$phoneNumber}>" >
+                <input class="input-text" type="text" name="mobileverifycode" value="" placeholder="6位数字"/>
+                <input id="check_captcha" class="button-validate" type="submit" name="submit_value" value="确定"/>
+                <div class="line red" style="padding-top: 10px;"><{$err_msg}></div>
+            </form>
+        </div>
+        <div class="line tips" style="margin: 10px 0px;">
+            <h3>没收到短信验证码？</h3>
+            <p>1. 网络通讯异常可能造成短信丢失，请重新获取或稍后再试。</p>
+            <p>2. 请核实手机是否已欠费停机，或者屏蔽了系统</p>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var submitHandle = function(e){
+        var bl =document.getElementById('check_captcha');
+        bl.setAttribute('value','验证中..');
+        bl.setAttribute('disabled','true');
+    };
+
+    var blf = document.mobileVerifyForm;
+    if(blf.addEventListener){
+        blf.addEventListener('submit',submitHandle,false);
+    }else{
+        blf.attachEvent('onsubmit',submitHandle);
+    }
+</script>
+</body>
+</html>

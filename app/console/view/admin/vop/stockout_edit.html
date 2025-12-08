@@ -1,0 +1,391 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/modedialog.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+
+<style type="text/css">
+.gridlist tbody td, .gridlist tbody th {
+    height: 30px;
+    line-height: 30px;
+}
+</style>
+
+<form id="fm1" name="form1" action="index.php?app=console&ctl=admin_vopstockout&act=doEdit" method="POST">
+<input type="hidden" name="stockout_id" value="<{$data.stockout_id}>" />
+<div class="tableform">
+    <h3>编辑出库单</h3>
+    <div class="division">
+        <h5>基础信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+            <tr>
+                <td align="right">出库单号：</td>
+                <td width="40%"><{$data.stockout_no}></td>
+                <td align="right">拣货单号：</td>
+                <td><{$pickInfo.pick_no}></td>
+            </tr>
+            <tr>
+                <td width="10%" align="right">出库数量：</td>
+                <td><{$data.pick_num}></td>
+                <td align="right" nowrap="nowrap">&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td align="right">出库仓：</td>
+                <td width="40%"><{$data.branch_name}></td>
+                <td align="right">入库仓：</td>
+                <td><{$pickInfo.to_branch_name}></td>
+            </tr>
+            <tr>
+                <td align="right">配送方式：</td>
+                <td width="40%">
+                <select name="dly_mode" id="dly_mode" onchange="get_delivery_time(this)">
+                    <option value="">请选择</option>
+                    <{foreach from=$dly_mode key=key item=val}>
+                    <option value="<{$key}>" <{if $data.dly_mode == $key}>selected<{/if}> ><{$val}></option>
+                    <{/foreach}>
+                </select>
+                </td>
+                <td align="right">承运商：</td>
+                <td>
+                <select name="carrier_code" id="carrier_code">
+                    <option value="">请选择</option>
+                    <{foreach from=$carrier_code key=key item=val}>
+                    <option value="<{$key}>" <{if $data.carrier_code == $key}>selected<{/if}> ><{$val}></option>
+                    <{/foreach}>
+                </select>
+                </td>
+            </tr>
+            <tr>
+                <td align="right">送货批次：</td>
+                <td>
+                <div id="set_delivery_date" style="width:100px; float:left;">
+                    <{input id="set_data_id" type="date" vtype="date" name="delivery_date" class="load_delivery_date" style="width:66px; font-family:arial;background-color: white;background-position: 2px -1510px;border-width: 1px;padding-left: 18px;" value=$data.delivery_date}>
+                    <input type="hidden" name="hide_delivery_time" id="hide_delivery_time" value="<{$data.delivery_date}>" />
+                </div>
+                <div id="set_delivery_hour" style="width:150px; float:left;">
+                    <select name="delivery_hour" id="delivery_hour" onchange="reckonArrivalTime()">
+                        <option value="">请选择</option>
+                        <{foreach from=$sel_delivery_hour key=key item=val}>
+                        <option value="<{$val}>" <{if $data.delivery_hour == $val}>selected<{/if}> ><{$val}></option>
+                        <{/foreach}>
+                    </select>
+                </div>
+                </td>
+                <td align="right" nowrap="nowrap">要求到货时间：</td>
+                <td>
+                <div id="set_arrival_time">
+                    <select name="arrival_time" id="arrival_time">
+                    <{if $arrival_time_list}>
+                        <{foreach from=$arrival_time_list key=key item=val}>
+                            <option value="<{$val}>" <{if $data.arrival_time == $val}>selected<{/if}> ><{$val}></option>
+                        <{/foreach}>
+                    <{/if}>
+                    </select>
+                </div>
+                </td>
+              </tr>
+            <tr>
+                <td align="right">是否航空禁运：</td>
+                <td width="40%">
+                <select name="is_air_embargo">
+                    <option value="0" <{if $data.is_air_embargo != 1}>selected<{/if}>>不禁运</option>
+                    <option value="1" <{if $data.is_air_embargo == 1}>selected<{/if}>>禁运</option>
+                </select>
+                </td>
+            </tr>
+            </thead>
+        </table>
+    </div>
+
+    <div class="division">
+        <h5>出库单明细</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+                <tr>
+                    <th style='text-align:left;padding-left:5px;'>采购单号</th>
+                    <th style='text-align:left;padding-left:5px;'>拣货单号</th>
+                    <th style='text-align:left;padding-left:5px;'>货号</th>
+                    <th style='text-align:left;padding-left:5px;'>条形码</th>
+                    <th style='text-align:left;padding-left:5px;'>货品名称</th>
+                    <th style='text-align:left;padding-left:5px;'>尺寸</th>
+                    <th style='text-align:left;padding-left:5px;'>数量</th>
+                    <th style='text-align:left;padding-left:5px;'>申请数量</th>
+                    <th style='text-align:left;padding-left:5px;'>可用库存</th>
+                    <th style='text-align:left;padding-left:5px;'>成本价</th>
+                    <th style='text-align:left;padding-left:5px;'>市场价</th>
+                    <th style='text-align:left;padding-left:5px;'>标记</th>
+                    <th style='text-align:left;padding-left:5px;'>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <{foreach from=$dataList item=item}>
+                <tr id="tr_<{$item.stockout_item_id}>" <{if $item.is_del == 'true'}>g-del="b" class="disabled"<{else}>g-del="a"<{/if}> >
+                    <td style='text-align:left;padding-left:5px;'><{$item.po_bn}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.pick_no}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.bn}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.barcode}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.product_name}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.size}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.item_num}></td>
+                    <td style='text-align:left;padding-left:5px;'>
+                        <input name="item_num[<{$item.stockout_item_id}>]" type="text" onchange="change_num(this)" value="<{$item.num}>" size="6" maxlength="8" aid="<{$item.stockout_item_id}>" <{if $item.is_del == 'true'}>disabled="disabled"<{/if}> />
+                    </td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.store}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.price}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.market_price}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.order_label}></td>
+                    <td style='text-align:left;padding-left:5px;'>
+                    <{if $item.is_del == 'false'}>
+                        <{button type="button" label="删除" id="del_{$item.stockout_item_id}" onclick="del_item('{$item.stockout_item_id}');" }></td>
+                    <{else}>
+                        <{button type="button" label="恢复" id="del_{$item.stockout_item_id}" onclick="del_item('{$item.stockout_item_id}');" }></td>
+                    <{/if}>
+                    </td>
+                </tr>
+                <{/foreach}>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="cc" class="noprint table-action"> <{button type="button" class="btn" id="purchase-save-btn" label="保 存"}> &nbsp; <{button type="button" class="btn" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}></div>
+
+</div>
+</form>
+<script>
+function change_num(e){
+    var id = e.get('aid'),l=0,_ca = e.getNext('.error');
+    if(e.disable) return;
+    
+    if (/^\d+(\.\d+)?$/.test(e.value)){
+        if (parseInt(e.value) <= 0){
+            if (!_ca){
+                new Element('span',{'class':'error caution notice-inline',html:'　请录入不小于0的数'}).injectAfter(e);
+                e.set('value', '0');
+            }
+            return;
+        }else{
+            if (_ca) _ca.remove();
+        }
+    }else{
+        if (!_ca){
+            new Element('span',{'class':"error caution notice-inline",html:"　请录入数值"}).injectAfter(e);
+            e.set('value', '0');
+        }
+    }
+}
+
+function del_item(id)
+{
+    var e = $('tr_'+id);
+    
+    if(e.get('g-del') == 'a')
+    {
+        e.addClass('disabled').set('g-del','b');
+        e.getElements('input').length && e.getElements('input[type=text]').set('disabled',true);
+        e.getElement('button') && e.getElement('button').getElement('span span').set('text','恢复');
+    }
+    else
+    {
+        e.removeClass('disabled').set('g-del','a');
+        e.getElements('input').length && e.getElements('input[type=text]').set('disabled',false);
+        e.getElement('button') && e.getElement('button').show().getElement('span span').set('text','删除');
+    }
+}
+
+(function(){
+    var pag;
+    
+    $('purchase-save-btn').addEvent('click',function(e)
+    {
+        var _this=this;
+        var form=this.getParent('form');
+        
+        var dly_mode = $("dly_mode").value;
+        var carrier_code = $("carrier_code").value;
+        var arrival_time = $("arrival_time").value;
+        var delivery_hour = $("delivery_hour").value;
+        var delivery_date = $ES('input[name=delivery_date]').get('value');
+        
+        if(dly_mode == "")
+        {
+            alert("请选择配送方式");
+            return false;    
+        }
+        if(carrier_code == "")
+        {
+            alert("请选择承运商");
+            return false;    
+        }
+        if(delivery_date == "")
+        {
+            alert("请选择送货批次日期");
+            return false;    
+        }
+        if(delivery_hour == "")
+        {
+            alert("请选择送货批次时间段");
+            return false;    
+        }
+        if(arrival_time == "")
+        {
+            alert("请选择到货时间段");
+            return false;
+        }
+        
+        form.store('target',{
+            onRequest:function(){
+                _this.disabled=true;
+            },
+            onComplete:function(jsontext){
+                try{
+                    var json = JSON.decode(jsontext);
+                    if (typeof(json.error)!='undefined'){
+                        _this.disabled=false;
+                    }else{
+                        _this.disabled=true;
+                        if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                        setTimeout('window.close()',200);
+                    }
+                }catch(e){}
+            }
+        });
+        
+        form.fireEvent('submit',e);
+    });
+})();
+
+function get_delivery_time(e)
+{
+    var dly_mode = e.value;
+    
+    if(dly_mode == "")
+    {
+        return false;
+    }
+    
+    var deliveryTime = new Array();
+    var json = <{$json_delivery_time}>;
+    
+    if(json)
+    {
+        for (var i in json)
+        {
+            deliveryTime[i] = new Array();
+            
+            for(var k in json[i])
+            {
+                deliveryTime[i][k]    = json[i][k];
+            }
+        }
+        
+        var html = '<select name="delivery_hour" id="delivery_hour" onchange="reckonArrivalTime()"><option value="">请选择</option>';
+        
+        var sel_deliveryTime = new Array();
+        sel_deliveryTime = deliveryTime[dly_mode];
+        
+        for(i=1; i<sel_deliveryTime.length; i++)
+        {
+            html += '<option value="'+ sel_deliveryTime[i] +'">'+ sel_deliveryTime[i] +'</option>';    
+        }
+        
+        html += '</select>';
+        
+        $("set_delivery_hour").set('html', html);
+    }
+    
+    //初始化要求到货时间
+    $("set_arrival_time").set('html', '<select name="arrival_time" id="arrival_time"></select>');
+}
+
+function reckonArrivalTime()
+{
+    var delivery_date = $ES('input[name=delivery_date]').get('value');
+    var delivery_hour = $("delivery_hour").value;
+    var dly_mode = $("dly_mode").value;
+    var html = '<select name="arrival_time" id="arrival_time"></select>';
+    
+    temp_delivery_date = delivery_date.toString();
+    if(temp_delivery_date == ""){
+        alert("请先选择送货批次的日期");
+        return false;
+    }
+    
+    if(delivery_date && delivery_hour && dly_mode)
+    {
+        new Request(
+        {
+            url: "index.php?app=console&ctl=admin_vopstockout&act=ajax_arrival_time",
+            async:false,
+            method:'post',
+            data:{delivery_date:delivery_date, delivery_hour:delivery_hour, dly_mode:dly_mode},
+            onComplete: function(json)
+            {
+                json = JSON.decode(json);
+                
+                if(json.res == 'succ')
+                {
+                    if(json['arrival_time'].length > 0){
+                        arrival_date = json['arrival_time'];
+                        
+                        html = '<select name="arrival_time" id="arrival_time">';
+                        arrival_date.each(function(arrival_time){
+                            html    += '<option value="'+ arrival_time +'">'+ arrival_time +'</option>';
+                        });
+                        html += '</select>';
+                        
+                        $("set_arrival_time").set('html', html);
+                    }
+                    else
+                    {
+                        alert("没有获取到要求到货时间!");
+                    }
+                }
+                else
+                {
+                    $("set_arrival_time").set('html', html);
+                    alert("获取到货时间失败!");
+                }
+            }
+        }).send();
+    }
+}
+
+function loadDeliveryDate(){
+    var delivery_date = $ES('input[name=delivery_date]').get('value');
+    var hide_delivery_time = $ES('input[name=hide_delivery_time]').get('value');
+    var delivery_hour = $("delivery_hour").value;
+    
+    delivery_date = delivery_date.toString();
+    hide_delivery_time = hide_delivery_time.toString();
+    
+    if(delivery_date){
+        $ES('input[name=hide_delivery_time]').set('value', delivery_date);
+    }
+    
+    //初始化未选择送货批次日期时,先选择了时间点,重新加载时间
+    if(hide_delivery_time == "" && delivery_date)
+    {
+        if(delivery_hour)
+        {
+            get_delivery_time($("dly_mode"));
+        }
+    }
+    
+    //送货批次日期发生变化,重新加载时间
+    if((hide_delivery_time != "") && (delivery_date != hide_delivery_time)){
+        get_delivery_time($("dly_mode"));
+    }
+}
+
+var intervalName ='';
+clearInterval(intervalName);
+intervalName = setInterval("loadDeliveryDate();", 3000);
+</script>

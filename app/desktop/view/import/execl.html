@@ -1,0 +1,66 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="POST" action="index.php?app=<{$env.get.app}>&ctl=<{$env.get.ctl}>&act=doExcelImport&p[]=<{$type}>&finder_vid=<{$env.get.finder_vid}>&finder_id=<{$env.get.finder_id}>"  enctype="multipart/form-data" id="import-form">
+    <{toinput from=$env.post}>
+    <div class="tableform" id="upload">
+        <{if $custom_html}><div class="division" id="custom_html"><{$custom_html}></div><{/if}>
+        <div class="division">
+          <table border="0" cellpadding="0" cellspacing="0" class="">
+              <tr>
+                  <th>
+                      下载模板：
+                  </th>
+                  <td style="text-align:left;">
+                      <a target="_blank" href="index.php?app=<{$env.get.app}>&ctl=<{$env.get.ctl}>&act=execlImportTmpl&p[]=<{$type}>&finder_vid=<{$env.get.finder_vid}>&finder_id=<{$env.get.finder_id}>">点击下载</a>
+                  </td>
+              </tr>
+          </table>
+        </div>
+
+        <div class="division">
+          <table border="0" cellpadding="0" cellspacing="0" class="">
+            <tr>
+                <th>
+                  导入文件：
+                </th>
+                <td style="text-align:left;">
+                  <input type='file' name='import_file' id='ImportCSV' />
+                </td>
+            </tr>
+          </table>
+      </div>
+    </div>
+
+    <div class="table-action">
+        <input type='hidden' id="import_type" name='import_type' value='add'/>
+        <{button label='导入' id="ImportBtn" class="btn-primary"  type="submit"}>
+        <{button label='关闭' id="stopBtn"   class="btn-secondary" type="button" isCloseDialogBtn="true" }>
+    </div>
+
+    <div class="notice-inline"><div id="iMsg" style='color: #6495ED;'></div></div>
+
+    <div class="error" style="display: none;"></div>
+</form>
+<script>
+(function(){
+    var state;
+    $('ImportBtn').addEvent('click',function(e){
+        if(state||!$('ImportCSV').value.length)return false;
+        state=true;
+        this.style.cursor='not-allowed';
+    });
+    $('ImportCSV').addEvent('change',function(e){
+        state=false;
+        $('ImportBtn').style.cursor='pointer';
+    });
+    $('import-form').store('target', {
+        onComplete:function(resp){
+            state=false;
+            // $('ImportBtn').style.cursor='pointer';
+        }
+    });
+})();
+</script>

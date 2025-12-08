@@ -1,0 +1,15 @@
+<desktop>
+<!--
+    <permissions>
+        <permission id="feature_manage">特性</permission>
+        <permission id="feature_group_manage">类目</permission>
+    </permissions>
+
+    <workground name="基础档案" id="goods_manager"  order="500">
+        <menugroup name="特性类目管理">
+            <menu controller='admin_feature' action='index' permission='feature_manage' display='true' order='1000300'>特性</menu>
+            <menu controller='admin_feature_group' action='index' permission='feature_group_manage' display='true' order='1000400'>类目</menu>
+        </menugroup>
+    </workground>
+-->
+</desktop>

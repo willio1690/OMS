@@ -1,0 +1,100 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app='omeauto' src="style.css"}>
+<{/capture}>
+<div class="tableform">
+    <div class="division">
+        <form action="index.php?app=console&ctl=admin_replenish_suggest&act=save" method="post" id="submit_form"> 
+        <input type="hidden" name="sug_id" id="sug_id" value="<{$data.sug_id}>">
+            <table width="100%" cellspacing="0" cellpadding="0">
+                <tbody>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc">补货任务号：</label> </th>
+                        <td><span style="font-weight:bold;"><{$reTaskInfo.task_bn}></span></td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc">补货任务名称：</label> </th>
+                        <td><{$reTaskInfo.task_name}></td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc">门店编码：</label> </th>
+                        <td><span style="font-weight:bold;"><{$data.store_bn}></span></td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc">门店名称：</label> </th>
+                        <td><{$storeInfo.name}></td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc">基础物料编码：</label> </th>
+                        <td><{$data.material_bn}></td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc">建议补货量：</label> </th>
+                        <td><span style="font-weight:bold; color:red;"><{$data.reple_nums}></span></td>
+                    </tr>
+                    <tr>
+                        <th width="60"><label for="dom_el_bc"><span style="color:red;">*</span>实际补货量：</label> </th>
+                        <td>
+                        <{input type="number&&required" size="6" maxlength="6" name="apply_nums" id='apply_nums' value=$data.apply_nums onkeyup="value=value.replace(/[^0-9]/g,'')" }>
+                        &nbsp;<{help}>实际补货数量必须大于0,否则不会执行此条数据。<{/help}>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="60">&nbsp;</th>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" align="center">
+                            <{button class="btn-primary" label="确定" type="button" id="msaveBtn"}>
+                            <{button class="btn-primary" label="取消" type="button" id="mcancelBtn"}>
+                        </td>
+                    </tr>
+              </tbody>
+            </table>
+        </form>
+    </div> 
+</div>
+<script>
+(function() {
+    var sug_id = "<{$data.sug_id}>";
+    var _form = $('submit_form');
+    var btn = $('msaveBtn');
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    
+    //关闭按钮
+    $('mcancelBtn').addEvent('click', function(){
+        $('mcancelBtn').getParent('.dialog').retrieve('instance').close();
+    });
+    
+    //保存按钮
+    $('msaveBtn').addEvent('click', function()
+    {
+        _form.fireEvent('submit', {stop:$empty});
+    });
+    
+    _form.store('target',{
+        onComplete:function(){
+        },
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+            
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){
+                    //==
+                }
+                
+                if(_dialogIns){
+                    finder.refresh();
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+})();
+</script>

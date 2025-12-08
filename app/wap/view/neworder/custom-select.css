@@ -1,0 +1,147 @@
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+/* 自定义 Select 组件样式 */
+.custom-select {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.custom-select-trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  /* min-height: 40px; */
+  line-height: 1.25rem;
+  box-sizing: border-box;
+  width: 100%;
+  position: relative;
+}
+
+.custom-select-trigger:hover {
+  opacity: 0.8;
+}
+
+.custom-select-trigger.active {
+  opacity: 0.9;
+}
+
+.custom-select-value {
+  flex: 1;
+  color: rgba(18, 18, 18, 1);
+  font-size: 0.875rem;
+  letter-spacing: 0.31111112236976624px;
+  font-family: PingFangSC-Regular;
+  font-weight: normal;
+  text-align: right;
+  white-space: nowrap;
+  line-height: 1.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 1.25rem 0 0;
+}
+
+.custom-select-value.placeholder {
+  color: #999;
+}
+
+.custom-select-arrow {
+  /* position: absolute;
+  top: 0.125rem;
+  right: 0.125rem; */
+  z-index: 0;
+  width: 0.5rem;
+  height: 0.313rem;
+  margin: 0.407rem 0 0.532rem 0.47rem;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+
+.custom-select-arrow.open {
+  transform: rotate(180deg);
+}
+
+.custom-select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: -0.625rem;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 4px;
+  width: 120%;
+}
+
+.custom-select-option {
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.875rem;
+  color: #333;
+  transition: background-color 0.2s;
+  text-align: left;
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  font-family: PingFangSC-Regular;
+}
+
+.custom-select-option:last-child {
+  border-bottom: none;
+}
+
+.custom-select-option:hover {
+  background-color: #f5f5f5;
+}
+
+.custom-select-option.selected {
+  background-color: #007aff;
+  color: #fff;
+  font-weight: 500;
+}
+
+.custom-select-option.disabled {
+  color: #ccc;
+  cursor: not-allowed;
+  background-color: #f9f9f9;
+}
+
+.custom-select-option.disabled:hover {
+  background-color: #f9f9f9;
+}
+
+/* 确保自定义select与原有样式兼容 */
+.image-text_2 .custom-select {
+  flex: 1.2;
+  position: relative;
+}
+
+.image-text_2 .custom-select-trigger {
+  justify-content: flex-end;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  /* .custom-select-dropdown {
+    max-height: 200px;
+  } */
+  
+  .custom-select-option {
+    padding: 1rem 0.875rem;
+    min-height: 3.25rem;
+    font-size: 0.875rem;
+  }
+} 

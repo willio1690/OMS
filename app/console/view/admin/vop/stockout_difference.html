@@ -1,0 +1,86 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+
+<form name="form1"  action="index.php?app=console&ctl=admin_vopstockout&act=doDefectiveconfirm" method="post">
+<div class="tableform">
+<input type="hidden" name="iso_id" value="<{$billInfo.stockout_id}>">
+<h4>出库单确认</h4>
+</div>
+
+<div class="division">
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+                <tr>
+                    <th style='text-align:left;padding-left:5px;'>采购单号</th>
+                    <th style='text-align:left;padding-left:5px;'>拣货单号</th>
+                    <th style='text-align:left;padding-left:5px;'>货号</th>
+                    <th style='text-align:left;padding-left:5px;'>条形码</th>
+                    <th style='text-align:left;padding-left:5px;'>货品名称</th>
+                    <th style='text-align:left;padding-left:5px;'>尺寸</th>
+                    <th style='text-align:left;padding-left:5px;'>数量</th>
+                    <th style='text-align:left;padding-left:5px;'>申请数量</th>
+                    <th style='text-align:left;padding-left:5px;'>实际出库数量</th>
+                    <th style='text-align:left;padding-left:5px;'>原价</th>
+                    <th style='text-align:left;padding-left:5px;'>市场价</th>
+                </tr>
+            </thead>
+            <tbody>
+                <{foreach from=$dataList item=item}>
+                <tr <{if $item.is_del == 'true'}>style="background-color: rgb(216, 216, 216);"<{/if}> >
+                    <td style='text-align:left;padding-left:5px;'><{$item.po_bn}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.pick_no}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.bn}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.barcode}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.product_name}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.size}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.item_num}></td>
+                    <td style='text-align:left;padding-left:5px;'><{if $item.is_del == 'true'}>0<{else}><{$item.num}><{/if}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.actual_num}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.price}></td>
+                    <td style='text-align:left;padding-left:5px;'><{$item.market_price}></td>
+                </tr>
+                <{/foreach}>
+            </tbody>
+        </table>
+
+<div id="cc" class="noprint table-action">
+    <{button type="button" class="btn-secondary" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}></div>
+</div>
+
+</div>
+
+</form>
+<script>
+$('stock-save-btn').addEvent('click',function(e){
+        var _this=this;
+        var form=this.getParent('form');
+        form.store('target',{
+                onRequest:function(){
+                    _this.disabled=true;
+                },
+                onComplete:function(jsontext){
+                    try{
+                        var json = JSON.decode(jsontext);
+                        if (typeof(json.error)!='undefined'){
+                            _this.disabled=false;
+                        }else{
+                            _this.disabled=true;
+                            opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                            setTimeout('window.close()',200);
+                        }
+                    }catch(e){}
+                }
+            });
+        form.fireEvent('submit',e);
+    });
+
+</script>

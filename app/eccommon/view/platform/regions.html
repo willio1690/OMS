@@ -1,0 +1,97 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=eccommon&ctl=platform_regions&act=doSyncRegion" id="frm">
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th>店铺：</th>
+                        <td>
+                            <select id="frm_shop_id" name='shop_id'>
+                                <{foreach from=$platformList item=platform}>
+                                <option value='<{$platform.shop_id}>'><{$platform.name}></option>
+                                <{/foreach}>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+    <div id="frmNotice"></div>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' class="btn-primary" label='同步' }>
+                    <{button type="button" id='close_btn' class="btn-secondary" label='关闭' isCloseDialogBtn="true"}>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<{/area}>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+                $('frm_shop_id').setAttribute('readonly', 'readonly');
+            },
+            onComplete:function(){
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    $('frmNotice').setHTML('省份同步成功');
+                    if(hash_res_obj.data) {
+                        requestArea(0, hash_res_obj.data);
+                    } else {
+                        $('frmNotice').setHTML('省份未写入成功');
+                    }
+                }
+            }
+        });
+
+        function requestArea(i, obj) {
+            var item = obj[i];
+            var oLength = obj.length;
+            item.shop_id = $('frm_shop_id').value;
+            new Request.JSON({
+                url: "index.php?app=eccommon&ctl=platform_regions&act=doSyncArea",
+                data: item,
+                onComplete: function(rsp) {
+                    i++;
+                    if(rsp.rsp == 'succ') {
+                        $('frmNotice').setHTML('('+i+'/'+oLength+')'+item.outregion_name+'同步成功<br>'+$('frmNotice').getHTML());
+                    } else {
+                        $('frmNotice').setHTML('('+i+'/'+oLength+')'+item.outregion_name+'同步失败'+rsp.msg+'<br>'+$('frmNotice').getHTML());
+                    }
+                    if(i == oLength) {
+                        $('frmNotice').setHTML('同步完成<br>'+$('frmNotice').getHTML());
+                        btn.removeAttribute('disabled');
+                        setTimeout(finder.refresh(),30000);
+                    } else {
+                        requestArea(i, obj);
+                    }
+                }
+            }).send();
+        }
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+    })();
+</script>

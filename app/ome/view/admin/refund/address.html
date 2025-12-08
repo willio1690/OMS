@@ -1,0 +1,111 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <tr class="division">
+        <form method="post" action="index.php?app=ome&ctl=admin_return_address&act=doAddAddress" id="frm">
+            <input type="hidden" name="address_id" value="<{$data.address_id}>" />
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                <tr>
+                    <th>选择店铺:</th>
+                    <td>
+                        <select name="shop_id" id="shop_id">
+                            <option value="">请选择</option>
+                            <{foreach from=$shop item=item}>
+                            <option value="<{$item.shop_id}>" <{if $item.shop_id==$data['shop_id']}>selected<{/if}> ><{$item.name}></option>
+                            <{/foreach}>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>收货人姓名：</th>
+                    <td>
+                        <input id="_zip" name="contact[contace_name]" type="text" value="<{$data['contact_name']}>" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>收货人手机：</th>
+                    <td><input id="_mobile" name="contact[mobile]" type="text" value="<{$data['phone']}>" /></td>
+                </tr>
+                <tr>
+                    <th>地区：</th>
+                    <td colspan="3"><{input type='region' app='eccommon' name="contact[area]" vtype="area" value=$data['area'] id="_region" }></td>
+                </tr>
+                <tr>
+                    <th>详细地址：</th>
+                    <td><input id="_mobile" name="contact[addr]" type="text" value="<{$data['addr']}>" /></td>
+                </tr>
+                <tr class="side-bx-title">
+                    <th>是否默认：</th>
+                    <td colspan="3">
+                        <select name="is_default" type="select" >
+                            <option value="false" <{if $data.cancel_def eq 'false'}>selected="selected"<{/if}>><{t}>否<{/t}></option>
+                            <option value="true" <{if $data.cancel_def eq 'true'}>selected="selected"<{/if}>><{t}>是<{/t}></option>
+                        </select>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' label='保存' }>
+                    <{button type="button" id='close_btn' label='关闭' }>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<{/area}>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+        $('close_btn').addEvent('click', function(){
+            try{
+                var _dialogIns = this.getParent('.dialog').retrieve('instance');
+            }catch(e){}
+
+            if(_dialogIns){
+                setTimeout(finder.refresh(),30000);
+                _dialogIns.close();
+            }
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+
+                    if(_dialogIns){
+                        setTimeout(finder.refresh(),30000);
+                        _dialogIns.close();
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+    })();
+</script>

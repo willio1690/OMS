@@ -1,0 +1,329 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="gEditor-Body">
+      <div class="spage-main-box">
+          <div class="tableform">
+          <div id="x-g-basic" class="goods-detail">
+            <div class="edit_box">
+            	<table width="100%" border="0" cellspacing="0" cellpadding="0" class="gridlist">
+                  <thead>
+                  <tr>
+                    <th align="left">相关信息</th>
+                  </tr>
+                  </thead>
+                </table>
+              <div class="h_10px"></div>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td width="130" align="right" nowrap="nowrap">物料编号：</td>
+                      <td>&nbsp;<{$item.material_bn}></td>
+                      <td width="130" align="right">物料名称：</td>
+                      <td>&nbsp;<{$item.material_name}></td>
+                  </tr>
+                  <tr>
+                    <td align="right" nowrap="nowrap">保质期批编码：</td>
+                    <td style="color:red;">&nbsp;<{$item.expire_bn}></td>
+                    <td align="right">剩余数量：</td>
+                    <td>&nbsp;<{$item.balance_num}></td>
+                  </tr>
+                  <tr>
+                    <td align="right" nowrap="nowrap">入库数量：</td>
+                    <td>&nbsp;<{$item.in_num}></td>
+                    <td align="right">出库数量：</td>
+                    <td>&nbsp;<{$item.out_num}></td>
+                  </tr>
+                  <tr>
+                    <td align="right" nowrap="nowrap">预警天数：</td>
+                    <td>&nbsp;<{$item.warn_day}>天</td>
+                    <td align="right">预警日期：</td>
+                    <td>&nbsp;<{$item.warn_date|cdate}></td>
+                  </tr>
+                  <tr>
+                    <td align="right" nowrap="nowrap">自动退出库存天数：</td>
+                    <td>&nbsp;<{$item.quit_day}>天</td>
+                    <td align="right">自动退出库存日期：</td>
+                    <td>&nbsp;<{$item.quit_date|cdate}></td>
+                  </tr>
+                </table>
+                <div class="h_10px"></div>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="gridlist">
+                  <thead>
+                  <tr>
+                    <th align="left">编辑信息</th>
+                  </tr>
+                  </thead>
+                </table>
+              <div class="h_10px"></div>
+              <form id="expireForm" name="expireForm" method="post" action="index.php?app=<{$env.get.app}>&ctl=<{$env.get.ctl}>&act=save">
+              <input type="hidden" name="bmsl_id" value="<{$item.bmsl_id}>">
+              <input type="hidden" id="bm_id" name="bm_id" value="<{$item.bm_id}>">
+              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td width="200" align="right" nowrap="nowrap" class="memo"><strong>物料生产日期：</strong></td>
+                    <td><{input type="date" vtype="date" id="production_date" name="production_date" value=$item.production_date style="width:100px; font-family:arial;"}></td>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td align="right" class="memo"><strong>保质期时长：</strong></td>
+                    <td>
+                        <select name="date_type" id="date_type">
+                            <option value="day" <{if $item.date_type == 1}>selected="selected"<{/if}> >按天</option>
+                            <option value="month" <{if $item.date_type == 2}>selected="selected"<{/if}> >按月</option>
+                            <option value="year" <{if $item.date_type == 3}>selected="selected"<{/if}> >按年</option>
+                            <option value="date" <{if $item.date_type == 4}>selected="selected"<{/if}> >按过期日期</option>
+                        </select>&nbsp;&nbsp;<input name="guarantee_period" type="text" id="guarantee_period" size="15" maxlength="5" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" value="<{$item.guarantee_period}>" />
+                    </td>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td width="200" align="right" nowrap="nowrap" class="memo"><strong>过期日期：</strong></td>
+                    <td id="show_cal" style="display:none;"><{input type="date" vtype="date" id="expiring_date" name="expiring_date" style="width:100px; font-family:arial;"}></td>
+                    <td id="show_input" ><input type="text" id="expiring_date" name="expiring_date" value="<{$item.expiring_date}>" readonly="readonly"></td>
+                    <td>&nbsp;</td>
+                  </tr>
+                </table>
+                <div class="h_20px"></div>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td align="center"><div class="table-action" style="margin:0px; padding:0px; border:none;">
+                        <{button label="保存修改" type="button" id="btn_submit" name="btn_submit"}> &nbsp; <{button label="关闭页面" id="cancelBtn" class="btn btn-secondary" isCloseDialogBtn='true'}>
+                        </div></td>
+                  </tr>
+                </table>
+              </form>
+              <div class="h_20px"></div>
+            </div>
+          </div>
+          </div>
+      </div>
+    </div>
+<style type="text/css">
+.dialog .dialog-content-body { background:#fff; border:none; }
+.dialog .tableform { background: none repeat scroll 0 0 #F8F8F8; border: 1px solid #D9D9D9; }
+.gridlist thead th { height:27px; line-height:27px; padding-left:12px;  }
+.edit_box { padding:10px 20px 5px 20px; }
+.h_10px { clear:both; width:100%; height:10px; }
+.h_20px { clear:both; width:100%; height:20px; }
+
+strong { font-weight:700; }
+.memo { font-size:18px; }
+</style>
+<script language="javascript">
+function find_date_change()
+{
+	var production_date = $('production_date').value;
+	var expiring_date = $('expiring_date').value;
+	var date_type = $('date_type').value;
+	var guarantee_period = $('guarantee_period').value;
+	
+	if(production_date && expiring_date){
+		var dates = production_date.split('-');
+		var cur_year = dates[0].toInt();
+		var cur_month = dates[1].toInt()-1;
+		var cur_day = dates[2].toInt();
+		var date = new Date(cur_year,cur_month,cur_day);
+
+		dates = expiring_date.split('-');
+		cur_year = dates[0].toInt();
+		cur_month = dates[1].toInt()-1;
+		cur_day = dates[2].toInt();
+		var date2 = new Date(cur_year,cur_month,cur_day);
+
+		switch(date_type){
+			case 'date':
+				$('guarantee_period').value = (date2-date)/86400000;
+				return;
+				break;
+		}
+	}
+
+	if(production_date && guarantee_period){
+		var dates = production_date.split('-');
+		var cur_year = dates[0].toInt();
+		var cur_month = dates[1].toInt()-1;
+		var cur_day = dates[2].toInt();
+
+		var date = new Date(cur_year,cur_month,cur_day);
+		switch(date_type){
+			case 'day':
+				$('show_input').getElement("input[name=expiring_date]").value = new Date(cur_year,cur_month,cur_day+guarantee_period.toInt()).toLocaleDateString().replace(/[\/]+/g,'-');
+				return;
+				break;
+			case 'month':
+				$('show_input').getElement("input[name=expiring_date]").value = new Date(cur_year,cur_month+guarantee_period.toInt(),cur_day).toLocaleDateString().replace(/[\/]+/g,'-');
+				return;
+				break;
+			case 'year':
+				$('show_input').getElement("input[name=expiring_date]").value = new Date(cur_year+guarantee_period.toInt(),cur_month,cur_day).toLocaleDateString().replace(/[\/]+/g,'-');
+				return;
+				break;
+		}
+	}
+}
+
+var intervalName ='';
+clearInterval(intervalName);
+intervalName = setInterval("find_date_change();", 800);
+
+$('date_type').addEvent('change', function(e) {
+	if(this.value == 'date'){
+		$('show_input').setStyle('display','none');
+		$('show_cal').setStyle('display','block');
+		$('guarantee_period').value ='';
+		$('guarantee_period').set('readonly',true);
+		$('show_input').getElement("input[name=expiring_date]").value ='';
+		$('show_cal').getElement("input[name=expiring_date]").value ='';
+	}else{
+		$('show_input').setStyle('display','block');
+		$('show_cal').setStyle('display','none');
+		$('guarantee_period').value ='';
+		$('guarantee_period').set('readonly',false);
+		$('show_input').getElement("input[name=expiring_date]").value ='';
+		$('show_cal').getElement("input[name=expiring_date]").value ='';
+	}
+});
+
+function submit_frm()
+{
+	var quit_day	= parseInt('<{$item.quit_day}>');
+	
+	var date_type	= $('date_type').value;
+	var production_date	= $('production_date').value;
+	var guarantee_period	= $('guarantee_period').value;
+	var expiring_date	    = $('expiring_date').value;
+	
+	guarantee_period	= (guarantee_period ? parseInt(guarantee_period) : 0);
+	
+	if(production_date == '')
+	{
+		alert('请选择生产日期!');
+		$('time_from').focus();
+		return false;
+	}
+	
+	if(guarantee_period == '' || guarantee_period <= 0)
+	{
+		alert('请输入保质期时长!');
+		$('guarantee_period').focus();
+		return false;
+	}
+	
+	if(production_date && expiring_date)
+	{
+		var start = production_date.split('-');
+	
+		var cur_year = start[0].toInt();
+		var cur_month = start[1].toInt()-1;
+		var cur_day = start[2].toInt();
+		var date = new Date(cur_year,cur_month,cur_day);
+	
+		var end = expiring_date.split('-');
+		cur_year = end[0].toInt();
+		cur_month = end[1].toInt()-1;
+		cur_day = end[2].toInt();
+		var date2 = new Date(cur_year,cur_month,cur_day);
+		
+		if(date2 <= date){
+			alert('过期日期不能早于生产日期!');
+			$('expiring_date').focus();
+			return false;
+		}
+	}
+	
+	if(production_date && guarantee_period){
+		var dates = production_date.split('-');
+		var cur_year = dates[0].toInt();
+		var cur_month = dates[1].toInt()-1;
+		var cur_day = dates[2].toInt();
+
+		var date = new Date(cur_year,cur_month,cur_day);
+		var date2 = '';
+		if(date_type == 'month')
+		{
+			date2 = new Date(cur_year,cur_month+guarantee_period.toInt(),cur_day).toLocaleDateString().replace(/[\/]+/g,'-');
+		}
+		else if(date_type == 'year')
+		{
+			date2 = new Date(cur_year+guarantee_period.toInt(),cur_month,cur_day).toLocaleDateString().replace(/[\/]+/g,'-');
+		}
+		else
+		{
+			date2 = new Date(cur_year,cur_month,cur_day+guarantee_period.toInt()).toLocaleDateString().replace(/[\/]+/g,'-');
+		}
+		
+		var dates = date2.split('-');
+		var cur_year = dates[0].toInt();
+		var cur_month = dates[1].toInt()-1;
+		var cur_day = dates[2].toInt();
+		date2	= new Date(cur_year,cur_month,cur_day);
+	}
+	
+	var diff_date	= (date2 - date) / 86400000;
+	if(diff_date <= quit_day)
+	{
+		alert('保质期天数必须大于自动退出库存天数');
+		return false;	
+	}
+	
+	if(confirm('确认提交修改内容？'))
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+(function()
+{
+	var _form	= $('expireForm');
+	var btn		= $('btn_submit');
+	var finder	= finderGroup['<{$env.get.finder_id}>'];
+	
+	_form.store('target',{
+		onSuccess:function(response){
+			var hash_res_obj = JSON.decode(response);
+		
+			if (hash_res_obj.success != undefined && hash_res_obj.success != "")
+			{
+				try{
+					var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+				}catch(e){}
+				
+				if(_dialogIns)
+				{
+					_dialogIns.close();
+					window.finderGroup['<{$env.get.finder_id}>'].refresh();
+				}
+			}
+		}
+	});
+	
+    $('btn_submit').addEvent('click',function()
+	{
+		var flag		= submit_frm();
+		if(flag)
+		{
+			clearInterval(intervalName);
+			_form.fireEvent('submit',{stop:$empty});	
+		}
+    });
+	
+	$('cancelBtn').removeEvents('click').addEvent('click', function(e) {
+        clearInterval(intervalName);
+        $('cancelBtn').getParent('.dialog').retrieve('instance').close();
+    });
+})();
+
+/*
+var closeBtn	= this.getParent('.dialog').getElement('.btn-close');
+closeBtn.removeEvents('click');
+//closeBtn.removeEvents('mousedown');
+closeBtn.removeEvents('click').addEvent('click', function(e){
+	clearInterval(intervalName);
+	this.getParent('.dialog').retrieve('instance').close();
+});
+*/
+</script>

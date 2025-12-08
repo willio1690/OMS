@@ -1,0 +1,164 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta name="author" content="tyler chao">
+  <meta name="keywords" content="keywords">
+  <meta name="description" content="description">
+  <title>门店库存</title>
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/mobile.min.css">
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/main.min.css">
+</head>
+<body>
+<{if $show_header}>
+<header class="fixed">
+  <div class="top-bar" data-topbar>
+    <div class="pos-left">
+      <a href="javascript:history.back();" class="icon-arrow-back"></a>
+    </div>
+    <h1>门店库存</h1>
+    <div class="pos-right"><a href="" class="icon-refresh"></a></div>
+  </div>
+</header>
+<{/if}>
+
+<main id="main" class="container no-margin">
+  <div class="top-bar reverse">
+    <form action="<{$link_url}>" method="post" class="row blank">
+      <div class="grid-2 columns">
+        <select name="sel_type" id="sel_type">
+          <option value="item_bn" <{if $sel_type=='item_bn'}>selected<{/if}>>货号</option>
+          <option value="item_name" <{if $sel_type=='item_name'}>selected<{/if}>>名称</option>
+        </select>
+      </div>
+      <div class="grid-10 columns">
+        <input type="search" name="sel_keywords" id="sel_keywords" placeholder="请输入关键词搜索" value="<{$sel_keywords}>">
+      </div>
+    </form>
+  </div>
+  
+  <div class="tabs-content">
+    <{if $dataList}>
+    <div class="content active" id="content11">
+        <form action="<{$stock_url}>" method="post" class="collapse" data-validator="ajax">
+            <ul class="no-bullet table bordered grid-table">
+                <li class="tr">
+                    <div class="grid-3 th">货号</div>
+                    <div class="grid-7 th">商品名称</div>
+                    <div class="grid-1 th">库存</div>
+                </li>
+                
+                <{foreach from=$dataList item=item}>
+                <li class="tr">
+                    <div class="grid-3 td item_bn"><div class="title" id="item_bn_<{$item.bm_id}>" onclick="showClampBn('<{$item.bm_id}>')"><{$item.material_bn}></div></div>
+                    <div class="grid-7 td item_name"><div class="title" id="item_title_<{$item.bm_id}>" onclick="showTitle('<{$item.bm_id}>')"><{$item.material_name}></div></div>
+                    <div class="grid-1 td"><input type="text" name="store[<{$item.id}>]" id="store_<{$item.id}>" value="<{$item.store}>" class="small text-center" pattern="digital" required data-alerts="库存必填，并且只能为数字"></div>
+                </li>
+                <{/foreach}>
+            </ul>
+            
+            <{if $pageSize > 1}>
+            <div class="text-center"><a href="<{$link_url}>" class="act-loadmore" rel="1"><i class="icon-refresh"></i> 点击查看更多商品</a></div>
+            <{/if}>
+            
+            <div class="container blank text-right"><button type="submit" class="primary small">批量调账</button></div>
+        </form>
+    </div>
+    <{else}>
+    <div class="no_content" id="content11" style="text-align:center;">没有门店库存数据...</div>
+    <{/if}>
+  </div>
+</main>
+
+<{include file="store/footer.html"}>
+
+<style>
+  /* 头部样式优化 */
+  .top-bar[data-topbar] {
+    background: #000 !important;
+    color: #d4ca99 !important;
+    padding: 12px 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .top-bar[data-topbar] h1 {
+    color: #d4ca99 !important;
+    font-size: 18px !important;
+    font-weight: 500 !important;
+    margin: 0;
+    text-align: center;
+  }
+
+  .top-bar[data-topbar] .icon-arrow-back,
+  .top-bar[data-topbar] .icon-refresh {
+    color: #d4ca99 !important;
+    font-size: 20px;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .top-bar[data-topbar] .icon-arrow-back:hover,
+  .top-bar[data-topbar] .icon-refresh:hover {
+    opacity: 0.8;
+  }
+
+  .top-bar[data-topbar] .pos-left,
+  .top-bar[data-topbar] .pos-right {
+    display: flex;
+    align-items: center;
+  }
+
+  .top-bar[data-topbar] .pos-left {
+    justify-content: flex-start;
+  }
+
+  .top-bar[data-topbar] .pos-right {
+    justify-content: flex-end;
+  }
+</style>
+
+<script>
+$('.act-loadmore').on('click', function(e) {
+    e.preventDefault();
+    var $target = $(e.target);
+    var pageSize  = parseInt("<{$pageSize}>");
+    var page      = parseInt($target.attr('rel')) + 1;
+    
+    $.post($target.attr('href'), {'page': $target.attr('rel')}, function(rs) {
+      if (rs) {
+          $target.parent().prev('ul').append(rs);
+          $target.html($target.data('text')).attr('rel', +$target.attr('rel') + 1);
+          
+          if(pageSize <= page)
+          {
+              $target.parent().html('<span class="text-reverse">没有更多数据了...</span>');
+          }
+      }
+      else {
+        $target.parent().html('<span class="text-reverse">没有更多门店库存了</span>');
+      }
+    });
+});
+
+function showTitle(item_id)
+{
+    var $this = $("#item_title_"+ item_id);
+    $this.css('-webkit-line-clamp', $this.css('-webkit-line-clamp') == 1 ? 'inherit' : '');
+}
+
+function showClampBn(item_id)
+{
+    var $this = $("#item_bn_"+ item_id);
+    $this.css('-webkit-line-clamp', $this.css('-webkit-line-clamp') == 1 ? 'inherit' : '');
+}
+</script>
+</body>
+</html>

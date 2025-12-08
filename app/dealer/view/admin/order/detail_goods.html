@@ -1,0 +1,12 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{/capture}>
+
+<{foreach from=$item_list item=objs key=obj_type}>
+    <{include app="dealer" file="admin/order/products/material_view.html"}>
+<{/foreach}>

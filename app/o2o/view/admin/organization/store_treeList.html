@@ -1,0 +1,24 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table cellspacing="0" cellpadding="0" style="width:100%">
+  <col class="Colauto"></col>
+  <col class="Coloption_1b"></col>
+  <tbody>
+    <{foreach from=$org_store.store item=item key=iLoop name="item"}>
+      <tr parentid="<{$org_store.org_id}>" class="provice-bg">
+        <td style="text-align:left; width:320px;">
+          <div style="padding-left:<{$item.step*25}>px">
+            <span class="imgTree tree_open"> &nbsp;&nbsp; </span>
+            <span style="font-weight:700; color:#000; text-decoration:none;padding-right:15px;" ><{$item.name}></span>
+          </div>
+        </td>
+        <td style="width:350px">
+            <a class="i" href='index.php?app=o2o&ctl=admin_store&act=edit&p[0]=<{$item.store_id}>&p[1]=<{$org_store.org_id}>' target="dialog::{title:'<{t}>编辑门店<{/t}>',width:650,height:650}">编辑门店</a>
+            &nbsp;|&nbsp;<a href="javascript:if(confirm('确认删除门店&nbsp;[<{$item.name|replace:'\'':'\\\''}>]&nbsp;？')){W.page('index.php?app=o2o&ctl=admin_store&act=toRemoveStore&p[0]=<{$item.store_id}>', {method:'get'})}void(0);" target="">删除</a>
+        </td>
+      </tr>
+      <{/foreach}>
+</table>

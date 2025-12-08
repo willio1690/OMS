@@ -1,0 +1,190 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{script src="CaiNiaoPrintFuncs.js" app='logisticsmanager'}>
+<{/capture}>
+    <{capture name="sidebar"}>
+    <div class="side-bx" id="template_form" style="border:none;">
+    <input type="hidden" name="template_id" id="template_id" value="<{$tmpl.template_id}>"/>
+    <input type="hidden" name="file_id" id="bg_file_id" value="<{$tmpl.file_id}>"/>
+    <input type="hidden" name="template_type" value="<{$tmpl.template_type}>"/>
+    <input type="hidden" name="template_width" value="<{$tmpl.template_width}>"/>
+    <input type="hidden" name="template_height" value="<{$tmpl.template_height}>"/>
+
+    <div class="side-bx-title">
+        <h3><{t}>快递单名称<{/t}></h3>
+    </div>
+    <div class="side-bx-bd">
+        <input style="width:100px" id="template_name" name="template_name" size="15" maxlength="30" value="<{$tmpl.template_name}>" />   
+    </div>
+    <br />
+    <div class="side-bx-title">
+        <h3><{t}>是否启用？<{/t}></h3>
+    </div>
+    <div class="side-bx-bd">
+        <select name="status" type="select" >
+            <option value="true" <{if $tmpl.status eq 'true'}>selected="selected"<{/if}>><{t}>是<{/t}></option>
+            <option value="false" <{if $tmpl.status eq 'false'}>selected="selected"<{/if}>><{t}>否<{/t}></option>
+        </select>
+    </div>
+    <div class="side-bx-title">
+        <h3><{t}>打印LOGO？<{/t}></h3>
+    </div>
+    <div class="side-bx-bd">
+        <select name="is_logo" type="select" >
+            <option value="true" <{if $tmpl.is_logo eq 'true'}>selected="selected"<{/if}>><{t}>是<{/t}></option>
+            <option value="false" <{if $tmpl.is_logo eq 'false'}>selected="selected"<{/if}>><{t}>否<{/t}></option>
+        </select>
+    </div>
+    <div class="side-bx-bd">
+        <textarea id="template_data" name="template_data" style="display:none">
+            <{if $tmpl.template_data}>
+                <{$tmpl.template_data}>       
+            <{/if}>
+        </textarea>
+    </div>
+     <div class="side-bx-title">
+        <h3><{t}>自定义打印项<{/t}></h3>
+    </div>
+    <div class="side-bx-bd" style="text-align: left">
+        <{button app="desktop" label="标签" id="embed_label"}><br />
+    </div>
+
+    <div class="side-bx-title">
+        <h3><{t}>单据打印项<{/t}></h3>
+    </div>
+    <div class="side-bx-bd" style="text-align: left">
+        <{foreach from=$elements key=key item=item}>
+            <{if in_array($key,$template_select)}>
+                <input class="template_select" name="template_select[]" type="checkbox" value="<{$key}>" checked="checked"/><{$item}><br />            
+            <{else}>
+                <input class="template_select" name="template_select[]" type="checkbox" value="<{$key}>" /><{$item}><br /> 
+            <{/if}>
+        <{/foreach}>
+    </div>
+    
+
+    
+    <br />
+</div>
+<{/capture}>
+<div style="width:850px;height:900px">
+    <object id="CaiNiaoPrint_OB" classid="clsid:09896DB8-1189-44B5-BADC-D6DB5286AC57" width=800 height=885> 
+      <param name="Caption" value="内嵌显示区域">
+       <param name="Border" value="1">
+      <param name="Color" value="#C0C0C0">
+      <embed id="CaiNiaoPrint_EM" TYPE="application/x-cainiaoprint" width=800 height=885 />
+    </object>
+</div>
+
+    
+
+<{capture name="footbar"}> 
+<div class="table-action">
+    <{button type="button" class="btn btn-primary" label="保存" id="btn-save"}>
+</div>
+<{/capture}>
+
+<script language="javascript" type="text/javascript">
+    var Js_Elements = <{ $js_elements }>;//单据项信息 
+    var template_data = $("template_data").getValue();//自定义区域信息
+    var AppKey ='10011902';
+    var Seller_ID = '155809';
+    var CP_CODE="YTO";
+    var CONFIG="c2lnbkE1M0ZFODMzQjkzREVBRUREOUZBQzY2QjYxMEU2MTJEJnsidmVyc2lvbiI6IjEiLCJhbGlfd2F5YmlsbF9jcF9sb2dvX1ZJU0lCTEUiOiJmYWxzZSIsImFsaV93YXliaWxsX2NvbnNpZ25lZV9hZGRyZXNzX0NPTlRFTlQiOiLmtYvor5Xpgq7lr4Tmm7/mjaIiLCJhbGlfd2F5YmlsbF9zaGlwcGluZ19hZGRyZXNzX1BPU1RGSVgiOiLvvIjmt5jlrp3mtYvor5Xov73liqDlhoXlrrnvvIkifQ==";
+    DisplayDesign();
+    function DisplayDesign(){
+        Login();
+        CreatePage();
+        InitData();
+    };
+    function Login() {
+        CNPrint = getCaiNiaoPrint(document.getElementById('CaiNiaoPrint_OB'),document.getElementById('CaiNiaoPrint_EM')); 
+        CNPrint.SET_PRINT_IDENTITY("AppKey="+AppKey+"&Seller_ID="+Seller_ID);//登陆appkey、seller_id 验证
+    };
+    function CreatePage(){ 
+        CNPrint.PRINT_INITA(0,0,400,800,"菜鸟打印模板编辑");
+        CNPrint.SET_PRINT_MODE("CAINIAOPRINT_MODE","CP_CODE="+CP_CODE+"&CONFIG="+CONFIG);	
+    };
+    function InitData() {   
+        CNPrint.SET_SHOW_MODE("DESIGN_IN_BROWSE",1);		
+        CNPrint.SET_PRINT_CONTENT("ali_waybill_product_type","代收货款");//单据类型
+        CNPrint.SET_PRINT_CONTENT("ali_waybill_short_address","021D-123-789");
+        CNPrint.SET_PRINT_CONTENT("ali_waybill_package_center_name","黑龙江齐齐哈尔集散");//集散地名称
+        CNPrint.SET_PRINT_CONTENT("ali_waybill_package_center_code","053277886278");//集散地条码
+        CNPrint.SET_PRINT_CONTENT("ali_waybill_waybill_code","053277886278");
+        CNPrint.SET_PRINT_CONTENT("ali_waybill_cod_amount","FKFS=到付;PSRQ=2015-07-10");//服务
+        CNPrint.SET_PRINT_CONTENT("ali_waybill_consignee_name","齐齐哈尔沐鱼");
+        CNPrint.SET_PRINT_CONTENT("ali_waybill_consignee_phone","15605883677");
+        CNPrint.SET_PRINT_CONTENT("ali_waybill_consignee_address","黑龙江省齐齐哈尔市建华区文化大街42号齐齐哈尔大学计算机工程学院计算机001班");//收件人地址
+        CNPrint.SET_PRINT_CONTENT("ali_waybill_send_name","浙江杭州行者");
+        CNPrint.SET_PRINT_CONTENT("ali_waybill_send_phone","180000980909");
+        CNPrint.SET_PRINT_CONTENT("ali_waybill_shipping_address","浙江省杭州市余杭区文一西路1001号阿里巴巴淘宝城5号小邮局");
+        CNPrint.SET_PRINT_CONTENT("EWM","123456789012");
+        CNPrint.ADD_PRINT_DATA("ProgramData",template_data);
+        CNPrint.PRINT_DESIGN();//打开ISV设计模式
+    };	
+    
+    /* 添加单据打印项 */
+    $$('.template_select').each(function(item){
+        item.addEvent('click',function(){
+            if(item.checked){
+                CNPrint.ADD_PRINT_TEXTA(item.value,564,4,100,20,Js_Elements[item.value]);
+            }else{
+                CNPrint.SET_PRINT_STYLEA(item.value,'Deleted',true);;
+            };
+        });
+    });
+    /* 表单提交 */
+    $('btn-save').addEvent('click', function(){
+        $('template_name').value = $('template_name').value.trim();
+        if(!$('template_name').value) {
+            alert('请填写单据名称');
+            return '';
+        }
+        var textval = CNPrint.GET_VALUE("CustomProgramData",0);
+        $("template_data").set('html',textval);
+        var _data =$('template_form').toQueryString()+'&finder_id=<{$env.get.finder_id}>';//CNPrint.GET_VALUE("CustomProgramData",0);
+        new Request ({
+            url:'index.php?app=logisticsmanager&ctl=admin_express_template&act=saveTmpl',
+            method:'post',
+            data:_data,
+            onRequest:function(e){
+                //提交按钮:disabled
+                $('btn-save').set('disabled', 'true');
+                $('btn-save').getElements('span')[1].set('text','正在保存');
+            },
+            onComplete:function(result){
+                if (result != 'SUCC'){
+                    MessageBox.error(result);
+                    //提交按钮:enabled
+                    $('btn-save').set('disabled', '');
+                    $('btn-save').getElements('span')[1].set('text','保存');
+                }else{
+                    MessageBox.success("保存成功");
+                    //提交按钮:enabled
+                    $('btn-save').set('disabled', '');
+                    $('btn-save').getElements('span')[1].set('text','保存');
+                    var findId = "<{$env.get.finder_id}>";
+                    if (findId != '') {
+                        opener.finderGroup[findId].refresh.delay(400,opener.finderGroup[findId]);
+                    }
+                    window.close();
+                }
+            }
+        }).send();
+    });
+$('embed_label').addEvent('click', function(){
+        CNPrint.ADD_PRINT_TEXTA('embed_label'+guid(),564,4,100,20,'');
+    });
+    function guid() {
+        return '-xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+            return v.toString(16);
+        });
+    }
+
+</script>

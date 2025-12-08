@@ -1,0 +1,113 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<div class="">
+    <form action="index.php?app=finance&ctl=bill_confirm&act=do_confirm&finder_id=<{$finder_id}>" method="post" id="bill_confirm_form">
+    <input type="hidden" name="confirm_id" value="<{$detail.confirm_id}>"/>
+    <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+            <tr>
+                <td>订单号：</td>
+                <td><{input type="required" name="order_bn" value="{$detail.order_bn}" size="40"}> <span id="order_err"></span></td>
+            </tr>
+            <tr>
+                <td>日期：</td>
+                <td><{$detail.trade_time|date_format:'%Y-%m-%d'}></td>
+            </tr>
+            <tr>
+                <td>费用项：</td>
+                <td>
+                <select vtype="required" id="fee_type" onchange='change_fee_type(this.value)'>
+                    <option value="">费用类</option>
+                    <{foreach from=$fee_type_data key=key item=val}>
+                        <option value="<{$key}>"><{$val.name}></option>
+                    <{/foreach}>
+                </select>
+                <span id='replace_type'>
+                    <select  vtype="required" name="fee_item">
+                        <option value="">费用项</option>
+                        <{foreach from=$fee_type_data key=key item=val name=foo}>
+                            <{if $smarty.foreach.foo.first}>
+                                <{foreach from=$val['fee_item'] item=item key=id}>
+                                    <option value="<{$item}>"><{$item}></option>
+                                <{/foreach}>
+                            <{/if}>
+                        <{/foreach}>
+                    </select>
+                </span>
+                </td>
+            </tr>
+            <tr>
+                <td>费用对象：</td>
+                <td><{input type="required" name="fee_obj" value="{$detail.fee_obj}"}></td>
+            </tr>
+            <tr>
+                <td>金额：</td>
+                <td><{if $detail.in_out_type == 'in'}><{$detail.money}><{else}>-<{$detail.money}><{/if}></td>
+            </tr>
+            <tr>
+                <td>凭据号：</td>
+                <td><{$detail.trade_no}></td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="table-action">
+        <{button label="确定" type="submit" name="submit" id="btn-do-confirm"}>
+    </div>
+    </form>
+</div>
+</div>
+<script>
+var form = $('bill_confirm_form');
+  form.store('target',{
+    onRequest:function (){
+        $('btn-do-confirm').set('disabled', 'true');
+        $('btn-do-confirm').getElements('span')[1].set('text','处理中');
+    },
+    onComplete:function(rs){
+      var result = JSON.decode(rs);
+      if (typeof(result.error) != 'undefined'){
+          $('order_err').set('html',result.msg).setStyle('color','red');
+          $('btn-do-confirm').set('disabled', '');
+          $('btn-do-confirm').getElements('span')[1].set('text','确认');
+      }else {
+          $('bill_confirm_form').getParent('.dialog').retrieve('instance').close();
+          finderGroup['<{$env.get.finder_id}>'].refresh();
+      }
+    }
+});
+
+$$('input[name=order_bn]').addEvent('blur',function(){
+    var order_bn = $(this).value;
+    new Request.JSON({url:'index.php?app=finance&ctl=bill_confirm&act=order_is_exists&p[0]='+order_bn, 
+        method:'post',
+        onSuccess:function(data){ 
+            if(data.rsp == 'succ'){
+                $('order_err').set('html','订单号存在').setStyle('color','blue');
+            }else{
+                $('order_err').set('html',data.msg).setStyle('color','red');
+            }
+        }
+    }).send();
+
+});
+
+
+function change_fee_type(type_id){
+    var json = '<{$json}>';
+    a = JSON.decode(json);
+    rs = a[type_id]['fee_item'];
+    var option='',v='';
+    for(v in rs) {
+        option += '<option value="'+rs[v]+'">'+rs[v]+'</option>';
+    }
+    var left = '<select  vtype="required" name="fee_item">';
+    var middle = option;
+    var right = '</select>'
+    var html = left+middle+right;
+    $('replace_type').set('html',html);
+}
+</script>

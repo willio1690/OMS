@@ -1,0 +1,20 @@
+<services>
+    <service id="desktop_finder.tbo2o_mdl_store">
+        <class>tbo2o_finder_store</class> 
+    </service>
+    <service id="desktop_finder.tbo2o_mdl_shop_skus">
+        <class>tbo2o_finder_shop_skus</class>
+    </service>
+    <service id="desktop_finder.tbo2o_mdl_shop_products">
+        <class>tbo2o_finder_shop_products</class>
+    </service>
+    <service id="desktop_finder.tbo2o_mdl_store_items">
+        <class>tbo2o_finder_store_items</class>
+    </service>
+    <service id="html_input">
+        <class>tbo2o_view_input</class>
+    </service>
+    <service id="openapi.tbo2o.channel">
+        <class>tbo2o_rpc_response_channel</class>
+    </service>
+</services>

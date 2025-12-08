@@ -1,0 +1,13 @@
+<app>
+    <name>qimen</name>
+    <description>qimen中间件应用</description>
+
+    <author>
+        <name>shopex开发团队</name>
+        <email>dev@shopex.cn</email>
+        <url>http://www.shopex.cn</url>
+    </author>
+
+    <version>0.1.0</version>
+    <license>shopex license</license>
+</app>

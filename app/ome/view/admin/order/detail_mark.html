@@ -1,0 +1,94 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .remark {
+        display: inline-block;
+        padding: 2px 4px; /* 增加左右间距 */
+        margin: 4px;
+        /*background-color: #f0f0f0; !* 背景颜色 *!*/
+        border: 1px dashed #157FE3; /* 虚线边框，颜色为 #157FE3 */
+        border-radius: 5px; /* 圆角 */
+        color: #157FE3; /* 文字颜色为 #157FE3 */
+        cursor: pointer; /* 鼠标悬停时显示手型指针 */
+        transition: background-color 0.3s, color 0.3s; /* 平滑过渡效果 */
+    }
+
+    .remark:hover {
+        background-color: #e0e0e0; /* 悬停时背景颜色变化 */
+    }
+
+</style>
+<form action="index.php?<{$env.server.QUERY_STRING}>" id="memo_form" method="post">
+<div class="tableform">
+  <input type="hidden" name='order[order_id]' value="<{$order.order_id}>">
+  <h4>订单备注</h4>
+  <table width="100%" border="0" cellpadding="0" cellspacing="0" >
+   <tr>
+   <th align='right'><{t}>标记：<{/t}></th>
+   <td align='left'>
+   	  <{foreach from=$order.mark_type_arr item=item key=key}>
+      <label><input type='radio' name='order[mark_type]' value='<{$key}>' id='<{$key}>' <{if $order.mark_type==$key}>checked="checked"<{/if}> ><img src='<{$item}>' width='20' height='20'></label>
+      <{/foreach}>
+   </td>
+   </tr>
+   <{if $order.mark_text}>
+   <tr>
+      <th><{t}>订单备注：<{/t}></th>
+      <td>
+        <{foreach from=$order.mark_text item=items}>
+        <div id="memo_show">
+	    <b><{$items.op_content|escape:"HTML"}></b> <{$items.op_time}> by <{$items.op_name}>
+	    </div>
+	    <{/foreach}>
+      </td>
+    </tr>
+    <{/if}>
+      <tr>
+          <th align='right'><{t}>常用备注：<{/t}></th>
+          <td align='left'>
+              <{foreach from=$commonRemarks key=key item=items }>
+              <span id="remark<{$key}>" class="remark"><{$items}></span>
+              <{/foreach}>
+          </td>
+      </tr>
+    <tr>
+      <th><{t}>追加备注：<{/t}></th>
+      <td><textarea name="order[mark_text]" id="memo" rows="6" vtype="required" style="width:80%"></textarea>
+      </td>
+    </tr>
+    <tr>
+      <th>&nbsp;</th>
+      <td><{button type="submit" label="保存" }></td>
+    </tr>
+    </table>  
+</div>
+</form>
+
+
+
+
+<script>
+    window.addEvent('domready',function(){
+        if('<{$order.mark_type}>'!=''){
+            $('<{$order.mark_type}>').checked = true;
+        }else{
+            $('b1').checked = true;
+        }
+
+        // 为每个常用备注添加点击事件
+        const remarks = document.querySelectorAll('.remark');
+        remarks.forEach(remark => {
+            remark.addEventListener('click', function() {
+                const textarea = document.getElementById('memo');
+                const newRemark = this.innerText;
+
+                // 追加新备注，并用空格分隔
+                textarea.value += (textarea.value ? '  ' : '') + newRemark;
+            });
+        });
+
+    });
+</script>

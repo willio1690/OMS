@@ -1,0 +1,105 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="post" action="index.php?app=finance&ctl=bill&act=do_add_bill&finder_id=<{$finder_id}>" id="add_form">
+    <input type="hidden" value='<{$json}>' id="json" />
+    <div>
+        <table class="gridlist" style="*width:97%;">
+            <tr>
+                <td>费用对象</td>
+                <td><input type="text" vtype="required" name="fee_obj" /></td>
+            </tr>
+            <tr>
+                <td>客户/会员</td>
+                <td><input type="text" vtype="required" name="member" /></td>
+            </tr>
+            <tr>
+                <td>费用类型</td>
+                <td>
+                    <select vtype="required" id="fee_type" onchange='change_fee_type(this.value)'>
+                        <{foreach from=$fee_type_data key=key item=val}>
+                        <option value="<{$key}>"><{$val.name}></option>
+                        <{/foreach}>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>费用名称</td>
+                <td>
+                    <div id='replace_type'>
+                        <select  vtype="required" name="fee_item">
+                            <{foreach from=$fee_type_data key=key item=val name=foo}>
+                            <{if $smarty.foreach.foo.first}>
+                            <{foreach from=$val['fee_item'] item=item key=id}>
+                            <option value="<{$item}>"><{$item}></option>
+                            <{/foreach}>
+                            <{/if}>
+                            <{/foreach}>
+                        </select>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>业务单据号</td>
+                <td><input type="text" vtype="required" name="order_bn" /></td>
+            </tr>
+            <tr>
+                <td>支付单据号</td>
+                <td><input type="text" vtype="required" name="credential_number" /></td>
+            </tr>
+            <tr>
+                <td>发生日期</td>
+                <td><{input type="date" name="trade_time" vtype="required" /}></td>
+            </tr>
+            <tr>
+                <td>总金额</td>
+                <td><input type="text" vtype="required&&money" name="money" /></td>
+            </tr>
+        </table>
+        <div align="center">
+            <button value="提交" id="btn-do-confirm" class="btn btn-primary" onclick="do_submit()" >
+                <span>
+                    <span>确定</span>
+                </span>
+            </button>
+        </div>
+    </div>
+</form>
+<script>
+var form = $('add_form');
+form.store('target',{
+    onRequest:function (){
+        $('add_form').set('disabled', 'true');
+        $('add_form').getElements('span')[1].set('text','处理中');
+    },
+    onComplete:function(rs){
+        var result = JSON.decode(rs);
+        if (typeof(result.error) != 'undefined'){
+            $('add_form').set('disabled', '');
+            $('add_form').getElements('span')[1].set('text','确定');
+        }else {
+            $('add_form').getParent('.dialog').retrieve('instance').close();
+            finderGroup['<{$env.get.finder_id}>'].refresh();
+        }
+    }
+});
+function do_submit(){
+    $('add_form').fireEvent('submit',{stop:function(){}});
+}
+function change_fee_type(type_id){
+    var json = $('json').value;
+    a = JSON.decode(json);
+    rs = a[type_id]['fee_item'];
+    var option='',v='';
+    for(v in rs) {
+        option += '<option value="'+rs[v]+'">'+rs[v]+'</option>';
+    }
+    var left = '<select  vtype="required" name="fee_item">';
+    var middle = option;
+    var right = '</select>'
+    var html = left+middle+right;
+    $('replace_type').set('html',html);
+}
+</script>

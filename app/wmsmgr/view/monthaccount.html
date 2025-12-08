@@ -1,0 +1,59 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<div class="division">
+<form method="post" action="index.php?<{$env.server.QUERY_STRING}>" id="terminal">
+<input type="hidden" name="wms_id" value="<{$wms_id}>">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+
+       <tr>
+          <th>月结号:</th>
+          <td>
+          <input type="text" name="monthaccount" value="<{$monthaccount}>">
+          </td>
+        </tr>
+
+           <tr>
+               <th>事业部编码：</th>
+               <td>
+                   <input type="text" name="department_no" value="<{$department_no}>">
+               </td>
+           </tr>
+           <tr>
+             <th>ISV来源编号：</th>
+             <td>
+                <input type="text" name="isv_source" value="<{$isv_source}>">
+             </td>
+           </tr>
+          
+           <tr>
+               <th>货主信息：</th>
+               <td>
+                   <input type="text" name="owner_user_id" value="<{$owner_user_id}>">
+               </td>
+           </tr>
+    
+        </tbody>
+      </table>
+<div class="table-action">
+
+<{button class="btn-primary" type="submit" id="saveterminal" name="submit" label="保存"}>
+
+</div>
+</form>
+</div>
+</div>
+
+<script>
+$('terminal').store('target',{
+    onRequest:function(){
+    },
+    onComplete:function(jsontext){
+      finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+    }
+});
+</script>

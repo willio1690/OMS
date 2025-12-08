@@ -1,0 +1,77 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+	<h3>加工单状态回传</h3>
+    <div class="division">
+ <form action="index.php?app=omevirtualwms&ctl=admin_wms&act=doSubmit" method="post" id="form-delivery">
+  <input type="hidden" name='flag' value='storeprocess' />
+  <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+            <tbody>
+              <tr>
+				<th>加工单编号</th>
+				<td><input type="text" name="storeprocess_bn"  value="<{$data.mp_bn}>"></td>
+			  </tr>
+			  <tr>
+				<th>第三方仓储</th>
+				<td>
+                <input type="hidden" name="node_id" value='<{$data.node_id}>' />
+					<{$data.wms_name}>
+				</td>
+			</tr>
+            </tbody>
+        </table>
+		<div class="tableform">
+			<div><span style="font-weight:bold;">加工单礼盒明细:</span></div>
+
+			<div id="listArea" class="division">
+				<{foreach from=$data.items item=item}>
+					<div>
+						<table width="100%" cellspacing="0" cellpadding="0" border="0">
+							<tr>
+								<th>基础物料名称</th>
+								<td><{$item.bm_name}></td>
+								<th>基础物料编码</th>
+								<td><{$item.bm_bn}></td>
+							</tr>
+							<tr>
+								<th style="width:70px;">数量</th>
+								<td><{$item.number}></td> 
+								<th style="width:70px;"></th>
+								<td></td>
+							</tr>
+						</table> 
+					</div>
+				<{/foreach}>
+			</div>
+			</div>
+			<div class="table-action">
+			<{button label="提交" type="submit" name="submit" id="btn-dataelivery"}>
+		</div>
+	</form>
+  </div>
+</div>
+<script>
+function addDelivery(){
+	var i = item_i++;
+	var content='\
+		<div id="delivery_'+i+'" style="margin-bottom:3px;border:1px solid #ccc;">\
+		<table width="100%" cellspacing="0" cellpadding="0" border="0">\
+		<tr><th>货品编号'+i+'</th>\
+		<td><input type="text" name="product['+i+'][]"></td>\
+		<th style="width:70px;">发货数量'+i+'</th> \
+		<td><input type="text" name="product['+i+'][]"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span onclick="delDelivery(\'delivery_'+i+'\');" style="cursor:pointer;color:red;">X</span></td> \
+		</tr>\
+		<table>\
+		</div>\
+	';
+	$E('#listArea').adopt(new Element('div').set('html',content).getFirst());
+	
+}
+delDelivery=function(o){
+  $(o).remove();
+}
+</script>  
+ 

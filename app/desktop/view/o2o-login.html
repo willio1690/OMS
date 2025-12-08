@@ -1,0 +1,41 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id = "qrcode_div">
+</div>
+<script src="<{$desktop_path}>/js_mini/jquery.min.js" ></script>
+<script src="<{$desktop_path}>/js_mini/jquery.qrcode.min.js" ></script>
+<script>
+jQuery(function(){
+	
+	//获取二维码
+    jQuery('#qrcode_div').qrcode({  
+    	render : "canvas",
+        width: 150,
+        height:150, 
+        text : "<{$http_pre_path}>/index.php/wap/passport/index"
+    });
+    
+    //加载页面 多个tab选择下 默认显示 基本 用户登录
+    jQuery(".window-tab-current").each(function(i){
+        if(parseInt(i)>0){
+            jQuery(this).attr("class","window-tab-non-current");
+            jQuery(this).css("margin-left","5px");
+        }
+    });
+    jQuery(".window-main").hide();
+    jQuery(".window-main").first().show();
+
+    //选择标签
+    jQuery("body").on("click",".window-tab-non-current",function(){
+        jQuery(".window-tab-current").attr("class","window-tab-non-current");
+        jQuery(this).attr("class","window-tab-current");
+    	jQuery(".window-main").hide();
+        jQuery("#"+this.getAttribute('value')+"_part").show();
+    });
+        
+}); 
+
+</script>

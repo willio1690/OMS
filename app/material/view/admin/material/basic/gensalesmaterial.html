@@ -1,0 +1,167 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .notice a {color: blue; font-size: 12px; font-weight: 700;margin-left: 4px; margin-right: 4px;}
+    .notify {border-color: #FFD324;font-size: 12px; }
+    .processBarBg {border:1px solid #999999; width:98%; margin:5px; height:25px;line-height:25px;padding:1px; background:#EEEEEE;}
+    .processBar {background:#3366cc; width:0px; padding-bottom:1px;overflow:hidden;}
+</style>
+<div id="auto_activeOrder" class="tableform">
+
+<{if $is_allow}>
+    <div class="note">
+        本次操作物料 <font color="red"><span id="materialCnt"><{$materialCnt}></span></font> 个
+    </div>
+    <div class="division">
+        <form method="post" action="index.php?app=material&ctl=admin_material_basic&act=dobatchGen" id="form-setting">
+            <div class="division" style="display:none;" id="information">
+                本次处理大约 <span id="iTotal" style="color:#083E96"></span> 个物料，
+                <span id="iSucc" style="color:green"></span> 个成功生成销售物料，
+                <span id="iFail" style="color:red"></span> 个失败(可能已存在相应的销售物料)……
+            </div>
+            <div id="processBarBg" class="processBarBg">
+                <div id="processBar" class="processBar">
+                    &nbsp;
+                </div>
+            </div>
+            <div class="table-action">
+                <{button label="开始" type="botton" name="Start" id="btn-run"}>
+            </div>
+        </form>
+    </div>
+<{else}>
+    <div class="notice" style="padding-top: 15px;padding-bottom: 15px; text-align:center; font-size:25px; line-height:40px;">
+        上次执行批量转换物料时间：<font color="#FF0000"><{$lastBatchGenSalesMaterial}></font><br>
+        本次距上次操作，时间还没有超过<font color="#FF0000"><{$getMaterialIntervalTime}></font>分钟，请稍后重试！
+    </div>
+    <{area inject=".mainFoot"}>
+    <div class="table-action">
+        <{button label="关闭" type="botton" isCloseDialogBtn="true" }>
+    </div>
+    <{/area}>
+<{/if}>
+</div>
+<script>
+    /*一次JS调用产生10个物料的调用*/
+    var MaxProcessMaterialNum = 20;
+    var MaterialGroups = <{$materialGroup}>;
+    var currentTime = <{$currentTime}>;
+    var MaterialQueue = new Array();
+
+    var doTotal = 0;
+    var doSucc = 0;
+    var doFail = 0;
+
+    /**
+     * 生成操作队列
+     *
+     * @param void
+     * @author hzjsq (2011/3/25)
+     */
+    function initOptQueue() {
+        
+        var MaterialHash = '';
+        var MaterialNum = 0;
+        var MaterialKey = '';
+
+        if (MaterialGroups == '') {
+            return;
+        }
+
+        var LeaveProcessMaterialNum = getTotal();
+        if (MaxProcessMaterialNum > LeaveProcessMaterialNum) {
+            MaxProcessMaterialNum = LeaveProcessMaterialNum;
+        }
+
+        for ( MaterialKey in MaterialGroups) {
+            if (MaterialHash == '')
+                MaterialHash = MaterialGroups[MaterialKey]['bm_id'];
+            else
+                MaterialHash = MaterialHash + ','+ MaterialGroups[MaterialKey]['bm_id'];
+            MaterialNum ++;
+            if (MaterialNum >= MaxProcessMaterialNum) {
+                MaterialQueue.push(MaterialHash);
+                MaterialNum =0;
+                MaterialHash = '';
+                LeaveProcessMaterialNum = LeaveProcessMaterialNum - MaxProcessMaterialNum;
+                if (MaxProcessMaterialNum > LeaveProcessMaterialNum) {
+                    MaxProcessMaterialNum = LeaveProcessMaterialNum;
+                }
+            }
+        }
+        if (MaterialHash != '') {
+            MaterialQueue.push(MaterialHash);
+        }
+    }
+
+    /**
+     * 执行AJAX调用并开始获取订单
+     *
+     * @param void
+     * @return void
+     */
+    function doRun() {
+        initOptQueue();
+        if (MaterialQueue.length == 0) {
+            return ;
+        }
+        //禁用开始按钮
+        doTotal = 0;
+        doSucc = 0;
+        doFail = 0;
+
+        displayProcessInfo();
+        $('information').style.display ='';
+        $('btn-run').disabled = true;
+        $('btn-run').set('html', '<span><span>数据处理中，请稍候！</span></span>');
+
+        doAjaxProcess(1);
+    }
+
+    /**
+     * 执行一次AJAX调用
+     */
+    function doAjaxProcess(idx) {
+        if (idx > MaterialQueue.length || doTotal >= getTotal()) {
+            $('processBar').setStyle('width', '100%');
+            $('btn-run').set('html', '<span><span>处理已完成，本窗口将在5秒后自动关闭！</span></span>');
+            setTimeout("$('btn-run').getParent('.dialog').retrieve('instance').close();finderGroup['<{$env.get.finder_id}>'].refresh();",2000);
+        } else {
+            var params = MaterialQueue[idx-1];
+            new Request({url:'index.php?app=material&ctl=admin_material_basic&act=dobatchGen',method:'post',data:'ajaxParams='+params+'&pageBn='+currentTime,
+                onComplete:function(result){
+                    if(!result) return;
+                    ret = JSON.decode(result);
+                    doTotal = doTotal + ret['total'];
+                    doSucc = doSucc + ret['succ']; 
+                    doFail = doFail + ret['fail'];
+                    displayProcessInfo();
+                    $('processBar').setStyle('width', (doTotal*100/(getTotal())) + '%');
+                    doAjaxProcess(idx+1);
+                }
+            }).send();
+        }
+    }
+
+    function getTotal() {
+        return <{$materialCnt}>;
+    }
+
+    /**
+     * 显示信息进度
+     */
+    function displayProcessInfo() {
+        
+        $('iTotal').set('html', getTotal());
+        $('iSucc').set('html', doSucc);
+        $('iFail').set('html', doFail);
+    }
+
+    //初始化
+    $('btn-run').addEvent('click', function(){
+        doRun();
+    });
+</script>

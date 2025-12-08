@@ -1,0 +1,172 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta name="author" content="tyler chao">
+  <meta name="keywords" content="keywords">
+  <meta name="description" content="description">
+  <title><{$title}></title>
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/mobile.min.css">
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/main.min.css">
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/dialog.min.css">
+  <link rel="stylesheet" href="<{$env.app.res_url}>/css/mobile-select-date.min.css">
+  <script src="<{$env.app.res_url}>/js/jquery-1.9.1.min.js"></script>
+  <script src="<{$env.app.res_url}>/js/dialog.min.js"></script>
+  <script src="<{$env.app.res_url}>/js/mobile-select-date.min.js"></script>
+</head>
+<body>
+<{if $show_header}>
+<header class="fixed">
+  <div class="top-bar" data-topbar>
+    <div class="pos-left">
+      <a href="javascript:history.back();" class="icon-arrow-back"></a>
+    </div>
+    <h1><{$title}></h1>
+    <div class="pos-right"><a href="" class="icon-refresh"></a></div>
+  </div>
+</header>
+<{/if}>
+
+<main id="main" class="container no-margin">
+<h2></h2>
+<form action="<{$delivery_link.info}>" method="post" class="form-inline">
+    <div class="form-row">
+      <div class="grid-3"><label for="">开始时间：</label></div>
+      <div class="grid-1"><input type="text" name="start_date" id="select_start_date" value="" maxlength="10"></div>
+    </div>
+    <div class="form-row">
+      <div class="grid-3"><label for="">结束时间：</label></div>
+      <div class="grid-1"><input type="text" name="end_date" id="select_end_date" value="" maxlength="10"></div>
+    </div>
+    <div class="form-row"><button type="submit" class="primary expand but_select">查 询</button></div>
+</form>
+<div class="split-line"></div>
+
+  <{if $statistics}>
+    <div style="width:100%;height:24px; line-height:24px; border:1px solid #ffd324;background-color:#fff9cf;color:#666;">
+        <span style="padding-left:5px;">提示：系统每日自动更新数据<{if $statistics.update_time}>,上次更新：<{$statistics.update_time}><{/if}>.</span>
+    </div>
+  <div class="statistic">
+          <div class="stat_line">
+            <ul class="block-grid-13 no-bullet">
+                <li><a><span>订单总数</span><span><{$statistics.total_orders}></span></a></li>
+                <li class="wire"><em></em></li>
+                <li><a><span>货品数</span><span><{$statistics.sale_sum}></span></a></li>
+                <li class="wire"><em></em></li>
+                <li><a><span>确认数</span><span><{$statistics.confirm_num}></span></a></li>
+            </ul>
+        </div>
+        <div class="stat_line">
+            <ul class="block-grid-13 no-bullet">
+                <li><a><span>拒绝数</span><span><{$statistics.refuse_num}></span></a></li>
+                <li class="wire"><em></em></li>
+                <li><a><span>发货数</span><span><{$statistics.send_num}></span></a></li>
+                <li class="wire"><em></em></li>
+                <li><a><span>核销数</span><span><{$statistics.verified_num}></span></a></li>
+            </ul>
+        </div>
+  </div>
+  <{/if}>
+  <div class="split-line"></div>
+
+  <div class="tabs-content">
+    <{if $dataList}>
+    <div class="content active" id="content11">
+        <div class="container blank order-item">
+            <{include file="store/statistics_more.html"}>
+        </div>
+        
+        <{if $pageSize > 1}>
+        <div class="text-center"><a href="<{$link_url}>" class="act-loadmore" rel="1"><i class="icon-refresh"></i> 点击查看更多</a></div>
+        <{/if}>
+    </div>
+    <{else}>
+        <div class="no_content" style="text-align:center;">暂时没有店铺数据哦，亲...</div>
+    <{/if}>
+  </div>
+</main>
+
+<{include file="store/footer.html"}>
+<script>
+$('.act-loadmore').on('click', function(e) {
+    e.preventDefault();
+    var $target = $(e.target);
+    var pageSize  = parseInt("<{$pageSize}>");
+    var page      = parseInt($target.attr('rel')) + 1;
+    
+    var start_date    = "<{$filter.start_date}>";
+    var end_date    = "<{$filter.end_date}>";
+    
+    $.post($target.attr('href'), {'flag': 'ajax', 'page': $target.attr('rel'), 'start_date': start_date, 'end_date': end_date}, function(rs) {
+      if (rs) {
+          $target.parent().prev('div').append(rs);
+          $target.html($target.data('text')).attr('rel', +$target.attr('rel') + 1);
+          
+          if(pageSize <= page)
+          {
+              $target.parent().html('<span class="text-reverse">没有更多数据了...</span>');
+          }
+      }
+      else {
+        $target.parent().html('<span class="text-reverse">没有更多数据了</span>');
+      }
+    });
+});
+
+$('.but_select').on('click', function(e) {
+    var start_date = $("#select_start_date").val();
+    var end_date = $("#select_end_date").val();
+    
+    start_date = new Date(start_date.replace(/\-/g, "\/"));  
+    end_date = new Date(end_date.replace(/\-/g, "\/")); 
+    
+    if(start_date=="" || end_date=="")
+    {
+        alert("请选择查询日期");
+        return false;
+    }
+    
+    if(start_date > end_date)
+    {
+        alert("开始日期不能大于结束日期");
+        return false;
+    }
+    
+    return true;
+});
+
+now    = new Date();
+sel_start_date = "<{$filter.start_date}>";
+sel_end_date   = "<{$filter.end_date}>";
+min_date = '1990/01/01';
+max_date = now.getFullYear() +'/12/31';
+
+$("#select_start_date").val(sel_start_date);
+$("#select_end_date").val(sel_end_date);
+
+var selectStartDate = new MobileSelectDate();
+selectStartDate.init({
+    trigger:'#select_start_date',
+    min:min_date,
+    max:max_date,
+    position:'bottom'
+});
+
+var selectEndDate = new MobileSelectDate();
+selectEndDate.init({
+    trigger:'#select_end_date',
+    min:min_date,
+    max:max_date,
+    position:'bottom'
+});
+</script>
+</body>
+</html>

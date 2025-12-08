@@ -1,0 +1,32 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<table width="100%" cellspacing="0" cellpadding="0">
+    <tbody>
+        <tr>
+            <th>仓库：</th>
+            <td>
+                <{foreach from=$branchList item=item}>
+                    <div class="span-3">
+                        <label>
+                        <input type="checkbox" value="<{$item.branch_id}>" name="content[branch_id][]" <{if $item.checked}>checked<{/if}> >
+                        <strong>
+                            <{$item.name}>
+                        </strong>
+                        </label>
+                    </div>
+                <{/foreach}>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<style>
+.span-3 input {
+    float: left;
+}
+.span-3 strong {
+    line-height: 36px;padding-left: 10px;
+}
+</style>

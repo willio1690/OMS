@@ -1,0 +1,20 @@
+<app>
+    <name>唯品会JIT</name>
+    <description>唯品会JIT相关业务</description>
+
+    <author>
+        <name>shopex开发团队</name>
+        <email>dev@shopex.cn</email>
+        <url>http://www.shopex.cn</url>
+    </author>
+
+    <version>1.0.0</version>
+    <license>shopex license</license>
+    <parent_model_class>dbeav_model</parent_model_class>
+
+	<depends>
+        <app>eccommon</app>
+        <app>ome</app>
+        <app>finance</app>
+	</depends>
+</app>

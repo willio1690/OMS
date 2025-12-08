@@ -1,0 +1,88 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=ome&ctl=admin_return_rchange&act=do_cancel_package&finder_id=<{$env.get.finder_id}>" method="post" id="add_link">
+<input type="hidden" name="reship_id" value="<{$reship_id}>">
+<{if $processList}>
+    <h3 style="padding-bottom:8px;">京东售后服务单列表：</h3>
+    <table cellpadding="0" cellspacing="0" border="0" class="gridlist">
+    <thead>
+        <tr>
+            <th>京东申请单号</th>
+            <th>服务单号</th>
+            <th>京东订单号</th>
+            <th>服务单状态</th>
+            <th>服务类型</th>
+        </tr>
+    </thead>
+        <{foreach from=$processList key=packKey item=packItem}>
+        <tr>
+            <td><{$packItem.wms_order_code}></td>
+            <td><{$packItem.service_bn}></td>
+            <td><{$packItem.package_bn}></td>
+            <td><{$packItem.service_status}></td>
+            <td><{$packItem.service_type}></td>
+        </tr>
+        <{/foreach}>
+    </table>
+<{else}>
+    <h3 style="padding-bottom:8px;">京东售后申请单列表：</h3>
+    <table cellpadding="0" cellspacing="0" border="0" class="gridlist">
+    <thead>
+        <tr>
+            <th>京东申请单号</th>
+            <th>京东订单号</th>
+            <th>退货状态</th>
+            <th>同步状态</th>
+        </tr>
+    </thead>
+        <{foreach from=$rePackageList key=packKey item=packItem}>
+        <tr>
+            <td><{$packItem.wms_order_code}></td>
+            <td><{$packItem.wms_package_bn}></td>
+            <td><{$packItem.status}></td>
+            <td><{$packItem.sync_status}></td>
+        </tr>
+        <{/foreach}>
+    </table>
+<{/if}>
+
+
+</form>
+<br />
+<div>确定要取消单据：<span style="font-weight:bold;"><{$reship_bn}></span>?</div>
+<div class="table-action">
+    <{button label="确定取消售后申请单" id="btn-cancel" class="btn-primary" }> &nbsp; &nbsp;
+    <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+</div>
+<script>
+(function(){
+    var _form = $('add_link');
+    var btn = $('btn-cancel');
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    
+    _form.store('target',{
+        onComplete:function(){
+        },
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+                
+                if(_dialogIns){
+                    finder.refresh();
+                    _dialogIns.close();
+                }
+            }
+        }
+    });
+    
+    btn.addEvent('click',function(){
+        _form.fireEvent('submit',{stop:$empty});
+    });
+})();
+</script>

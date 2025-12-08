@@ -1,0 +1,259 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{script src="coms/autocompleter.js" app="desktop"}>
+<{script src="coms/pager.js" app="desktop"}>
+<{/capture}>
+<style>
+.division{
+    overflow: visible;
+}
+</style>
+<div class="tableform">
+    <form method="post" action="index.php?app=console&ctl=<{if $isStoreAdjust}>admin_o2oadjust<{else}>admin_adjust<{/if}>&act=save" id="frm">
+        <div class="division">
+            <h3><{$data.adjust_bn}>基本信息</h3>
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th><span style="color: red">*</span>财务审核：</th>
+                        <td>
+                            <{input type='radio' class="x-input-select inputstyle" required="required" name='is_check' value=$data.is_check|default:0 options=array("0"=>"否","1"=>"是") separator="&nbsp;"}></td>
+                    </tr>
+                    <tr>
+                        <th><span style="color: red">*</span>调账方式：</th>
+                        <td><{input type='select' class="x-input-select inputstyle" required="required" name='adjust_mode' value=$data.adjust_mode options=array("zl"=>"增量","ql"=>"全量")}></td>
+                    </tr>
+                    <tr>
+                        <th><span style="color: red">*</span><{if $isStoreAdjust}>门店名称<{else}>仓库名称<{/if}>：</th>
+                        <td><{input type='select' issearch="fuzzy-search" required="required" name='branch_id' options=$branchOptions value=$data.branch_id}></td>
+                    </tr>
+                   
+                    <tr>
+                        <th>单据备注：</th>
+                        <td ><{input style="width: 400px; height: 44px;" type='textarea' name="memo" value=$data.memo}></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="division">
+            <h5 style="margin-top:10px;">明细列表</h5>
+            <{button label="基础物料库频道" id="adjust-find-btn" }>
+            <span id='pfba3'>
+              <label>按条形码索引：</label>
+              <input type="text" name="barcode" />
+            </span>
+            <span id='pfba'>
+              <label>按基础物料编码索引：</label>
+              <input type="text" name="bn" />
+            </span>
+            <span id='pfba2'>
+              <label>按基础物料名称索引：</label>
+              <input name="name" type="text" size="35" />
+            </span>
+            <table class="gridlist" id="adjust_table"  style="margin:4px 0;">
+              <thead>
+                <tr>
+                  <th>基础物料编码</th>
+                  <th style="width:240px;">基础物料名称</th>
+                  <th>规格</th>
+                  <th>条形码</th>
+                  <th>库存</th>
+                  <th>可用库存</th>
+                  <th>SN</th>
+                  <th>数量</th>
+                  <th style="width:30px;">删除</th>
+                </tr>
+              </thead>
+              <tbody id="adjust-tbody">
+                
+              </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' label='保存' }>
+                    <{button type="button" id='close_btn' label='关闭' }>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+        tail.select('select[issearch="fuzzy-search"]', {
+            search: true,
+            width: 150,
+            height: 660,
+            searchMinLength: 0
+        });
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = opener.finderGroup['<{$env.get.finder_id}>'];
+        $('close_btn').addEvent('click', function(){
+            if(finder){
+                setTimeout(finder.refresh(),3000);
+            }
+            setTimeout('window.close()',200);
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    if(finder){
+                        setTimeout(finder.refresh(),3000);
+                    }
+                    setTimeout('window.close()',200);
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+          _form.fireEvent('submit',{stop:$empty});
+        });
+
+        var branchVal = branchValue();
+        var oriCallurl = 'index.php?app=purchase&ctl=admin_purchase&act=getProducts';
+        var callurl=oriCallurl + '&p[0]=' + branchVal;
+        var options={
+            'getVar':'bn',
+            'fxOptions':false,
+            callJSON:function(){return window.autocompleter_json;},
+            injectChoice:function(json){
+                var choice = new Element('li', {'html': this.markQueryValue(json[this.options.getVar])});
+                choice.store('_data',json);
+                choice.inputValue = json[this.options.getVar];
+                this.addChoiceEvents(choice).inject(this.choices);
+            },
+            onHide:function(ipt){
+                if(!this.selected || ipt.value=='')return;
+                var json=this.selected.retrieve('_data');
+                json=$splat(json);
+                init(json);
+                MessageBox.success('加载商品成功!!');
+            },
+            onFocus:function(ipt){
+                ipt.value='';
+                var branchVal = branchValue();
+                this.url += '&p[0]=' + branchVal;
+            }
+        };
+        new Autocompleter.script($E('#pfba input'),callurl, options);
+        new Autocompleter.script($E('#pfba2 input'),callurl,$merge(options,{'getVar':'name'}));
+        new Autocompleter.script($E('#pfba3 input'),callurl,$merge(options,{'getVar':'barcode'}));
+
+        var tpl='\
+                    <td>{bn}</td>\
+                    <td class="product-name" visibility="{visibility}">\
+                        {name}\
+                    </td>\
+                    <td>{spec_info}</td>\
+                    <td>{barcode}</td>\
+                    <td class="store">{store}</td>\
+                    <td class="valid_store">{valid_store}</td>\
+                    <td><input type="text" value="" name="sn[{product_id}]" placeholder="多个使用 , 间隔" size="12"></td>\
+                    <td><input type="number" value="{num}" name="number[{product_id}]" size="6"></td>\
+                    <td><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>';
+        function branchValue() {
+            var bid = 0;
+            $$('input[name="branch_id"]','select[name="branch_id"]').each(function(item){
+                var type = item.type;
+                if(type == 'radio'){
+                    if(item.checked){
+                        bid = item.value;
+                    }
+                }else if(type=='hidden'){
+                    bid = item.value;
+                }else{
+                    bid = item.value;
+                }
+            });
+            return bid;
+        }
+        $('adjust-find-btn').addEvent('click',function(e){
+            var url='index.php?app=desktop&act=alertpages&goto='+encodeURIComponent('index.php?app=console&ctl=admin_purchase&act=findMaterial');
+            Ex_Loader('modedialog',function() {
+                var branchVal = branchValue();
+                new finderDialog(url,{params:{url:oriCallurl + '&p[0]=' + branchVal,name:'product_id[]'},width:1000,height:660,
+                    onCallback:function(rs){
+                        if(!rs)return;
+                        rs=JSON.decode(rs);
+                        init(rs);
+                    }
+                });
+            });
+        });
+        function init(rs) {
+            //console.log(rs);
+            rs.each(function(item) {
+                if($("product_"+item.product_id)) {
+                    // 更新库存
+                    $("product_"+item.product_id).getElement('.store').setHTML(item.store);
+                    // 更新可用库存
+                    $("product_"+item.product_id).getElement('.valid_store').setHTML(item.valid_store);
+                    return;
+                }
+                var oTr = new Element('tr', {html: tpl.substitute(item), class:"product_select", id: "product_"+item.product_id});
+                oTr.getElement('.btn-delete-item').addEvent('click',function(e){
+                    e.stop();
+                    oTr.remove();
+                });
+                $('adjust-tbody').adopt(oTr);
+            });
+        }
+        $$('input[name="branch_id"]','select[name="branch_id"]').each(function(item){
+            var type = item.type;
+            if(type == 'radio'){
+                item.addEvent('click', function () {
+                    changeBranch(this.value);
+                })
+            }else if(type=='hidden'){
+                bid = item.value;
+            }else{
+                item.addEvent('change', function () {
+                    changeBranch(this.value);
+                })
+            }
+        });
+        function changeBranch(branch_id) {
+            if(!branch_id) {
+                return;
+            }
+            var rd = [];
+            if(!$$('.product_select').length) {
+                return;
+            }
+            Object.each($$('.product_select'), function(item){
+                if(typeof item != "object") {
+                    return;
+                }
+                var i = item.getAttribute('id').replace('product_', '');
+                rd.push(i);
+            })
+            new Request({
+                url: oriCallurl + '&p[0]=' + branch_id,
+                data: {'product_id':rd},
+                onComplete: function (rs){
+                    var rs = JSON.decode(rs.replace('window.autocompleter_json=', ''));
+                    init(rs);
+                }
+            }).send();
+        }
+    })();
+</script>

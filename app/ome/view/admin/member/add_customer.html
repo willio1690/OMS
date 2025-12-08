@@ -1,0 +1,229 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.division table{border:1px solid #dbdbdb;}
+.division table tr{height:24px; line-height:24px;}
+.division table tr th{text-align:right;width:15%}
+.division table tr th, .division table tr td{padding:7px 5px;}
+.division table td input{height:24px; line-height:24px;}
+h5{margin-bottom:12px;color:#305c89;}
+
+</style>
+<div class="division">
+  <form action="index.php?app=ome&ctl=admin_customer&act=doAdd" method="post" id="newMemForm">
+  <h5>基础信息</h5>
+    <table border="0" cellspacing="0" cellpadding="0">
+      <tbody>
+        <tr>
+          <th><em class="c-red">*</em>客户账户：</td>
+          <td>
+          <{if $oper_type == 'edit'}>
+          <{$member_detail.uname}>
+          <input type='hidden' name='uname'  value='<{$member_detail.uname}>'>
+          <{else}>
+            <input type='text' name='uname'  vtype="required" value='<{$member_detail.uname}>'>
+          <{/if}>
+          </td>
+        </tr>
+        <tr>
+         <th><em class="c-red">*</em>客户名称：</td>
+          <td>
+          <{if $oper_type == 'edit'}>
+          <{$member_detail.name}>
+          <{else}>
+             <input type='text' name='name'  vtype="required" value='<{$member_detail.name}>'>
+          <{/if}>
+          </td> 
+        </tr>
+        <{if $oper_type == 'edit'}>
+        <tr>
+          <th>
+            所属平台:
+          </th>
+          <td>
+          <{$member_detail.shop_type_show}>
+          </td>
+        </tr>
+        <{if $member_detail.shop_name}>
+        <tr>
+          <th>
+            
+            店铺:
+          </th>
+          <td><{$member_detail.shop_name}></td>
+        </tr>
+        <{/if}>
+        <{else}>
+        <tr>
+          <th><em class="c-red">*</em>所属平台：</td>
+          <td>
+          <select id='shop_type' name='shop_type' onchange='change_shop(this.value);' vtype="required">
+          <option value=''>请选择</option>
+            <{foreach from=$shop_type item=shop_type key=key}>
+           <option value="<{$key}>" <{if $key==$member_detail.shop_type}>selected<{/if}>><{$shop_type}></option>
+            <{/foreach}>
+          </select>
+          </td>
+        </tr>
+        <tr id=shop_id_select style="display:none;">
+        </tr>
+        <{/if}>
+        
+        </tbody>
+    </table>
+    <br/>
+
+    <h5><{if $oper_type == 'edit'}>编辑<{elseif $oper_type == 'copy'}>复制<{else}>新增<{/if}>地址</h5>
+    <table border="0" class="gridlist">
+      <tbody>
+        <tr>
+          <th><em class="c-red">*</em>所在地址：</td>
+          <td>
+           <{input type='region' app='eccommon' name="contact[area]" vtype="area"  id="_region" value=$member_detail.area}>
+          </td>
+        </tr>
+       
+        <tr>
+          <th><em class="c-red">*</em>详细地址：</td>
+          <td>
+            <textarea name='addr' style='top: 0px;width: 200px;height: 90px;' vtype="required"><{$member_detail.addr}></textarea>
+          </td>
+        </tr>
+        <tr>
+          <th>邮编：</td>
+          <td>
+            <input id="zip" type='text' name='zip'  value='<{$member_detail.zip}>'>
+          </td>
+        </tr>
+        <tr>
+          <th>邮箱：</td>
+          <td>
+            <input type='text' name='email' vtype="email"  value='<{$member_detail.email}>'>
+          </td>
+        </tr>
+        <tr>
+          <th><em class="c-red">*</em>收件人：</td>
+          <td>
+            <input type='text' name='name'  value='<{$member_detail.name}>' vtype="required">
+          </td>
+        </tr>
+        <tr>
+          <th><em class="c-red">*</em>手机：</td>
+          <td>
+            <input id="mobile" type='text' name='mobile' vtype="number"  value='<{$member_detail.mobile}>'>
+          </td>
+        </tr>
+        <tr>
+          <th>固定电话：</td>
+          <td>
+            <input id="telephone" type='text' name='tel'  value='<{$member_detail.tel}>'>
+          </td>
+        </tr>
+        </tbody>
+    </table>
+    <{if $oper_type == 'edit'}>
+    <input type='hidden' name='member_id' value='<{$member_detail.member_id}>'>
+    <{/if}>
+    <input type='hidden' name='oper_type' value='<{$oper_type}>'>
+    <div class="table-action">
+      <{button label="确定" class="btn-primary" type="button" id="btnMemSubmit"}> &nbsp; &nbsp;
+      <{button label="取消" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+  </form>
+</div>
+<script>
+  (function(){
+
+   function is_phone(str){
+
+      var partten = /^[\d-]+$/;
+      if(partten.test(str)){
+          return true;
+      }else{
+          return false;
+      }
+  }
+
+  function is_mobile(str){
+
+      var partten = /^\d{8,15}$/;
+      if(partten.test(str)){
+          return true;
+      }else{
+          return false;
+      }
+  }
+    
+    $('btnMemSubmit').addEvent('click',function(){
+      var _this=this;
+    
+      var form = this.getParent('form');
+      if(! validate(form)) return;
+      var gd_tel,mobile;
+      gd_tel = $('telephone').value.replace(" ","");
+      mobile = $('mobile').value.replace(' ','');
+      if (!gd_tel && !mobile){
+        alert('固定电话与手机号码必需填写一项');
+        $('telephone').focus();
+        return false;
+      }
+      if (gd_tel){
+        if (is_phone(gd_tel) === false){
+          alert('请填写正确的固定电话');
+          $('telephone').focus();
+          return false;
+        }
+      }
+      if (mobile){
+        if ( is_mobile(mobile) === false){
+          alert('请输入正确的手机号码');
+          $('mobile').focus();
+          return false;
+        }
+        if (mobile[0] == '0'){
+          alert('手机号码前请不要加0');
+          $('mobile').focus();
+          return false;
+          }
+      }
+
+      new Request({url:form.action,method:'post',data:form.toQueryString(),
+        onRequest:function(){
+          MessageBox.show('正在提交表单');
+        },
+        onComplete:function(json){
+          json = JSON.decode(json);
+          
+          alert(json.msg);
+          if(json.rsp=='succ'){
+            _this.getParent('.dialog').retrieve('instance').close();
+            window.finderGroup['<{$finder_id}>'].refresh(true);
+          }
+          
+
+          
+        }
+      }).send();
+    });
+  })()
+
+function change_shop(shop_type){
+    new Request({url:'index.php?app=ome&ctl=admin_customer&act=ajax_get_shop',onSuccess:function(rs){
+        if(rs){
+            $('shop_id_select').setStyle('display','');
+            document.getElementById('shop_id_select').innerHTML = rs;
+        }else{
+            $('shop_id_select').setStyle('display','none');
+            document.getElementById('shop_id_select').innerHTML = '';
+        }
+    }}).post('shop_type='+shop_type+'');
+}
+
+var shop_type_value = '<{$member_detail.shop_type}>';
+if (shop_type_value){
+    change_shop(shop_type_value);
+}
+</script>

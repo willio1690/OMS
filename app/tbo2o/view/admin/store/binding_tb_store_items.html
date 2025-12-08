@@ -1,0 +1,103 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{css src='style.css' app='tbo2o'}>
+
+<div class=''>
+    <div id='download-msg'>
+        <{if $url}>
+            <{if $loadList}>
+                <div class="console_handle" >
+                    <span class="flt" style="color:#333; margin-left:10px;">等待淘宝门店关联宝贝批量绑定</span>
+                </div>
+                <div class="clear loadpart">    
+                    <div  class="loader"><strong class="appNum" style='top:-50px;'>0%</strong></div>
+                </div>
+                <{foreach from=$loadList item=item key=key}>
+                <div flag='<{$key}>' class='waiting-download' style='display:none;' name="<{$item.name}>" ></div>
+                <{/foreach}>
+            <{/if}>
+            <div class='clear'></div>
+            <div id='result'></div>
+        <{else}>
+            <div>参数错误，同步失败！！！</div>
+        <{/if}>
+    </div>
+</div>
+<{area inject='.mainFoot'}>
+<div class='table-action'>
+<{button label='确定' isCloseDialogBtn="true"}>
+</div>
+<{/area}>
+<form id='download-form'>
+    <{$inputhtml}>
+</form> 
+<{if $url}>
+<script type="text/javascript">
+void function(){
+    var loader = $E('#download-msg .waiting-download');
+    if ($defined(loader))
+    {
+        function request(page,flag,item){
+            
+            new Request.JSON({
+                url:"<{$url}>&page="+page+'&flag='+flag,
+                data:$('download-form'),
+                method:'post',
+                async:true,
+                onRequest:function(){
+                    $E('#download-msg .console_handle .flt').setHTML('正在同步【'+item.get('name')+'】...');
+                },
+                onComplete:function(resp){
+                    if (resp.error)
+                    {
+                        isDownload = false;
+                        $('result').addClass('error').setHTML('同步终止：'+resp.error);
+                        $E('#download-msg .console_handle .flt').setHTML('终止同步【'+item.get('name')+'】');
+                        return ;
+                    }
+                    if (resp.errormsg)
+                    {
+                        var errorDiv = new Element('div',{html:'同步成功，但存在以下问题：<br/>'+resp.errormsg});
+                        $('result').addClass('notice').adopt(errorDiv);
+                    }
+                    $E('#download-msg .loadpart .appNum').setHTML(resp.downloadRate+'%');
+                    $E('#download-msg .loadpart .loader').setStyle('width',resp.downloadRate+'%');
+                    if (resp.downloadStatus == 'finish')
+                    {
+                        $E('#download-msg .console_handle .flt').setHTML('同步【'+item.get('name')+'】已完成！');
+                        item.removeClass('waiting-download').addClass('complete');
+                        loader = $E('#download-msg .waiting-download');
+                        if ($defined(loader))
+                        {
+                            request(1,loader.get('flag'),loader);
+                        } else {
+                            if ("<{$redirectUrl}>")
+                            {
+                                W.page("<{$redirectUrl}>");
+                            }
+                        }
+                        return ;
+                    }
+                    page++;
+                    request(page,flag,item);
+                },
+                onFailure:function(){
+                        isDownload = false;
+                        $('result').addClass('error').setHTML('同步终止：请求服务器失败！');
+                        $E('#download-msg .console_handle .flt').setHTML('终止同步【'+item.get('name')+'】');
+                        return ;
+                }
+            }).send();
+            return false;
+        }
+
+        $('result').removeClass('error').removeClass('notice').empty();
+
+        request(1,loader.get('flag'),loader);
+    }
+}();
+</script>
+<{/if}>

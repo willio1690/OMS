@@ -1,0 +1,172 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form enctype="multipart/form-data" action="index.php?app=o2o&ctl=admin_inventory&act=index&action=to_export" method="post">
+<input type="hidden" name="_io_type" value="csv">
+<input type="hidden" name="app" value="o2o" />
+<input type="hidden" name="model" value="inventory" />
+    <div id="gEditor-Body">
+      <div class="spage-main-box">
+          <div class="tableform">
+          <div id="x-g-basic" class="goods-detail">
+            <div class="edit_box">
+
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                      <td align="center" nowrap="nowrap"><strong>选择门店：</strong></td>
+                      <td>
+                        <div style="float:left">
+                            <div style="border: 1px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;width:570px">
+                                <div style="float:left;">组织架构：</div>
+                                <div style="float:left;"><{input type='organization' app='organization' show="onlytree" effect="organization_stores_list"}></div>
+                            </div>
+                            <div style="border: 1px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;">
+                                <div style="float:left;">门店名称：</div>
+                                <div style="float:left;"><input type="text" id="store_name_filter_popup" onblur="filter_store_list(this);" class="x-input"></div>
+                            </div>
+                            <div style="border: 1px solid #EBEFF4;margin:2px 16px 2px 0;padding: 4px;height:26px;">
+                                <div style="float:left;">选择门店：</div>
+                                <div style="float:left;" id="organization_stores_list_popup"></div>
+                                <div style="float:left;color:red">&nbsp;*必选<{help}><{t}>筛选特定门店请做选择,以上两项是用来过滤此门店下拉的列表。 <{/t}><{/help}></div>
+                            </div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="center" nowrap="nowrap"><strong>盘点类型：</strong></td>
+                      <td>
+                        <span id="inventory_type_radio">
+                            <input type="radio" name="inventory_type" id="inventory_first" disabled value="1">期初&nbsp;&nbsp;&nbsp;
+                            <input type="radio" name="inventory_type" id="inventory_all" disabled value="2">全盘<{help}><{t}>选择全盘导出模板时会自动带出该门店下的所有物料相关信息。<{/t}><{/help}>&nbsp;&nbsp;&nbsp;
+                            <input type="radio" name="inventory_type" id="inventory_part" disabled value="3">部分盘&nbsp;&nbsp;&nbsp;<span style="color:red">*请先选择门店后选择此项</span>
+                         </span>
+                      </td>
+                    </tr>
+                  </table>
+                  <table>
+                     <tr>
+                         <td><div class="table-action text_left" style = "border-top:0px"><{button label="导出" id="export_btn" disabled="disabled" type="submit"}></td></div></td>
+                         <td>&nbsp;</td>
+                         <td>&nbsp;</td>
+                     </tr>
+                  </table>
+              
+            </div>
+          </div>
+          </div>
+      </div>
+    </div>
+</form>
+
+
+<script>
+
+window.addEvent('domready', function() {
+    //页面加载时 默认显示所有组织门店
+    load_organization_stores_list("", "", "onload");
+    //只有选择了盘点类型了才能导出
+    $('inventory_type_radio').getElements("input").addEvent('click',function(e){
+          $("export_btn").disabled = false;
+    });
+});
+
+function type_radio(obj){
+    //每次变更
+    $('inventory_type_radio').getElements("input[name='inventory_type']").removeProperties("checked");
+    $("export_btn").disabled = true;
+    //当前选择的branch_bn
+    var onchange_value = obj.value;
+    if(onchange_value == "_NULL_"){
+        //选择了 '请选择...' 全部disabled掉
+        $('inventory_type_radio').getElements("input").each(function(ite){
+            ite.disabled = true;
+        });
+        return false;
+    }
+    new Request({
+        url : "index.php?app=o2o&ctl=admin_inventory&act=hasO2oStore",
+        async : false,
+        method : 'post',
+        data : {
+            branch_bn : onchange_value,
+        },
+        onComplete : function(result) {
+            if(result){
+                //有库存记录
+                $("inventory_all").removeAttribute("disabled");
+                $("inventory_part").removeAttribute("disabled");
+            }else{
+                //无库存记录
+                $("inventory_first").removeAttribute("disabled");
+            }
+        }
+    }).send();
+}
+
+//根据组织架构加载选择门店的option
+function load_organization_stores_list(org_id,value,action){
+    if (action == "onchange" && org_id == '_NULL_') {
+        //在选择过程中 选择了 “请选择...” 选择门店options 这里自动显示父类下拉框的门店信息
+        var org_id = "";
+        if (value) {
+            var arr_cur_select = value.split(":");
+            org_id = arr_cur_select[2];
+        }
+    }
+    new Request({
+          url : "index.php?app=o2o&ctl=admin_branch_product&act=organization_stores_list",
+          async : false,
+          method : 'post',
+          data : {
+              p_org_id : org_id,
+          },
+          onComplete : function(store_html) {
+              $("organization_stores_list_popup").set('html',store_html);
+              filter_store_list_by_org();
+          }
+      }).send();
+}
+
+//选择组织架构时 根据填写的门店名称 过滤最终选择门店的option
+function filter_store_list_by_org(){
+    var store_name_val = $("store_name_filter_popup").getValue().trim();
+    get_store_list(store_name_val);
+}
+
+//onblur事件根据填写的门店名称 过滤最终选择门店的option
+function filter_store_list(obj){
+    var store_name_val = obj.getValue().trim();
+    get_store_list(store_name_val);
+}
+
+function get_store_list(store_name_val){
+    if(!store_name_val){
+        return false;
+    }
+    var select_store_name = $("organization_stores_list_popup").getElements("option:selected")[0].text;
+    //如果门店名称和选择项不一样 默认给请选择... 来重新选择
+    if(select_store_name.indexOf(store_name_val) == -1 && select_store_name != "请选择..."){
+        $("organization_stores_list_popup").getElements("option")[0].selected=true;
+        $("organization_stores_list_popup").getElements("option:selected")[0].text = "请选择...";
+    }
+    //先显示当前组织架构的门店option
+    $("organization_stores_list_popup").getElements("option").each(function(item){
+            item.removeAttribute("style");
+    });
+    //过滤option项
+    $("organization_stores_list_popup").getElements("option").each(function(item){
+        if(item.value == "_NULL_"){
+            //不过滤 请选择选项
+            return true;
+        }
+        if(item.text.indexOf(store_name_val) == -1){
+            //不符合填写内容的过滤掉
+            item.setAttribute("style","display:none");
+        }
+    });
+}
+
+</script>
+

@@ -1,0 +1,134 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<link rel="stylesheet" type="text/css" href="<{$base_url}>/app/desktop/statics/css/layui.css"/>
+<link rel="stylesheet" href="<{$base_url}>/app/desktop/statics/css/address.css">
+<style>
+    /* 自定义中国地址选择器的宽度样式 */
+    #cascader + .el-cascader {
+        width: 330px !important;
+    }
+    #cascader + .el-cascader .el-input {
+        width: 100% !important;
+    }
+</style>
+<input id="cascader" >
+<input type="hidden" name="<{$params.name}>" id="<{$params.id}>" value="<{$params.data|escape:'html'}>">
+<!-- options 直接注入为 JS 对象，避免被 HTML 转义导致解析失败 -->
+
+<textarea id="china-options" style="display:none"><{$treeList}></textarea>
+
+<script>
+    var casader;
+    var value = document.getElementById('<{$params.id}>').value;
+    var options = [];
+    try {
+        var optionsText = document.getElementById('china-options').value || '[]';
+        options = JSON.parse(optionsText); // 含根节点"中国"
+    } catch (e) { options = []; }
+    
+    // 安全处理value值
+    if (value == '' || value == 'null' || value == 'undefined') {
+        value = null;
+    } else {
+        try {
+            value = JSON.parse(value);
+        } catch (e) {
+            console.warn('Invalid JSON value:', value);
+            value = null;
+        }
+    }
+    Ex_Loader('layui',function(){
+        Ex_Loader('address',function(){
+            layui.use(['layCascader'], function () {
+                var layCascader = layui.layCascader;
+                var cascader = layCascader({
+                    elem: '#cascader',
+                    options: options,
+                    value: value,
+                    disabled: false,
+                    clearable: true,
+                    placeholder: '请选择',
+                    props: {
+                        multiple: true,
+                        value: 'id',
+                        label: 'label',
+                        checkStrictly: true
+                    }
+                });
+                cascader.change(function (values, nodes) {
+                    // 若选择了根“中国”，则仅保存 ["CN"]
+                    var hasChina = nodes && nodes.some(function(n){
+                        return n && n.data && n.data.id === 'CN';
+                    });
+                    var arr;
+                    if (hasChina) {
+                        arr = ['CN'];
+                    } else {
+                        // 检查是否有父子级冲突，如果有则移除子级选择
+                        var filteredNodes = [];
+                        var selectedPaths = [];
+                        
+                        // 收集所有已选择的路径
+                        nodes.forEach(function(n) {
+                            if (n && n.path) {
+                                selectedPaths.push(n.path.map(function(p){ return p.data.id; }));
+                            }
+                        });
+                        
+                        // 过滤掉被父级包含的子级选择
+                        nodes.forEach(function(n) {
+                            if (n && n.path) {
+                                var currentPath = n.path.map(function(p){ return p.data.id; });
+                                var isChildOfSelected = false;
+                                
+                                // 检查当前路径是否被其他已选择的路径包含
+                                for (var i = 0; i < selectedPaths.length; i++) {
+                                    var otherPath = selectedPaths[i];
+                                    if (otherPath.length < currentPath.length) {
+                                        // 检查otherPath是否是currentPath的父级
+                                        var isParent = true;
+                                        for (var j = 0; j < otherPath.length; j++) {
+                                            if (otherPath[j] !== currentPath[j]) {
+                                                isParent = false;
+                                                break;
+                                            }
+                                        }
+                                        if (isParent) {
+                                            isChildOfSelected = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                                if (!isChildOfSelected) {
+                                    filteredNodes.push(n);
+                                }
+                            }
+                        });
+                        
+                        arr = filteredNodes.map(function(n){
+                            return n.path.map(function(p){ return p.data.id; }).join(',');
+                        });
+                        
+                        // 如果已选覆盖了所有省份，等价于全国，压缩为 ["CN"]
+                        try {
+                            var provinces = [];
+                            (options[0] && options[0].children || []).forEach(function(p){ provinces.push(String(p.id)); });
+                            var leafs = filteredNodes.map(function(n){ return String(n.data.id); }).sort();
+                            provinces.sort();
+                            if (provinces.length && JSON.stringify(leafs) === JSON.stringify(provinces)) {
+                                arr = ['CN'];
+                            }
+                        } catch(e) {}
+                    }
+                    document.getElementById("<{$params.id}>").value = JSON.stringify(arr)
+                })
+            });
+        });
+    });
+</script>
+
+

@@ -1,0 +1,150 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.processBarBg {
+    border: 1px solid #999999;
+    width: 98%;
+    margin: 5px;
+    height: 25px;
+    line-height: 25px;
+    padding: 1px;
+    background: #EEEEEE;
+}
+.processBar {
+    background: #3366cc;
+    width: 0px;
+    padding-bottom: 1px;
+    overflow: hidden;
+}
+</style>
+<div class="division">
+    <table class="tableform">
+        <tbody>
+        <tr>
+            <th>签约店铺:</th>
+            <td>
+                <select name="shop_id" id="shop_id">
+                    <{foreach from=$shopList item=item}>
+                    <option value="<{$item.shop_id}>"><{$item.name}></option>
+                    <{/foreach}>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <th>商品创建时间:</th>
+            <td><{input type='date' vtype='date' name='start_time' id="start_time" value=$start_time}>&nbsp;&nbsp;<{help}>* 平台店铺商品的创建时间，默认选择的是前三天日期。<{/help}></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div class="division">
+    <h4>当前共 <span id="mtotal" style="font-weight: bold;"></span> 个商品</h4>
+    <div class="division" style="display:none;" id="information">
+        已经处理 <span id="iTotal" style="color:#083E96"></span> 个商品，自动拆分放入到队列中执行！<br/>
+        其中 <span id="iFail" style="color:#083E96"></span> 个商品未新增成功，<br/>
+    </div>
+    <div id="processBarBg" class="processBarBg">
+        <div id="processBar" class="processBar">
+            &nbsp;
+        </div>
+    </div>
+    <div class="table-action">
+        <{button label="开始" class="btn-primary" name="Start" id="btn-run"}>
+        <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true" }>
+    </div>
+    <div id="showError" style="color: red; font-weight: bold;"></div>
+</div>
+
+<{if $notice}><div class="notice"><{$notice}></div><{/if}>
+
+<script>
+    (function(){
+        $('btn-run').addEvent('click', function(){
+            doRun();
+        });
+        
+        var doTotal, doFail, total, shop_id, startTime;
+        function doRun()
+        {
+            //禁用开始按钮
+            doTotal = total = doFail = addForeignError = addForeignSucc = 0;
+            
+            displayProcessInfo();
+            
+            $('information').style.display ='';
+            $('btn-run').disabled = true;
+            $('btn-run').set('html', '<span><span>数据处理中，请稍候！</span></span>');
+
+            shop_id = $('shop_id').value;
+            startTime = $('start_time').value;
+            
+            doAjaxProcess('');
+        }
+
+        /**
+         * 执行一次AJAX调用
+         */
+        function doAjaxProcess(nextPage)
+        {
+            new Request({url:'index.php?app=dchain&ctl=admin_aoxiang_pkgproduct&act=ajaxApportion',
+                method:'post',
+                data: {
+                    nextPage: nextPage,
+                    shop_id: shop_id,
+                    startTime: startTime,
+                },
+                onComplete:function(result){
+                    if(!result) {
+                        $('showError').setHTML('可能超时了，请重试');
+                        return;
+                    }
+                    var ret = JSON.decode(result);
+                    if(ret['err_msg']) {
+                        $('showError').setHTML(ret['err_msg']);
+                        // return;
+                    }
+                    
+                    var nextPage = ret['next_page'];
+                    total = ret['total'];
+                    doTotal += ret['itotal'];
+                    doFail += ret['ifail'];
+                    
+                    displayProcessInfo();
+                    
+                    if(nextPage > 0) {
+                        $('processBar').setStyle('width', (doTotal*100/(total)) + '%');
+                        doAjaxProcess(nextPage);
+                    } else {
+                        $('processBar').setStyle('width', '100%');
+                        // 判断是否弹框
+                        var dailogEl = $('btn-run').getParent('.dialog')
+                        if ($defined(dailogEl)) {
+                            var dailog = dailogEl.retrieve('instance');
+
+                            dailog.close.delay(3000,dailog);
+
+                        <{if $env.get.finder_id}>
+                            finderGroup['<{$env.get.finder_id}>'].refresh.delay(3000,finderGroup['<{$env.get.finder_id}>']);
+                        <{/if}>
+                            }
+                        }
+                    }
+                }).send();
+        }
+
+        /**
+         * 显示信息进度
+         */
+        function displayProcessInfo()
+        {
+            $('iTotal').set('html', doTotal);
+            $('iFail').set('html', doFail);
+            $('mtotal').set('html', total);
+            // $('ForeignSucc').set('html', addForeignSucc);
+            // $('ForeignError').set('html', addForeignError);
+        }
+    }());
+</script>

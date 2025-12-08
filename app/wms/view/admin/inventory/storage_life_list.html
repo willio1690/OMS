@@ -1,0 +1,290 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style type="text/css">
+.finder-detail{
+	background:#eee;
+	padding:5px;
+	margin:5px 0;
+	border:1px solid #bbb;
+}
+.finder-detail td{
+	background:#fff;
+
+}
+.gridlist tr.waring, .gridlist td.waring {
+	background:none repeat scroll 0 0 #9999ff;
+	color:#333333;
+}
+.gridlist tr.masterorder, .gridlist tr.masterorder td, .gridlist td.masterorder {
+	color: #000000;
+	font-weight: 700;
+	font-size : 12px;
+	background:#f0f6fe
+}
+.gridlist tr.memberorder, .gridlist tr.memberorder td, .gridlist td.memberorder tr.addressorder, .gridlist tr.addressorder td, .gridlist td.addressorder {
+	background: none repeat scroll 0 0 #e2effe;
+	color: #000000;
+	font-weight: 400;
+	font-size : 12px;
+}
+.strong { font-weight:bold; }
+</style>
+<div id='selectStorageLife'>
+<div id="nosplitarea">
+<form class="tableform" style="background:#fff; border:0 none; margin:0px; padding:0px;" method="post" action="index.php?app=wms&ctl=admin_inventory&act=search_storage_life" name="storage_lift_search_frm" id="storage_lift_search_frm">
+    <input type="hidden" name="barcode" id="barcode" value="<{$barcode}>" />
+    <input type="hidden" name="selecttype" id="selecttype" value="<{$selecttype}>" />
+    <input type="hidden" name="branch_id" id="branch_id" value="<{$branch_id}>" />
+    <input type="hidden" name="bm_id" id="bm_id" value="<{$bm_id}>" />
+	
+    <div class="finder-detail">
+    	<div style="padding:5px;" id="dataAction" class="data-action">
+        <table width="100%" cellspacing="0" cellpadding="0" border="0">
+            <tbody>
+                <tr>
+                    <td nowrap="nowrap" align="left"><span class="strong">过期日期查询:</span></td>
+                    <td nowrap="nowrap" align="left">
+                        <{input type="date" vtype="date" name="expiring_date_from" id="expiring_date_from" style="width:66px; font-family:arial;" value="{$search_expiring_date.time_from}"}>&nbsp;<{t}>至<{/t}>&nbsp;
+                        <{input type="date" vtype="date" name="expiring_date_to" id="expiring_date_to" style="width:66px; font-family:arial;" value="{$search_expiring_date.time_to}"}>
+                    </td>
+                    <td nowrap="nowrap" align="left">&nbsp;</td>
+                    <td nowrap="nowrap" align="left">&nbsp;</td>
+                    <td nowrap="nowrap" align="left">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td nowrap="nowrap" align="left"><span class="strong">生产日期查询:</span></td>
+                    <td nowrap="nowrap" align="left">
+                        <{input type="date" vtype="date" name="production_date_from" id="production_date_from" style="width:66px; font-family:arial;" value="{$search_production_date.time_from}"}>&nbsp;<{t}>至<{/t}>&nbsp;
+                        <{input type="date" vtype="date" name="production_date_to" id="production_date_to" style="width:66px; font-family:arial;" value="{$search_production_date.time_to}"}>
+                    </td>
+                    <td nowrap="nowrap" align="left"><span class="strong">按保质期查询:</span></td>
+                    <td nowrap="nowrap" align="left"><input name="search_expire_bn" type="text" id="search_expire_bn" style="height:22px;" value="<{$search_expire_bn}>" maxlength="15"></td>
+                    <td nowrap="nowrap" align="left"><button class="btn" name="btn_search" id="btn_search" type="button"><span><span>筛 选</span></span></button></td>
+                </tr>
+            </tbody>
+        </table>
+    	</div>
+    </div>
+</form>
+
+<form class="tableform" style="background:#fff; border:0 none; margin:0px; padding:0px;" method="post" action="index.php?app=wms&ctl=admin_inventory&act=bind_storage_life" name="storage_lift_frm" id="storage_lift_frm">
+    <input type="hidden" name="expire_barcode" id="expire_barcode" value="<{$barcode}>" />
+    <input type="hidden" name="expire_selecttype" id="expire_selecttype" value="<{$selecttype}>" />
+    <input type="hidden" name="expire_branch_id" id="expire_branch_id" value="<{$branch_id}>" />
+    <input type="hidden" name="expire_bm_id" id="expire_bm_id" value="<{$bm_id}>" />
+
+	<div class="finder-detail">
+            <div id="presentList">
+                <table class="nosplit gridlist clear" width="100%" cellspacing="0" cellpadding="0" border="0" >
+            		<thead>
+                        <tr>
+                            <th align="center"><input type="checkbox" class="sellist" id="but_checkAll">全选</th>
+                            <th>序 号</th>
+                            <th>保质期批次号</th>
+                            <th>账面数量</th>
+                            <th align="center">生产日期</th>
+                            <th align="center">过期日期</th>
+                            <th align="center">输入盘点数量</th>
+              			</tr>
+                  </thead>
+                    <tbody id="dataNode">
+                    	<{if $data}>
+                            <{foreach from=$data key=key item=val}>
+                            <tr>
+                                <td height="28" align="center">
+                                <{if $val.is_exist}>
+                                <input type="checkbox" rowindex="8" name="no_sel_id[]" value="" disabled="disabled" />
+                                <{else}>
+                                <input type="checkbox" rowindex="8" name="bmsl_id[]" class="btn_bmsl_id" value="<{$val.bmsl_id}>" />
+                                <{/if}>
+                                </td>
+                                <td>&nbsp;<{$key+1}></td>
+                                <td><{$val.expire_bn}></td>
+                                <td><{$val.balance_num}></td>
+                                <td align="center"><{$val.production_date|cdate:'FDATE'}></td>
+                                <td align="center"><{$val.expiring_date|cdate}></td>
+                                <td align="center"><input name="in_nums[<{$val.bmsl_id}>]" id="in_nums_<{$val.bmsl_id}>" type="text" size="10" maxlength="10" value="" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" /><input name="sel_expire_bn[<{$val.bmsl_id}>]" type="hidden" id="sel_expire_bn_<{$val.bmsl_id}>" value="<{$val.expire_bn}>" /></td>
+                            </tr>
+                            <{/foreach}>
+                        <{else}>
+                            <tr>
+                            	<td height="50" colspan="7" align="center">没有相关记录。。。</td>
+                            </tr>
+                        <{/if}>
+                    </tbody>
+                </table>
+                
+                <table border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                        <div class="table-action" style="margin:0px; padding:0px; border:none;">
+                        <{button label="确定" class="btn btn-primary" id="btn_sumit_storage_life" name="btn_sumit_storage_life"}> &nbsp; <{button label="关闭" id="cancelBtn" class="btn btn-secondary" isCloseDialogBtn='true'}>
+                        </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+</form>
+</div>
+
+<div class="gridlist-footer">
+<{$pager}>&nbsp;&nbsp;共<{$count}>条，每页显示<{$pagelimit}>条 
+</div>
+</div>
+<script language="javascript">
+var frmObject	= $('selectStorageLife');
+
+$('cancelBtn').removeEvents('click').addEvent('click', function(e)
+{
+	$('cancelBtn').getParent('.dialog').retrieve('instance').close();
+});
+
+$('btn_search').addEvent('click', function()
+{
+	var search_expire_bn	= $('search_expire_bn').value;
+	var expiring_date_from	= frmObject.getElement('input[name=expiring_date_from]');
+	var expiring_date_to	= frmObject.getElement('input[name=expiring_date_to]');
+	var production_date_from	= frmObject.getElement('input[name=production_date_from]');
+	var production_date_to	= frmObject.getElement('input[name=production_date_to]');
+	
+	if(expiring_date_from.value && expiring_date_to.value)
+	{
+		check	= check_data(expiring_date_from, expiring_date_to);
+		if(!check)
+		{
+			alert("过期时间范围选择有误！");
+			return false;
+		}
+	}
+	if(production_date_from.value && production_date_to.value)
+	{
+		check	= check_data(production_date_from, production_date_to);
+		if(!check)
+		{
+			alert("生产时间范围选择有误！");
+			return false;
+		}
+	}
+	
+	$("storage_lift_search_frm").fireEvent('submit',{stop:function(){}});
+});
+
+$("but_checkAll").addEvent('click', function()
+{
+	$$('#presentList tr input[name=bmsl_id[]]').each(function(item)
+	{
+		if($("but_checkAll").checked == true)
+		{
+			item.set('checked', true);	
+		}
+		else
+		{
+			item.set('checked', false);	
+		}
+	});
+});
+
+function check_data(from, to)
+{
+	var data=[],
+	_return=[from,to].every(function(el)
+	{
+	  if(!/^(19|20)[0-9]{2}-([1-9]|0[1-9]|1[012])-([1-9]|0[1-9]|[12][0-9]|3[01])+$/.test(el.value)){
+		new MessageBox('<{t}>请录入日期格式yyyy-mm-dd<{/t}>',{type:'error',autohide:true});
+		//el.focus();
+		return false;
+	  }
+	  data.push(Date.parse(el.value.replace(/-/gi,"/")));
+	  return true;
+	});
+	
+	if(!_return)return null;
+	
+	if(data[1] < data[0]){
+	  return MessageBox.error('<{t}>选择开始时间必须早于结束时间<{/t}>');
+	}
+	
+	return _return;
+}
+
+$('btn_sumit_storage_life').addEvent('click', function()
+{
+	var flag	= false;
+	var flag_num	= true;
+	$$('#presentList tr input[name=bmsl_id[]]').each(function(item)
+	{
+		if(item.checked == true)
+		{
+			var in_nums_id	= 'in_nums_' + item.value;
+			var set_in_nums	= parseInt($(in_nums_id).value);
+			
+			if(isNaN(set_in_nums) || set_in_nums < 0)
+			{
+				flag_num	= false;
+				
+				var	erro_expire_bn	= $("sel_expire_bn_" + item.value).value;
+				
+				alert("保质期：" + erro_expire_bn +" 未输入盘点的数量");
+				return false;
+			}
+			
+			flag	= true;
+		}
+	});
+	
+	if(!flag_num)
+	{
+		return false;	
+	}
+	if(!flag)
+	{
+		alert("请选择保质期批次号");
+		return false;	
+	}
+	
+	$("storage_lift_frm").fireEvent('submit',{stop:function(){}});
+});
+
+$('storage_lift_frm').removeEvents('submit').addEvent('submit', function(e) {
+	e.stop();
+	new Request.JSON ({
+		url:this.action,
+		onRequest: function () {
+			$('btn_sumit_storage_life').set('disabled', 'true');
+			$('cancelBtn').set('disabled', 'true');
+		},
+		onSuccess: function(result) {
+			if (result.code == 'succ')
+			{
+				addRole(result.msg, result.count);
+				$('btn_sumit_storage_life').getParent('.dialog').retrieve('instance').close();
+			} else {
+				$('btn_sumit_storage_life').set('disabled', false);
+				$('cancelBtn').set('disabled', false);
+				alert(result.msg);
+			}
+		}
+	})[this.method](this);
+});
+
+function addRole(msg, num)
+{
+	$('expire_bn_info').set('value', msg);
+	$("num_ipt").set('value', num);
+	$("in_number").set('value', num);
+	
+	$('btn_submit').set('disabled', false).focus();
+	
+	$('btn_submit').removeEvents('click').addEvent('click',function(){
+		this.disabled=true;
+		this.getParent('form').fireEvent('submit',{stop:$empty});
+	});
+}
+</script>

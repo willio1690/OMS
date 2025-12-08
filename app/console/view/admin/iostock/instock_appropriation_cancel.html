@@ -1,0 +1,147 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form method="post" id="instock_appropriation_form" name="instock_appropriation_form" action="index.php?app=console&ctl=admin_iostockorder&act=doCancelIostockin">
+  <div class="tableform">
+    <h3>调拨入库取消</h3>
+    <div class="division">
+      <h5>基本信息</h5>
+      <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+         <thead>
+         <tr>
+          <td width="10%" align="right" nowrap="nowrap">调拨入库取消单名称:</td>
+          <td width="40%">
+            <input type="text" size="32" id="iostockorder_name" name="iostockorder_name" value="<{$cur_date}>" />
+          </td>
+           </tr>
+           <tr>
+          <td align="right">调入仓:</td>
+          <td width="40%"><{$to_branch_name}></td>
+          <td width="10%" align="right">退回仓:</td>
+          <td><{$from_branch_name}></td>
+        </tr>
+        <tr>
+          <td align="right">入库类型:</td>
+          <td>调拨入库取消</td></td>
+        </tr>
+        </thead>
+      </table>
+      
+      <h5 style="margin-top:10px;">入库单明细</h5>
+      <div class="division">
+			<table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+			<col style="width:10%;"></col>
+			<col style="width:18%;"></col>
+			<col style="width:10%;"></col>
+			<col style="width:10%;"></col>
+			<col style="width:6%;"></col>
+			<col style="width:6%;"></col>
+			<col style="width:6%;"></col>
+			<thead>
+				<tr>
+				    <th>货号</th>
+				    <th>货品名称</th>
+				    <th>规格</th>
+				    <th>条码</th>
+				    <th>入库数量</th>
+				    <th>单价</th>
+				    <th>合计</th>
+				</tr>
+			</thead>
+			<{foreach from=$iso_items item=item}>
+			<tbody>
+			<tr>
+			    <td><{$item.bn}></td>
+			    <td><{$item.product_name}></td>
+			    <td><{$item.spec_info}></td>
+			    <td><{$item.barcode}></td>
+			    <td><{$item.nums}></td>
+			    <td><{$item.price}></td>
+			    <td><{$item.total_price}></td>
+			</tr>
+			</tbody>
+			<{/foreach}>
+			</table>
+			<br />
+            <div style="color:#5b5b5b" align="right">入库总量: <span><{$total_stockin_number}></span>&nbsp;&nbsp;总金额: <span><{$total_stockin_price}></span></div>
+		</div>
+      
+      <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-top:10px;">
+      <tr>
+        <td width="10%" align="right">备注:</td>
+        <td align="left"><textarea id="memo" maxth="255" rows="3" cols="80%" name="memo" type="textarea"></textarea></td>
+      </tr>
+      <tr>
+        <td align="right">经办人:</td>
+        <td align="left"><input name="operator" type="text" value="<{$operator}>" size="15" vtype="required"/></td>
+      </tr>
+    </table>
+    
+    <div id="cc" class="noprint table-action"> 
+        <{button type="button" id="instock-appropriation-cancel-btn" label="确认"}> &nbsp; 
+        <{button type="button" class="btn-secondary" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}>
+    </div>
+    
+    <input type="hidden" name="iso_id" value="<{$iso_id}>" />
+    
+  </div>
+</form>
+
+<script>
+
+$('instock_appropriation_form').store('target',{
+    onSuccess:function(){
+        opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+        setTimeout('window.close()',200);
+    }
+});
+
+$('instock-appropriation-cancel-btn').addEvent('click',function(e){
+    var operator_name = '<{$title}>';
+    var _this=this;
+    new Request({url:'index.php?app=console&ctl=admin_iostockorder&act=checkCancel&p[0]='+<{$iso_id}>+'&io=1',method:'POST',
+                onRequest:function(){
+                    $('instock-appropriation-cancel-btn').set('disabled', 'true');
+                    $('instock-appropriation-cancel-btn').getElements('span')[1].set('text','正在取消...'); 
+                },
+                onComplete:function(json){
+                    if (json != ''){
+                        json = JSON.decode(json);
+                        
+                        if(json.rsp == 'fail'){
+                            if (json.msg_code=='w402'){
+                                if (window.confirm('仓储物流系统无法进行撤销'+operator_name+'操作,是否继续取消'+operator_name+'?\n注：确定继续拒绝将强制撤销本系统未处理的'+operator_name+'，否则请线下联系仓储服务商取消相应的'+operator_name))
+                                {
+                                    $('instock_appropriation_form').fireEvent('submit',{stop:function(){}});
+                                }else{
+                                    $('instock-appropriation-cancel-btn').set('disabled', '');
+                                    $('instock-appropriation-cancel-btn').getElements('span')[1].set('text','确定');
+                                }
+                            }else{
+                                var msg = '取消失败';
+                                if(json.msg) {
+                                    msg += ':'+json.msg;
+                                }
+                                alert(msg);
+                                $('instock-appropriation-cancel-btn').set('disabled', '');
+                                $('instock-appropriation-cancel-btn').getElements('span')[1].set('text','确定'); 
+                                _this.getParent('.dialog').retrieve('instance').close();
+                                window.finderGroup['<{$env.get.finder_id}>'].refresh(true);
+                                return;
+                            }
+                            
+                        }else{
+                            $('instock_appropriation_form').fireEvent('submit',{stop:function(){}});
+                        }
+                    }
+                },
+                }).send();
+
+});
+
+</script>
+
+
+

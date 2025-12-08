@@ -1,0 +1,145 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{capture name="header"}>
+<{css app="ome" src="ome.css"}>
+<{css app="ome" src="style.css"}>
+<{/capture}>
+
+<form method="post" id="sales_material_form" action="index.php?app=tbo2o&ctl=admin_shop_products&act=toEdit">
+    <input type="hidden" name="id" value="<{$data.id}>">
+    <div class="tableform">
+      <h3>编辑后端商品</h3>
+      <div class="division">
+        <h5>基本信息</h5>
+        <table border="0" cellspacing="0" cellpadding="0" class="gridlist">
+            <thead>
+                <tr>
+                    <td width="10%" align="right" nowrap="nowrap">商品编码：</td>
+                    <td><span style="color:red;"><{$data.bn}></span></td>
+                    <td>商品名称：</td>
+                    <td><{$data.name}></td>
+                </tr>
+                <tr>
+                  <td align="right" nowrap="nowrap">商品类型：</td>
+                  <td>
+                      <input type="radio" name="item_type" value="0" <{if $data.item_type != 1}>checked="checked"<{/if}> />普通供应链商品&nbsp;&nbsp;&nbsp;
+                      <input type="radio" name="item_type" value="1" <{if $data.item_type == 1}>checked="checked"<{/if}> />供应链组合主商品
+                  </td>
+                  <td>条形码：</td>
+                  <td><{$data.barcode}></td>
+                </tr>
+                <tr>
+                  <td align="right" nowrap="nowrap">是否易碎品：</td>
+                  <td>
+                  <input type="radio" name="is_fragile" value="1" <{if $data.is_fragile == 1}>checked="checked"<{/if}> />是&nbsp;&nbsp;&nbsp;
+                  <input type="radio" name="is_fragile" value="0" <{if $data.is_fragile != 1}>checked="checked"<{/if}> />否
+                  </td>
+                  <td>是否危险品：</td>
+                  <td>
+                  <input type="radio" name="is_dangerous" value="1" <{if $data.is_dangerous == 1}>checked="checked"<{/if}> />是&nbsp;&nbsp;&nbsp;
+                  <input type="radio" name="is_dangerous" value="0" <{if $data.is_dangerous != 1}>checked="checked"<{/if}> />否
+                  </td>
+                </tr>
+                <tr>
+                  <td align="right" nowrap="nowrap">是否贵重品：</td>
+                  <td>
+                  <input type="radio" name="is_costly" value="1" <{if $data.is_costly == 1}>checked="checked"<{/if}> />是&nbsp;&nbsp;&nbsp;
+                  <input type="radio" name="is_costly" value="0" <{if $data.is_costly != 1}>checked="checked"<{/if}> />否
+                  </td>
+                  <td>是否保质期：</td>
+                  <td>
+                  <input type="radio" name="is_warranty" value="1" <{if $data.is_warranty == 1}>checked="checked"<{/if}> />是&nbsp;&nbsp;&nbsp;
+                  <input type="radio" name="is_warranty" value="0" <{if $data.is_warranty != 1}>checked="checked"<{/if}> />否
+                  </td>
+                </tr>
+                <tr>
+                  <td align="right" nowrap="nowrap">重量：</td>
+                  <td><input type="text" name="weight" value="<{$data.weight}>" onkeyup="value=value.replace(/[^\d]/ig,'')" />&nbsp;&nbsp;<span style="color:blue;">重量单位:克(g)</span></td>
+                  <td>长：</td>
+                  <td><input type="text" name="length" value="<{$data.length}>" /> mm</td>
+                </tr>
+                <tr>
+                  <td align="right" nowrap="nowrap">宽：</td>
+                  <td><input type="text" name="width" value="<{$data.width}>" /> mm</td>
+                  <td>高：</td>
+                  <td><input type="text" name="height" value="<{$data.height}>" /> mm</td>
+                </tr>
+                <tr>
+                  <td align="right" nowrap="nowrap">体积：</td>
+                  <td><input type="text" name="volume" value="<{$data.volume}>" /> 立方厘米</td>
+                  <td>单价：</td>
+                  <td><input type="text" name="price" value="<{$data.price}>" onkeyup="value=value.replace(/[^\d\.]/ig,'')" /></td>
+                </tr>
+                <tr>
+                  <td align="right" nowrap="nowrap">材质：</td>
+                  <td>
+                  <input type="radio" name="matter_status" value="0" <{if $data.matter_status != '1' && $data.matter_status != '2'}>checked="checked"<{/if}> />液体&nbsp;&nbsp;&nbsp;
+                  <input type="radio" name="matter_status" value="1" <{if $data.matter_status == '1'}>checked="checked"<{/if}> />粉体&nbsp;&nbsp;&nbsp;
+                  <input type="radio" name="matter_status" value="2" <{if $data.matter_status == '2'}>checked="checked"<{/if}> />固体
+                  </td>
+                  <td>品牌：</td>
+                  <td>
+                    <select name="brand_id" id="brand_id">
+                        <option value="0">--请选择品牌--</option>
+                        <{foreach from=$brandList item=brand}>
+                            <{if $data.brand_id == $brand.brand_id}>
+                            <option value="<{$brand.brand_id}>" selected><{$brand.brand_name}></option>
+                            <{else}>
+                            <option value="<{$brand.brand_id}>"><{$brand.brand_name}></option>
+                            <{/if}>
+                        <{/foreach}>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="right" nowrap="nowrap">是否区域销售：</td>
+                  <td>
+                  <input type="radio" name="is_area_sale" value="1" <{if $data.is_area_sale == 1}>checked="checked"<{/if}> />是
+                  <input type="radio" name="is_area_sale" value="0" <{if $data.is_area_sale != 1}>checked="checked"<{/if}> />否
+                  </td>
+                  <td>&nbsp;</td>
+                  <td>&nbsp;</td>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+      <div id="cc" class="noprint table-action">
+          <{button type="button" id="edit_product_btn" label="保 存"}> &nbsp;
+          <{button type="button" class="btn-secondary" id="return-btn" label="关 闭" onclick="javascript:void(window.close());"}>
+      </div>
+    </div>
+</form>
+<script>
+(function() {
+    window.addEvent('domready', function() {
+        $('edit_product_btn').addEvent('click',function(e){
+            var _this=this;
+            var form=this.getParent('form');
+            
+            form.store('target',{
+                    onRequest:function(){
+                        _this.disabled=true;
+                    },
+                    onComplete:function(jsontext){
+                        try{
+                            var json = JSON.decode(jsontext);
+                            if (typeof(json.error)!='undefined'){
+                                _this.disabled=false;
+                            }else{
+                                _this.disabled=true;
+                                if(opener.finderGroup['<{$env.get.finder_id}>']) opener.finderGroup['<{$env.get.finder_id}>'].refresh.delay(100,opener.finderGroup['<{$env.get.finder_id}>']);
+                                setTimeout('window.close()',200);
+                            }
+                        }catch(e){}
+                    }
+            });
+            
+            form.fireEvent('submit',e);
+        });
+    });
+})();
+</script>

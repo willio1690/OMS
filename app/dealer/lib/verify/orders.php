@@ -1,0 +1,49 @@
+<?php
+/**
+ * Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+ * See LICENSE file for license details.
+ */
+/**
+ * @Author: xueding@shopex.cn
+ * @Date: 2022/12/19
+ * @Describe: 核销订单处理Lib
+ */
+class dealer_verify_orders
+{
+    /**
+     * 创建b2b发票信息
+     * @Author: xueding
+     * @Vsersion: 2022/12/19 下午6:10
+     * @param $verifyOrdersData
+     * @param $items
+     * @param null $msg
+     * @return bool
+     */
+
+    public function createB2BInvoice($verifyOrdersData, &$msg = null)
+    {
+        $orderSdf = $this->_formatCreateParams($verifyOrdersData);
+        
+        /**@used-by invoice_event_receive_einvoice::create_invoice_order * */
+        return kernel::single('ome_event_trigger_shop_invoice')->process($orderSdf, 'create_invoice_order',
+            'order_create');
+    }
+    
+    /**
+     * b2b发票信息format
+     * @Author: xueding
+     * @Vsersion: 2022/12/19 下午6:10
+     * @param $orderInfo
+     * @param $items
+     * @return mixed
+     */
+    private function _formatCreateParams($orderInfo)
+    {
+        $params                            = $orderInfo;
+        $params['invoice_amount']          = $orderInfo['total_amount'];
+        $params['order_type']              = 'b2b';
+        $params['invoice_kind']            = '3';
+        $params['value_added_tax_invoice'] = '1';
+        return $params;
+    }
+}

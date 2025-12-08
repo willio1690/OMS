@@ -1,0 +1,281 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="gEditor-Body">
+      <div class="spage-main-box">
+          <div class="tableform">
+          <div id="x-g-basic" class="goods-detail">
+            <div class="edit_box">
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td width="80" align="right" nowrap="nowrap" bgcolor="#ffc"><strong>物料编号：</strong></td>
+                      <td bgcolor="#ffc">&nbsp;<{$item.material_bn}></td>
+                      <td width="130" align="right" bgcolor="#ffc"><strong>物料名称：</strong></td>
+                      <td bgcolor="#ffc">&nbsp;<{$item.material_name}></td>
+                  </tr>
+                </table>
+              <div class="h_10px"></div>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td align="right" class="memo"><strong>物料保质期条码：</strong></td>
+                    <td><input name="expire_bn" type="text" id="expire_bn" size="15" maxlength="8"/></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td align="right" class="memo"><strong>出库数量：</strong></td>
+                    <td><input name="out_num" type="text" id="out_num" size="15" maxlength="8" /></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>&nbsp;</td>
+                    <td><button class="btn btn-primary" id="btn_create_barcode"><span><span><{t}>生成保质期出库明细<{/t}></span></span></button></td>
+                    <td>&nbsp;</td>
+                  </tr>
+                </table>
+           <div class="h_20px"></div>
+           
+           <div id="ajax_get_div_contents">
+             <form id="expireForm" name="expireForm" action="index.php?app=wms&ctl=admin_iostockorder&act=do_bind_storage_life" method="POST">
+                <input type="hidden" name="iso_id" value="<{$iso_item.iso_id}>">
+                <input type="hidden" id="curr_id" name="bm_id" value="<{$item.bm_id}>">
+                <input type="hidden" name="iso_items_id" value="<{$iso_item.iso_items_id}>">
+                <table class="gridlist">
+                    <thead>
+                      <tr>
+                            <th width="80" align="center" nowrap="nowrap">序号</th>
+                            <th align="right">保质期条码</th>
+                            <th width="80">出库数量</th>
+                            <th width="100">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody id="material_barcode_list" class="material_barcode_li">
+                    </tbody>
+                </table>
+                  
+                <table border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>
+                        <div class="table-action" style="margin:0px; padding:0px; border:none;">
+                        <{button label="绑定" class="btn btn-primary" id="saveBtn" name="btn_submit"}> &nbsp; <{button label="关闭" id="cancelBtn" class="btn btn-secondary" isCloseDialogBtn='true'}>
+                        </div>
+                        </td>
+                    </tr>
+                </table>
+             </form>
+           </div>
+                
+                <div class="h_10px"></div>
+            </div>
+          </div>
+          </div>
+      </div>
+    </div>
+<style type="text/css">
+.dialog .dialog-content-body { background:#fff; border:none; }
+.dialog .tableform { background: none repeat scroll 0 0 #F8F8F8; border: 1px solid #D9D9D9; }
+.gridlist thead th { height:27px; line-height:27px; padding-left:12px;  }
+.edit_box { padding:10px 20px 5px 20px; }
+.h_10px { clear:both; width:100%; height:10px; }
+.h_20px { clear:both; width:100%; height:20px; }
+
+strong { font-weight:700; }
+.memo { font-size:18px; }
+</style>
+<script language="javascript">
+    void function()
+    {
+        var new_spec_item = 1;
+		var item_nums   = parseInt('<{$iso_item.nums}>');
+        var has_expire_bm_info = <{$has_expire_bm_info}>;
+     
+        var getTemp = function(i, barcode, out_num)
+        {
+			item_nums	= item_nums - out_num;
+			
+            return '<td width="90" align="center" nowrap="nowrap">'+ i +'<input name="expire_id[]" type="hidden" value="'+ i +'" /></td><td>'+barcode+'<input name="expire_barcode[]" class="li_expire_barcode" type="hidden" value="'+ barcode.toUpperCase() +'" /></td><td><strong>'+ out_num +'</strong><input name="expire_num[]" type="hidden" value="'+ out_num +'" /></td><td align="center"><{img src="bundle/delecate.gif" app="desktop" key="state" class="pointer btn-delete-item"}></td>';
+        };
+		
+        $('btn_create_barcode').addEvent('click',function(e){
+            e.stop();
+            var expire_bn	= $('expire_bn').value;
+            var out_num	    = $('out_num').value;
+            out_num	    = (out_num ? parseInt(out_num) : 0);
+			
+			var is_fail	= false;
+			
+			if(item_nums <= 0)
+            {
+				alert('没有可出库数量!');
+                $('out_num').focus();
+                return false;
+            }
+			
+			if(out_num <= 0)
+            {
+                alert('请输入出库数量!');
+                $('out_num').focus();
+                return false;
+            }
+			
+            if(out_num > item_nums)
+            {
+                alert('出库数量不能大于调拨出库数量');
+                $('out_num').focus();
+                return false;
+            }
+			$$('#material_barcode_list tr input[name=expire_barcode[]]').each(function(item)
+			{
+				if(expire_bn == item.value || (expire_bn.toUpperCase()) == item.value)
+				{
+					is_fail	= true;
+				}
+			});
+			
+			if(is_fail)
+			{
+				alert("保质期条码已经存在，请不要重复输入");
+				return false;
+			}
+			
+            new Request({url:'index.php?app=wms&ctl=admin_iostockorder&act=checkExpireBn', method:'post',data: {expire_bn: expire_bn, bm_id: $('curr_id').value, iso_id: $('iso_id').value, out_num: out_num},
+                onComplete:function(res) {
+                    
+					if(res == 'empty')
+					{
+						alert('提交参数无效');
+                        $('expire_bn').focus();
+                        return false;
+					}
+					else if(res == 'fail')
+					{
+						alert('保质期条码关闭、不存在或不属于当前仓库或当前物料');
+                        $('expire_bn').focus();
+                        return false;
+					}
+					else if(res == 'error_num')
+					{
+						alert('保质期条码有效数量不足');
+                        $('expire_bn').focus();
+                        return false;
+					}
+					else if(res == false){
+                        alert('请输入有效的物料保质期条码!');
+                        $('expire_bn').focus();
+                        return false;
+                    }else{
+                        if(out_num <= 0){
+                            alert('请输入出库数量!');
+                            $('out_num').focus();
+                            return false;
+                        }
+
+                        var newRow=new Element('tr.barcode_tr_li',{html:getTemp(new_spec_item++,expire_bn, out_num)}).inject($('material_barcode_list'));
+
+                        $ES('.btn-delete-item').each(function(item){
+                            item.removeEvent('click').addEvent('click',function(e){
+                                if(confirm('确定要删除批次'+this.getParent('tr').getElement("input[name=expire_barcode[]]").value+'吗？'))
+								{
+									var get_expire_num    = this.getParent('tr').getElement("input[name=expire_num[]]").value;
+									item_nums    = item_nums + get_expire_num;
+									
+									this.getParent('tr').destroy();
+								}
+                            });
+                        });
+                    }
+                }
+            }).send();
+        });
+
+        if(has_expire_bm_info != '1'){
+            has_expire_bm_info.each(function(item){
+                new Element('tr.barcode_tr_li',{html:getTemp(new_spec_item++,item.expire_bn, item.out_num)}).inject($('material_barcode_list'));
+            });
+
+            $ES('.btn-delete-item').each(function(item){
+                item.removeEvent('click').addEvent('click',function(e){
+                    if(confirm('确定要删除批次'+this.getParent('tr').getElement("input[name=expire_barcode[]]").value+'吗？'))
+					{
+						var get_expire_num    = this.getParent('tr').getElement("input[name=expire_num[]]").value;
+						item_nums    = item_nums + get_expire_num;
+						
+						this.getParent('tr').destroy();
+					}
+                });
+            });
+        }
+    }();
+
+    //保存按钮
+    $('saveBtn').addEvent('click', function()
+	{
+		var flag	= true;
+		var temp_arr = new Array;
+		$$('#material_barcode_list tr input[name=expire_barcode[]]').each(function(item)
+		{
+			temp_expire_bn	= item.value;
+			temp_expire_bn	= temp_expire_bn.toUpperCase();
+			
+			temp_arr.push(temp_expire_bn);
+		});
+		if(temp_arr)
+		{
+			var nary	= temp_arr.sort();
+			for(var i=0; i < nary.length; i++)
+			{
+				if (nary[i] == nary[i+1])
+				{
+					alert("不能重复输入保质期条码："+nary[i]);
+					flag	= false;
+				}
+			}
+		}
+		
+		if(flag)
+		{
+			$('expireForm').fireEvent('submit', {
+				stop: function() {
+				}
+			});
+		}
+    });
+
+    $('expireForm').removeEvents('submit').addEvent('submit', function(e) {
+        e.stop();
+        new Request.JSON ({
+            url:this.action,
+            onRequest: function () {
+                $('saveBtn').set('disabled', 'true');
+                $('cancelBtn').set('disabled', 'true');
+            },
+            onSuccess: function(result) {
+                if (result.code =='SUCC') {
+                    var curr_id = $('curr_id').value;
+                    addRole(curr_id,result.msg,result.count);
+                    $('saveBtn').getParent('.dialog').retrieve('instance').close();
+                } else {
+                    $('saveBtn').set('disabled', '');
+                    $('cancelBtn').set('disabled', '');
+                    //提示信息
+                    alert(result.msg);
+                }
+            }
+        })[this.method](this);
+    });
+
+    $('cancelBtn').removeEvents('click').addEvent('click', function(e) {
+        $('cancelBtn').getParent('.dialog').retrieve('instance').close();
+    });
+	
+    function addRole(id,msg,num) {
+        var expire_bm_info = 'expire_bm_'+id;
+        var bm_num = 'bm_num_'+id;
+        $(expire_bm_info).set('expire_bm_info',msg);
+        $(bm_num).set('text',num);
+    }
+</script>

@@ -1,0 +1,102 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+    <div class="division">
+        <form method="post" action="index.php?app=console&ctl=admin_vopreturn&act=doCancel" id="frm">
+            <{input type="hidden" name="id" value=$data.id}>
+            <table border="0" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <th>单号：</th>
+                        <td><{$data.return_sn}></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+<{area inject=".mainFoot"}>
+<div class="table-action">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <{button type="button" id='submit_btn' label='确定' }>
+                    <{button type="button" id='close_btn' label='关闭' }>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<{/area}>
+<script type="text/javascript">
+    (function(){
+        var _form = $('frm');//表单ID 
+        var btn   = $('submit_btn');//按钮ID
+        var finder = finderGroup['<{$env.get.finder_id}>'];
+        var operator_name = '<{$data.return_sn}>';
+        $('close_btn').addEvent('click', function(){
+            try{
+                var _dialogIns = this.getParent('.dialog').retrieve('instance');
+            }catch(e){}
+
+            if(_dialogIns){
+                setTimeout(finder.refresh(),30000);
+                _dialogIns.close();
+            }
+        });
+        _form.store('target',{
+            onRequest:function(){
+                btn.setAttribute('disabled', 'disabled');
+            },
+            onComplete:function(){
+                btn.removeAttribute('disabled');
+            },
+            onSuccess:function(response){
+                var hash_res_obj = JSON.decode(response);
+                if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                    try{
+                        var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                    }catch(e){}
+
+                    if(_dialogIns){
+                        setTimeout(finder.refresh(),30000);
+                        _dialogIns.close();
+                    }
+                }
+            }
+        });
+
+        btn.addEvent('click',function(){
+            new Request({
+                url:'index.php?app=console&ctl=admin_vopreturn&act=checkCancel&p[0]='+<{$data.id}>,
+                method:'POST',
+                onRequest:function(){
+                    btn.set('disabled', 'true');
+                    btn.getElements('span')[1].set('text','正在取消...'); 
+                },
+                onComplete:function(json){
+                    if (json != ''){
+                        json = JSON.decode(json);
+                        
+                        if(json.rsp == 'fail'){
+                            if (window.confirm('仓储物流系统无法进行撤销'+operator_name+'操作,是否继续取消'+operator_name+'?\n注：确定继续拒绝将强制撤销本系统未处理的'+operator_name+'，否则请线下联系仓储服务商取消相应的'+operator_name))
+                            {
+                                _form.fireEvent('submit',{stop:function(){}});
+                            }else{
+                                btn.set('disabled', '');
+                                btn.getElements('span')[1].set('text','确定');
+                            }
+                        }else{
+                            _form.fireEvent('submit',{stop:function(){}});
+                        }
+                    }
+                },
+            }).send();
+        });
+
+    })();
+</script> 

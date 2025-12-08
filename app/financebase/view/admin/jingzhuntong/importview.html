@@ -1,0 +1,38 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div id="system-setting" class="tableform tableform-tabs">
+        <form action='index.php?app=financebase&ctl=admin_shop_settlement_jingzhuntong&act=doImport&type=<{$setting.type}>&finder_id=<{$env.get.finder_id}>' method='post' target="uploadframe" enctype="multipart/form-data" id="import_form" class="tableform">
+            <br>
+            <span style="color:red; font-size:14pz; padding-top:5px; line-height:24px;"><{$setting.name}></span>
+            <br>
+                        选择文件:
+            <input type='file' name='import_file' id='ImportCSV'/>
+            &nbsp;
+            <button id="downloadTemplate" onclick="javascript:window.location.href='/app/financebase/statics/import/jingzhuntong/<{$setting.type}>.xls'" class="btn filterBtn btn-thirdly" type="button"><span><span>下载模板</span></span></button>
+            <br />
+            <br/>
+            <br/>
+            <div class="table-action">
+                <{button label=$___desktop="导入"|t:'desktop' id="ImportBtn"  type="submit"}>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+(function(){
+    var state;
+    $('ImportBtn').addEvent('click',function(e){
+        if(state||!$('ImportCSV').value.length)return false;
+        state=true;
+        this.style.cursor='not-allowed';
+    });
+    
+    $('ImportCSV').addEvent('change',function(e){
+        state=false;
+        $('ImportBtn').style.cursor='pointer';
+    });
+})();
+</script>

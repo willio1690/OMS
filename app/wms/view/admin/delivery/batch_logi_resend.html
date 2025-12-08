@@ -1,0 +1,72 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+    .delivery-tab{margin:0;padding:0;overflow:hidden;}
+    .delivery-tab li{float:left; width:200px;height:24px;line-height:24px;margin-right:5px;font-size: 12px;overflow:hidden;}
+    .delivery-tab .hover{background-position:0 0;font-weight:bold;}
+</style>
+<form method="POST" action="index.php?app=wms&ctl=admin_receipts_print&act=doLogiResend" class="tableform" id="form_change_dly">
+<input type="hidden" id="delivery_ids" name="delivery_ids" value="<{$delivery_ids}>" />
+<div class="tableform">
+    <div class="note">
+        本次操作您共选择了 <font color='red'><span id='orderCount'><{$orderCnt}></span></font> 个发货单。
+    </div>
+    <div>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td width="90" nowrap="nowrap"><em><font color='red'>*</font></em>物流公司：</td>
+          <td>
+          <select type="select" name="logi_id" id="logi_id" class="x-input-select inputstyle">
+              <{foreach from=$corpList item=corpItem key=corpKey}>
+              <option value="<{$corpItem.corp_id}>" <{if $deliveryInfo.logi_id == $corpItem.corp_id}>selected<{/if}> ><{$corpItem.name}><{if $corpItem.tmpl_type == 'electron'}>(电子面单)<{/if}></option>
+              <{/foreach}>
+          </select>
+          </td>
+        </tr>
+        <tr>
+          <td nowrap="nowrap"><em><font color='red'>*</font></em>物流单号：</td>
+          <td><input class="x-input " type="text" name="logi_no" id="logi_no" size="30"> <br /><span style="color:red;">*电子面单类型不需要填写物流单号，会通过接口自动获取。</span></td>
+        </tr>
+      </table>
+    </div>
+</div>
+</form>
+<{area inject='.mainFoot'}>
+<div class="table-action">
+    <{button type="button" label="更换物流并通知平台" id="btn-run"}>
+</div>
+<{/area}>
+
+<script>
+(function(){
+    var _form = $('form_change_dly');
+    var btn =$('btn-run');
+    var finder = finderGroup['<{$env.get._finder.finder_id}>'];
+    
+    _form.store('target',{
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+        
+            if (hash_res_obj.success != undefined && hash_res_obj.success != ""){
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+                
+                if(_dialogIns){    
+                    _dialogIns.close();
+                    window.finderGroup['<{$env.get._finder.finder_id}>'].refresh();
+                }
+            }
+            
+        }
+    });
+
+    btn.addEvent('click',function(){
+        _form.fireEvent('submit',{stop:$empty});
+    });
+    
+})();
+</script>

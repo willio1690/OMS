@@ -1,0 +1,119 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $total > 0}>
+<style>
+    .processBarBg {border:1px solid #999999; width:98%; margin:5px; height:25px;line-height:25px;padding:1px; background:#EEEEEE;}
+    .processBar {background:#3366cc; width:0px; padding-bottom:1px;overflow:hidden;}
+</style>
+<div id="processBarBg" class="processBarBg"><div id="processBar" class="processBar">&nbsp;</div></div>
+
+<div class="division" style="display:none;" id="information">
+<span id="iSucc" style="color:green">0</span> 个成功，
+<span id="iFail" style="color:red">0</span> 个失败
+</div>
+
+<div class="tableform">
+    <form id="order-batch-dialog" method='post' action='index.php?app=material&ctl=admin_material_basic&act=doBatchSetBbu'>
+        <input type="hidden" name="filter" value="<{$filter}>">
+        <table width="100%" >
+            <tbody> 
+                <tr>
+                     <td width="38%" align="right" nowrap="nowrap">所属销售团队：</td>
+                     <td>
+                        <select name="bbu_info">
+                            <option value="0">--请选择所属销售团队--</option>
+                            <{foreach from=$bbuList item=bbu}>
+                            <option value="<{$bbu.bbu_id}>|<{$bbu.cos_id}>"><{$bbu.bbu_name}>(<{$bbu.bbu_code}>)</option>
+                            <{/foreach}>
+                        </select>
+                     </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+<div class="table-action">
+<{button label="开始" type="botton" name="Start" id="btn-run"}>
+<{button label="关闭" type="botton" isCloseDialogBtn="true" }>
+</div>
+<script type="text/javascript">
+
+(function(){
+    function process(page_no){
+        var _form = $("order-batch-dialog");
+        var _input = document.getElementsByTagName('input');
+        var _textarea = document.getElementsByTagName('textarea');
+        var url = _form.action+'&page_no='+page_no+'&total=<{$total}>';
+        if(! validate(_form)) return;
+        new Request({url:url,method:'post',data:_form,
+            onComplete:function(result){
+                if(!result) return;
+                ret = JSON.decode(result);
+
+                var succ_num = $('iSucc').getText().toInt() + ret.data.succ_num;
+                var fail_num = $('iFail').getText().toInt() + ret.data.fail_num;
+                $('iSucc').set('html', succ_num);
+                $('iFail').set('html', fail_num);
+                
+                $('processBar').setStyle('width', ret.data.rate + '%');
+                if (ret.status == 'running') {
+                    page_no++;
+                    return process(page_no);
+                };
+
+                $('btn-run').set('html', '<span><span>处理已完成，本窗口将在3秒后自动关闭！</span></span>');
+                setTimeout("$('btn-run').getParent('.dialog').retrieve('instance').close();finderGroup['<{$env.get.finder_id}>'].refresh();",2000);
+            },
+            onRequest:function(){
+                $('information').style.display ='';
+                $('btn-run').disabled = true;
+                if(_input){
+                    for(var key in _input){
+                       SetReadOnly(_input[key]);
+                    }
+                }
+                if(_textarea){
+                    for(var key in _textarea){
+                       _textarea[key].readOnly=true;
+                    }
+                }
+                $('btn-run').set('html', '<span><span>数据处理中，请稍候！</span></span>');
+            }
+        }).send();
+    }
+
+    $("btn-run").addEvent('click',function(){
+        process(1);
+    });
+
+})();
+function SetReadOnly(obj) {
+    if (obj.type == 'radio') {
+        // 单选框时，设置所有具有相同name的radio为只读  
+        if (obj.name) {
+            var arr = document.getElementsByName(obj.name);
+            var len = arr.length;
+            var tmp = null;
+            for (var i = 0; i < len; i++)
+                if (arr[i].checked) {
+                tmp = arr[i];
+                break;
+            }  
+            var func;  
+            if (tmp)  
+                func = function() { tmp.checked = true; };
+            else  
+                func = function() { return false; };
+            for (var i = 0; i < len; i++)
+                arr[i].onclick = func;
+        } else
+            obj.onclick = function() { return false; };
+    }
+}
+</script>
+<{else}>
+<h2 style="color:red;">暂无符合条件的物料</h2>
+<{/if}>

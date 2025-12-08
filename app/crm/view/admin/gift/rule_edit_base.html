@@ -1,0 +1,435 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+#num_rules {list-style:none;margin:0;padding:0;}
+#num_rules label{cursor:pointer;}
+#num_rules li{color:#999;padding:3px 0;background:#EFEFEF;}
+#num_rules li.active{color:#000;background:#FFc;}
+</style>
+
+<form method="POST" action="index.php?app=crm&ctl=admin_gift_rulebase&act=save" class="" id="form_member_lv">
+
+    <{input type="hidden" name="id" value=$rule.id }>
+
+    <h3 class="head-title">赠品规则</h3>
+    <div class="tableform" style="background:#FFF;">
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" >
+            <tr>
+                <th><em class="c-red">*</em><{t}>规则编号：<{/t}></th>
+                <td>
+                    <{if $rule.id}>
+                        <{$rule.rule_bn}>
+                    <{else}>
+                        <{input id="rule_bn" type="text" name="rule_bn" value=$rule.rule_bn size="25" vtype="required" }>
+                    <{/if}>
+                </td>
+            </tr>
+            <tr>
+                <th><em class="c-red">*</em><{t}>规则名称：<{/t}></th>
+                <td><{input id="title" type="text" name="title" value=$rule.title size="25" vtype="required" }></td>
+            </tr>
+        </table>
+    </div>
+
+    <h3 class="head-title">规则条件</h3>
+    <{include file='admin/gift/rule_edit_2.html' app="crm" }>
+    
+    <h3 class="head-title">赠送商品</h3>
+    <{include file='admin/gift/rule_edit_3.html' app="crm" }>
+    
+</form>
+
+<div class="table-action">
+    <{button type="button" label="确认保存" id="rule_save" style="display:;"}>
+    <{button type="button" label="返回" onclick="location.href=window.frameElement.src" }>
+</div>
+
+<script>
+var num_rule = '<{$rule.filter_arr.buy_goods.num_rule}>';
+var count_type = '<{$rule.filter_arr.buy_goods.count_type}>';
+var gift_template = '';//赠品列表tr模板
+
+(function(){
+
+    init_select_value();
+    
+    if(!num_rule){
+        num_rule = 'fixed';
+    }
+    var num_rule_radio = $$('#num_rules input[type=radio][value="'+num_rule+'"]');
+    num_rule_radio.set('checked', 'checked');
+    num_rule_radio.getParent().set('class', 'active');
+
+    gift_template = '<td><input onclick="set_bg_color($(this)); updateGiftContent();" type="checkbox" name="gift_id[]" value="<!--gift_id-->" /></td>';
+    gift_template += '<td>移动</td>';
+    gift_template += '<td><!--gift_bn--></td>';
+    gift_template += '<td><!--gift_name--></td>';
+    gift_template += '<td><!--gift_price--></td>';
+    gift_template += '<td>';
+    gift_template += '<{input type="text" vtype="required&&unsignedint" name="gift_num[<!--gift_id-->]" value=1 size=4 }>';
+    gift_template += '</td>';
+
+    $$('input[name="status"][value='+status+']').set('checked','checked');
+    
+    //保存规则
+    $('rule_save').addEvent('click', function(){
+        if(chk_form() == false) return false;
+        $('form_member_lv').fireEvent('submit',{stop:$empty});
+    });
+    
+    //订单金额类型
+    $$('select[name="filter_arr[order_amount][type]"]').addEvent('change', function(){
+        var ele = $(this);
+        if(ele.value=='0'){
+            ele.getNext().hide();
+        }else{
+            ele.getNext().show();
+        }
+    });
+    
+    $$('select[name="filter_arr[order_amount][sign]"]').addEvent('change', function(){
+        var ele = $(this);
+        if(ele.value=='bthan'){
+            ele.getNext().hide();
+        }else{
+            ele.getNext().show();
+        }
+    }); 
+    
+    $$('#num_rules_sign').addEvent('change', function(){
+        var ele = $(this);
+        if(ele.value!='between'){
+            ele.getNext().getNext().hide();
+        }else{
+            ele.getNext().getNext().show();
+        }
+    }); 
+    
+    $('filter_arr[buy_goods][limit_type]').addEvent('change', function(){
+        var ele = $(this);
+        if(ele.value=='0'){
+            ele.getNext().hide();
+        }else{
+            if($('buy_goods_limit_orders').get('value')==''){
+                $('buy_goods_limit_orders').set('value', 10);
+            }
+            ele.getNext().show();
+        }
+    });
+
+    $('filter_arr[buy_goods][type]').addEvent('change', function(){
+        var ele = $(this);
+        if(ele.value=='0'){
+            ele.getNext().hide();
+        }else{
+            ele.getNext().show();
+            if(ele.value=='2') {
+                $('add_sku_postion').childNodes[1].show();
+                $('add_sku_postion').childNodes[2].hide();
+            } else {
+                $('add_sku_postion').childNodes[1].hide();
+                $('add_sku_postion').childNodes[2].show();
+            }
+        }
+    });
+    $('filter_arr[buy_goods][type]').fireEvent('change', {stop:$empty});
+
+    var _form = $('form_member_lv');
+    var btn =$('rule_preview');
+    var finder = finderGroup['<{$env.get.finder_id}>'];
+    
+    _form.store('target',{
+        onSuccess:function(response){
+            var hash_res_obj = JSON.decode(response);
+        
+            if (hash_res_obj.success != undefined && hash_res_obj.success != "")
+            {
+                try{
+                    var _dialogIns = btn.getParent('.dialog').retrieve('instance');
+                }catch(e){}
+                
+                if(_dialogIns)
+                {    
+                    _dialogIns.close();
+                    window.finderGroup['<{$env.get.finder_id}>'].refresh();
+                }
+            }
+        }
+    });
+    
+    $('giftFilterBtn').addEvent('click',function(){
+        ajax_get_gifts();
+    });
+    
+    $$('#num_rules input[type=radio]').addEvent('click', function(){
+        $$('#num_rules li').set('class', '');
+        $(this).getParent().set('class', 'active');
+    });
+    
+    $('count_type').addEvent('change', function(){
+        $('count_type2').set('value', $(this).get('value'));
+    });
+    
+    $('count_type2').addEvent('change', function(){
+        $('count_type').set('value', $(this).get('value'));
+    });
+
+})();
+
+var scrollAuto =  new Scroller($('gift_list').getElement('tbody')); 
+var objSortables = new Sortables($('gift_list').getElement('tbody'),{clone:false,opacity:.5,handle:'.move-handler',onStart:function(){
+    $('gift_list').addClass('move-active');
+    scrollAuto.start();
+},onComplete:function(){
+    scrollAuto.stop();
+    $('gift_list').removeClass('move-active');
+}});
+
+function ajax_get_gifts(){
+
+    //清除所有未选择的赠品
+    //只移除未选择的商品
+    var sel_goods = '0';
+    var chkBox = $$('#gift_list input[type="checkbox"]');
+    chkBox.each(function($obj,i){
+        var tr_obj = $obj.parentNode.parentNode;
+        if($obj.get('checked') == false) {
+            tr_obj.remove();
+        }else{
+            sel_goods += ','+$obj.value;
+        }
+    });
+
+    var _url = 'index.php?app=crm&ctl=admin_gift_rulebase&act=ajax_get_gifts';
+    var _data = 'sel_goods='+sel_goods+'&s_gift_bn='+$('s_gift_bn').value+'&s_gift_name='+$('s_gift_name').value;
+    new Request({
+        url : _url,
+        method : 'post',
+        data : _data,
+        onSuccess : function(responseText){
+            //alert(responseText);
+            //alert(gift_template)
+            var obj = JSON.decode(responseText);
+            var gift_list = $('gift_list').getElement('tbody');
+            var new_node;
+            var gift_no = $$('#gift_list tbody tr').length;
+            for(var i=0;i<obj.length;i++){    
+                gift_no++;
+                new_node = gift_template.replace(/<!--gift_type--\>/g,obj[i].gift_type).replace(/<!--gift_id--\>/g,obj[i].id).replace('<!--gift_name--\>',obj[i].gift_name).replace('<!--gift_bn--\>',obj[i].gift_bn).replace('<!--gift_no--\>',gift_no).replace('<!--gift_price--\>',obj[i].gift_price);
+                var new_tr = new Element('tr', {class:"move-handler", style:"display:;"});
+                new_tr.set('html',new_node);
+                new_tr.inject(gift_list);
+                objSortables.removeItems(gift_list);
+                objSortables.addLists(gift_list);
+            }
+        }
+    }).send();
+}
+
+function get_selected_text(ele){
+    return ele.options[ele.selectedIndex].text;
+}
+
+//预设下拉框的值
+function init_select_value(){
+    if('<{$rule.id}>' == '' && '<{$type}>' != 'copy')  {
+        return ;
+    }
+
+    var _form = $('form_member_lv');
+    
+    _form.getElement('select[name="filter_arr[order_amount][type]"]').set('value', '<{$rule.filter_arr.order_amount.type}>');
+    
+    _form.getElement('select[name="filter_arr[order_amount][sign]"]').set('value', '<{$rule.filter_arr.order_amount.sign}>');
+    
+    _form.getElement('select[name="filter_arr[buy_goods][rules_sign]"]').set('value', '<{$rule.filter_arr.buy_goods.rules_sign}>');
+    
+    _form.getElement('select[name="filter_arr[buy_goods][type]"]').set('value', '<{$rule.filter_arr.buy_goods.type}>');
+    
+    _form.getElement('select[name="filter_arr[buy_goods][buy_type]"]').set('value', '<{$rule.filter_arr.buy_goods.buy_type}>');
+
+    _form.getElement('select[name="filter_arr[buy_goods][calculate_type]"]').set('value', '<{$rule.filter_arr.buy_goods.calculate_type}>');
+
+    _form.getElement('select[name="filter_arr[buy_goods][limit_type]"]').set('value', '<{$rule.filter_arr.buy_goods.limit_type}>'); 
+    
+    _form.getElement('select[name="filter_arr[buy_goods][count_type]"]').set('value', '<{$rule.filter_arr.buy_goods.count_type}>');
+    
+    _form.getElement('select[name="filter_arr[buy_goods][count_type2]"]').set('value', '<{$rule.filter_arr.buy_goods.count_type}>');    
+}
+
+//检测必填项
+function chk_form(){
+    var _form = $('form_member_lv');
+    
+    if($('rule_bn') && $('rule_bn').get('value')==''){
+        alert('请输入规则编号');
+        $('rule_bn').focus();
+        return false;
+    }
+
+    if($('title').get('value')==''){
+        alert('请输入规则名称');
+        $('title').focus();
+        return false;
+    }
+    
+    //限定：购买金额
+    var order_amount_type = get_selected_text($('order_amount_type'));
+    
+    if(order_amount_type != '无限制'){
+        var order_amount_sign = get_selected_text($('order_amount_sign'))
+        var order_amount_min_num = $('order_amount_min_num').get('value');
+        var order_amount_max_num = $('order_amount_max_num').get('value');
+
+        if(chk_money(order_amount_max_num) == false){
+            alert('请输入最高金额');
+        return false;
+    }
+    
+        if(order_amount_sign == '介于'){
+            if(chk_money(order_amount_min_num) == false){
+                alert('请输入最低金额');
+                return false;
+            }
+        }
+    }
+    
+    if($('filter_arr[buy_goods][type]').get('value')==1){
+        var product_id = $$('input[name="product_id"]').get('value');
+        var pkg_goods_id = $$('input[name="pkg_goods_id"]').get('value');
+        if((product_id ==  '') && (pkg_goods_id == '')){
+            alert('请至少选择一个商品');
+            
+            return false;
+        }
+        var buy_type = $('filter_arr[buy_goods][buy_type]').get('value');
+        if(!buy_type){
+            alert('请选择购买范围');
+            return false;
+        }
+    }
+        
+    if($('filter_arr[buy_goods][limit_type]').get('value') == 1){
+        if(chk_int($('buy_goods_limit_orders').value) == false){
+            alert('限量赠送 请输入送出赠品的最多订单数量');
+            $('buy_goods_limit_orders').focus();
+            return false;
+        }
+    }
+
+    if(chk_num_rules() == false){
+        return false;
+    }
+    //赠品列表预览
+    var gift_list = [];
+    $$('#gift_list input:checked').each(function(ele){
+        gift_list.push(ele.value);
+    });
+    if(gift_list.length == 0){
+        alert('请选择至少一个赠送商品');
+        return false;
+    }
+
+    return true;
+}
+
+function get_num_rules(){
+    var num_rule = $$('#num_rules input[type=radio]:checked').get('value');
+    var str = '';
+    
+    if(num_rule == 'fixed'){
+        if($('num_rules_sign').get('value')=='between'){
+            str = '购买数量' + get_selected_text($('num_rules_sign')) + $('buy_goods_min_num').value + '~' + $('buy_goods_max_num').value;
+        }else{
+            str = '购买数量' + get_selected_text($('num_rules_sign')) + $('buy_goods_min_num').value;
+        }
+    }else if(num_rule == 'limit_orders'){
+        str = '购买此商品的前 '+ $('buy_goods_limit_orders').value +' 笔订单赠送1组赠品';
+    }else if(num_rule == 'auto'){
+        str = '每购买 '+$('per_num').value+' 件， 赠送 '+$('send_suite').value+' 组赠品， 每订单最多送 '+ $('max_send_suite').value +' 组';
+    }
+    
+    return str;
+}
+
+function chk_num_rules(){
+    var num_rule = $$('#num_rules input[type=radio]:checked').get('value');
+    var count_type = $("count_type").get('value');
+    var count_type2 = $("count_type2").get('value');
+    
+    //alert('='+num_rule+'=')
+    
+    if(num_rule == 'fixed'){
+        if(count_type == 'paid'){
+            if(chk_money($('buy_goods_min_num').value) == false){
+                alert('促销条件 请输入正确购买金额');
+                return false;
+        }
+            if($('num_rules_sign').get('value')=='between' && chk_money($('buy_goods_max_num').value) == false){
+                alert('促销条件 请输入正确最大购买金额');
+                return false;
+            }
+        }else{
+            if(chk_int($('buy_goods_min_num').value) == false){
+                alert('促销条件 请输入最小购买数量');
+                return false;
+            }
+            if($('num_rules_sign').get('value')=='between' && chk_int($('buy_goods_max_num').value) == false){
+                alert('促销条件 请输入最大购买数量');
+                return false;
+            }
+        }
+    }else if(num_rule == 'limit_orders'){
+        if(chk_int($('buy_goods_limit_orders').value) == false){
+            alert('促销条件 请输入限定订单数');
+            return false;
+        }
+    }else if(num_rule == 'auto'){
+        if(count_type2 == 'paid'){
+            if(chk_money($('per_num').value) == false){
+                alert('促销条件 请输入正确购买金额');
+                return false;
+            }
+        }else{
+            if(chk_int($('per_num').value) == false){
+                alert('促销条件 请输入订单数');
+                return false;
+            }
+        }
+        if(chk_int($('send_suite').value) == false){
+            alert('促销条件 请输入赠送套数');
+            return false;
+        }
+        if(chk_int($('max_send_suite').value) == false){
+            alert('促销条件 请输入总赠送套数');
+            return false;
+        }
+    }
+}
+
+//设置背景色
+function set_bg_color(e){
+    if(e.checked === true){
+        e.getParent().getParent().style.backgroundColor = '#FFFFCC';
+    }else{
+        e.getParent().getParent().style.backgroundColor = '';
+    }
+}
+
+function chk_int(val){
+    var reg = new RegExp("^([1-9]+)([0-9]*)$");
+    if(!reg.test(val)){
+        return false;
+    }
+}
+
+function chk_money(val){
+    var reg = new RegExp("^([0-9]+)(\.*)([0-9]*)$");
+    if(!reg.test(val)){
+        return false;
+    }
+}
+</script>

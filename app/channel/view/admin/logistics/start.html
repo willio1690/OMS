@@ -1,0 +1,24 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div style="margin-left:20px;margin-bottom:10px;padding:5px; border:0;font-size:15px;">
+</div>
+<div style="margin-left:10px;border:1px #666666 solid;width:581px;" id='start_examin'>
+	<a href="#" id='hh' onclick='start_examin();'><img width="581px" height="383px"  src='<{$env.app.res_url}>/crm.gif'></a>
+</div>
+<script>
+function start_examin(){
+    new Request({
+    	url:'index.php?app=channel&ctl=admin_logistics_examin&act=ajax_start_examin',
+   		method:'post',
+   		data:'ajaxParams='+100,
+   		async:false,
+        onComplete:function(txt){
+            location = 'index.php?app=channel&ctl=admin_logistics_examin&act=index';
+            window.location = location;
+        }
+    }).send();
+}
+</script>

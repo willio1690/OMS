@@ -1,0 +1,404 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<style>
+.shop-name{
+    color:red;font-weight:bold;
+}
+</style>
+
+<div class="form-layout">
+  <form method="post" action="index.php?app=ome&ctl=admin_branch&act=save" id="form-branch">
+    <input type="hidden" name="branch_id" value="<{$branch.branch_id|default:0}>">
+    <div class="form-layout-block">
+    <h3>仓库添加/编辑</h3>
+    <div class="form-layout-fields form-layout-fields-column">
+            <div class="form-field">
+                <span class="form-field-label"><em class="c-red">*</em>仓库名称：</span>
+                <input class="form-input" name="name"  value="<{$branch.name}>" vtype="required" placeholder="仓库在系统中的中文名称标识" />
+            </div>
+
+             <div class="form-field">
+                    <span class="form-field-label"><em class="c-red">*</em>仓库编号：</span>
+                    <input class="form-input" name="branch_bn" id="branch_bn" value="<{$branch.branch_bn}>" vtype="code&&required" placeholder="仓库在系统中的编号" />
+            </div>
+
+            <div class="form-field">
+                <span class="form-field-label"><em class="c-red">*</em>库内存放点编号：</span>
+                <input class="form-input" name="storage_code" id="storage_code" value="<{$branch.storage_code}>" vtype="code&&required" placeholder="库内存放点编号" />
+            </div>
+
+             <div class="form-field">
+                <span class="form-field-label">截单时间：</span>
+                <{input type='select' name='cutoff_time_hour' value=$branch.cutoff_time_hour options=$conf_hours }>时:
+                <{input type='select' name='cutoff_time_minute' value=$branch.cutoff_time_minute options=$conf_minitue }>分
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">最晚出库时间：</span>
+                <{input type='select' name='latest_delivery_time_hour' value=$branch.latest_delivery_time_hour options=$conf_hours }>时:
+                <{input type='select' name='latest_delivery_time_minute' value=$branch.latest_delivery_time_minute options=$conf_minitue }>分
+            </div>
+            <div class="form-field">
+                <span class="form-field-label">仓库对应WMS：</span>
+                 <{foreach item=wms from=$wms_list}>
+                <input type="radio" class='wms_type' name="wms_id" id="wms_id" <{if $wms_disabled}>disabled<{/if}> value="<{$wms.wms_id}>" <{if $branch.wms_id == $wms.wms_id}>checked<{/if}> adapter=<{$wms.adapter}>>
+                <span <{if $branch.wms_id == $wms.wms_id}>class="shop-name"<{/if}> title="<{$wms.wms_name}>"><{$wms.wms_name|cut}></span>&nbsp;&nbsp;
+              <{/foreach}>
+            </div> 
+             <div class="form-field" id="selfattr">
+                <span class="form-field-label">仓库归属：</span>
+                <{input type='radio' name='owner' onclick="changeOwnerRdo()" value=$branch.owner|default:'1' options=$options.owner separator=' '}>
+            </div> 
+            <div class="form-field">
+                <span class="form-field-label">仓库类型：</span>
+                <{foreach item=item key=key from=$type}>
+                    <input type="radio" <{if $branch.branch_id}>disabled<{/if}> onclick="changeRdo('<{$key}>')" <{if $branch.type == $key || $branch.type == ''}>checked="checked"<{/if}> name="branch_type" <{if $branch_main_disabled}>disabled='disabled'<{/if}> id="branch_type" value="<{$key}>"><{$item}><{/foreach}>
+              
+                 
+            </div>
+
+            <div class="form-field" id="main_branch_Div">
+                <span class="form-field-label">请选择主仓库：</span>
+                <span id="main_branch_span"></span>
+                <span id="main_branch_select">
+                <select id='main_branch' name="main_branch" vtype="required">
+                    <{foreach from=$main_branch key=branch_id item=branch_name}>
+                        <option value="<{$branch_id}>" <{if $branch_id}>disabled<{/if}> <{if $branch_id == $branch.parent_id}>SELECTED<{/if}>><{$branch_name}></option>
+                    <{/foreach}>
+                </select>
+                </span>
+            </div>
+             <div class="form-field" >
+                <span class="form-field-label">权重：</span>
+               <input class="form-input" name="weight" value="<{$branch.weight|default:0}>" vtype="digits&&required" placeholder="优先级降序排" />
+                <p class="form-remark">数值越大表示优先级越高。如不填写,默认为0</p>
+             </div>
+
+            <div class="form-field" >
+                <span class="form-field-label">备注：</span>
+               <textarea class="form-input" name="memo" style="height: 100px" placeholder="对仓库附加的其它说明" vtype="alphanum"><{$branch.memo}></textarea>
+            </div>
+            <div class="form-field">
+
+                <span class="form-field-label">指定物流公司：</span>
+                <div class="form-checkbox">
+                <{foreach item=item_corp from=$corps}>
+                <label>
+                <input type="checkbox" name="corp_config[]" value="<{$item_corp.corp_id}>" <{if $item_corp.selected }>checked<{/if}> onchange="javascript:if(this.checked){this.getNext('span').addClass('shop-name');}else{this.getNext('span').removeClass('shop-name');}">
+                    <span><{$item_corp.name|cut}></span>
+                </label>
+              <{/foreach}>
+              </div>
+            </div>
+            <div class="form-field" >
+                <span class="form-field-label">货主编码：</span>
+                <input class="form-input" name="owner_code" value="<{$branch.owner_code}>" placeholder="货主编码" />
+            </div>
+
+            <div class="form-field">
+                <span class="form-field-label">纬度：</span>
+                <input class="form-input" name="latitude" value="<{$branch.latitude}>" placeholder="仓库的纬度坐标" />
+            </div>
+
+            <div class="form-field">
+                <span class="form-field-label">经度：</span>
+                <input class="form-input" name="longitude" value="<{$branch.longitude}>" placeholder="仓库的经度坐标" />
+            </div>
+    </div>
+
+    </div>
+
+    <div class="form-layout-block" id="platform-ref">
+        <div class="form-layout-fields form-layout-fields-column">
+            <div class="form-field">
+            <span class="form-field-label">所属平台：</span>
+            <select id='platform' name="platform">
+                <option value="" >请选择所属平台</option>
+                <{foreach from=$platform_list key=platform_type item=platform_name}>
+                <option value="<{$platform_type}>"  <{if $platform_type == $branch.platform}>SELECTED<{/if}>><{$platform_name}></option>
+                <{/foreach}>
+            </select>
+            </div>   
+        </div>        
+
+    </div>
+     <div class="form-layout-block">
+        <div class="form-layout-fields form-layout-fields-column">
+            <div class="form-field">
+            <span class="form-field-label">供货店铺：</span>
+             <div class="form-checkbox">
+            <{foreach item=item from=$shop}>
+                <label>
+                <input type="checkbox" name="shop_config[]" id="shop" value="<{$item.shop_bn}>" <{if is_array($shop_bns) && in_array($item.shop_bn , $shop_bns,true) }>checked<{/if}> onchange="javascript:if(this.checked){this.getNext('span').addClass('shop-name');}else{this.getNext('span').removeClass('shop-name');}">
+                <span <{if is_array($shop_bns) && in_array($item.shop_bn , $shop_bns,true) }>class="shop-name"<{/if}> title="<{$item.name}>"><{$item.name|cut}></span>&nbsp;&nbsp;
+                </label>
+            <{/foreach}>
+            </div>
+            </div>   
+
+            <div class="form-field">
+                <span class="form-field-label">仓库属性：</span>
+                <input name="attr" type="radio" value="true" id="up" <{if $branch.attr=='true'}>checked="checked" <{/if}>/>线上 
+                <input name="attr" type="radio" value="false" id='down' <{if $branch.attr=='false' || $branch.attr==''}>checked="checked" <{/if}>/>线下
+            </div> 
+            <div class="form-field">
+                <span class="form-field-label">发货属性：</span>
+                <input type="radio" name="is_deliv_branch" id="is_deliv_branch" value="true" <{if $branch.is_deliv_branch=='true'}>checked="checked" <{/if}>/>发货仓库
+                <input type="radio" name="is_deliv_branch" id="not_deliv_branch" value="false" <{if $branch.is_deliv_branch !='true' }>checked="checked" <{/if}>/>备货仓库
+
+            </div> 
+            
+             <div class="form-field">
+                <span class="form-field-label">配送时效：</span>
+               
+                <input class="form-input" name="logistics_limit_time" value="<{$branch.logistics_limit_time}>" placeholder="天" />天
+                <p class="form-remark">指定仓库备货出库后，物流快递必须在最晚几日后送达客户签收，不然算作配送超时</p>
+            </div> 
+        </div>        
+
+    </div>
+     <div class="form-layout-block">
+        <div class="form-layout-fields form-layout-fields-column">
+
+             <div class="form-field">
+                    <span class="form-field-label"><em class="c-red">*</em>联系人姓名：</span>
+                    <input class="form-input" name="uname" value="<{$branch.uname}>" vtype="alphanum&&required" placeholder="仓库负责人的姓名" />
+                </div>
+
+            <div class="form-field">
+                <span class="form-field-label"><em class="c-red">*</em>性别：</span>
+                <div class="form-radios">
+                    <{input type="radio" name="sex" options=['male'=>'男','female'=>'女'] value=$branch.sex|default:"male"}>
+                </div>
+            </div>
+
+             <div class="form-field">
+                <span class="form-field-label"><em class="c-red">*</em>地区：</span>
+                <{input type='region' app='eccommon' name="area" value=$branch.area required="true"}>
+            </div>
+
+            <div class="form-field">
+                <span class="form-field-label"><em class="c-red">*</em>地址：</span>
+                <input class="form-input" name="address" value="<{$branch.address}>" placeholder="仓库所在城市的详细地址" />
+            </div>
+
+            <div class="form-field">
+                <span class="form-field-label">邮编：</span>
+                <input class="form-input" name="zip" value="<{$branch.zip}>" vtype="digits" placeholder="仓库所在城市的详细地址" />
+            </div>
+
+            <div class="form-field">
+                <span class="form-field-label">电话：</span>
+                <input class="form-input" name="phone" value="<{$branch.phone}>" placeholder="仓库的固定电话" />
+            </div>
+
+            <div class="form-field">
+                <span class="form-field-label">手机：</span>
+                <input class="form-input" name="mobile" value="<{$branch.mobile}>" vtype="number" placeholder="仓库负责人的移动联系方式" />
+            </div>
+        </div>
+    </div>  
+    
+    <!-- 扩展字段 -->
+    <{if $customcols}>
+    <div class="form-layout-block">
+        <div class="form-layout-fields form-layout-fields-column">
+            <{foreach from=$customcols item=customcol}>
+            <div class="form-field">
+                <span class="form-field-label"><{$customcol.col_name}>：</span>
+                <input class="form-input" type="text" name="props[<{$customcol.col_key}>]" value="<{$customcol.col_value}>" size="60" placeholder="请输入<{$customcol.col_name}>"/>
+            </div>
+            <{/foreach}>
+        </div>
+    </div>
+    <{/if}>
+
+
+     <div class="table-action">
+        <{button label="提交" class="btn-primary" type="submit" name="submit" id="btn-branch"}>
+        <{button label="返回" class="btn-primary" type="button" id="btn-back"}>
+    </div>          
+    </form>
+</div>
+
+
+<script>
+$('btn-back').addEvent('click', function(){
+    location.href=window.frameElement.src;
+});
+
+$ES('input[name="is_deliv_branch"]').addEvent('click',function(){
+    if (this.get('value')=='true')
+    {
+        alert('设置发货属性为发货仓库后，该仓库将为前端提供发货服务!');
+    }else{
+        alert('设置发货属性为备货仓库后，该仓库将不提供发货服务，请谨慎使用!');
+    }
+});
+
+
+$ES('input[name="attr"]').addEvent('click',function(){
+    if(this.value=='true'){
+        if ($defined($ES('input[name="shop_config[]"]')))
+        {
+            $ES('input[name="shop_config[]"]').set('disabled',false);
+        }
+
+        alert('线下仓改成线上以后，该仓库库存在可售库存之内，并且订单拆分的时候将会显示该仓库');
+    }else{
+        if ($defined($ES('input[name="shop_config[]"]')))
+        {
+             $ES('input[name="shop_config[]"]').set('disabled',true);
+             $ES('input[name="shop_config[]"]').set('checked',false);
+             $ES('input[name="shop_config[]"]').getNext('span').removeClass('shop-name');
+        }
+
+        alert('线上仓改成线下以后，该仓库库存不在可售库存之内，并且订单拆分的时候将不显示该仓库');
+    }
+});
+if ($E('input[name="attr"]:checked').value == 'false')
+{  
+    if ($defined($ES('input[name="shop_config[]"]')))
+    {
+         $ES('input[name="shop_config[]"]').set('disabled',true);
+         $ES('input[name="shop_config[]"]').set('checked',false);
+         $ES('input[name="shop_config[]"]').getNext('span').removeClass('shop-name');
+    }
+}
+
+
+window.addEvent('domready', function(){
+  
+
+    $E('input[name=owner]:checked').fireEvent('click',{stop:$empty});
+})
+$('main_branch_Div').setStyle('display','none');
+<{if $branch.type == 'aftersale' || $branch.type == 'damaged'}>
+    $('main_branch_Div').setStyle('display','');
+    $('up').set('disabled','disabled');
+    $('down').set('disabled','disabled');
+    $('down').set('checked','checked');
+    $('is_deliv_branch').set('disabled','disabled');
+    $('not_deliv_branch').set('disabled','disabled');
+    $('not_deliv_branch').set('checked','checked');
+    $$('input[name^=shop_config]').set('disabled','disabled');
+    $$('input[name=owner]').set('disabled','disabled');
+
+<{/if}>
+
+<{if $branch.type == 'main' || $branch.type == ''}>
+    $('branch_type').set('checked','checked');
+    <{if $branch.attr == 'false'}>
+        $$('input[name^=shop_config]').set('disabled','disabled');
+    <{/if}>
+<{/if}>
+
+
+var changeRdo = function (value){
+    if(value=='aftersale' || value=='damaged'){
+        $('main_branch_Div').setStyle('display','');
+        $('up').set('disabled','disabled');
+        $('down').set('disabled','disabled');
+        $('down').set('checked','checked');
+        $('is_deliv_branch').set('disabled','disabled');
+        $('not_deliv_branch').set('disabled','disabled');
+        $('not_deliv_branch').set('checked','checked');
+        $$('input[name^=shop_config]').set('disabled','disabled');
+
+
+    } else {
+        $('main_branch_Div').setStyle('display','none');
+        $('up').set('disabled','');
+        $('down').set('disabled','');
+        $('down').set('checked','checked');
+        $('is_deliv_branch').set('disabled','');
+        $('not_deliv_branch').set('disabled','');
+        $('not_deliv_branch').set('checked','checked');
+        $$('input[name^=shop_config]').set('disabled','disabled');
+        
+    }
+}
+
+$$('input[name=branch_type]').addEvent('click', function(e){
+    var branch_bn = $('branch_bn').value;
+    var branch_type = this.get('value');
+    var wms_id = $ES("input[name='wms_id']:checked").get('value');
+    if(!$E("input[name='wms_id']:checked")) {
+        alert('未选择WMS仓储');
+        return;
+    }
+    if (branch_type == 'main' || branch_type == 'agentsale')
+    {
+        $('main_branch_Div').setStyle('display','none');
+        $('btn-branch').setStyle('display','');
+       
+    }else{
+        $('main_branch_Div').setStyle('display','');
+        show_branch_type(this.get('value'),branch_bn,wms_id);
+    }
+});
+var wms_id = $ES("input[name='wms_id']:checked").get('value');
+<{if $branch.type == 'damaged'}>
+    show_branch_type('damaged','<{$branch.branch_bn}>',wms_id);
+<{/if}>
+
+
+
+if ($E("input[name='branch_type']:checked").get('value') == 'main') {
+    changeOwnerRdo();
+}
+function changeOwnerRdo(){
+    var owner = $E("input[name='owner']:checked").get('value');
+
+    
+    if (owner == 3) {
+        $('platform-ref').show();
+    }else{
+        $('platform-ref').hide();
+    }
+
+}
+
+function show_branch_type(branch_type,branch_bn,wms_id){
+    W.page('index.php?app=ome&ctl=admin_branch&act=get_branch_type&p[0]=' + branch_type + '&p[1]=' + branch_bn+'&p[2]='+wms_id, {
+        update: $('main_branch_select'),
+        onComplete: function(e) {
+            if(e == 'false'){
+               $('main_branch_select').setStyle('display','none');
+               $('main_branch_span').setStyle('display','');
+               $('main_branch_span').set('html','已没有可选择的主仓，请添加新的主仓！');
+               $('btn-branch').setStyle('display','none');
+            }else{
+               $('main_branch_select').setStyle('display','');
+               $('main_branch_span').setStyle('display','none');
+               $('btn-branch').setStyle('display','');
+            }
+
+        }
+    });
+}
+
+$$('.wms_type').addEvent('click',function(e){
+var wms_id = $ES("input[name='wms_id']:checked").get('value');
+var adapter = this.get('adapter');
+
+var branch_bn = $('branch_bn').value;
+var branch_type = $ES("input[name='branch_type']:checked").get('value');
+$$('.wms_type').each(function(item){
+    if(item.checked){
+        item.getNext('span').addClass('shop-name');
+    }else{
+        item.getNext('span').removeClass('shop-name');
+    }
+});
+if (branch_type =='damaged' || branch_type =='aftersale')
+{
+    show_branch_type(this.get('value'),branch_bn,wms_id);
+}
+    		
+});
+
+
+</script>

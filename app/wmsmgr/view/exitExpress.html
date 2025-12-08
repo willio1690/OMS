@@ -1,0 +1,38 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<div class="tableform">
+<div class="division">
+<form method="post" action="index.php?<{$env.server.QUERY_STRING}>" id="terminal">
+<input type="hidden" name="wms_id" value="<{$wms_id}>">
+      <table width="100%" cellspacing="0" cellpadding="0" border="0" >
+        <tbody>
+        <{foreach from=$sys_express_corp item=v}>
+       <tr>
+          <th> <{$v.name}>(<{$v.type}>)</th>
+          <td><{input type="text" size="32" name="wms_express_bn[{$v.corp_id}]" value=$wmsBn[$v.corp_id]}>
+            <{input type="hidden" size="32" name="sys_express_bn[{$v.corp_id}]" value=$v.type}>
+          <{help}><{t}>WMS物流公司编号<{/t}><{/help}>
+          </td>
+        </tr>
+        <{/foreach}>
+        </tbody>
+      </table>
+<div class="table-action">
+<{button class="btn-primary" type="submit" id="saveterminal" name="submit" label="保存"}>
+</div>
+</form>
+</div>
+</div>
+
+<script>
+$('terminal').store('target',{
+    onRequest:function(){
+    },
+    onComplete:function(jsontext){
+      finderGroup['<{$env.get.finder_id}>'].refresh.delay(400,finderGroup['<{$env.get.finder_id}>']);
+    }
+});
+</script>

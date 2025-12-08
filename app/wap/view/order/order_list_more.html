@@ -1,0 +1,155 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<{if $dataList}>
+<{foreach from=$dataList item=item}>
+<div class="list-item">
+  <div class="order-item-container flex-row">
+      
+    <div class="order-content flex-col" style="flex: 1;">
+      <div class="text-wrapper_5 flex-row justify-between">
+        <span class="text_11">订单号：</span>
+        <span class="text_12"><{$item.order_bn}>
+          <{if $item.order_info.is_change_order}>
+            <span style="color: #FF0000">换货</span>
+          <{/if}>
+        </span>
+        <span class="status-order"><{$item.dly_status}></span>
+        <{if $item.is_history == 'true'}>
+          <span class="status-order">历史</span>
+        <{/if}>
+      </div>
+      <div class="text-wrapper_5 flex-row justify-between">
+        <span class="text_11">门店：</span>
+        <span class="text_12"><{$item.shop_info.store_name}></span>
+      </div>
+      <div class="text-wrapper_5 flex-row justify-between">
+        <span class="text_11">渠道：</span>
+        <span class="text_12"><{$item.shop_type_name}></span>
+        <{if $item.order_info.order_over_time}>
+        <span class="text_13" style="color: #FF0000"><{$item.order_info.order_over_time}></span>
+        <{elseif $item.order_info.deadline}>
+        <span class="text_13 countdown" data-deadline="<{$item.order_info.deadline}>"></span>
+        <{/if}>
+      </div>
+      <div class="text-wrapper_5 flex-row justify-between">
+        <span class="text_11">发货单号：</span>
+        <span class="text_12"><{$item.outer_delivery_bn}></span>
+      </div>
+      <{if $item.delivery_bill.logi_no}>
+      <div class="text-wrapper_5 flex-row justify-between">
+        <span class="text_11">快递单号：</span>
+        <span class="text_12"><{$item.delivery_bill.logi_no}></span>
+      </div>
+      <{/if}>
+      <div class="text-wrapper_5 flex-row justify-between">
+        <span class="text_11">下单时间：</span>
+        <span class="text_12"><{$item.order_info.createtime|date:"Y-m-d H:i:s"}></span>
+      </div>
+      <div class="text-wrapper_5 flex-row pr">
+        <span class="text_11">收件人：</span>
+        <span class="text_26 sensitive-text flex-shrink-1" data-decryptAddress="false" data-orderid="<{$item.order_info.order_id}>" data-masked-copy="<{$item.ship_name}>（<{$item.ship_mobile}>） <{$item.ship_addr}> " data-raw-copy="<{$item.ship_name}>（<{$item.ship_mobile}>） <{$item.ship_addr}> "  data-raw="<{$item.ship_name}>（<{$item.ship_mobile}>）" data-masked="<{$item.ship_name}>（<{$item.ship_mobile}>）"><{$item.ship_name}>（<{$item.ship_mobile}>）</span>
+        <span class="text_27 copy-btn" data-copy="<{$item.ship_name}>（<{$item.ship_mobile}>） <{$item.ship_addr}>"></span>
+        <div class="toggle-visibility label_1">
+          <i class="eye-icon hidden"></i>
+        </div>
+      </div>
+      <div class="text-wrapper_5 flex-row">
+        <span class="text_11">收货地址：</span>
+        <span class="text_26 sensitive-text flex-shrink-1" data-raw="<{$item.ship_addr}>" data-masked="<{$item.ship_addr}>"><{$item.ship_addr}></span>
+        <!--
+        <span class="text_27 copy-btn" data-copy="<{$item.ship_addr}>">复制</span>
+        -->
+      </div>
+      <{if $item.order_info.custom_remark_text}>
+      <div class="text-wrapper_5 flex-row">
+        <span class="text_11">买家备注：</span>
+        <div class="flex-row align-center justify-between" style="flex: 1;">
+          <span class="remark-content"><{$item.order_info.custom_remark_text}></span>
+          <span class="arrow-icon"></span>
+        </div>
+      </div>
+      <{/if}>
+
+      <{if $item.order_info.order_remark_text}>
+      <div class="text-wrapper_5 flex-row">
+        <span class="text_11">客服备注：</span>
+        <div class="flex-row align-center justify-between" style="flex: 1;">
+          <span class="remark-content"><{$item.order_info.order_remark_text}></span>
+          <span class="arrow-icon"></span>
+        </div>
+      </div>
+      <{/if}>
+      <div class="hr"></div>
+    </div>
+  </div>
+  <!-- goodsInfo -->
+
+  <{if $item.delivery_items}>
+  <{foreach from=$item.delivery_items item=dly_item}>
+  <div class="section_6 flex-row">
+    <{if $dly_item.default_img_url}>
+    <img class="image_2" referrerpolicy="no-referrer"
+      src="<{$dly_item.default_img_url}>" />
+    <{else}>
+    <img class="image_2" referrerpolicy="no-referrer"
+      src="<{$env.app.res_url}>/img/nopic.jpg" />
+    <{/if}>
+    <div class="text-group_1 flex-col">
+      <div class="status-info"> <span class="text_28 flex-shrink-1"><{$dly_item.product_name}></span> </div>
+      <span class="text_29">商户货号：<{$dly_item.bn}></span>
+      <span class="text_29">子订单号：<{$dly_item.oid}></span>
+      <span class="text_30"><{$dly_item.number}><{$dly_item.unit}>；<{$dly_item.product_attr}></span>
+    </div>
+  </div>
+  
+  <{/foreach}>
+  <!-- total -->
+  <!--
+  <div class="text-wrapper_11 flex-row">
+    <span class="text_36">总价：</span>
+    <span class="text_37">￥<{$item.total_amount}></span>
+  </div>
+  -->
+  <{/if}>
+  
+    
+ 
+  <div class="section_7 flex-row justify-end">
+     <{if $item.is_received == 2 && $item.signimage_attachment_url}>
+     <div class="text-wrapper_12 flex-col">
+      <span class="text_38" data-images="<{$item.signimage_attachment_url|escape:'html'}>" onclick="showimgFromData(this)">查看签收照片</span>
+    </div>
+      <{/if}>
+      <{if $item.print_status == 1 && $item.confirm == 1 && $item.status != 1}>
+      <div class="text-wrapper_12 flex-col">
+        <span class="text_38" onclick="if(confirm('确定重新打印吗？')){window.location.href='<{$delivery_link.onlineDelivery}>?delivery_id=<{$item.delivery_id}>&action=reprint'}">重新打印</span>
+      </div>
+      <{/if}>
+    <{if $item.status == 0 && $item.confirm == 3 && $item.process_status == 0}>
+    
+    <div class="text-wrapper_12 flex-col">
+      <span class="text_38" onclick="window.location.href='<{$delivery_link.onlineDelivery}>?delivery_id=<{$item.delivery_id}>'">打印配货单</span>
+    </div>
+   
+   <{elseif $item.status == 0 && $item.confirm == 1}>
+   
+    <div class="text-wrapper_12 flex-col">
+      <span class="text_38" onclick="confirmDelivery('<{$item.delivery_id}>')">确认发货</span>
+    </div>
+     
+   <{elseif $item.status == 3 && $item.process_status == 7 && $item.is_received==1}>
+    <div class="text-wrapper_12 flex-col">
+      <span class="text_38" onclick="showRefuseModal('<{$item.delivery_id}>','new')">签收配送单上传</span>
+    </div>
+    <{elseif $item.status == 3 && $item.process_status == 7 && $item.is_received==2 && $item.count_signimage<3}>
+    <div class="text-wrapper_12 flex-col">
+      <span class="text_38" onclick="showRefuseModal('<{$item.delivery_id}>','add')">追加配送单上传</span>
+    </div>
+    <{/if}>
+  </div>
+</div>
+<{/foreach}>
+<{/if}>

@@ -1,0 +1,37 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<form action="index.php?app=ome&ctl=admin_reship&act=do_create_change_order&p[0]=<{$reship_id}>&finder_id=<{$env.get.finder_id}>" method="post" id="add_link">
+<div>确定要生成换货订单吗?<{$reship_detail.reship_bn}></div>
+</form>
+    <div class="table-action">
+      <{button label="确定" id="btn-submit" class="btn-primary"}> &nbsp; &nbsp;
+      <{button label="关闭" class="btn-secondary" isCloseDialogBtn="true"}>
+    </div>
+<script>
+
+$('btn-submit').addEvent('click',function(e){
+  $('btn-submit').set('disabled',true);
+    new Request.JSON({url:$('add_link').get('action'),
+        method:'post',
+
+        onSuccess:function(json){
+
+            alert(json.msg);
+            if($('add_link').getParent('.dialog')){
+                window.finderGroup['<{$env.get.finder_id}>'].refresh();
+                $('add_link').getParent('.dialog').retrieve('instance').close();
+            }
+        }
+      }).send();
+
+
+});
+
+
+
+
+</script>
+

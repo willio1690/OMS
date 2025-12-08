@@ -1,0 +1,133 @@
+<!--
+  Copyright © ShopeX （http://www.shopex.cn）. All rights reserved.
+  See LICENSE file for license details.
+-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>订单管理</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		/* .flex-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			flex-flow: row wrap;
+		} */
+		.order-grid {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 20px;
+			padding: 20px;
+		}
+
+		.order-item {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			position: relative;
+		}
+
+		.order-icon {
+			width: 37px;
+			height: 37px;
+			position: relative;
+		}
+
+		.order-icon img {
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+		}
+
+		.badge {
+			position: absolute;
+			top: -8px;
+			right: -8px;
+			background-color: #ff0000;
+			color: white;
+			border-radius: 9px;
+			min-width: 18px;
+			height: 18px;
+			line-height: 18px;
+			text-align: center;
+			font-size: 12px;
+			padding: 0 4px;
+		}
+
+		.order-text {
+			margin-top: 8px;
+			font-size: 14px;
+			color: #333;
+			white-space: nowrap;
+		}
+
+		a {
+			text-decoration: none;
+			color: inherit;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="order-grid">
+		<a href="" class="order-item">
+			<div class="order-icon">
+				<img src="../../../wap/statics/img/icon-1.png" alt="订单列表">
+				<span class="badge">100</span>
+			</div>
+			<span class="order-text">订单列表</span>
+		</a>
+
+		<a href="" class="order-item">
+			<div class="order-icon">
+				<img src="../../../wap/statics/img/icon-2.png" alt="待发货">
+				<span class="badge">15</span>
+			</div>
+			<span class="order-text">待发货</span>
+		</a>
+
+		<a href="" class="order-item">
+			<div class="order-icon">
+				<img src="../../../wap/statics/img/icon-3.png" alt="已发货">
+				<span class="badge">8</span>
+			</div>
+			<span class="order-text">已发货</span>
+		</a>
+
+		<a href="" class="order-item">
+			<div class="order-icon">
+				<img src="../../../wap/statics/img/icon-0.png" alt="仅退款申请">
+				<span class="badge">2</span>
+			</div>
+			<span class="order-text">仅退款申请</span>
+		</a>
+
+		<a href="" class="order-item">
+			<div class="order-icon">
+				<img src="../../../wap/statics/img/icon-5.png" alt="售后申请">
+				<span class="badge">2</span>
+			</div>
+			<span class="order-text">售后申请</span>
+		</a>
+
+		<a href="" class="order-item">
+			<div class="order-icon">
+				<img src="../../../wap/statics/img/icon-5.png" alt="已退款">
+				<span class="badge">2</span>
+			</div>
+			<span class="order-text">已退款</span>
+		</a>
+	</div>
+
+</body>
+
+</html>
