@@ -123,7 +123,7 @@ ONEX OMS 是由 [商派 ShopeX](https://www.shopex.cn) 开发并开源的企业�
 ---
 
 ## 📞 支持
-+ **文档中心**：[https://op.shopex.cn/doc_oms_dev/100.rule/1.code.html)
++ **文档中心**：[https://op.shopex.cn/doc_oms_dev/100.rule/1.code.html](https://op.shopex.cn/doc_oms_dev/100.rule/1.code.html)
 + **问题反馈**：[GitHub Issues](https://github.com/ShopeX/ONEX-OMS/issues)
 + **开发指南**：[PHP编码规范](https://op.shopex.cn/doc_oms_dev/100.rule/1.code.html)
 
