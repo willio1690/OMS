@@ -105,7 +105,7 @@ class erpapi_shop_response_process_reissue
 
         $resultData = array(
             'bizOrderId' => $sdf['order_bn'], // 主订单id
-            'shippingAppkey' => '商派智能运营中台', // 发货软件
+            'shippingAppkey' => '商派订单管理系统', // 发货软件
             'shippingList' => $shippingList, // 发货单据列表
         );
 
